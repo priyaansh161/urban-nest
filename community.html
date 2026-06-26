@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Nest Edit — Urban Nest</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gold: #B8956A;
+      --white: #FAFAF8;
+      --black: #111110;
+      --grey: #6B6B68;
+      --grey-light: #F4F3EF;
+      --border: #E0DFD9;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--black); overflow-x: hidden; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 18px 48px; background: rgba(250,250,248,0.96); border-bottom: 0.5px solid var(--border); backdrop-filter: blur(8px); }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo-icon { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; }
+    .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-logo-text { font-family: 'Bodoni Moda', serif; font-size: 17px; letter-spacing: 0.16em; color: var(--black); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { font-size: 11px; letter-spacing: 0.14em; color: var(--grey); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+    /* PAGE HERO */
+    .page-hero {
+      padding: 140px 48px 64px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--black);
+      position: relative; overflow: hidden;
+    }
+    .page-hero-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(250,250,248,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(250,250,248,0.03) 1px, transparent 1px);
+      background-size: 80px 80px; pointer-events: none;
+    }
+    .hero-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; }
+    .page-tag { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 20px; }
+    .page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 400; line-height: 1.0; color: #FAFAF8; }
+    .page-title em { font-style: italic; color: var(--gold); }
+    .page-sub { font-size: 14px; color: rgba(250,250,248,0.4); line-height: 1.9; max-width: 440px; align-self: end; padding-bottom: 8px; }
+
+    /* FILTERS */
+    .filters {
+      padding: 24px 48px;
+      border-bottom: 0.5px solid var(--border);
+      display: flex; gap: 8px; align-items: center;
+      max-width: 1280px; margin: 0 auto;
+    }
+    .filter-label { font-size: 10px; letter-spacing: 0.2em; color: var(--grey); margin-right: 8px; }
+    .filter-btn {
+      font-size: 11px; letter-spacing: 0.1em; color: var(--grey);
+      padding: 6px 16px; border: 0.5px solid var(--border);
+      background: transparent; cursor: pointer; transition: all 0.2s;
+      border-radius: 20px;
+    }
+    .filter-btn:hover, .filter-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+
+    /* FEATURED ARTICLE */
+    .featured {
+      padding: 64px 48px 0;
+      max-width: 1280px; margin: 0 auto;
+    }
+    .featured-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 24px; }
+    .featured-card {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 0.5px solid var(--border); overflow: hidden;
+      text-decoration: none; color: inherit;
+      transition: border-color 0.3s;
+    }
+    .featured-card:hover { border-color: var(--gold); }
+    .featured-img {
+      height: 420px; overflow: hidden; position: relative;
+      background: var(--grey-light);
+    }
+    .featured-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; filter: brightness(0.9); }
+    .featured-card:hover .featured-img img { transform: scale(1.04); }
+    .featured-body { padding: 48px; display: flex; flex-direction: column; justify-content: space-between; }
+    .featured-meta { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+    .featured-cat { font-size: 10px; letter-spacing: 0.2em; color: var(--gold); }
+    .featured-date { font-size: 11px; color: var(--grey); }
+    .featured-title { font-family: 'Bodoni Moda', serif; font-size: clamp(24px, 3vw, 36px); font-weight: 400; line-height: 1.2; color: var(--black); margin-bottom: 20px; }
+    .featured-title em { font-style: italic; }
+    .featured-excerpt { font-size: 14px; color: var(--grey); line-height: 1.9; margin-bottom: 32px; }
+    .featured-author { display: flex; align-items: center; gap: 12px; }
+    .author-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--grey-light); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .author-name { font-size: 12px; color: var(--black); font-weight: 500; }
+    .author-role { font-size: 11px; color: var(--grey); }
+    .read-more { display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: 0.15em; color: var(--gold); transition: gap 0.2s; }
+    .featured-card:hover .read-more { gap: 16px; }
+
+    /* ARTICLES GRID */
+    .articles-section { padding: 64px 48px 100px; max-width: 1280px; margin: 0 auto; }
+    .articles-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 32px; }
+    .articles-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); }
+
+    .articles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: var(--border); }
+
+    .article-card {
+      background: var(--white); padding: 0;
+      text-decoration: none; color: inherit;
+      display: flex; flex-direction: column;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .article-card:hover { background: var(--grey-light); }
+
+    .article-img {
+      width: 100%; height: 220px;
+      overflow: hidden; position: relative;
+      background: var(--grey-light);
+    }
+    .article-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; filter: brightness(0.92); }
+    .article-card:hover .article-img img { transform: scale(1.04); }
+
+    .article-body { padding: 24px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .article-meta { display: flex; align-items: center; gap: 12px; }
+    .article-cat { font-size: 9px; letter-spacing: 0.2em; color: var(--gold); }
+    .article-date { font-size: 10px; color: var(--grey); }
+    .article-title { font-family: 'Bodoni Moda', serif; font-size: 20px; font-weight: 400; line-height: 1.25; color: var(--black); }
+    .article-title em { font-style: italic; }
+    .article-excerpt { font-size: 13px; color: var(--grey); line-height: 1.8; flex: 1; }
+    .article-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 0.5px solid var(--border); margin-top: auto; }
+    .article-author { font-size: 11px; color: var(--grey); }
+    .article-read { font-size: 10px; letter-spacing: 0.12em; color: var(--gold); }
+
+    /* COMMENT SECTION */
+    .comments-section {
+      border-top: 0.5px solid var(--border);
+      padding: 64px 48px 80px;
+      background: var(--grey-light);
+    }
+    .comments-inner { max-width: 720px; margin: 0 auto; }
+    .comments-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 8px; }
+    .comments-title { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; color: var(--black); margin-bottom: 32px; }
+    .comments-title em { font-style: italic; }
+
+    /* Comment input */
+    .comment-form { margin-bottom: 48px; }
+    .comment-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .comment-input {
+      width: 100%; padding: 12px 16px;
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      background: var(--white); border: 0.5px solid var(--border);
+      color: var(--black); outline: none; transition: border-color 0.2s;
+    }
+    .comment-input:focus { border-color: var(--gold); }
+    .comment-input::placeholder { color: var(--grey); }
+    textarea.comment-input { resize: vertical; min-height: 100px; }
+    .comment-submit {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 28px; background: var(--black); color: var(--white);
+      font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
+      border: none; cursor: pointer; transition: background 0.2s; margin-top: 12px;
+    }
+    .comment-submit:hover { background: var(--gold); }
+
+    /* Comments list */
+    .comments-list { display: flex; flex-direction: column; gap: 0; }
+    .comment {
+      padding: 24px 0; border-bottom: 0.5px solid var(--border);
+      display: grid; grid-template-columns: 44px 1fr; gap: 16px;
+    }
+    .comment:last-child { border-bottom: none; }
+    .comment-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--black); color: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bodoni Moda', serif; font-size: 16px;
+      flex-shrink: 0;
+    }
+    .comment-name { font-size: 13px; font-weight: 500; color: var(--black); margin-bottom: 4px; }
+    .comment-date { font-size: 10px; color: var(--grey); margin-bottom: 10px; letter-spacing: 0.06em; }
+    .comment-text { font-size: 14px; color: var(--grey); line-height: 1.8; }
+    .comment-like {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--grey); margin-top: 10px;
+      background: none; border: none; cursor: pointer; transition: color 0.2s; padding: 0;
+    }
+    .comment-like:hover { color: var(--gold); }
+
+    /* NEWSLETTER */
+    .newsletter {
+      background: var(--black); padding: 80px 48px;
+      text-align: center;
+    }
+    .newsletter-tag { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 16px; }
+    .newsletter-title { font-family: 'Bodoni Moda', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 400; color: #FAFAF8; margin-bottom: 12px; }
+    .newsletter-title em { font-style: italic; color: var(--gold); }
+    .newsletter-sub { font-size: 14px; color: rgba(250,250,248,0.4); margin-bottom: 36px; }
+    .newsletter-form { display: flex; gap: 0; max-width: 480px; margin: 0 auto; }
+    .newsletter-input { flex: 1; padding: 13px 20px; background: rgba(250,250,248,0.06); border: 0.5px solid rgba(250,250,248,0.15); color: #FAFAF8; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; }
+    .newsletter-input::placeholder { color: rgba(250,250,248,0.3); }
+    .newsletter-btn { padding: 13px 24px; background: var(--gold); color: var(--black); font-size: 11px; font-weight: 500; letter-spacing: 0.15em; border: none; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
+    .newsletter-btn:hover { opacity: 0.85; }
+
+    footer { padding: 32px 48px; background: var(--black); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid rgba(250,250,248,0.06); }
+    .footer-left { display: flex; align-items: center; gap: 12px; }
+    .footer-icon { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; }
+    .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.18em; color: rgba(250,250,248,0.3); }
+    .footer-note { font-size: 11px; color: rgba(250,250,248,0.18); letter-spacing: 0.06em; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+      <span class="nav-logo-text">URBAN NEST</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#rooms">Spaces</a></li>
+      <li><a href="community.html" class="active">The Nest Edit</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="page-hero-grid"></div>
+    <div class="hero-inner">
+      <div>
+        <div class="page-tag">STORIES · TRENDS · COMMUNITY</div>
+        <h1 class="page-title">The Nest<br/><em>Edit.</em></h1>
+      </div>
+      <p class="page-sub">Ideas, inspiration, and the latest from the world of Indian home décor. Curated by Urban Nest. Discussed by you.</p>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div style="padding:24px 48px;border-bottom:0.5px solid var(--border);">
+    <div style="max-width:1280px;margin:0 auto;display:flex;gap:8px;align-items:center;">
+      <span style="font-size:10px;letter-spacing:0.2em;color:var(--grey);margin-right:8px;">FILTER</span>
+      <button class="filter-btn active" onclick="filterArticles('all', this)">All</button>
+      <button class="filter-btn" onclick="filterArticles('trends', this)">Trends</button>
+      <button class="filter-btn" onclick="filterArticles('tips', this)">Tips & Guides</button>
+      <button class="filter-btn" onclick="filterArticles('collection', this)">Collections</button>
+      <button class="filter-btn" onclick="filterArticles('inspiration', this)">Inspiration</button>
+    </div>
+  </div>
+
+  <!-- FEATURED -->
+  <div class="featured">
+    <div class="featured-label">EDITOR'S PICK</div>
+    <a href="#article-1" class="featured-card" onclick="openArticle('article-1'); return false;">
+      <div class="featured-img">
+        <img src="https://images.unsplash.com/photo-1584622781867-1b79ff7e0d21?w=800&q=80" alt="Indian bathroom decor trends"/>
+      </div>
+      <div class="featured-body">
+        <div>
+          <div class="featured-meta">
+            <span class="featured-cat">TRENDS</span>
+            <span class="featured-date">June 2025</span>
+          </div>
+          <h2 class="featured-title">Why Indian homes are finally embracing <em>the art of the small detail</em></h2>
+          <p class="featured-excerpt">The era of the statement chandelier is giving way to something more quietly radical — the rise of the curated everyday object. From Bengaluru to Bhopal, middle-class Indian homes are discovering that a well-chosen soap dispenser can transform a bathroom just as dramatically as a renovation.</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="featured-author">
+            <div class="author-avatar">U</div>
+            <div>
+              <div class="author-name">Urban Nest Editorial</div>
+              <div class="author-role">8 min read</div>
+            </div>
+          </div>
+          <span class="read-more">READ MORE →</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <!-- ARTICLES GRID -->
+  <div class="articles-section">
+    <div class="articles-header">
+      <div class="articles-label">LATEST FROM THE NEST</div>
+    </div>
+    <div class="articles-grid" id="articles-grid">
+
+      <div class="article-card" data-cat="tips" onclick="openArticle('article-2')">
+        <div class="article-img">
+          <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80" alt="Kitchen organisation"/>
+        </div>
+        <div class="article-body">
+          <div class="article-meta">
+            <span class="article-cat">TIPS & GUIDES</span>
+            <span class="article-date">May 2025</span>
+          </div>
+          <div class="article-title">5 kitchen accessories that make cooking feel <em>effortless</em></div>
+          <p class="article-excerpt">You don't need a modular kitchen to have a beautiful one. These five pieces will change the way your kitchen looks and feels.</p>
+          <div class="article-footer">
+            <span class="article-author">Urban Nest</span>
+            <span class="article-read">5 MIN READ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card" data-cat="inspiration" onclick="openArticle('article-3')">
+        <div class="article-img">
+          <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=600&q=80" alt="Bedroom decor India"/>
+        </div>
+        <div class="article-body">
+          <div class="article-meta">
+            <span class="article-cat">INSPIRATION</span>
+            <span class="article-date">April 2025</span>
+          </div>
+          <div class="article-title">The Indian bedroom, <em>reimagined</em></div>
+          <p class="article-excerpt">How a generation of young urban Indians is transforming their bedrooms from sleeping spaces into sanctuaries of personal expression.</p>
+          <div class="article-footer">
+            <span class="article-author">Urban Nest</span>
+            <span class="article-read">6 MIN READ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card" data-cat="trends" onclick="openArticle('article-4')">
+        <div class="article-img">
+          <img src="https://images.unsplash.com/photo-1567016432779-094069958ea5?w=600&q=80" alt="Home decor trends India 2025"/>
+        </div>
+        <div class="article-body">
+          <div class="article-meta">
+            <span class="article-cat">TRENDS</span>
+            <span class="article-date">March 2025</span>
+          </div>
+          <div class="article-title">The 7 home décor trends defining <em>India in 2025</em></div>
+          <p class="article-excerpt">From warm neutrals to handcrafted textures — the aesthetic shifts shaping how urban India is decorating its homes this year.</p>
+          <div class="article-footer">
+            <span class="article-author">Urban Nest</span>
+            <span class="article-read">7 MIN READ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card" data-cat="collection" onclick="openArticle('article-5')">
+        <div class="article-img">
+          <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&q=80" alt="Bathroom collection"/>
+        </div>
+        <div class="article-body">
+          <div class="article-meta">
+            <span class="article-cat">COLLECTIONS</span>
+            <span class="article-date">February 2025</span>
+          </div>
+          <div class="article-title">Build the perfect <em>bath collection</em> under ₹3,000</div>
+          <p class="article-excerpt">A complete guide to curating a cohesive, beautiful bathroom with just seven intentional pieces — all under ₹3,000 total.</p>
+          <div class="article-footer">
+            <span class="article-author">Urban Nest</span>
+            <span class="article-read">4 MIN READ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card" data-cat="tips" onclick="openArticle('article-6')">
+        <div class="article-img">
+          <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80" alt="Small apartment decor India"/>
+        </div>
+        <div class="article-body">
+          <div class="article-meta">
+            <span class="article-cat">TIPS & GUIDES</span>
+            <span class="article-date">January 2025</span>
+          </div>
+          <div class="article-title">Making a 1BHK feel like <em>a home, not a house</em></div>
+          <p class="article-excerpt">The compact urban Indian apartment has its own rules. Here's how to work with the space you have — not the space you wish you had.</p>
+          <div class="article-footer">
+            <span class="article-author">Urban Nest</span>
+            <span class="article-read">6 MIN READ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card" data-cat="inspiration" onclick="openArticle('article-7')">
+        <div class="article-img">
+          <img src="https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=600&q=80" alt="Affordable luxury India"/>
+        </div>
+        <div class="article-body">
+          <div class="article-meta">
+            <span class="article-cat">INSPIRATION</span>
+            <span class="article-date">December 2024</span>
+          </div>
+          <div class="article-title">Affordable luxury — <em>what it actually means</em></div>
+          <p class="article-excerpt">Luxury is not a price point. It is a feeling — the quiet pleasure of using something beautiful every single day. Here's how to find it.</p>
+          <div class="article-footer">
+            <span class="article-author">Urban Nest</span>
+            <span class="article-read">5 MIN READ</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COMMUNITY COMMENTS -->
+  <div class="comments-section">
+    <div class="comments-inner">
+      <div class="comments-label">THE COMMUNITY</div>
+      <h2 class="comments-title">What the Nest is <em>talking about</em></h2>
+
+      <div class="comment-form">
+        <div class="comment-input-row">
+          <input type="text" class="comment-input" placeholder="Your name" id="comment-name"/>
+          <input type="text" class="comment-input" placeholder="Your city" id="comment-city"/>
+        </div>
+        <textarea class="comment-input" placeholder="Share your thoughts on Indian home décor, a product you love, or a space you've transformed..." id="comment-text" style="width:100%"></textarea>
+        <button class="comment-submit" onclick="submitComment()">POST TO THE NEST →</button>
+      </div>
+
+      <div class="comments-list" id="comments-list">
+
+        <div class="comment">
+          <div class="comment-avatar">P</div>
+          <div>
+            <div class="comment-name">Priya M. <span style="font-size:10px;color:var(--grey);font-weight:400;">· Mumbai</span></div>
+            <div class="comment-date">June 12, 2025</div>
+            <p class="comment-text">I never thought a soap dispenser could make me feel good about my bathroom until I actually bought a nice one. It sounds silly but it genuinely changed how I feel about getting ready in the morning. Urban Nest is right — it really is the small things.</p>
+            <button class="comment-like" onclick="likeComment(this)">♡ <span>24</span></button>
+          </div>
+        </div>
+
+        <div class="comment">
+          <div class="comment-avatar">R</div>
+          <div>
+            <div class="comment-name">Rahul S. <span style="font-size:10px;color:var(--grey);font-weight:400;">· Bengaluru</span></div>
+            <div class="comment-date">May 28, 2025</div>
+            <p class="comment-text">The 3D bathroom experience on this website is genuinely the most useful thing I've ever used for home shopping. I could actually see how the waste basket would look next to the toilet before buying. More websites need to do this.</p>
+            <button class="comment-like" onclick="likeComment(this)">♡ <span>18</span></button>
+          </div>
+        </div>
+
+        <div class="comment">
+          <div class="comment-avatar">A</div>
+          <div>
+            <div class="comment-name">Aarav K. <span style="font-size:10px;color:var(--grey);font-weight:400;">· Delhi</span></div>
+            <div class="comment-date">April 15, 2025</div>
+            <p class="comment-text">Just moved into my first apartment and this has been my go-to for figuring out what I actually need vs what looks good in isolation. The curated approach is so much better than scrolling through 500 options on Amazon.</p>
+            <button class="comment-like" onclick="likeComment(this)">♡ <span>31</span></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="newsletter">
+    <div class="newsletter-tag">STAY IN THE LOOP</div>
+    <h2 class="newsletter-title">The Nest Edit,<br/><em>in your inbox.</em></h2>
+    <p class="newsletter-sub">New articles, décor guides, and curated finds — every two weeks.</p>
+    <div class="newsletter-form">
+      <input type="email" class="newsletter-input" placeholder="your@email.com"/>
+      <button class="newsletter-btn">SUBSCRIBE →</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+      <span class="footer-logo">URBAN NEST</span>
+    </div>
+    <div class="footer-note">© 2025 Urban Nest · All rights reserved</div>
+  </footer>
+
+  <script>
+    // Filter articles
+    function filterArticles(cat, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.article-card').forEach(card => {
+        if (cat === 'all' || card.dataset.cat === cat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // Open article placeholder
+    function openArticle(id) {
+      alert('Full article coming soon! For now, use this page to browse and discuss.');
+    }
+
+    // Submit comment
+    function submitComment() {
+      const name = document.getElementById('comment-name').value.trim();
+      const city = document.getElementById('comment-city').value.trim();
+      const text = document.getElementById('comment-text').value.trim();
+      if (!name || !text) { alert('Please enter your name and comment.'); return; }
+
+      const list = document.getElementById('comments-list');
+      const initial = name.charAt(0).toUpperCase();
+      const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const comment = document.createElement('div');
+      comment.className = 'comment';
+      comment.innerHTML = `
+        <div class="comment-avatar">${initial}</div>
+        <div>
+          <div class="comment-name">${name} <span style="font-size:10px;color:var(--grey);font-weight:400;">${city ? '· ' + city : ''}</span></div>
+          <div class="comment-date">${today}</div>
+          <p class="comment-text">${text}</p>
+          <button class="comment-like" onclick="likeComment(this)">♡ <span>0</span></button>
+        </div>
+      `;
+      list.insertBefore(comment, list.firstChild);
+
+      document.getElementById('comment-name').value = '';
+      document.getElementById('comment-city').value = '';
+      document.getElementById('comment-text').value = '';
+    }
+
+    // Like a comment
+    function likeComment(btn) {
+      const span = btn.querySelector('span');
+      const count = parseInt(span.textContent);
+      span.textContent = count + 1;
+      btn.style.color = 'var(--gold)';
+      btn.innerHTML = '♥ <span>' + (count + 1) + '</span>';
+    }
+  </script>
+
+</body>
+</html>

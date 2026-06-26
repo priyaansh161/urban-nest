@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About — Urban Nest</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --gold: #B8956A;
+      --white: #FAFAF8;
+      --black: #111110;
+      --grey: #6B6B68;
+      --border: #E0DFD9;
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--black); overflow-x: hidden; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 18px 48px; background: rgba(250,250,248,0.96); border-bottom: 0.5px solid var(--border); backdrop-filter: blur(8px); }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo-icon { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; }
+    .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-logo-text { font-family: 'Bodoni Moda', serif; font-size: 17px; letter-spacing: 0.16em; color: var(--black); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { font-size: 11px; letter-spacing: 0.14em; color: var(--grey); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+    /* PAGE HERO */
+    .page-hero {
+      padding: 160px 48px 80px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--white);
+      position: relative; overflow: hidden;
+    }
+    .page-hero-bg {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 80px 80px; opacity: 0.35; pointer-events: none;
+    }
+    .page-tag { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 20px; position: relative; z-index: 1; }
+    .page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(40px, 7vw, 82px); font-weight: 400; line-height: 1.0; color: var(--black); max-width: 800px; position: relative; z-index: 1; }
+    .page-title em { font-style: italic; color: var(--gold); }
+
+    /* SECTIONS */
+    .about-section { padding: 80px 48px; border-bottom: 0.5px solid var(--border); }
+    .about-section:last-of-type { border-bottom: none; }
+    .section-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 80px; align-items: start; }
+    .section-label {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 20px; font-weight: 400; font-style: italic;
+      color: var(--black); padding-top: 4px; letter-spacing: 0.02em;
+    }
+    .section-content h2 { font-family: 'Bodoni Moda', serif; font-size: clamp(26px, 3.5vw, 40px); font-weight: 400; color: var(--black); margin-bottom: 24px; line-height: 1.15; }
+    .section-content h2 em { font-style: italic; }
+    .section-content p { font-size: 15px; color: var(--grey); line-height: 1.95; margin-bottom: 16px; max-width: 640px; }
+    .section-content p strong { color: var(--black); font-weight: 400; }
+    .section-content p:last-child { margin-bottom: 0; }
+
+    /* WHAT WE ARE GRID */
+    .pillars-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; margin-top: 8px; background: var(--border); }
+    .pillar-card { background: var(--white); padding: 32px; transition: background 0.2s; }
+    .pillar-card:hover { background: #F4F3EF; }
+    .pillar-num { font-family: 'Bodoni Moda', serif; font-size: 32px; color: rgba(184,149,106,0.2); margin-bottom: 14px; }
+    .pillar-title { font-size: 13px; font-weight: 500; color: var(--black); margin-bottom: 8px; letter-spacing: 0.02em; }
+    .pillar-text { font-size: 13px; color: var(--grey); line-height: 1.8; }
+
+    /* CONTACT */
+    .contact-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; margin-top: 8px; background: var(--border); }
+    .contact-card { background: var(--white); padding: 28px; transition: background 0.2s; }
+    .contact-card:hover { background: #F4F3EF; }
+    .contact-icon { font-size: 18px; margin-bottom: 14px; color: var(--gold); }
+    .contact-type { font-size: 9px; letter-spacing: 0.22em; color: var(--gold); margin-bottom: 8px; }
+    .contact-value { font-size: 14px; color: var(--black); text-decoration: none; display: block; transition: color 0.2s; line-height: 1.5; }
+    .contact-value:hover { color: var(--gold); }
+    .contact-note { font-size: 11px; color: var(--grey); margin-top: 6px; line-height: 1.6; }
+
+    /* CLOSING */
+    .closing { padding: 100px 48px; background: var(--black); text-align: center; }
+    .closing-quote { font-family: 'Bodoni Moda', serif; font-size: clamp(22px, 3.5vw, 38px); font-weight: 400; color: rgba(250,250,248,0.3); line-height: 1.5; max-width: 700px; margin: 0 auto 40px; }
+    .closing-quote em { color: #FAFAF8; font-style: italic; }
+    .back-home { display: inline-flex; align-items: center; gap: 12px; padding: 13px 36px; background: transparent; color: rgba(250,250,248,0.6); font-size: 11px; letter-spacing: 0.2em; text-decoration: none; border: 0.5px solid rgba(250,250,248,0.2); transition: all 0.3s; }
+    .back-home:hover { background: var(--gold); color: var(--black); border-color: var(--gold); }
+
+    footer { padding: 32px 48px; background: var(--black); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid rgba(250,250,248,0.06); }
+    .footer-left { display: flex; align-items: center; gap: 12px; }
+    .footer-icon { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; }
+    .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.18em; color: rgba(250,250,248,0.3); }
+    .footer-note { font-size: 11px; color: rgba(250,250,248,0.18); letter-spacing: 0.06em; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+      <span class="nav-logo-text">URBAN NEST</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html#rooms">Spaces</a></li>
+      <li><a href="community.html">The Nest Edit</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="index.html">Home</a></li>
+    </ul>
+  </nav>
+
+  <div class="page-hero">
+    <div class="page-hero-bg"></div>
+    <div class="page-tag">WHO WE ARE</div>
+    <h1 class="page-title">We believe your home should feel like <em>you.</em></h1>
+  </div>
+
+  <!-- OUR NEST -->
+  <div class="about-section">
+    <div class="section-inner">
+      <div class="section-label">OUR NEST</div>
+      <div class="section-content">
+        <h2>Where the idea began</h2>
+        <p>Urban Nest was born from a frustration that many Indian households quietly share — <strong>beautiful, functional home products are everywhere, but finding them feels impossible.</strong> Endless scrolling, inconsistent quality, and no sense of how things actually look in a real space.</p>
+        <p>We noticed something else too. Home décor in India has long been treated as a luxury for the few — expensive chandeliers, lakh-worth furniture, inaccessible aesthetics. The middle-class Indian home was left out of the conversation.</p>
+        <p>We disagreed. <strong>It's the small things</strong> — a soap dispenser, a bath rug, a cotton jar on your countertop — the intentional little choices that quietly transform an ordinary apartment into something genuinely beautiful. You should not need a five-lakh budget to feel at home.</p>
+        <p>Urban Nest was built to bridge that gap. Not a store. Not a catalogue. A curated living experience — where you walk into a room, see how it feels, and discover the pieces that make it yours.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUR MISSION -->
+  <div class="about-section">
+    <div class="section-inner">
+      <div class="section-label">OUR MISSION</div>
+      <div class="section-content">
+        <h2>Affordable luxury.<br/><em>For real homes.</em></h2>
+        <p>Our mission is to introduce <strong>affordable luxury that uplifts the standard of living</strong> of the everyday Indian household — one intentional object at a time.</p>
+        <p>We want to give the Indian consumer a sense of prestige through the ordinary. To show that <strong>this is the normal</strong> — that living beautifully is not a privilege, it is a choice that everyone can make.</p>
+        <p>Every product on Urban Nest is chosen with intention. Functional over decorative. Timeless over trendy. Affordable without feeling cheap.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUR VISION -->
+  <div class="about-section">
+    <div class="section-inner">
+      <div class="section-label">OUR VISION</div>
+      <div class="section-content">
+        <h2>The Experience Nest</h2>
+        <p>We envision Urban Nest as <strong>India's most trusted lifestyle curation platform</strong> — a space where home décor, kitchen essentials, bedding, personal care, and décor all live under one beautifully curated roof.</p>
+        <p>Online first, we are building a brand and an experience. Eventually, Urban Nest will move into physical concept stores — <strong>Experience Nests</strong> — in Tier-1 and Tier-2 cities, designed not as traditional retail but as fully realized room environments where customers walk through curated spaces and discover products the way they were meant to be seen.</p>
+        <p>Because the Indian consumer deserves to touch, feel, and truly understand what they are bringing home.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHAT WE ARE -->
+  <div class="about-section">
+    <div class="section-inner">
+      <div class="section-label">WHAT WE ARE</div>
+      <div>
+        <h2 style="font-family:'Bodoni Moda',serif;font-size:clamp(26px,3.5vw,40px);font-weight:400;color:var(--black);margin-bottom:32px;line-height:1.15">Four things.<br/><em>All at once.</em></h2>
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-num">01</div>
+            <div class="pillar-title">A curation platform</div>
+            <div class="pillar-text">We hand-pick products from across India's best retailers so you discover only what is worth your attention — never a shelf full of mediocrity.</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-num">02</div>
+            <div class="pillar-title">An immersive experience</div>
+            <div class="pillar-text">Step inside 3D-rendered rooms. See products in context before you decide. No more guessing how it will look in your space.</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-num">03</div>
+            <div class="pillar-title">A lifestyle brand</div>
+            <div class="pillar-text">Urban Nest stands for a way of living — intentional, aesthetic, and deeply personal. The brand of the middle-class Indian who is living well.</div>
+          </div>
+          <div class="pillar-card">
+            <div class="pillar-num">04</div>
+            <div class="pillar-title">A complete look</div>
+            <div class="pillar-text">Collections designed to work together. Buy the feeling, not just the product. The full bath set. The kitchen that coordinates. The bedroom that breathes.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="about-section">
+    <div class="section-inner">
+      <div class="section-label">GET IN TOUCH</div>
+      <div>
+        <h2 style="font-family:'Bodoni Moda',serif;font-size:clamp(26px,3.5vw,40px);font-weight:400;color:var(--black);margin-bottom:32px;line-height:1.15">We'd love to<br/><em>hear from you.</em></h2>
+        <div class="contact-grid">
+          <div class="contact-card">
+            <div class="contact-icon">✉</div>
+            <div class="contact-type">EMAIL</div>
+            <a href="mailto:reachus.urbannest@gmail.com" class="contact-value">reachus.urbannest@gmail.com</a>
+            <div class="contact-note">For partnerships, collaborations and general enquiries</div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon">◎</div>
+            <div class="contact-type">WHATSAPP · PHONE</div>
+            <a href="tel:+918588944583" class="contact-value">+91 85889 44583</a>
+            <div class="contact-note">Available on WhatsApp for quick queries</div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon">◈</div>
+            <div class="contact-type">INSTAGRAM</div>
+            <a href="https://instagram.com/store.urbannest" target="_blank" class="contact-value">@store.urbannest</a>
+            <div class="contact-note">Follow along for new spaces and curated finds</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLOSING -->
+  <div class="closing">
+    <p class="closing-quote">"Your home is not a backdrop.<br/>It is <em>the story you tell every day.</em>"</p>
+    <a href="index.html" class="back-home">← BACK TO HOME</a>
+  </div>
+
+  <footer>
+    <div class="footer-left">
+      <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+      <span class="footer-logo">URBAN NEST</span>
+    </div>
+    <div class="footer-note">© 2025 Urban Nest · All rights reserved</div>
+  </footer>
+
+</body>
+</html>

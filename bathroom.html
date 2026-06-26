@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Bathroom — Urban Nest</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.97/build/spline-viewer.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #0A0A0A; color: #F8F7F4; overflow: hidden; height: 100vh; width: 100vw; }
+
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: space-between; align-items: center; padding: 18px 36px; background: linear-gradient(to bottom, rgba(10,10,10,0.9), transparent); pointer-events: none; }
+    nav a, nav span { pointer-events: all; }
+    .logo { font-family: 'Bodoni Moda', serif; font-size: 18px; font-weight: 400; letter-spacing: 0.22em; color: #F8F7F4; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; }
+    .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-right { display: flex; align-items: center; gap: 16px; transition: opacity 0.3s; }
+    .nav-room-label { font-size: 10px; letter-spacing: 0.22em; color: rgba(248,247,244,0.35); }
+    .back-btn { font-size: 11px; letter-spacing: 0.14em; color: rgba(248,247,244,0.5); text-decoration: none; border: 0.5px solid rgba(248,247,244,0.15); padding: 7px 16px; border-radius: 20px; transition: all 0.2s; background: rgba(10,10,10,0.4); }
+    .back-btn:hover { color: #F8F7F4; border-color: rgba(248,247,244,0.4); }
+    body.panel-open .nav-right { opacity: 0; pointer-events: none; }
+
+    spline-viewer { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 1; }
+
+    /* DOTS */
+    #dots-layer { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+    .dot { position: absolute; transform: translate(-50%,-50%); pointer-events: all; cursor: pointer; }
+    .dot-ring { width: 18px; height: 18px; border-radius: 50%; background: rgba(184,149,106,0.2); border: 1.5px solid #B8956A; display: flex; align-items: center; justify-content: center; animation: pulse 2.4s ease-in-out infinite; transition: transform 0.2s, background 0.2s; }
+    .dot:hover .dot-ring { transform: scale(1.3); background: rgba(184,149,106,0.4); }
+    .dot-ring::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #B8956A; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(184,149,106,0.5)} 50%{box-shadow:0 0 0 6px rgba(184,149,106,0)} }
+    .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(250,250,248,0.95); color: #111110; font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .dot:hover .dot-label { opacity: 1; }
+    body.adjust-mode .dot-ring { width: 22px; height: 22px; background: rgba(184,149,106,0.35); cursor: grab; }
+    body.adjust-mode .dot-label { opacity: 1; }
+
+    #hint { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.15em; color: rgba(248,247,244,0.3); pointer-events: none; white-space: nowrap; transition: opacity 0.5s; }
+    #hint::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #B8956A; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    #adjust-btn { position: fixed; bottom: 24px; right: 24px; z-index: 30; font-size: 11px; letter-spacing: 0.1em; color: rgba(248,247,244,0.4); background: rgba(10,10,10,0.7); border: 0.5px solid rgba(248,247,244,0.12); padding: 7px 14px; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+    #adjust-btn:hover, #adjust-btn.active { color: #B8956A; border-color: rgba(184,149,106,0.4); }
+
+    /* PANEL */
+    #panel { position: fixed; top: 0; right: 0; bottom: 0; width: 50vw; background: #FAFAF8; z-index: 150; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; }
+    #panel.open { transform: translateX(0); }
+
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 0.5px solid #E0DFD9; flex-shrink: 0; position: sticky; top: 0; background: #FAFAF8; z-index: 5; }
+    .panel-back { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.12em; color: #6B6B68; cursor: pointer; border: none; background: none; transition: color 0.2s; padding: 6px 0; }
+    .panel-back:hover { color: #111110; }
+    .panel-room-tag { font-size: 10px; letter-spacing: 0.2em; color: #B8956A; }
+
+    .panel-3d { width: 100%; height: 50vh; background: #111110; flex-shrink: 0; position: relative; overflow: hidden; }
+    #product-viewer-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .zoom-controls { position: absolute; bottom: 14px; right: 14px; z-index: 10; display: flex; flex-direction: column; gap: 4px; }
+    .zoom-btn { width: 32px; height: 32px; background: rgba(250,250,248,0.1); border: 0.5px solid rgba(250,250,248,0.2); color: #FAFAF8; font-size: 18px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .zoom-btn:hover { background: rgba(184,149,106,0.2); border-color: #B8956A; color: #B8956A; }
+    .panel-3d-hint { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.1em; color: rgba(250,250,248,0.2); pointer-events: none; white-space: nowrap; }
+
+    .panel-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .panel-tag { font-size: 10px; letter-spacing: 0.22em; color: #B8956A; }
+    .panel-name { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; color: #111110; line-height: 1.15; }
+    .panel-desc { font-size: 14px; color: #6B6B68; line-height: 1.9; }
+    .divider { height: 0.5px; background: #E0DFD9; }
+    .specs { display: flex; flex-direction: column; border: 0.5px solid #E0DFD9; border-radius: 4px; overflow: hidden; }
+    .spec-row { display: flex; justify-content: space-between; padding: 10px 14px; font-size: 12px; border-bottom: 0.5px solid #E0DFD9; }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-label { color: #6B6B68; }
+    .spec-val { color: #111110; font-weight: 500; }
+    .similar-note { font-size: 11px; color: #6B6B68; font-style: italic; }
+    .btn-similar { display: block; text-align: center; padding: 14px; background: #111110; color: #FAFAF8; font-size: 11px; font-weight: 500; letter-spacing: 0.18em; border-radius: 4px; text-decoration: none; transition: background 0.2s; }
+    .btn-similar:hover { background: #B8956A; }
+    .similar-label { font-size: 10px; letter-spacing: 0.2em; color: #B8956A; margin-bottom: -8px; }
+    .similar-chips { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 24px; }
+    .chip { font-size: 11px; color: #6B6B68; padding: 5px 12px; border: 0.5px solid #E0DFD9; border-radius: 20px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    .chip:hover { border-color: #B8956A; color: #B8956A; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="logo">
+      <div class="logo-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+      URBAN NEST
+    </a>
+    <div class="nav-right">
+      <span class="nav-room-label">THE BATHROOM</span>
+      <a href="index.html" class="back-btn">← ALL SPACES</a>
+    </div>
+  </nav>
+
+  <spline-viewer url="https://prod.spline.design/uZpVsuRsjSo8bzao/scene.splinecode"></spline-viewer>
+
+  <div id="dots-layer">
+    <div class="dot" style="left:40.1249%;top:49.8715%" data-id="Soap Dispenser"><span class="dot-label">Soap Dispenser</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:44.7593%;top:53.1597%" data-id="Soap Dish"><span class="dot-label">Soap Dish</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:44.1763%;top:52.3608%" data-id="Tray"><span class="dot-label">Vanity Tray</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:41.0926%;top:69.5693%" data-id="Teal Rug"><span class="dot-label">Teal Rug</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:54.1982%;top:69.6905%" data-id="Toilet Mat"><span class="dot-label">Toilet Mat</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:63.6311%;top:69.9588%" data-id="Shower Mat"><span class="dot-label">Shower Mat</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:67.6259%;top:41.0653%" data-id="Shower Caddy"><span class="dot-label">Shower Caddy</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:47.8217%;top:61.2219%" data-id="Waste Basket"><span class="dot-label">Waste Basket</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:37.7079%;top:52.0565%" data-id="Tissue Holder"><span class="dot-label">Tissue Holder</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:44.9676%;top:51.1812%" data-id="Brush Holder"><span class="dot-label">Brush Holder</span><div class="dot-ring"></div></div>
+    <div class="dot" style="left:43%;top:46%" data-id="White Vase"><span class="dot-label">White Vase</span><div class="dot-ring"></div></div>
+  </div>
+
+  <div id="hint">CLICK THE GOLD DOTS TO EXPLORE</div>
+  <button id="adjust-btn" onclick="toggleAdjust()">⊹ ADJUST DOTS</button>
+
+  <div id="panel">
+    <div class="panel-header">
+      <button class="panel-back" id="close-btn">← BACK TO BATHROOM</button>
+      <span class="panel-room-tag">THE BATHROOM</span>
+    </div>
+    <div class="panel-3d">
+      <div id="product-viewer-wrap"></div>
+      <div class="zoom-controls">
+        <button class="zoom-btn" id="zoom-in">+</button>
+        <button class="zoom-btn" id="zoom-out">−</button>
+      </div>
+      <div class="panel-3d-hint">DRAG TO ROTATE</div>
+    </div>
+    <div class="panel-body">
+      <div class="panel-tag" id="p-tag"></div>
+      <div class="panel-name" id="p-name"></div>
+      <div class="panel-desc" id="p-desc"></div>
+      <div class="divider"></div>
+      <div class="specs" id="p-specs"></div>
+      <p class="similar-note">Similar style · Available in India</p>
+      <a class="btn-similar" id="p-buy" href="#" target="_blank">SHOP SIMILAR →</a>
+      <div class="similar-label">MORE OPTIONS</div>
+      <div class="similar-chips" id="p-similar"></div>
+    </div>
+  </div>
+
+  <script>
+    const products = {
+      'Soap Dispenser': { tag:'BATHROOM ACCESSORIES', name:'Soap Dispenser', desc:'A sleek ceramic dispenser for your liquid soap or handwash. Clean lines, matte black pump, perfect for any modern vanity.', spline:'https://prod.spline.design/GE2Lq8Cg0wgaAZjS/scene.splinecode', link:'https://amzn.to/4gAUBxh', specs:[['Material','Ceramic'],['Pump','Matte black'],['Capacity','300 ml']], similar:[] },
+      'Soap Dish': { tag:'BATHROOM ACCESSORIES', name:'Soap Dish', desc:'A ribbed ceramic soap dish with drainage grooves. Keeps your soap dry and your counter clean.', spline:'https://prod.spline.design/htz3mYXdulTmsqtL/scene.splinecode', link:'https://amazon.in', specs:[['Material','Ceramic'],['Finish','Matte white'],['Size','12 × 8 cm']], similar:[] },
+      'Tray': { tag:'VANITY ACCESSORIES', name:'Vanity Tray', desc:'A white marble vanity tray with a polished gold rim. Organise your counter essentials with effortless elegance.', spline:'https://prod.spline.design/ReoocyAwE8Yvhmpu/scene.splinecode', link:'https://amazon.in', specs:[['Material','Marble'],['Rim','Polished gold'],['Size','30 × 20 cm']], similar:[] },
+      'Toilet Mat': { tag:'BATH TEXTILES', name:'Toilet Mat', desc:'A soft cotton loop pile mat with non-slip latex backing. Machine washable and moisture absorbent.', spline:'https://prod.spline.design/666Wti0U3yF-wPvt/scene.splinecode', link:'https://amazon.in', specs:[['Material','100% cotton'],['GSM','900'],['Backing','Non-slip latex']], similar:[] },
+      'Teal Rug': { tag:'BATH TEXTILES', name:'Teal Rug', desc:'A plush tufted rectangle rug in teal. Soft underfoot, moisture absorbent, anti-skid base.', spline:'https://prod.spline.design/nsVngQY8mZwEoJ5k/scene.splinecode', link:'https://amazon.in', specs:[['Material','Cotton tufted'],['Size','60 × 90 cm'],['Base','Anti-skid']], similar:[] },
+      'Shower Mat': { tag:'BATH TEXTILES', name:'Shower Mat', desc:'A quick-dry microfibre mat that keeps your shower area dry and slip-free after every use.', spline:'https://prod.spline.design/NRQZO3lqB-RA4ogV/scene.splinecode', link:'https://amazon.in', specs:[['Material','Microfibre'],['Size','45 × 75 cm'],['Feature','Quick-dry']], similar:[] },
+      'Shower Caddy': { tag:'SHOWER ACCESSORIES', name:'Shower Caddy', desc:'A rust-proof aluminium hanging caddy with 3 shelves and hooks. Fits all standard shower heads.', spline:'https://prod.spline.design/b5XDOSq8WFuWr1Dd/scene.splinecode', link:'https://amazon.in', specs:[['Material','Aluminium'],['Shelves','3'],['Install','No drilling']], similar:[] },
+      'Waste Basket': { tag:'BATHROOM ESSENTIALS', name:'Waste Basket', desc:'A fingerprint-resistant matte waste basket with a soft-close lid and removable inner bucket.', spline:'https://prod.spline.design/VQefV2V4jnLNtF5l/scene.splinecode', link:'https://amazon.in', specs:[['Finish','Matte'],['Capacity','5 litres'],['Lid','Soft-close']], similar:[] },
+      'Tissue Holder': { tag:'BATHROOM ESSENTIALS', name:'Tissue Holder', desc:'A matte black stainless steel wall-mounted tissue holder. All mounting hardware included.', spline:'https://prod.spline.design/sP3ZQLmrTKIyG1rB/scene.splinecode', link:'https://amazon.in', specs:[['Material','Stainless steel'],['Finish','Matte black'],['Mount','Wall-mount']], similar:[] },
+      'Brush Holder': { tag:'VANITY ESSENTIALS', name:'Brush Holder', desc:'A ceramic brush and cup holder with a matte glaze finish. Keeps toothbrushes and razors neatly organised.', spline:'https://prod.spline.design/2Ts6Qsis8U6196K2/scene.splinecode', link:'https://amazon.in', specs:[['Material','Ceramic'],['Finish','Matte glaze'],['Slots','4']], similar:[] },
+      'White Vase': { tag:'BATHROOM DECOR', name:'White Vase', desc:'A clean minimal white vase that adds a touch of life and elegance to your bathroom counter or shelf.', spline:'https://prod.spline.design/GE2Lq8Cg0wgaAZjS/scene.splinecode', link:'https://amazon.in', specs:[['Material','Ceramic'],['Finish','Gloss white'],['Style','Minimal']], similar:[] }
+    };
+
+    let zoomLevel = 1;
+    let currentViewer = null;
+
+    function openPanel(id) {
+      const p = products[id];
+      if (!p) return;
+      const wrap = document.getElementById('product-viewer-wrap');
+      wrap.innerHTML = '';
+      const viewer = document.createElement('spline-viewer');
+      viewer.setAttribute('url', p.spline);
+      viewer.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+      wrap.appendChild(viewer);
+      currentViewer = viewer;
+      zoomLevel = 1;
+      document.getElementById('p-tag').textContent  = p.tag;
+      document.getElementById('p-name').textContent = p.name;
+      document.getElementById('p-desc').textContent = p.desc;
+      document.getElementById('p-buy').href         = p.link;
+      document.getElementById('p-specs').innerHTML  = p.specs.map(([l,v]) =>
+        `<div class="spec-row"><span class="spec-label">${l}</span><span class="spec-val">${v}</span></div>`
+      ).join('');
+      document.getElementById('p-similar').innerHTML = p.similar.map(s =>
+        `<a class="chip" href="${s.link}" target="_blank">${s.name}</a>`
+      ).join('');
+      document.getElementById('panel').classList.add('open');
+      document.body.classList.add('panel-open');
+      document.getElementById('hint').style.opacity = '0';
+      document.getElementById('panel').scrollTop = 0;
+    }
+
+    function closePanel() {
+      document.getElementById('panel').classList.remove('open');
+      document.body.classList.remove('panel-open');
+      setTimeout(() => {
+        document.getElementById('product-viewer-wrap').innerHTML = '';
+        currentViewer = null;
+      }, 400);
+    }
+
+    document.querySelectorAll('.dot').forEach(dot => {
+      dot.addEventListener('click', (e) => {
+        if (adjustMode) return;
+        e.stopPropagation();
+        openPanel(dot.dataset.id);
+      });
+    });
+
+    document.getElementById('close-btn').addEventListener('click', closePanel);
+
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      zoomLevel = Math.min(zoomLevel + 0.2, 3);
+      if (currentViewer) currentViewer.style.transform = `scale(${zoomLevel})`;
+    });
+
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      zoomLevel = Math.max(zoomLevel - 0.2, 0.5);
+      if (currentViewer) currentViewer.style.transform = `scale(${zoomLevel})`;
+    });
+
+    // ADJUST MODE
+    let adjustMode = false;
+    let dragging = null;
+    let startX, startY, startLeft, startTop;
+
+    function toggleAdjust() {
+      adjustMode = !adjustMode;
+      document.body.classList.toggle('adjust-mode', adjustMode);
+      const btn = document.getElementById('adjust-btn');
+      btn.classList.toggle('active', adjustMode);
+      btn.textContent = adjustMode ? '✓ DONE' : '⊹ ADJUST DOTS';
+      document.querySelector('spline-viewer').style.pointerEvents = adjustMode ? 'none' : 'all';
+    }
+
+    document.querySelectorAll('.dot').forEach(dot => {
+      dot.addEventListener('mousedown', (e) => {
+        if (!adjustMode) return;
+        dragging = dot;
+        startX = e.clientX; startY = e.clientY;
+        startLeft = parseFloat(dot.style.left);
+        startTop  = parseFloat(dot.style.top);
+        dot.style.cursor = 'grabbing';
+        e.preventDefault();
+      });
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const dx = ((e.clientX - startX) / window.innerWidth)  * 100;
+      const dy = ((e.clientY - startY) / window.innerHeight) * 100;
+      dragging.style.left = (startLeft + dx) + '%';
+      dragging.style.top  = (startTop  + dy) + '%';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (dragging) { dragging.style.cursor = 'grab'; dragging = null; }
+    });
+  </script>
+
+</body>
+</html>

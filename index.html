@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Urban Nest — Curated Living Spaces</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold: #B8956A;
+      --gold-light: rgba(184,149,106,0.12);
+      --white: #FAFAF8;
+      --black: #111110;
+      --grey: #6B6B68;
+      --grey-light: #E8E7E3;
+      --border: #E0DFD9;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 48px;
+      background: rgba(250,250,248,0.96);
+      border-bottom: 0.5px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 34px; height: 34px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-logo-text {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 17px; font-weight: 400;
+      letter-spacing: 0.16em; color: var(--black);
+    }
+
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: 11px; letter-spacing: 0.14em;
+      color: var(--grey); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--black); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      text-align: center; padding: 120px 24px 80px;
+      position: relative; overflow: hidden;
+      background: var(--white);
+    }
+
+    .hero-bg-line {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 80px 80px;
+      opacity: 0.4;
+    }
+
+    .hero-glow {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 50%, rgba(184,149,106,0.06) 0%, transparent 65%);
+    }
+
+    .hero-content { position: relative; z-index: 2; max-width: 900px; }
+
+    .hero-eyebrow {
+      display: flex; align-items: center; gap: 16px;
+      justify-content: center; margin-bottom: 36px;
+    }
+    .eyebrow-line { width: 36px; height: 0.5px; background: var(--gold); }
+    .eyebrow-text { font-size: 10px; letter-spacing: 0.36em; color: var(--gold); }
+
+    .hero-title {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(52px, 9vw, 108px);
+      font-weight: 400; line-height: 0.95;
+      color: var(--black); margin-bottom: 30px;
+    }
+    .hero-title em { font-style: italic; color: var(--gold); }
+
+    .hero-sub {
+      font-size: 14px; color: var(--grey);
+      line-height: 2; margin-bottom: 52px;
+      max-width: 400px; margin-left: auto; margin-right: auto;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 14px;
+      padding: 14px 38px;
+      background: var(--black); color: var(--white);
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.2em; text-decoration: none;
+      transition: all 0.3s;
+    }
+    .hero-cta:hover { background: var(--gold); gap: 20px; }
+
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%;
+      transform: translateX(-50%); z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      font-size: 9px; letter-spacing: 0.25em; color: var(--grey);
+    }
+    .scroll-line {
+      width: 0.5px; height: 44px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollpulse 2.2s ease-in-out infinite;
+    }
+    @keyframes scrollpulse {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      overflow: hidden; background: var(--black);
+      padding: 13px 0;
+    }
+    .marquee-track {
+      display: flex; width: max-content;
+      animation: marquee 22s linear infinite;
+    }
+    .marquee-item {
+      display: flex; align-items: center; gap: 18px;
+      padding: 0 28px;
+      font-size: 10px; letter-spacing: 0.24em;
+      color: rgba(250,250,248,0.3); white-space: nowrap;
+    }
+    .marquee-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--gold); }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+
+    /* ── STATEMENT ── */
+    .statement {
+      padding: 100px 48px;
+      border-bottom: 0.5px solid var(--border);
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center;
+    }
+    .statement-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 20px; }
+    .statement-title {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(30px, 4vw, 46px);
+      font-weight: 400; line-height: 1.15; color: var(--black);
+    }
+    .statement-title em { font-style: italic; }
+    .statement-body { font-size: 15px; color: var(--grey); line-height: 2; }
+    .statement-body p + p { margin-top: 16px; }
+    .statement-body strong { color: var(--black); font-weight: 400; }
+
+    /* ── ROOMS ── */
+    .rooms-section { padding: 80px 48px 100px; background: var(--white); }
+    .rooms-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      max-width: 1280px; margin: 0 auto 40px;
+    }
+    .rooms-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); }
+    .rooms-count { font-size: 10px; color: var(--grey); letter-spacing: 0.12em; }
+
+    .rooms-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 2px; max-width: 1280px; margin: 0 auto;
+    }
+
+    .room-card {
+      position: relative; height: 580px;
+      overflow: hidden; cursor: pointer;
+      text-decoration: none; display: block;
+    }
+
+    .room-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.9s cubic-bezier(0.4,0,0.2,1), filter 0.5s ease;
+      filter: brightness(0.65) saturate(0.85);
+    }
+    .room-card:hover .room-img { transform: scale(1.06); filter: brightness(0.5); }
+
+    .room-shimmer {
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,0.04) 50%, transparent 65%);
+      transform: translateX(-100%); transition: transform 0.7s ease;
+    }
+    .room-card:hover .room-shimmer { transform: translateX(100%); }
+
+    .room-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(to top, rgba(17,17,16,0.96) 0%, rgba(17,17,16,0.25) 55%, transparent 100%);
+    }
+
+    .room-num {
+      position: absolute; top: 22px; left: 24px; z-index: 3;
+      font-family: 'Bodoni Moda', serif;
+      font-size: 12px; color: rgba(250,250,248,0.3); letter-spacing: 0.1em;
+    }
+
+    .badge-soon {
+      position: absolute; top: 20px; right: 20px; z-index: 3;
+      font-size: 9px; letter-spacing: 0.18em; color: rgba(250,250,248,0.4);
+      padding: 4px 12px; border: 0.5px solid rgba(250,250,248,0.15); border-radius: 20px;
+    }
+
+    .room-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 32px 28px; z-index: 3;
+    }
+
+    .room-tag {
+      font-size: 9px; letter-spacing: 0.22em; color: var(--gold);
+      margin-bottom: 10px; opacity: 0;
+      transform: translateY(10px); transition: all 0.35s;
+    }
+    .room-card:hover .room-tag { opacity: 1; transform: translateY(0); }
+
+    .room-name {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 38px; font-weight: 400; color: #FAFAF8;
+      margin-bottom: 10px; line-height: 1;
+      transition: transform 0.35s;
+    }
+    .room-card:hover .room-name { transform: translateY(-4px); }
+
+    .room-desc {
+      font-size: 12px; color: rgba(250,250,248,0.4);
+      line-height: 1.7; margin-bottom: 22px;
+    }
+
+    .room-enter {
+      display: flex; align-items: center; gap: 14px;
+      font-size: 10px; letter-spacing: 0.2em; color: rgba(250,250,248,0.4);
+      transition: color 0.25s;
+    }
+    .room-enter::after {
+      content: ''; width: 28px; height: 0.5px;
+      background: currentColor; transition: width 0.35s;
+    }
+    .room-card:hover .room-enter { color: var(--gold); }
+    .room-card:hover .room-enter::after { width: 56px; }
+
+    /* ── PHILOSOPHY ── */
+    .philosophy {
+      padding: 100px 48px;
+      background: var(--black);
+    }
+    .philosophy-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start;
+    }
+    .philosophy-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 24px; }
+    .philosophy-title {
+      font-family: 'Bodoni Moda', serif;
+      font-size: clamp(28px, 3.5vw, 44px);
+      font-weight: 400; line-height: 1.15; color: #FAFAF8; margin-bottom: 20px;
+    }
+    .philosophy-title em { font-style: italic; color: var(--gold); }
+    .philosophy-body { font-size: 14px; color: rgba(250,250,248,0.45); line-height: 2; }
+
+    .pillars { display: flex; flex-direction: column; }
+    .pillar {
+      padding: 22px 0 22px 22px;
+      border-left: 1px solid rgba(250,250,248,0.07);
+      border-bottom: 0.5px solid rgba(250,250,248,0.04);
+      transition: border-left-color 0.3s, padding-left 0.3s;
+    }
+    .pillar:last-child { border-bottom: none; }
+    .pillar:hover { border-left-color: var(--gold); padding-left: 28px; }
+    .pillar-num { font-size: 10px; color: rgba(184,149,106,0.4); letter-spacing: 0.15em; margin-bottom: 7px; }
+    .pillar-name { font-size: 13px; font-weight: 500; color: #FAFAF8; margin-bottom: 5px; }
+    .pillar-desc { font-size: 12px; color: rgba(250,250,248,0.38); line-height: 1.7; }
+
+    /* ── CONTACT STRIP ── */
+    .contact-strip {
+      background: var(--white);
+      border-top: 0.5px solid var(--border);
+      border-bottom: 0.5px solid var(--border);
+      padding: 64px 48px;
+    }
+    .contact-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px; align-items: center;
+    }
+    .contact-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 16px; }
+    .contact-title {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 28px; font-weight: 400; color: var(--black);
+    }
+    .contact-item { display: flex; flex-direction: column; gap: 6px; }
+    .contact-type { font-size: 10px; letter-spacing: 0.2em; color: var(--gold); }
+    .contact-value {
+      font-size: 14px; color: var(--black);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .contact-value:hover { color: var(--gold); }
+    .contact-note { font-size: 11px; color: var(--grey); margin-top: 2px; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 48px;
+      background: var(--black);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-left { display: flex; align-items: center; gap: 12px; }
+    .footer-icon { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; }
+    .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .footer-logo {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 14px; letter-spacing: 0.18em; color: rgba(250,250,248,0.3);
+    }
+    .footer-note { font-size: 11px; color: rgba(250,250,248,0.18); letter-spacing: 0.06em; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">
+        <img src="logo-icon.png" alt="Urban Nest"/>
+      </div>
+      <span class="nav-logo-text">URBAN NEST</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#rooms">Spaces</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="community.html">The Nest Edit</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-line"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-text">CURATED LIVING SPACES</span>
+        <div class="eyebrow-line"></div>
+      </div>
+      <h1 class="hero-title">
+        Small things.<br/>
+        <em>Big difference.</em>
+      </h1>
+      <p class="hero-sub">This is Urban Nest — where intentional living begins with the objects you choose every day.</p>
+      <a href="#rooms" class="hero-cta">EXPLORE SPACES →</a>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      SCROLL
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <div class="marquee-item">THE BATHROOM <span class="marquee-dot"></span></div>
+      <div class="marquee-item">THE KITCHEN <span class="marquee-dot"></span></div>
+      <div class="marquee-item">THE BEDROOM <span class="marquee-dot"></span></div>
+      <div class="marquee-item">AFFORDABLE LUXURY <span class="marquee-dot"></span></div>
+      <div class="marquee-item">CURATED LIVING <span class="marquee-dot"></span></div>
+      <div class="marquee-item">FUNCTIONAL DESIGN <span class="marquee-dot"></span></div>
+      <div class="marquee-item">URBAN NEST <span class="marquee-dot"></span></div>
+      <div class="marquee-item">THE BATHROOM <span class="marquee-dot"></span></div>
+      <div class="marquee-item">THE KITCHEN <span class="marquee-dot"></span></div>
+      <div class="marquee-item">THE BEDROOM <span class="marquee-dot"></span></div>
+      <div class="marquee-item">AFFORDABLE LUXURY <span class="marquee-dot"></span></div>
+      <div class="marquee-item">CURATED LIVING <span class="marquee-dot"></span></div>
+      <div class="marquee-item">FUNCTIONAL DESIGN <span class="marquee-dot"></span></div>
+      <div class="marquee-item">URBAN NEST <span class="marquee-dot"></span></div>
+    </div>
+  </div>
+
+  <!-- STATEMENT -->
+  <section class="statement">
+    <div>
+      <div class="statement-label">THE URBAN NEST IDEA</div>
+      <h2 class="statement-title">
+        It's the little things<br/>
+        that make a home<br/>
+        <em>a home.</em>
+      </h2>
+    </div>
+    <div class="statement-body">
+      <p>Home décor in India has long been treated as a luxury for the few — expensive chandeliers, lakh-worth furniture, inaccessible aesthetics. <strong>We disagree.</strong></p>
+      <p>It's the soap dispenser, the bath rug, the cotton jar on your countertop. The small, intentional choices that quietly transform your everyday space into something beautiful. <strong>Urban Nest exists to make that possible for everyone.</strong></p>
+    </div>
+  </section>
+
+  <!-- ROOMS -->
+  <section class="rooms-section" id="rooms">
+    <div class="rooms-header">
+      <div class="rooms-label">EXPLORE SPACES</div>
+      <div class="rooms-count">01 — 03</div>
+    </div>
+    <div class="rooms-grid">
+
+      <a href="bathroom.html" class="room-card">
+        <img class="room-img" src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=900&q=80" alt="Modern bathroom interior"/>
+        <div class="room-shimmer"></div>
+        <div class="room-overlay"></div>
+        <div class="room-num">01</div>
+        <div class="room-info">
+          <div class="room-tag">INTERACTIVE · 10 ITEMS</div>
+          <div class="room-name">The Bathroom</div>
+          <div class="room-desc">Where mornings begin.<br/>Discover accessories that elevate your ritual.</div>
+          <div class="room-enter">ENTER SPACE</div>
+        </div>
+      </a>
+
+      <a href="#" class="room-card">
+        <img class="room-img" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=80" alt="Modern kitchen interior"/>
+        <div class="room-shimmer"></div>
+        <div class="room-overlay"></div>
+        <div class="room-num">02</div>
+        <span class="badge-soon">COMING SOON</span>
+        <div class="room-info">
+          <div class="room-tag">COMING SOON</div>
+          <div class="room-name">The Kitchen</div>
+          <div class="room-desc">Where flavour meets form.<br/>Essentials that make cooking a pleasure.</div>
+          <div class="room-enter">COMING SOON</div>
+        </div>
+      </a>
+
+      <a href="#" class="room-card">
+        <img class="room-img" src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=900&q=80" alt="Modern bedroom interior"/>
+        <div class="room-shimmer"></div>
+        <div class="room-overlay"></div>
+        <div class="room-num">03</div>
+        <span class="badge-soon">COMING SOON</span>
+        <div class="room-info">
+          <div class="room-tag">COMING SOON</div>
+          <div class="room-name">The Bedroom</div>
+          <div class="room-desc">Where rest becomes sanctuary.<br/>Pieces that bring calm to your space.</div>
+          <div class="room-enter">COMING SOON</div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- PHILOSOPHY -->
+  <section class="philosophy" id="philosophy">
+    <div class="philosophy-inner">
+      <div>
+        <div class="philosophy-label">OUR PHILOSOPHY</div>
+        <h2 class="philosophy-title">Affordable luxury.<br/><em>For real homes.</em></h2>
+        <p class="philosophy-body">You should not need a budget of five lakhs to make your space feel beautiful. Urban Nest introduces affordable luxury that uplifts the everyday — one intentional object at a time.</p>
+      </div>
+      <div class="pillars">
+        <div class="pillar">
+          <div class="pillar-num">01</div>
+          <div class="pillar-name">Small things, big impact</div>
+          <div class="pillar-desc">A soap dispenser, a bath rug, a cotton jar — the little things that quietly transform a home.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">02</div>
+          <div class="pillar-name">See it before you buy it</div>
+          <div class="pillar-desc">Walk through curated rooms. Discover products in context, not on a shelf.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">03</div>
+          <div class="pillar-name">Curated, not catalogued</div>
+          <div class="pillar-desc">Every item is chosen for how it functions, how it looks, and how it fits your life.</div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">04</div>
+          <div class="pillar-name">The complete look</div>
+          <div class="pillar-desc">Buy the feeling, not just the product. Collections designed to work together beautifully.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact-strip">
+    <div class="contact-inner">
+      <div>
+        <div class="contact-label">GET IN TOUCH</div>
+        <h3 class="contact-title">We'd love to hear from you.</h3>
+      </div>
+      <div class="contact-item">
+        <span class="contact-type">EMAIL</span>
+        <a href="mailto:reachus.urbannest@gmail.com" class="contact-value">reachus.urbannest@gmail.com</a>
+        <span class="contact-note">For partnerships and general enquiries</span>
+      </div>
+      <div>
+        <div class="contact-item" style="margin-bottom:20px">
+          <span class="contact-type">WHATSAPP / PHONE</span>
+          <a href="tel:+918588944583" class="contact-value">+91 85889 44583</a>
+        </div>
+        <div class="contact-item">
+          <span class="contact-type">INSTAGRAM</span>
+          <a href="https://instagram.com/store.urbannest" target="_blank" class="contact-value">@store.urbannest</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+      <span class="footer-logo">URBAN NEST</span>
+    </div>
+    <div class="footer-note">© 2025 Urban Nest · All rights reserved</div>
+  </footer>
+
+</body>
+</html>
