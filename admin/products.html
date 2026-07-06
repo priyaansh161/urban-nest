@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>3D Products — Urban Nest Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  /* ROOM TABS */
+  .room-tabs { display: flex; border: 0.5px solid var(--border); background: var(--white); }
+  .room-tab { padding: 10px 28px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey); cursor: pointer; border: none; background: transparent; font-family: 'DM Sans', sans-serif; transition: all 0.2s; border-right: 0.5px solid var(--border); }
+  .room-tab:last-child { border-right: none; }
+  .room-tab.active { background: var(--black); color: var(--white); }
+
+  .layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+
+  /* STAGE */
+  .stage-panel { background: var(--black); border: 0.5px solid var(--border); }
+  .stage-header { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .stage-title { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .stage-hint { font-size: 10px; letter-spacing: 0.08em; color: rgba(184,149,106,0.8); }
+  #stage { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; }
+  #stage spline-viewer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #stage-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: rgba(255,255,255,0.3); font-size: 12px; letter-spacing: 0.1em; text-align: center; padding: 24px; }
+  #stage-empty a { color: var(--gold); }
+
+  .dot { position: absolute; transform: translate(-50%,-50%); cursor: grab; z-index: 10; }
+  .dot:active { cursor: grabbing; }
+  .dot-ring { width: 20px; height: 20px; border-radius: 50%; background: rgba(184,149,106,0.25); border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
+  .dot:hover .dot-ring, .dot.selected .dot-ring { transform: scale(1.35); background: rgba(184,149,106,0.5); }
+  .dot.selected .dot-ring { box-shadow: 0 0 0 5px rgba(184,149,106,0.25); }
+  .dot-ring::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  .dot.unpublished .dot-ring { border-style: dashed; opacity: 0.75; }
+  .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(250,250,248,0.95); color: var(--black); font-size: 10px; letter-spacing: 0.06em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; pointer-events: none; }
+
+  .stage-footer { padding: 12px 20px; display: flex; gap: 12px; align-items: center; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .btn { padding: 10px 24px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
+  .btn-gold { background: var(--gold); color: var(--black); }
+  .btn-gold:hover { background: #cba87c; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover { background: #222; }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover { color: var(--black); border-color: var(--black); }
+  .btn-danger { background: transparent; color: #c0392b; border: 0.5px solid rgba(192,57,43,0.35); }
+  .btn-danger:hover { background: rgba(192,57,43,0.06); }
+  .stage-footer .note { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; }
+
+  /* FORM */
+  .form-panel { background: var(--white); border: 0.5px solid var(--border); padding: 28px; position: sticky; top: 24px; }
+  .form-panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .form-group { display: flex; flex-direction: column; gap: 7px; margin-bottom: 15px; }
+  label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey); }
+  input, textarea, select { padding: 10px 13px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black); outline: none; transition: border-color 0.2s; width: 100%; }
+  input:focus, textarea:focus { border-color: var(--gold); }
+  textarea { resize: vertical; min-height: 66px; }
+  .form-hint { font-size: 10.5px; color: var(--grey); line-height: 1.5; }
+  .spec-row { display: grid; grid-template-columns: 1fr 1fr 28px; gap: 6px; margin-bottom: 6px; }
+  .spec-remove { border: 0.5px solid var(--border); background: transparent; color: var(--grey); cursor: pointer; font-size: 13px; transition: all 0.2s; }
+  .spec-remove:hover { color: #c0392b; border-color: rgba(192,57,43,0.4); }
+  .add-spec { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; background: none; border: none; color: var(--gold); cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 4px 0; }
+  .publish-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--grey); cursor: pointer; margin: 4px 0 16px; }
+  .publish-row input { width: auto; }
+  .form-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  details.advanced { margin-bottom: 15px; }
+  details.advanced summary { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey); cursor: pointer; padding: 4px 0; }
+  details.advanced .form-group { margin-top: 12px; }
+  #form-empty { text-align: center; color: var(--grey); font-size: 12.5px; line-height: 1.8; padding: 24px 0; }
+
+  /* LIST */
+  .list-panel { background: var(--white); border: 0.5px solid var(--border); margin-top: 24px; }
+  .list-header { padding: 18px 24px; border-bottom: 0.5px solid var(--border); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  .item-row { padding: 16px 24px; border-bottom: 0.5px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
+  .item-row:last-child { border-bottom: none; }
+  .item-row:hover { background: #faf9f5; }
+  .item-name { font-weight: 500; font-size: 14px; }
+  .item-meta { font-size: 11px; color: var(--grey); margin-top: 3px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+  .badge-grey { background: #eee; color: var(--grey); }
+  .row-actions { display: flex; gap: 8px; }
+  .row-btn { padding: 5px 12px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .row-btn:hover { border-color: var(--black); color: var(--black); }
+  .row-btn.active-btn { border-color: var(--gold); color: var(--gold); background: var(--gold-light); }
+  .row-btn.danger { color: #c0392b; border-color: rgba(192,57,43,0.3); }
+  .row-btn.danger:hover { background: rgba(192,57,43,0.05); }
+  .empty-state { padding: 36px 24px; text-align: center; color: var(--grey); font-size: 13px; line-height: 1.8; }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+
+  @media (max-width: 1200px) { .layout { grid-template-columns: 1fr; } .form-panel { position: static; } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item active"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <h1>3D Products</h1>
+      <p>Place gold dots on your 3D rooms and attach Amazon products to them</p>
+    </div>
+    <div class="room-tabs">
+      <button class="room-tab active" data-room="bath" onclick="switchRoom('bath')">Bathroom</button>
+      <button class="room-tab" data-room="kitchen" onclick="switchRoom('kitchen')">Kitchen</button>
+      <button class="room-tab" data-room="bed" onclick="switchRoom('bed')">Bedroom</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- STAGE -->
+    <div class="stage-panel">
+      <div class="stage-header">
+        <span class="stage-title" id="stageTitle">Bathroom Scene</span>
+        <select id="sceneSelect" onchange="onSceneChange()" style="display:none;background:#1a1a19;color:#FAFAF8;border:0.5px solid rgba(255,255,255,0.2);font-size:11px;padding:6px 10px;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;max-width:220px;"></select>
+        <span class="stage-hint">DRAG DOTS ONTO PRODUCTS · CLICK A DOT TO EDIT</span>
+      </div>
+      <div id="stage">
+        <div id="stage-empty" style="display:none;"></div>
+      </div>
+      <div class="stage-footer">
+        <button class="btn btn-gold" onclick="addProduct()">+ Add Product Dot</button>
+        <span class="note">A new dot appears in the centre — drag it onto the product, then fill in the details</span>
+      </div>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="form-panel">
+      <div class="form-panel-title">
+        <span id="formTitle">Product Details</span>
+        <button class="btn btn-secondary" id="cancelBtn" onclick="clearForm()" style="display:none;padding:5px 12px;font-size:10px">Cancel</button>
+      </div>
+
+      <div id="form-empty">
+        Click a gold dot on the scene to edit its product,<br/>
+        or press <strong>+ Add Product Dot</strong> to create one.
+      </div>
+
+      <div id="form-fields" style="display:none;">
+        <div class="form-group">
+          <label for="pName">Product Name</label>
+          <input type="text" id="pName" placeholder="e.g. Spice Rack"/>
+        </div>
+        <div class="form-group">
+          <label for="pTag">Category Label</label>
+          <input type="text" id="pTag" placeholder="e.g. KITCHEN ACCESSORIES"/>
+        </div>
+        <div class="form-group">
+          <label for="pDesc">Description</label>
+          <textarea id="pDesc" placeholder="Short, warm description shown to shoppers…"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="pBuy">Amazon Affiliate Link</label>
+          <input type="url" id="pBuy" placeholder="https://amzn.to/…"/>
+        </div>
+        <div class="form-group">
+          <label for="pSpline">Product 3D Scene URL (optional)</label>
+          <input type="url" id="pSpline" placeholder="https://prod.spline.design/…/scene.splinecode"/>
+          <span class="form-hint">A close-up Spline scene of just this product, shown in the popup. Leave empty to skip the 3D preview.</span>
+        </div>
+        <div class="form-group">
+          <label>Specifications</label>
+          <div id="specRows"></div>
+          <button class="add-spec" onclick="addSpecRow()">+ Add specification</button>
+        </div>
+        <details class="advanced">
+          <summary>Advanced</summary>
+          <div class="form-group">
+            <label for="pObject">Spline Object Name (optional)</label>
+            <input type="text" id="pObject" placeholder="Exact object name inside the scene"/>
+            <span class="form-hint">If set, the dot follows this 3D object automatically when visitors rotate the room. Leave empty to keep the dot where you dragged it.</span>
+          </div>
+        </details>
+        <label class="publish-row">
+          <input type="checkbox" id="pPublished"/> Published — visible on the website
+        </label>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+          <button class="btn btn-danger" id="deleteBtn" onclick="deleteProduct()" style="display:none;">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div class="list-panel">
+    <div class="list-header" id="listHeader">Bathroom Products</div>
+    <div id="productList"><div class="empty-state">Loading…</div></div>
+  </div>
+</main>
+
+<script>
+const ROOM_LABELS = { bath: 'Bathroom', kitchen: 'Kitchen', bed: 'Bedroom' };
+// Fallback scene per room when none is Active in Spline Scenes
+const DEFAULT_SCENES = {
+  bath: 'https://prod.spline.design/uZpVsuRsjSo8bzao/scene.splinecode',
+  kitchen: 'https://prod.spline.design/Sj5adFcvg1xrFk7n/scene.splinecode',
+  bed: null,
+};
+
+let currentRoom = 'bath';
+let roomScenes = [];    // active scenes (views) for current room
+let currentSceneId = null;
+let products = [];      // rows for current room
+let editing = null;     // product being edited (null = none, {id:null} = new)
+let tableMissing = false;
+
+(async () => { await requireAuth(); switchRoom('bath'); })();
+
+// ── ROOM SWITCHING ─────────────────────────────────────────────
+async function switchRoom(room) {
+  currentRoom = room;
+  document.querySelectorAll('.room-tab').forEach(t => t.classList.toggle('active', t.dataset.room === room));
+  document.getElementById('stageTitle').textContent = ROOM_LABELS[room] + ' Scene';
+  document.getElementById('listHeader').textContent = ROOM_LABELS[room] + ' Products';
+  clearForm();
+  await Promise.all([loadScenes(room), loadProducts(room)]);
+  showScene(roomScenes.length ? 0 : -1);
+  renderList();
+}
+
+// A room can have several active renders (views) — dots belong to one view
+async function loadScenes(room) {
+  const { data } = await db.from('spline_scenes')
+    .select('id,name,url').eq('page_placement', room).eq('active', true)
+    .order('created_at');
+  roomScenes = data || [];
+  if (!roomScenes.length && DEFAULT_SCENES[room]) {
+    roomScenes = [{ id: null, name: 'Main View', url: DEFAULT_SCENES[room] }];
+  }
+  const sel = document.getElementById('sceneSelect');
+  sel.style.display = roomScenes.length > 1 ? '' : 'none';
+  sel.innerHTML = roomScenes.map((s, i) =>
+    `<option value="${i}">${s.name || 'View ' + (i + 1)}</option>`).join('');
+}
+
+function onSceneChange() {
+  showScene(parseInt(document.getElementById('sceneSelect').value, 10));
+}
+
+function showScene(i) {
+  const stage = document.getElementById('stage');
+  stage.querySelectorAll('spline-viewer').forEach(v => v.remove());
+  const empty = document.getElementById('stage-empty');
+  if (i < 0 || !roomScenes[i]) {
+    currentSceneId = null;
+    empty.style.display = 'flex';
+    empty.innerHTML = 'No 3D scene for this room yet.<br/>Add one in <a href="spline.html">Spline Scenes</a> and set it Active — you can still place dots meanwhile.';
+    renderDots();
+    return;
+  }
+  currentSceneId = roomScenes[i].id;
+  document.getElementById('sceneSelect').value = i;
+  empty.style.display = 'none';
+  const viewer = document.createElement('spline-viewer');
+  viewer.setAttribute('url', roomScenes[i].url);
+  stage.appendChild(viewer);
+  renderDots();
+}
+
+async function loadProducts(room) {
+  const { data, error } = await db.from('room_products')
+    .select('*').eq('room', room).order('sort_order').order('created_at');
+  if (error) {
+    products = [];
+    tableMissing = /room_products/.test(error.message) || error.code === '42P01';
+    if (!tableMissing) showToast('Failed to load products: ' + error.message, 'error');
+    return;
+  }
+  tableMissing = false;
+  products = data || [];
+}
+
+// ── DOTS ───────────────────────────────────────────────────────
+function renderDots() {
+  document.querySelectorAll('#stage .dot').forEach(d => d.remove());
+  // show only dots that belong to the view on screen (no scene_id = all views)
+  products.filter(p => !p.scene_id || p.scene_id === currentSceneId)
+    .forEach(p => createDot(p));
+}
+
+function createDot(p) {
+  const stage = document.getElementById('stage');
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (p.published ? '' : ' unpublished') + (editing && editing.id === p.id ? ' selected' : '');
+  dot.dataset.pid = p.id || 'new';
+  dot.style.left = (p.dot_x ?? 50) + '%';
+  dot.style.top  = (p.dot_y ?? 50) + '%';
+  dot.innerHTML = `<span class="dot-label">${p.name || 'New product'}</span><div class="dot-ring"></div>`;
+  stage.appendChild(dot);
+  makeDraggable(dot);
+  return dot;
+}
+
+function makeDraggable(dot) {
+  dot.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    const stage = document.getElementById('stage');
+    const rect = stage.getBoundingClientRect();
+    const startX = e.clientX, startY = e.clientY;
+    let moved = false;
+
+    const onMove = (ev) => {
+      if (Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY) > 4) moved = true;
+      if (!moved) return;
+      const x = Math.min(99, Math.max(1, ((ev.clientX - rect.left) / rect.width) * 100));
+      const y = Math.min(99, Math.max(1, ((ev.clientY - rect.top) / rect.height) * 100));
+      dot.style.left = x + '%';
+      dot.style.top  = y + '%';
+    };
+    const onUp = async (ev) => {
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      const pid = dot.dataset.pid;
+      if (!moved) { selectProduct(pid); return; }
+      const x = parseFloat(dot.style.left), y = parseFloat(dot.style.top);
+      if (pid === 'new') {
+        if (editing) { editing.dot_x = x; editing.dot_y = y; }
+        return;
+      }
+      const p = products.find(q => q.id === pid);
+      if (p) { p.dot_x = x; p.dot_y = y; }
+      const { error } = await db.from('room_products').update({ dot_x: x, dot_y: y }).eq('id', pid);
+      if (error) showToast('Could not save position', 'error');
+      else showToast('Dot position saved');
+    };
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  });
+}
+
+// ── FORM ───────────────────────────────────────────────────────
+function selectProduct(pid) {
+  const p = pid === 'new' ? editing : products.find(q => q.id === pid);
+  if (!p) return;
+  // jump to the view this product's dot lives on
+  if (p.scene_id && p.scene_id !== currentSceneId) {
+    const i = roomScenes.findIndex(s => s.id === p.scene_id);
+    if (i >= 0) showScene(i);
+  }
+  editing = p;
+  document.getElementById('form-empty').style.display = 'none';
+  document.getElementById('form-fields').style.display = '';
+  document.getElementById('formTitle').textContent = p.id ? 'Edit Product' : 'New Product';
+  document.getElementById('cancelBtn').style.display = '';
+  document.getElementById('deleteBtn').style.display = p.id ? '' : 'none';
+  document.getElementById('pName').value = p.name || '';
+  document.getElementById('pTag').value = p.tag || '';
+  document.getElementById('pDesc').value = p.description || '';
+  document.getElementById('pBuy').value = p.buy_link || '';
+  document.getElementById('pSpline').value = p.spline_url || '';
+  document.getElementById('pObject').value = p.object_name || '';
+  document.getElementById('pPublished').checked = !!p.published;
+  const rows = document.getElementById('specRows');
+  rows.innerHTML = '';
+  (p.specs || []).forEach(([k, v]) => addSpecRow(k, v));
+  if (!(p.specs || []).length) addSpecRow();
+  document.querySelectorAll('#stage .dot').forEach(d =>
+    d.classList.toggle('selected', d.dataset.pid === (p.id || 'new')));
+}
+
+function addProduct() {
+  if (tableMissing) {
+    showToast('Run setup-products.sql in Supabase first (see SQL Editor)', 'error');
+    return;
+  }
+  // discard a previous unsaved dot
+  const stale = document.querySelector('#stage .dot[data-pid="new"]');
+  if (stale) stale.remove();
+  editing = { id: null, room: currentRoom, scene_id: currentSceneId, dot_x: 50, dot_y: 50, specs: [], published: false };
+  createDot({ ...editing, name: 'New product' });
+  selectProduct('new');
+  document.getElementById('pName').focus();
+}
+
+function addSpecRow(k = '', v = '') {
+  const row = document.createElement('div');
+  row.className = 'spec-row';
+  row.innerHTML = `<input type="text" placeholder="Label (e.g. Material)" value="${k.replace(/"/g,'&quot;')}"/>
+    <input type="text" placeholder="Value (e.g. Ceramic)" value="${v.replace(/"/g,'&quot;')}"/>
+    <button class="spec-remove" onclick="this.parentElement.remove()">×</button>`;
+  document.getElementById('specRows').appendChild(row);
+}
+
+function clearForm() {
+  editing = null;
+  const stale = document.querySelector('#stage .dot[data-pid="new"]');
+  if (stale) stale.remove();
+  document.getElementById('form-empty').style.display = '';
+  document.getElementById('form-fields').style.display = 'none';
+  document.getElementById('formTitle').textContent = 'Product Details';
+  document.getElementById('cancelBtn').style.display = 'none';
+  document.querySelectorAll('#stage .dot').forEach(d => d.classList.remove('selected'));
+}
+
+// ── CRUD ───────────────────────────────────────────────────────
+function collectSpecs() {
+  return Array.from(document.querySelectorAll('#specRows .spec-row'))
+    .map(r => Array.from(r.querySelectorAll('input')).map(i => i.value.trim()))
+    .filter(([k, v]) => k || v);
+}
+
+async function saveProduct() {
+  if (!editing) return;
+  const name = document.getElementById('pName').value.trim();
+  if (!name) { showToast('Product name is required', 'error'); return; }
+  const payload = {
+    room: currentRoom,
+    scene_id: editing.id ? (editing.scene_id ?? null) : currentSceneId,
+    name,
+    tag: document.getElementById('pTag').value.trim() || null,
+    description: document.getElementById('pDesc').value.trim() || null,
+    buy_link: document.getElementById('pBuy').value.trim() || null,
+    spline_url: document.getElementById('pSpline').value.trim() || null,
+    object_name: document.getElementById('pObject').value.trim() || null,
+    specs: collectSpecs(),
+    published: document.getElementById('pPublished').checked,
+    dot_x: editing.dot_x ?? 50,
+    dot_y: editing.dot_y ?? 50,
+  };
+  // for an existing product keep its (possibly re-dragged) live dot position
+  if (editing.id) {
+    const dot = document.querySelector(`#stage .dot[data-pid="${editing.id}"]`);
+    if (dot) { payload.dot_x = parseFloat(dot.style.left); payload.dot_y = parseFloat(dot.style.top); }
+  } else {
+    const dot = document.querySelector('#stage .dot[data-pid="new"]');
+    if (dot) { payload.dot_x = parseFloat(dot.style.left); payload.dot_y = parseFloat(dot.style.top); }
+  }
+  let error;
+  if (editing.id) ({ error } = await db.from('room_products').update(payload).eq('id', editing.id));
+  else ({ error } = await db.from('room_products').insert(payload));
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast(editing.id ? 'Product updated' : 'Product added!');
+  clearForm();
+  await loadProducts(currentRoom);
+  renderDots();
+  renderList();
+}
+
+async function deleteProduct() {
+  if (!editing || !editing.id) return;
+  if (!confirm(`Delete "${editing.name}" and its dot?`)) return;
+  const { error } = await db.from('room_products').delete().eq('id', editing.id);
+  if (error) { showToast('Delete failed', 'error'); return; }
+  showToast('Product deleted');
+  clearForm();
+  await loadProducts(currentRoom);
+  renderDots();
+  renderList();
+}
+
+async function togglePublish(id, current) {
+  const { error } = await db.from('room_products').update({ published: !current }).eq('id', id);
+  if (error) { showToast('Update failed', 'error'); return; }
+  showToast(!current ? 'Product published' : 'Product hidden');
+  await loadProducts(currentRoom);
+  renderDots();
+  renderList();
+}
+
+// ── LIST ───────────────────────────────────────────────────────
+function sceneName(sceneId) {
+  if (!sceneId) return '◉ All views';
+  const s = roomScenes.find(x => x.id === sceneId);
+  return '◉ ' + (s ? (s.name || 'View') : 'View not active');
+}
+
+function renderList() {
+  const el = document.getElementById('productList');
+  if (tableMissing) {
+    el.innerHTML = `<div class="empty-state">The products table doesn't exist yet.<br/>
+      Open <strong>Supabase → SQL Editor</strong>, paste the contents of <strong>admin/setup-products.sql</strong>, and run it once.</div>`;
+    return;
+  }
+  if (!products.length) {
+    el.innerHTML = `<div class="empty-state">No products in the ${ROOM_LABELS[currentRoom].toLowerCase()} yet.<br/>Press <strong>+ Add Product Dot</strong> to place your first one.</div>`;
+    return;
+  }
+  el.innerHTML = products.map(p => `
+    <div class="item-row">
+      <div>
+        <div class="item-name">${p.name}</div>
+        <div class="item-meta">
+          <span>${sceneName(p.scene_id)}</span>
+          ${p.tag ? `<span>${p.tag}</span>` : ''}
+          ${p.buy_link ? '<span>🔗 Amazon link</span>' : '<span style="color:#c0392b">no buy link</span>'}
+          ${p.spline_url ? '<span>◉ 3D preview</span>' : ''}
+          <span class="badge ${p.published ? 'badge-gold' : 'badge-grey'}">${p.published ? 'Live' : 'Hidden'}</span>
+        </div>
+      </div>
+      <div class="row-actions">
+        <button class="row-btn" onclick="selectProduct('${p.id}')">Edit</button>
+        <button class="row-btn ${p.published ? 'active-btn' : ''}" onclick="togglePublish('${p.id}', ${p.published})">${p.published ? 'Live ✓' : 'Publish'}</button>
+      </div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>

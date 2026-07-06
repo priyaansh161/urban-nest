@@ -205,7 +205,122 @@
     .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
     .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.18em; color: rgba(250,250,248,0.3); }
     .footer-note { font-size: 11px; color: rgba(250,250,248,0.18); letter-spacing: 0.06em; }
+
+    /* ── FONT SIZE INCREASES ── */
+    .featured-excerpt { font-size: 15px; }
+    .featured-cat, .article-cat, .featured-label, .articles-label { font-size: 11px; }
+    .article-excerpt { font-size: 14px; }
+    .article-title { font-size: 21px; }
+    .comments-title { font-size: 30px; }
+    .comment-text { font-size: 15px; }
+    .comment-name { font-size: 14px; }
+    .newsletter-sub { font-size: 15px; }
+
+    /* ── ARTICLE MODAL ── */
+    #articleOverlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(17,17,16,0.78); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.32s ease;
+      padding: 32px 20px;
+    }
+    #articleOverlay.open { opacity: 1; pointer-events: all; }
+    #articleModal {
+      width: 70%; max-width: 1000px; max-height: 90vh;
+      background: var(--white); overflow-y: auto;
+      transform: scale(0.94) translateY(28px); opacity: 0;
+      transition: transform 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.32s ease;
+      position: relative; scroll-behavior: smooth;
+    }
+    #articleOverlay.open #articleModal { transform: scale(1) translateY(0); opacity: 1; }
+    .modal-close {
+      position: absolute; top: 0; right: 0; width: 52px; height: 52px;
+      background: var(--black); color: var(--white); border: none;
+      font-size: 22px; cursor: pointer; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; font-family: 'DM Sans', sans-serif;
+    }
+    .modal-close:hover { background: var(--gold); }
+    .modal-hero { width: 100%; height: 54vh; overflow: hidden; background: var(--grey-light); }
+    .modal-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .modal-body { padding: 52px; }
+    .modal-cat { font-size: 10px; letter-spacing: 0.32em; color: var(--gold); margin-bottom: 16px; }
+    .modal-title { font-family: 'Bodoni Moda', serif; font-size: clamp(22px, 3.2vw, 40px); font-weight: 400; line-height: 1.12; margin-bottom: 22px; color: var(--black); }
+    .modal-title em { font-style: italic; }
+    .modal-meta { display: flex; gap: 24px; font-size: 12px; color: var(--grey); letter-spacing: 0.08em; margin-bottom: 36px; padding-bottom: 28px; border-bottom: 0.5px solid var(--border); }
+    .modal-content p { font-size: 15px; color: #4a4a47; line-height: 2.0; margin-bottom: 22px; }
+    .modal-content h3 { font-family: 'Bodoni Moda', serif; font-size: 21px; font-weight: 400; font-style: italic; color: var(--black); margin: 36px 0 14px; }
+    @media (max-width: 768px) {
+      #articleModal { width: 96%; max-height: 92vh; }
+      .modal-hero { height: 36vh; }
+      .modal-body { padding: 28px 20px; }
+      .modal-meta { flex-wrap: wrap; gap: 10px; }
+    }
+
+    /* ── HAMBURGER ── */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; z-index: 101; }
+    .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--black); transition: all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links {
+        display: none; position: fixed; top: 61px; left: 0; right: 0;
+        background: rgba(250,250,248,0.98); backdrop-filter: blur(12px);
+        flex-direction: column; padding: 0; z-index: 99; gap: 0;
+        border-bottom: 0.5px solid var(--border);
+      }
+      .nav-links.open { display: flex; }
+      .nav-links li { border-bottom: 0.5px solid var(--border); }
+      .nav-links a { display: block; padding: 16px 20px; font-size: 13px; }
+      .hamburger { display: flex; }
+
+      .page-hero { padding: 100px 20px 48px; }
+      .hero-inner { grid-template-columns: 1fr; gap: 24px; }
+      .page-title { font-size: clamp(40px, 12vw, 72px); }
+
+      .featured { padding: 40px 20px 0; }
+      .featured-card { grid-template-columns: 1fr; }
+      .featured-img { height: 240px; }
+      .featured-body { padding: 28px 20px; }
+
+      .articles-section { padding: 40px 20px 64px; }
+      .articles-grid { grid-template-columns: 1fr; }
+
+      .comments-section { padding: 48px 20px 60px; }
+      .comment-input-row { grid-template-columns: 1fr; }
+
+      .newsletter { padding: 56px 20px; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-btn { padding: 13px; }
+
+      footer { padding: 24px 20px; flex-direction: column; gap: 12px; text-align: center; }
+
+      .dynamic-posts { padding: 32px 20px 0; }
+      .dynamic-grid { grid-template-columns: 1fr; }
+
+      .filter-btn { padding: 7px 14px; font-size: 10px; }
+    }
+
+    /* DYNAMIC POSTS FROM NEST */
+    .dynamic-posts { padding: 48px 48px 0; max-width: 1280px; margin: 0 auto; }
+    .dynamic-posts-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 8px; }
+    .dynamic-posts-title { font-family: 'Bodoni Moda', serif; font-size: 20px; font-weight: 400; margin-bottom: 24px; color: var(--black); }
+    .dynamic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2px; background: var(--border); margin-bottom: 8px; }
+    .dynamic-card { background: var(--white); padding: 28px; display: flex; flex-direction: column; gap: 12px; }
+    .dynamic-card-cat { font-size: 9px; letter-spacing: 0.2em; color: var(--gold); }
+    .dynamic-card-img { width: 100%; height: 180px; object-fit: cover; }
+    .dynamic-card-title { font-family: 'Bodoni Moda', serif; font-size: 18px; font-weight: 400; line-height: 1.25; }
+    .dynamic-card-content { font-size: 13px; color: var(--grey); line-height: 1.8; }
+    .dynamic-card-date { font-size: 10px; color: var(--grey); margin-top: auto; }
+    .dynamic-pin { border-top: 2px solid var(--gold); }
+    .submit-feedback-msg { font-size: 13px; color: var(--gold); margin-top: 10px; display: none; }
   </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
 </head>
 <body>
 
@@ -219,6 +334,12 @@
       <li><a href="community.html" class="active">The Nest Edit</a></li>
       <li><a href="about.html">About</a></li>
     </ul>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <a href="join.html" style="padding:9px 20px;background:var(--black);color:var(--white);font-size:10px;letter-spacing:0.18em;text-decoration:none;text-transform:uppercase;transition:background 0.2s;" onmouseover="this.style.background='var(--gold)'" onmouseout="this.style.background='var(--black)'">Join the Nest</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleNav()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
 
   <!-- PAGE HERO -->
@@ -242,6 +363,14 @@
       <button class="filter-btn" onclick="filterArticles('tips', this)">Tips & Guides</button>
       <button class="filter-btn" onclick="filterArticles('collection', this)">Collections</button>
       <button class="filter-btn" onclick="filterArticles('inspiration', this)">Inspiration</button>
+    </div>
+  </div>
+
+  <!-- DYNAMIC POSTS FROM ADMIN -->
+  <div id="dynamicPostsWrap" style="display:none">
+    <div class="dynamic-posts">
+      <div class="dynamic-posts-label">FROM THE NEST</div>
+      <div class="dynamic-grid" id="dynamicGrid"></div>
     </div>
   </div>
 
@@ -284,15 +413,33 @@
 
       <div class="article-card" data-cat="tips" onclick="openArticle('article-2')">
         <div class="article-img">
-          <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&q=80" alt="Kitchen organisation"/>
+          <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=600&q=80" alt="Space planning interiors"/>
         </div>
         <div class="article-body">
           <div class="article-meta">
             <span class="article-cat">TIPS & GUIDES</span>
+            <span class="article-date">June 2025</span>
+          </div>
+          <div class="article-title">Space planning — the hidden science behind a <em>beautiful room</em></div>
+          <p class="article-excerpt">Premium interiors are rarely about expensive furniture. They start with a plan — and understanding how movement, balance, and zoning transform a space.</p>
+          <div class="article-footer">
+            <span class="article-author">Urban Nest</span>
+            <span class="article-read">6 MIN READ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card" data-cat="trends" onclick="openArticle('article-3')">
+        <div class="article-img">
+          <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80" alt="Curved furniture interiors"/>
+        </div>
+        <div class="article-body">
+          <div class="article-meta">
+            <span class="article-cat">TRENDS</span>
             <span class="article-date">May 2025</span>
           </div>
-          <div class="article-title">5 kitchen accessories that make cooking feel <em>effortless</em></div>
-          <p class="article-excerpt">You don't need a modular kitchen to have a beautiful one. These five pieces will change the way your kitchen looks and feels.</p>
+          <div class="article-title">India's interiors are going soft — <em>and it's perfect</em></div>
+          <p class="article-excerpt">Arched doorways, rounded sofas, organic forms — the return of curves in contemporary Indian design is less a trend import than a homecoming.</p>
           <div class="article-footer">
             <span class="article-author">Urban Nest</span>
             <span class="article-read">5 MIN READ</span>
@@ -300,71 +447,35 @@
         </div>
       </div>
 
-      <div class="article-card" data-cat="inspiration" onclick="openArticle('article-3')">
+      <div class="article-card" data-cat="inspiration" onclick="openArticle('article-4')">
         <div class="article-img">
-          <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=600&q=80" alt="Bedroom decor India"/>
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&q=80" alt="Luxury penthouse interiors"/>
         </div>
         <div class="article-body">
           <div class="article-meta">
             <span class="article-cat">INSPIRATION</span>
             <span class="article-date">April 2025</span>
           </div>
-          <div class="article-title">The Indian bedroom, <em>reimagined</em></div>
-          <p class="article-excerpt">How a generation of young urban Indians is transforming their bedrooms from sleeping spaces into sanctuaries of personal expression.</p>
+          <div class="article-title">What celebrity homes actually <em>teach us about design</em></div>
+          <p class="article-excerpt">The real lesson from a well-curated penthouse isn't the budget. It's the consistency of personality — and that's available at any price point.</p>
           <div class="article-footer">
             <span class="article-author">Urban Nest</span>
-            <span class="article-read">6 MIN READ</span>
+            <span class="article-read">5 MIN READ</span>
           </div>
         </div>
       </div>
 
-      <div class="article-card" data-cat="trends" onclick="openArticle('article-4')">
+      <div class="article-card" data-cat="trends" onclick="openArticle('article-5')">
         <div class="article-img">
-          <img src="https://images.unsplash.com/photo-1567016432779-094069958ea5?w=600&q=80" alt="Home decor trends India 2025"/>
+          <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80" alt="Retro interior design"/>
         </div>
         <div class="article-body">
           <div class="article-meta">
             <span class="article-cat">TRENDS</span>
             <span class="article-date">March 2025</span>
           </div>
-          <div class="article-title">The 7 home décor trends defining <em>India in 2025</em></div>
-          <p class="article-excerpt">From warm neutrals to handcrafted textures — the aesthetic shifts shaping how urban India is decorating its homes this year.</p>
-          <div class="article-footer">
-            <span class="article-author">Urban Nest</span>
-            <span class="article-read">7 MIN READ</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="article-card" data-cat="collection" onclick="openArticle('article-5')">
-        <div class="article-img">
-          <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=600&q=80" alt="Bathroom collection"/>
-        </div>
-        <div class="article-body">
-          <div class="article-meta">
-            <span class="article-cat">COLLECTIONS</span>
-            <span class="article-date">February 2025</span>
-          </div>
-          <div class="article-title">Build the perfect <em>bath collection</em> under ₹3,000</div>
-          <p class="article-excerpt">A complete guide to curating a cohesive, beautiful bathroom with just seven intentional pieces — all under ₹3,000 total.</p>
-          <div class="article-footer">
-            <span class="article-author">Urban Nest</span>
-            <span class="article-read">4 MIN READ</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="article-card" data-cat="tips" onclick="openArticle('article-6')">
-        <div class="article-img">
-          <img src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=600&q=80" alt="Small apartment decor India"/>
-        </div>
-        <div class="article-body">
-          <div class="article-meta">
-            <span class="article-cat">TIPS & GUIDES</span>
-            <span class="article-date">January 2025</span>
-          </div>
-          <div class="article-title">Making a 1BHK feel like <em>a home, not a house</em></div>
-          <p class="article-excerpt">The compact urban Indian apartment has its own rules. Here's how to work with the space you have — not the space you wish you had.</p>
+          <div class="article-title">The retro revival — <em>why nostalgia is the hottest design language</em></div>
+          <p class="article-excerpt">Wood panelling, cantilever chairs, mirror-clad surfaces — mid-century aesthetics are back and they look more contemporary than almost anything designed this decade.</p>
           <div class="article-footer">
             <span class="article-author">Urban Nest</span>
             <span class="article-read">6 MIN READ</span>
@@ -372,20 +483,38 @@
         </div>
       </div>
 
-      <div class="article-card" data-cat="inspiration" onclick="openArticle('article-7')">
+      <div class="article-card" data-cat="inspiration" onclick="openArticle('article-6')">
         <div class="article-img">
-          <img src="https://images.unsplash.com/photo-1565182999561-18d7dc61c393?w=600&q=80" alt="Affordable luxury India"/>
+          <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&q=80" alt="Immersive interior design"/>
         </div>
         <div class="article-body">
           <div class="article-meta">
             <span class="article-cat">INSPIRATION</span>
-            <span class="article-date">December 2024</span>
+            <span class="article-date">February 2025</span>
           </div>
-          <div class="article-title">Affordable luxury — <em>what it actually means</em></div>
-          <p class="article-excerpt">Luxury is not a price point. It is a feeling — the quiet pleasure of using something beautiful every single day. Here's how to find it.</p>
+          <div class="article-title">When a room becomes <em>an experience</em></div>
+          <p class="article-excerpt">The most exciting interiors in the world are dissolving the line between architecture and furniture. What this shift means for how we think about home.</p>
           <div class="article-footer">
             <span class="article-author">Urban Nest</span>
             <span class="article-read">5 MIN READ</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="article-card" data-cat="trends" onclick="openArticle('article-7')">
+        <div class="article-img">
+          <img src="https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=600&q=80" alt="Indian home design"/>
+        </div>
+        <div class="article-body">
+          <div class="article-meta">
+            <span class="article-cat">TRENDS</span>
+            <span class="article-date">January 2025</span>
+          </div>
+          <div class="article-title">The jugaad home — <em>why India deserves purpose-built design</em></div>
+          <p class="article-excerpt">The ice cream container as butter dish. The plate as cutting board. India's improvised home is a tribute to ingenuity — and it deserves something better.</p>
+          <div class="article-footer">
+            <span class="article-author">Urban Nest</span>
+            <span class="article-read">7 MIN READ</span>
           </div>
         </div>
       </div>
@@ -405,7 +534,8 @@
           <input type="text" class="comment-input" placeholder="Your city" id="comment-city"/>
         </div>
         <textarea class="comment-input" placeholder="Share your thoughts on Indian home décor, a product you love, or a space you've transformed..." id="comment-text" style="width:100%"></textarea>
-        <button class="comment-submit" onclick="submitComment()">POST TO THE NEST →</button>
+        <button class="comment-submit" id="submitBtn" onclick="submitComment()">POST TO THE NEST →</button>
+        <div class="submit-feedback-msg" id="submitMsg">Thank you! Your message has been posted to The Nest.</div>
       </div>
 
       <div class="comments-list" id="comments-list">
@@ -450,9 +580,10 @@
     <h2 class="newsletter-title">The Nest Edit,<br/><em>in your inbox.</em></h2>
     <p class="newsletter-sub">New articles, décor guides, and curated finds — every two weeks.</p>
     <div class="newsletter-form">
-      <input type="email" class="newsletter-input" placeholder="your@email.com"/>
-      <button class="newsletter-btn">SUBSCRIBE →</button>
+      <input type="email" class="newsletter-input" id="nlEmail" placeholder="your@email.com"/>
+      <button class="newsletter-btn" id="nlBtn" onclick="quickSubscribe()">SUBSCRIBE →</button>
     </div>
+    <p id="nlMsg" style="font-size:12px;color:var(--gold);margin-top:12px;display:none;">You're in! <a href="join.html" style="color:var(--gold);text-decoration:underline;">Complete your profile</a> for early store access.</p>
   </div>
 
   <footer>
@@ -462,6 +593,24 @@
     </div>
     <div class="footer-note">© 2025 Urban Nest · All rights reserved</div>
   </footer>
+
+  <!-- ARTICLE MODAL -->
+  <div id="articleOverlay" onclick="handleOverlayClick(event)">
+    <div id="articleModal">
+      <button class="modal-close" onclick="closeArticle()" title="Close">×</button>
+      <div class="modal-hero"><img id="modalImg" src="" alt=""/></div>
+      <div class="modal-body">
+        <div id="modalCat" class="modal-cat"></div>
+        <h2 id="modalTitle" class="modal-title"></h2>
+        <div class="modal-meta">
+          <span id="modalAuthor"></span>
+          <span id="modalRead"></span>
+          <span id="modalDate"></span>
+        </div>
+        <div id="modalContent" class="modal-content"></div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Filter articles
@@ -477,17 +626,138 @@
       });
     }
 
-    // Open article placeholder
+    // ── ARTICLE DATA ──
+    const ARTICLES = {
+      'article-1': {
+        cat:'TRENDS', date:'June 2025', read:'8 min read', author:'Urban Nest Editorial',
+        title:'Why Indian homes are finally embracing <em>the art of the small detail</em>',
+        img:'https://images.unsplash.com/photo-1584622781867-1b79ff7e0d21?w=1200&q=80',
+        body:`<p>The era of the statement chandelier is giving way to something more quietly radical — the rise of the curated everyday object. For decades, "decorating your home" in India meant one of two things: a major renovation or doing nothing at all. The middle path — upgrading your space incrementally, deliberately, with small but perfectly chosen objects — was simply not available. The market didn't offer it. The culture didn't celebrate it. That is changing.</p>
+        <h3>The shift we're seeing</h3>
+        <p>Walk into any mid-market apartment in Bengaluru, Pune, or Delhi today and you'll notice something different. The bathroom has a matching set — soap dispenser, toothbrush holder, tray, all in the same material and tone. The kitchen counter has been cleared of accumulated clutter and replaced with two or three purposeful pieces: a chopping board beautiful enough to leave out, a spice rack that earns its counter space. No architect was involved. No lakhs were spent. And yet these spaces feel curated, considered, alive.</p>
+        <h3>Why it took so long</h3>
+        <p>The answer lies in how the Indian home décor market was structured. At the top: luxury brands with beautiful catalogues aimed at the wealthiest 10%. At the bottom: uncoordinated, purely functional items from local markets and e-commerce mass listings. No one was making design-led, coordinated, affordable home accessories for the vast middle — the family in a 2BHK in Noida or a 1BHK in Thane who cares deeply about their home but cannot justify ₹15,000 for a side table.</p>
+        <h3>What we believe</h3>
+        <p>Urban Nest was built precisely for this gap. Our belief is simple: every Indian home deserves objects that are beautiful, functional, and designed to work together — not one perfect showpiece, but a coherent, considered home environment you enjoy living in every day. The art of the small detail isn't about minimalism or Instagram aesthetics. It is about choosing the seven things in your bathroom intentionally rather than accumulating twenty things accidentally. The quiet pleasure of a kitchen counter where everything has a place and a purpose. That, to us, is what home really means.</p>`
+      },
+      'article-2': {
+        cat:'TIPS & GUIDES', date:'June 2025', read:'6 min read', author:'Urban Nest Editorial',
+        title:'Space planning — the hidden science behind a <em>beautiful room</em>',
+        img:'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1200&q=80',
+        body:`<p>When we think about what makes a room feel premium, we reach for obvious answers — expensive furniture, imported fabrics, designer lighting. But visit enough well-designed spaces and a pattern emerges: the rooms that feel truly special have something simpler in common. They are planned well. Space planning is the discipline that determines how furniture, movement, light, and activity are distributed across a room. It is the skeleton beneath the decoration, separating a room that merely contains furniture from one that genuinely functions as a space for human living.</p>
+        <h3>The three principles that matter</h3>
+        <p><em>Movement first.</em> A room should allow its occupants to move through it comfortably without weaving between chairs. The primary pathway through any space should be clear. This sounds obvious but is routinely ignored — most Indian homes have too much furniture pushed against walls, leaving an awkward void in the centre.</p>
+        <p><em>Zoning.</em> Even a small room can contain multiple zones — a reading nook, a conversation area, a workspace — if they are defined correctly. The tools are simple: a rug, a change in lighting, the angle of a chair. No walls required.</p>
+        <p><em>Balance, not symmetry.</em> The goal is visual equilibrium, not mirror-image layouts. A heavy sofa can be balanced by a cluster of smaller furniture on the opposite side. An asymmetric arrangement often feels more alive than a perfectly symmetrical one.</p>
+        <h3>For Indian homes specifically</h3>
+        <p>Indian interiors often have to solve a unique challenge: multi-purpose spaces where one room serves simultaneously as living room, dining room, and home office. The answer is not to buy less furniture — it is to choose pieces that do multiple jobs and arrange them to create a sense of transition between functions. A well-placed bookshelf can divide a space without a wall. A dining table at the right height serves as a workspace during the day. Space planning turns constraints into design decisions.</p>`
+      },
+      'article-3': {
+        cat:'TRENDS', date:'May 2025', read:'5 min read', author:'Urban Nest Editorial',
+        title:"India's interiors are going soft — <em>and it's perfect</em>",
+        img:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=80',
+        body:`<p>For most of the past decade, the dominant aesthetic in Indian urban homes was a fairly literal interpretation of contemporary minimalism: hard lines, rectangular furniture, flat surfaces. It was clean and legible. It was also, if we're honest, a little cold. Something has shifted. The curves are back. Across the country's most interesting new interiors — apartments in Worli, concept cafés in Indiranagar, the mood boards of every designer worth following — organic forms are arriving. Arched doorways. Rounded sofas. Circular rugs. Sculptural accent chairs that look more like abstract art than furniture. This is not a passing trend. It is a correction.</p>
+        <h3>Why soft geometry works</h3>
+        <p>The science is straightforward: rounded forms trigger a physiological response of comfort and safety. Sharp corners signal alertness; curves signal ease. A sofa with gently rounded arms feels welcoming in a way that a right-angled sectional simply does not. For homes — spaces designed for rest, for the private self — this matters enormously.</p>
+        <h3>India's relationship with the curve</h3>
+        <p>What makes this trend particularly resonant in the Indian context is that curves are not foreign to Indian design — they are native to it. The arched niches of Rajasthani havelis. The gentle jharokha window-bays of Gujarati architecture. The rounded motifs of classical Indian textiles. Organic form is woven into India's design DNA; it simply got suppressed by a century of modernist influence. The return of curves in contemporary Indian interiors is less a trend import than a homecoming.</p>
+        <h3>How to start</h3>
+        <p>You don't need to renovate to introduce softness. A single rounded accent chair. A curved mirror. A circular dining table instead of a rectangular one. An arched bookshelf insert. The entry point is lower than you think, and the effect on a room's atmosphere is immediate.</p>`
+      },
+      'article-4': {
+        cat:'INSPIRATION', date:'April 2025', read:'5 min read', author:'Urban Nest Editorial',
+        title:'What celebrity homes actually <em>teach us about design</em>',
+        img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80',
+        body:`<p>Glossy home tours of celebrity penthouses tend to generate a predictable response — initial awe at the scale, then the comfortable dismissal: "It's easy to have a beautiful home when you have that kind of money." This dismissal misses the more interesting lesson available in these spaces. The budget is irrelevant. The principle is not.</p>
+        <h3>Personality as design brief</h3>
+        <p>The most striking thing about any well-curated home — celebrity or otherwise — is the consistency of personality across the entire space. A good home tells you something specific and true about the person who lives in it. When a space is curated around an actual vision, you can feel it. When it is decorated by accumulation — one sofa from here, a gifted artwork from there, a rug that was on sale — you can feel that too. The lesson from these home tours is not "spend more." It is: know what you're trying to say, and let that guide every decision.</p>
+        <h3>Translated for the rest of us</h3>
+        <p>This kind of intentionality is available to every home, at every budget. It begins with a simple question: what do I actually want to feel when I walk into this room? Not "what looks good on Instagram." Not "what will impress guests." What do I — specifically — want to feel? From that answer, every subsequent decision becomes clearer. You discover you don't need more objects; you need fewer, better-chosen ones. You stop buying what's available and start waiting for what's right. The celebrity penthouse is a useful mirror — not because it shows you what to buy, but because it shows you what a deliberate home looks like.</p>`
+      },
+      'article-5': {
+        cat:'TRENDS', date:'March 2025', read:'6 min read', author:'Urban Nest Editorial',
+        title:'The retro revival — <em>why nostalgia is the hottest design language</em>',
+        img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80',
+        body:`<p>When Italian architect Fabio Fantolino designed the Lève Office Bar in Turin, he reached backwards — to the 1960s, to Space Age modernism, to the chrome-and-cantilever aesthetic of mid-century Italian offices — and found in that archive something more contemporary than anything designed this decade. Wood panelling, mirror-clad surfaces, cantilever chairs in tubular steel, olive green countertops. An interior simultaneously deeply historical and unmistakably fresh. This is the paradox at the heart of the retro revival: nostalgia, executed well, does not look old. It looks timeless.</p>
+        <h3>Why vintage aesthetics are winning</h3>
+        <p>The appeal of mid-century and retro aesthetics is a reaction to something specific: the sameness that has increasingly defined the contemporary interior. When every new café, home, and hotel uses the same five materials — white walls, terrazzo, brushed brass, light oak, linen — spaces stop being interesting. They become settings rather than experiences. Retro design offers a genuine escape from this convergence: a visual language with actual history behind it, one that feels lived-in rather than assembled.</p>
+        <h3>What retro means for Indian homes</h3>
+        <p>India has its own rich archive of mid-century modernism: the public buildings of Chandigarh, the civic architecture of post-Independence Mumbai, the clean-lined furniture of the 1970s Indian middle class. This design language belongs to us. As the global design conversation rediscovers the power of the past, there is an opportunity for Indian design to reconnect with its own modernist heritage — honest materials, clean geometry, objects made to last rather than to impress for a season.</p>`
+      },
+      'article-6': {
+        cat:'INSPIRATION', date:'February 2025', read:'5 min read', author:'Urban Nest Editorial',
+        title:'When a room becomes <em>an experience</em>',
+        img:'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80',
+        body:`<p>For most of design history, architecture and furniture have been understood as separate disciplines. Architecture defines the shell; furniture fills it. The relationship is sequential and hierarchical — the building comes first, the furniture comes later. A growing body of contemporary design work is disrupting this separation, and the results are some of the most striking interiors being built anywhere in the world. Spanish designer Isern Serra's Barcelona cocktail bar offers a compelling example: modular seating flows continuously across floor, wall, and ceiling, forming a landscape of curved forms that makes the distinction between furniture and architecture essentially meaningless. You don't sit in the room. You inhabit it.</p>
+        <h3>The experiential interior</h3>
+        <p>What makes this kind of space feel different is its relationship to the body. Standard interior design speaks primarily to the eye — it creates images, compositions, visual effects. Experiential design speaks to the whole body: it changes how you move, how you sit, what you feel when you enter. Indian architecture has always understood this dimension. The cool shadow of a deep veranda. The heightened threshold of a carved doorway. The meditative repetition of a colonnaded courtyard. These are spaces designed to be felt, not just seen.</p>
+        <h3>Closer to home</h3>
+        <p>You don't need to commission a designer to think experientially about your home. The question is simply: how does this room make you feel when you're in it? Often the answer is not satisfying. And often the fix is not expensive — a change in where the light falls, a rug that defines where you actually spend time, a chair placed at an angle that invites conversation rather than facing the television. Small interventions, experiential effects.</p>`
+      },
+      'article-7': {
+        cat:'TRENDS', date:'January 2025', read:'7 min read', author:'Urban Nest Editorial',
+        title:'The jugaad home — <em>why India deserves purpose-built design</em>',
+        img:'https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=1200&q=80',
+        body:`<p>There is a word in Hindi that captures something essential about how Indian homes actually function: jugaad. A clever improvisation born of necessity. An ice cream container repurposed as a butter dish. A plate used as a cutting surface. A plastic bag serving as a bathroom bin. Jugaad is celebrated in Indian culture as resourcefulness — a tribute to ingenuity. But in the context of the home, jugaad has a cost.</p>
+        <h3>What improvisation actually looks like</h3>
+        <p>When every object in your home is a compromise — used for a purpose it was not designed for, placed where it fits rather than where it belongs — the cumulative effect is a space that feels perpetually provisional. A home waiting to become a home. This is the experience of millions of Indian middle-class households: not poverty, not affluence, but a persistent gap between the home they want and the products available to create it.</p>
+        <h3>The gap in the market</h3>
+        <p>India's home décor market has a peculiar structure. At the top: luxury brands offering beautifully designed objects at prices that exclude the majority. At the bottom: functional items that fill the gap without resolving it. The middle — coordinated, design-led, functional accessories at genuinely accessible price points — has been largely absent. Global benchmarks like IKEA and MUJI demonstrate that design-led functionality can transform middle-class living standards; yet their reach in India remains limited and largely furniture-oriented. No Indian brand currently offers a cohesive home accessory experience for middle-income households. That is the gap Urban Nest intends to fill.</p>
+        <h3>What purpose-built actually means</h3>
+        <p>A bathroom set designed to work together: matching tray, soap dispenser, toothbrush holder, bin, in a consistent material and tone. A kitchen with a chopping board that earns its counter space, a butter dish that replaces the ice cream container, a utensil organiser that makes cooking feel considered rather than improvised. These are not luxury items. They are objects designed for their purpose, made well, and priced for the people who actually need them. The jugaad instinct is honourable. But design should make it unnecessary — not by being expensive, but by being thoughtful. That is what Urban Nest is building.</p>`
+      }
+    };
+
     function openArticle(id) {
-      alert('Full article coming soon! For now, use this page to browse and discuss.');
+      const a = ARTICLES[id];
+      if (!a) return;
+      document.getElementById('modalImg').src = a.img;
+      document.getElementById('modalImg').alt = a.title.replace(/<[^>]*>/g,'');
+      document.getElementById('modalCat').textContent = a.cat;
+      document.getElementById('modalTitle').innerHTML = a.title;
+      document.getElementById('modalAuthor').textContent = a.author;
+      document.getElementById('modalRead').textContent = a.read;
+      document.getElementById('modalDate').textContent = a.date;
+      document.getElementById('modalContent').innerHTML = a.body;
+      document.getElementById('articleModal').scrollTop = 0;
+      document.getElementById('articleOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
     }
 
-    // Submit comment
-    function submitComment() {
+    function closeArticle() {
+      document.getElementById('articleOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('articleOverlay')) closeArticle();
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArticle(); });
+
+    // Submit comment — saves to Supabase feedback table and renders locally
+    async function submitComment() {
       const name = document.getElementById('comment-name').value.trim();
       const city = document.getElementById('comment-city').value.trim();
       const text = document.getElementById('comment-text').value.trim();
       if (!name || !text) { alert('Please enter your name and comment.'); return; }
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'POSTING…';
+
+      const message = city ? `${text} [${city}]` : text;
+
+      try {
+        await db.from('feedback').insert({
+          name,
+          message,
+          page: 'community',
+          status: 'unread',
+        });
+      } catch (e) {
+        // Silently continue — show comment locally even if Supabase isn't configured yet
+      }
 
       const list = document.getElementById('comments-list');
       const initial = name.charAt(0).toUpperCase();
@@ -509,6 +779,58 @@
       document.getElementById('comment-name').value = '';
       document.getElementById('comment-city').value = '';
       document.getElementById('comment-text').value = '';
+      btn.disabled = false;
+      btn.textContent = 'POST TO THE NEST →';
+      const msg = document.getElementById('submitMsg');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 4000);
+    }
+
+    // Load published Nest posts from Supabase
+    async function loadNestPosts() {
+      try {
+        const { data } = await db.from('nest_posts')
+          .select('*')
+          .eq('published', true)
+          .order('pinned', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(6);
+
+        if (!data || !data.length) return;
+
+        const grid = document.getElementById('dynamicGrid');
+        grid.innerHTML = data.map(p => `
+          <div class="dynamic-card ${p.pinned ? 'dynamic-pin' : ''}">
+            ${p.image_url ? `<img class="dynamic-card-img" src="${p.image_url}" alt="${p.title}" loading="lazy"/>` : ''}
+            <div class="dynamic-card-cat">${p.category ? p.category.toUpperCase() : 'THE NEST'}${p.pinned ? ' · PINNED' : ''}</div>
+            <div class="dynamic-card-title">${p.title}</div>
+            <div class="dynamic-card-content">${(p.content || '').slice(0, 180)}${p.content && p.content.length > 180 ? '…' : ''}</div>
+            <div class="dynamic-card-date">${new Date(p.created_at).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}</div>
+          </div>`).join('');
+
+        document.getElementById('dynamicPostsWrap').style.display = '';
+      } catch (e) {
+        // Supabase not configured — static content shows as fallback
+      }
+    }
+
+    loadNestPosts();
+
+    // Quick email subscribe from newsletter bar
+    async function quickSubscribe() {
+      const email = document.getElementById('nlEmail').value.trim();
+      if (!email || !email.includes('@')) return;
+      const btn = document.getElementById('nlBtn');
+      btn.textContent = '…';
+      btn.disabled = true;
+      try {
+        await db.from('subscribers').insert({ email, source: 'newsletter', city: 'Unknown' });
+      } catch(e) {}
+      document.getElementById('nlEmail').value = '';
+      btn.textContent = 'SUBSCRIBE →';
+      btn.disabled = false;
+      const msg = document.getElementById('nlMsg');
+      msg.style.display = 'block';
     }
 
     // Like a comment
@@ -520,6 +842,21 @@
       btn.innerHTML = '♥ <span>' + (count + 1) + '</span>';
     }
   </script>
+
+<script>
+  function toggleNav() {
+    const links = document.querySelector('.nav-links');
+    const btn = document.getElementById('hamburger');
+    links.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => {
+      document.querySelector('.nav-links').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
+    });
+  });
+</script>
 
 </body>
 </html>

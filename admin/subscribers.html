@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Subscribers — Urban Nest Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+  .header-actions { display: flex; gap: 10px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 28px; }
+  .stat-chip { background: var(--white); border: 0.5px solid var(--border); padding: 18px 20px; }
+  .stat-chip-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 6px; }
+  .stat-chip-value { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .stat-chip.gold .stat-chip-value { color: var(--gold); }
+
+  .toolbar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+  .filter-btn { padding: 8px 18px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover { color: var(--black); border-color: var(--black); }
+  .filter-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+  .search-box { padding: 8px 14px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--black); outline: none; width: 220px; margin-left: auto; }
+  .search-box:focus { border-color: var(--gold); }
+
+  .export-btn { padding: 8px 20px; border: 0.5px solid var(--gold); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); cursor: pointer; transition: all 0.2s; }
+  .export-btn:hover { background: var(--gold); color: var(--white); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--white); border: 0.5px solid var(--border); }
+  thead { border-bottom: 0.5px solid var(--border); }
+  th { padding: 12px 20px; text-align: left; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); font-weight: 500; }
+  td { padding: 14px 20px; font-size: 13px; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #faf9f5; }
+  .td-name { font-weight: 500; }
+  .td-sub { font-size: 11px; color: var(--grey); margin-top: 2px; }
+  .city-badge { font-size: 10px; letter-spacing: 0.08em; padding: 3px 8px; background: var(--gold-light); color: var(--gold); display: inline-block; }
+  .source-badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; background: #eee; color: var(--grey); display: inline-block; }
+  .del-btn { padding: 4px 10px; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 0.5px solid rgba(192,57,43,0.25); background: transparent; cursor: pointer; color: #c0392b; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .del-btn:hover { background: rgba(192,57,43,0.05); }
+  .empty-state { padding: 64px; text-align: center; color: var(--grey); font-size: 13px; background: var(--white); border: 0.5px solid var(--border); }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item active"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <h1>Subscribers</h1>
+      <p>People who joined the Nest — your future store audience</p>
+    </div>
+    <div class="header-actions">
+      <button class="export-btn" onclick="exportCSV()">Export CSV ↓</button>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-chip gold">
+      <div class="stat-chip-label">Total</div>
+      <div class="stat-chip-value" id="statTotal">—</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-chip-label">Delhi</div>
+      <div class="stat-chip-value" id="statDelhi">—</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-chip-label">Noida / GN</div>
+      <div class="stat-chip-value" id="statNoida">—</div>
+    </div>
+    <div class="stat-chip">
+      <div class="stat-chip-label">Other Cities</div>
+      <div class="stat-chip-value" id="statOther">—</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('delhi', this)">Delhi</button>
+    <button class="filter-btn" onclick="setFilter('noida', this)">Noida</button>
+    <button class="filter-btn" onclick="setFilter('gurgaon', this)">Gurgaon</button>
+    <button class="filter-btn" onclick="setFilter('other', this)">Other</button>
+    <input class="search-box" type="text" placeholder="Search name or email…" oninput="searchSubs(this.value)"/>
+  </div>
+
+  <table id="subsTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Area</th>
+        <th>Address</th>
+        <th>Source</th>
+        <th>Joined</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="subsBody">
+      <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--grey)">Loading…</td></tr>
+    </tbody>
+  </table>
+</main>
+
+<script>
+let subscribers = [];
+let currentFilter = 'all';
+let searchTerm = '';
+
+(async () => { await requireAuth(); loadSubscribers(); })();
+
+async function loadSubscribers() {
+  const { data, error } = await db.from('subscribers')
+    .select('*').order('created_at', { ascending: false });
+  if (error) { showToast('Failed to load subscribers', 'error'); return; }
+  subscribers = data || [];
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = subscribers.length;
+  document.getElementById('statDelhi').textContent = subscribers.filter(s => s.city && s.city.toLowerCase().includes('delhi')).length;
+  document.getElementById('statNoida').textContent = subscribers.filter(s => s.city && (s.city.toLowerCase().includes('noida') || s.city.toLowerCase().includes('greater noida'))).length;
+  const ncrKeywords = ['delhi', 'noida', 'gurgaon', 'gurugram', 'ghaziabad', 'faridabad'];
+  document.getElementById('statOther').textContent = subscribers.filter(s => s.city && !ncrKeywords.some(k => s.city.toLowerCase().includes(k))).length;
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function searchSubs(val) {
+  searchTerm = val.toLowerCase();
+  renderTable();
+}
+
+function filtered() {
+  return subscribers.filter(s => {
+    const city = (s.city || '').toLowerCase();
+    const matchFilter =
+      currentFilter === 'all' ? true :
+      currentFilter === 'delhi' ? city.includes('delhi') :
+      currentFilter === 'noida' ? (city.includes('noida') || city.includes('greater noida')) :
+      currentFilter === 'gurgaon' ? (city.includes('gurgaon') || city.includes('gurugram')) :
+      !['delhi','noida','gurgaon','gurugram','ghaziabad','faridabad'].some(k => city.includes(k));
+    const matchSearch = !searchTerm ||
+      (s.name || '').toLowerCase().includes(searchTerm) ||
+      (s.email || '').toLowerCase().includes(searchTerm);
+    return matchFilter && matchSearch;
+  });
+}
+
+function renderTable() {
+  const rows = filtered();
+  const body = document.getElementById('subsBody');
+  if (!rows.length) {
+    body.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--grey)">No subscribers found.</td></tr>`;
+    return;
+  }
+  body.innerHTML = rows.map(s => `
+    <tr>
+      <td><div class="td-name">${s.name || '—'}</div></td>
+      <td><div>${s.email}</div></td>
+      <td><div class="td-sub">${s.phone || '—'}</div></td>
+      <td>${s.city ? `<span class="city-badge">${s.city}</span>` : '—'}</td>
+      <td><div class="td-sub">${s.address || '—'}</div></td>
+      <td><span class="source-badge">${(s.source || 'website').replace('-', ' ')}</span></td>
+      <td><div class="td-sub">${new Date(s.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</div></td>
+      <td><button class="del-btn" onclick="deleteSub('${s.id}')">×</button></td>
+    </tr>`).join('');
+}
+
+async function deleteSub(id) {
+  if (!confirm('Remove this subscriber?')) return;
+  const { error } = await db.from('subscribers').delete().eq('id', id);
+  if (error) { showToast('Delete failed', 'error'); return; }
+  subscribers = subscribers.filter(s => s.id !== id);
+  updateStats();
+  renderTable();
+  showToast('Subscriber removed');
+}
+
+function exportCSV() {
+  const rows = filtered();
+  if (!rows.length) { showToast('Nothing to export', 'error'); return; }
+  const headers = ['Name', 'Email', 'Phone', 'Area', 'Address', 'Source', 'Joined'];
+  const lines = [
+    headers.join(','),
+    ...rows.map(s => [
+      `"${s.name || ''}"`,
+      `"${s.email || ''}"`,
+      `"${s.phone || ''}"`,
+      `"${s.city || ''}"`,
+      `"${(s.address || '').replace(/"/g, '""')}"`,
+      `"${s.source || ''}"`,
+      `"${new Date(s.created_at).toLocaleDateString('en-GB')}"`,
+    ].join(','))
+  ];
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `urban-nest-subscribers-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast(`Exported ${rows.length} subscribers`);
+}
+</script>
+</body>
+</html>

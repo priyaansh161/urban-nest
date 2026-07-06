@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>The Bathroom — Urban Nest</title>
+  <title>The Bedroom — Urban Nest</title>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase.js"></script>
@@ -107,7 +107,7 @@
       URBAN NEST
     </a>
     <div class="nav-right">
-      <span class="nav-room-label">THE BATHROOM</span>
+      <span class="nav-room-label">THE BEDROOM</span>
       <a href="index.html" class="back-btn">← ALL SPACES</a>
     </div>
   </nav>
@@ -116,11 +116,11 @@
 
   <div id="loading">
     <div class="spinner"></div>
-    <p>ENTERING THE BATHROOM</p>
+    <p>ENTERING THE BEDROOM</p>
   </div>
 
   <div id="no-scene">
-    <h2>The Bathroom is being prepared</h2>
+    <h2>The Bedroom is being prepared</h2>
     <p>THIS SPACE WILL OPEN SOON</p>
   </div>
 
@@ -130,8 +130,8 @@
 
   <div id="panel">
     <div class="panel-header">
-      <button class="panel-back" id="close-btn">← BACK TO BATHROOM</button>
-      <span class="panel-room-tag">THE BATHROOM</span>
+      <button class="panel-back" id="close-btn">← BACK TO BEDROOM</button>
+      <span class="panel-room-tag">THE BEDROOM</span>
     </div>
     <div class="panel-3d" id="panel-3d">
       <div id="product-viewer-wrap"></div>
@@ -148,29 +148,16 @@
       <div class="divider"></div>
       <div class="specs" id="p-specs"></div>
       <p class="similar-note">Similar style · Available in India</p>
-      <a class="btn-similar" id="p-buy" href="#" target="_blank" rel="noopener sponsored">SHOP SIMILAR →</a>
+      <a class="btn-similar" id="p-buy" href="#" target="_blank" rel="noopener sponsored">SHOP ON AMAZON →</a>
     </div>
   </div>
 
   <script>
-    const ROOM = 'bath';
-    const LOADING_TEXT = 'ENTERING THE BATHROOM';
+    const ROOM = 'bed';
+    const LOADING_TEXT = 'ENTERING THE BEDROOM';
     // Fallback scene when the database has no active scenes for this room
-    const DEFAULT_SCENE = 'https://prod.spline.design/uZpVsuRsjSo8bzao/scene.splinecode';
-    // Used until room_products is set up in Supabase (run admin/setup-products.sql once)
-    const FALLBACK_PRODUCTS = [
-      { id:'f1',  name:'Soap Dispenser', tag:'BATHROOM ACCESSORIES', description:'A sleek ceramic dispenser for your liquid soap or handwash. Clean lines, matte black pump, perfect for any modern vanity.', spline_url:'https://prod.spline.design/GE2Lq8Cg0wgaAZjS/scene.splinecode', buy_link:'https://amzn.to/4gAUBxh', specs:[['Material','Ceramic'],['Pump','Matte black'],['Capacity','300 ml']], dot_x:40.1249, dot_y:49.8715, object_name:'Soap Dispenser' },
-      { id:'f2',  name:'Soap Dish', tag:'BATHROOM ACCESSORIES', description:'A ribbed ceramic soap dish with drainage grooves. Keeps your soap dry and your counter clean.', spline_url:'https://prod.spline.design/htz3mYXdulTmsqtL/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','Ceramic'],['Finish','Matte white'],['Size','12 × 8 cm']], dot_x:44.7593, dot_y:53.1597, object_name:'Soap Dish' },
-      { id:'f3',  name:'Vanity Tray', tag:'VANITY ACCESSORIES', description:'A white marble vanity tray with a polished gold rim. Organise your counter essentials with effortless elegance.', spline_url:'https://prod.spline.design/ReoocyAwE8Yvhmpu/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','Marble'],['Rim','Polished gold'],['Size','30 × 20 cm']], dot_x:44.1763, dot_y:52.3608, object_name:'Tray' },
-      { id:'f4',  name:'Toilet Mat', tag:'BATH TEXTILES', description:'A soft cotton loop pile mat with non-slip latex backing. Machine washable and moisture absorbent.', spline_url:'https://prod.spline.design/666Wti0U3yF-wPvt/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','100% cotton'],['GSM','900'],['Backing','Non-slip latex']], dot_x:54.1982, dot_y:69.6905, object_name:'Toilet Mat' },
-      { id:'f5',  name:'Teal Rug', tag:'BATH TEXTILES', description:'A plush tufted rectangle rug in teal. Soft underfoot, moisture absorbent, anti-skid base.', spline_url:'https://prod.spline.design/nsVngQY8mZwEoJ5k/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','Cotton tufted'],['Size','60 × 90 cm'],['Base','Anti-skid']], dot_x:41.0926, dot_y:69.5693, object_name:'Teal Rug' },
-      { id:'f6',  name:'Shower Mat', tag:'BATH TEXTILES', description:'A quick-dry microfibre mat that keeps your shower area dry and slip-free after every use.', spline_url:'https://prod.spline.design/NRQZO3lqB-RA4ogV/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','Microfibre'],['Size','45 × 75 cm'],['Feature','Quick-dry']], dot_x:63.6311, dot_y:69.9588, object_name:'Shower Mat' },
-      { id:'f7',  name:'Shower Caddy', tag:'SHOWER ACCESSORIES', description:'A rust-proof aluminium hanging caddy with 3 shelves and hooks. Fits all standard shower heads.', spline_url:'https://prod.spline.design/b5XDOSq8WFuWr1Dd/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','Aluminium'],['Shelves','3'],['Install','No drilling']], dot_x:67.6259, dot_y:41.0653, object_name:'Shower Caddy' },
-      { id:'f8',  name:'Waste Basket', tag:'BATHROOM ESSENTIALS', description:'A fingerprint-resistant matte waste basket with a soft-close lid and removable inner bucket.', spline_url:'https://prod.spline.design/VQefV2V4jnLNtF5l/scene.splinecode', buy_link:'https://amazon.in', specs:[['Finish','Matte'],['Capacity','5 litres'],['Lid','Soft-close']], dot_x:47.8217, dot_y:61.2219, object_name:'Waste Basket' },
-      { id:'f9',  name:'Tissue Holder', tag:'BATHROOM ESSENTIALS', description:'A matte black stainless steel wall-mounted tissue holder. All mounting hardware included.', spline_url:'https://prod.spline.design/sP3ZQLmrTKIyG1rB/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','Stainless steel'],['Finish','Matte black'],['Mount','Wall-mount']], dot_x:37.7079, dot_y:52.0565, object_name:'Tissue Holder' },
-      { id:'f10', name:'Brush Holder', tag:'VANITY ESSENTIALS', description:'A ceramic brush and cup holder with a matte glaze finish. Keeps toothbrushes and razors neatly organised.', spline_url:'https://prod.spline.design/2Ts6Qsis8U6196K2/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','Ceramic'],['Finish','Matte glaze'],['Slots','4']], dot_x:44.9676, dot_y:51.1812, object_name:'Brush Holder' },
-      { id:'f11', name:'White Vase', tag:'BATHROOM DECOR', description:'A clean minimal white vase that adds a touch of life and elegance to your bathroom counter or shelf.', spline_url:'https://prod.spline.design/GE2Lq8Cg0wgaAZjS/scene.splinecode', buy_link:'https://amazon.in', specs:[['Material','Ceramic'],['Finish','Gloss white'],['Style','Minimal']], dot_x:43, dot_y:46, object_name:'White Vase' }
-    ];
+    const DEFAULT_SCENE = null;
+    const FALLBACK_PRODUCTS = [];
 
     let scenes = [];          // active scenes for this room (from Admin → Spline Scenes)
     let currentSceneId = null;

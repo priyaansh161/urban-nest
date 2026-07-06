@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spline Scenes — Urban Nest Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 32px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  .layout { display: grid; grid-template-columns: 420px 1fr; gap: 32px; align-items: start; }
+
+  /* FORM */
+  .form-panel { background: var(--white); border: 0.5px solid var(--border); padding: 32px; }
+  .form-panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+  label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey); }
+  input, textarea, select { padding: 11px 14px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black); outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus { border-color: var(--gold); }
+  .form-hint { font-size: 11px; color: var(--grey); margin-top: 4px; line-height: 1.5; }
+  .form-actions { display: flex; gap: 12px; margin-top: 8px; }
+  .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover { background: #222; }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover { color: var(--black); border-color: var(--black); }
+
+  /* PREVIEW */
+  .preview-panel { background: var(--black); border: 0.5px solid var(--border); }
+  .preview-header { padding: 16px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
+  .preview-title { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+  .preview-url { font-size: 11px; color: var(--gold); word-break: break-all; }
+  .preview-body { position: relative; min-height: 420px; display: flex; align-items: center; justify-content: center; }
+  .preview-placeholder { text-align: center; color: rgba(255,255,255,0.2); }
+  .preview-placeholder p { font-size: 13px; letter-spacing: 0.1em; margin-top: 8px; }
+  spline-viewer { width: 100%; height: 420px; display: block; }
+  .preview-btn { padding: 8px 20px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border: 0.5px solid rgba(255,255,255,0.2); background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .preview-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* SCENES LIST */
+  .scenes-panel { background: var(--white); border: 0.5px solid var(--border); margin-top: 32px; }
+  .scenes-header { padding: 20px 24px; border-bottom: 0.5px solid var(--border); }
+  .scenes-header-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  .scene-card { padding: 20px 24px; border-bottom: 0.5px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
+  .scene-card:last-child { border-bottom: none; }
+  .scene-card:hover { background: #faf9f5; }
+  .scene-name { font-weight: 500; font-size: 14px; margin-bottom: 3px; }
+  .scene-meta { font-size: 11px; color: var(--grey); display: flex; gap: 16px; flex-wrap: wrap; }
+  .scene-url { font-size: 11px; color: var(--grey); margin-top: 4px; word-break: break-all; font-family: monospace; }
+  .scene-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .row-btn { padding: 5px 12px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .row-btn:hover { border-color: var(--black); color: var(--black); }
+  .row-btn.active-btn { border-color: var(--gold); color: var(--gold); background: var(--gold-light); }
+  .row-btn.danger { color: #c0392b; border-color: rgba(192,57,43,0.3); }
+  .row-btn.danger:hover { background: rgba(192,57,43,0.05); }
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+  .badge-grey { background: #eee; color: var(--grey); }
+  .empty-state { padding: 40px 24px; text-align: center; color: var(--grey); font-size: 13px; }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+
+  @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item active"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Spline Scenes</h1>
+    <p>Attach 3D renders to any room — paste a Spline scene URL and preview it live. Active scenes appear on the website; a room with several active scenes gets a view switcher.</p>
+  </div>
+
+  <div class="layout">
+    <!-- FORM + PREVIEW -->
+    <div>
+      <div class="form-panel">
+        <div class="form-panel-title">
+          <span id="formTitle">Add Scene</span>
+          <button class="btn btn-secondary" id="resetBtn" onclick="resetForm()" style="display:none;padding:6px 14px;font-size:10px">Cancel</button>
+        </div>
+        <input type="hidden" id="editingId"/>
+        <div class="form-group">
+          <label for="sceneName">Scene Name</label>
+          <input type="text" id="sceneName" placeholder="e.g. Bathroom Hero"/>
+        </div>
+        <div class="form-group">
+          <label for="sceneUrl">Spline Scene URL</label>
+          <input type="url" id="sceneUrl" placeholder="https://prod.spline.design/…/scene.splinecode"
+            oninput="debouncedPreview(this.value)"/>
+          <span class="form-hint">Copy from Spline → Export → Copy Link. Ends in <code>.splinecode</code></span>
+        </div>
+        <div class="form-group">
+          <label for="scenePage">Page Placement</label>
+          <select id="scenePage">
+            <option value="bath">Bath</option>
+            <option value="kitchen">Kitchen</option>
+            <option value="bed">Bed</option>
+          </select>
+          <span class="form-hint" style="margin-top:4px">More categories can be added here later</span>
+        </div>
+        <div class="form-group">
+          <label for="sceneDescription">Notes (optional)</label>
+          <input type="text" id="sceneDescription" placeholder="e.g. Hero section background"/>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="saveScene()">Save Scene</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE PREVIEW -->
+    <div class="preview-panel">
+      <div class="preview-header">
+        <span class="preview-title">Live Preview</span>
+        <button class="preview-btn" onclick="loadPreview()">Reload ↺</button>
+      </div>
+      <div class="preview-body" id="previewBody">
+        <div class="preview-placeholder">
+          <div style="font-size:32px;opacity:0.15;">◉</div>
+          <p>Enter a Spline URL to preview</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVED SCENES -->
+  <div class="scenes-panel">
+    <div class="scenes-header">
+      <span class="scenes-header-title">Saved Scenes</span>
+    </div>
+    <div id="scenesList">
+      <div class="empty-state">Loading scenes…</div>
+    </div>
+  </div>
+</main>
+
+<script>
+let scenes = [];
+let previewTimer;
+(async () => { await requireAuth(); loadScenes(); })();
+
+function debouncedPreview(url) {
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(() => { if (url) loadPreview(); }, 800);
+}
+
+function loadPreview() {
+  const url = document.getElementById('sceneUrl').value.trim();
+  const body = document.getElementById('previewBody');
+  if (!url) {
+    body.innerHTML = '<div class="preview-placeholder"><div style="font-size:32px;opacity:0.15;">◉</div><p>Enter a Spline URL to preview</p></div>';
+    return;
+  }
+  body.innerHTML = `<spline-viewer url="${url}" loading="lazy"></spline-viewer>`;
+}
+
+async function loadScenes() {
+  const { data, error } = await db.from('spline_scenes')
+    .select('*').order('created_at', { ascending: false });
+  if (error) { showToast('Failed to load scenes', 'error'); return; }
+  scenes = data || [];
+  renderScenes();
+}
+
+function renderScenes() {
+  const el = document.getElementById('scenesList');
+  if (!scenes.length) {
+    el.innerHTML = '<div class="empty-state">No scenes saved yet. Paste a Spline URL above to get started.</div>';
+    return;
+  }
+  el.innerHTML = scenes.map(s => `
+    <div class="scene-card">
+      <div>
+        <div class="scene-name">${s.name}</div>
+        <div class="scene-meta">
+          <span>Page: <strong>${s.page_placement}</strong></span>
+          ${s.description ? `<span>${s.description}</span>` : ''}
+          <span class="badge ${s.active ? 'badge-gold' : 'badge-grey'}">${s.active ? 'Active' : 'Inactive'}</span>
+        </div>
+        <div class="scene-url">${s.url}</div>
+      </div>
+      <div class="scene-actions">
+        <button class="row-btn" onclick="previewScene('${s.url}')">Preview</button>
+        <button class="row-btn" onclick="editScene('${s.id}')">Edit</button>
+        <button class="row-btn ${s.active ? 'active-btn' : ''}" onclick="toggleActive('${s.id}', ${s.active})">
+          ${s.active ? 'Active ✓' : 'Set Active'}
+        </button>
+        <button class="row-btn danger" onclick="deleteScene('${s.id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function previewScene(url) {
+  document.getElementById('sceneUrl').value = url;
+  loadPreview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function editScene(id) {
+  const s = scenes.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('editingId').value = id;
+  document.getElementById('sceneName').value = s.name;
+  document.getElementById('sceneUrl').value = s.url;
+  document.getElementById('scenePage').value = s.page_placement || 'bath';
+  document.getElementById('sceneDescription').value = s.description || '';
+  document.getElementById('formTitle').textContent = 'Edit Scene';
+  document.getElementById('resetBtn').style.display = '';
+  loadPreview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  ['editingId','sceneName','sceneUrl','sceneDescription'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('scenePage').value = 'bath';
+  document.getElementById('formTitle').textContent = 'Add Scene';
+  document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('previewBody').innerHTML = '<div class="preview-placeholder"><div style="font-size:32px;opacity:0.15;">◉</div><p>Enter a Spline URL to preview</p></div>';
+}
+
+async function saveScene() {
+  const name = document.getElementById('sceneName').value.trim();
+  const url  = document.getElementById('sceneUrl').value.trim();
+  if (!name || !url) { showToast('Name and URL are required', 'error'); return; }
+  const id = document.getElementById('editingId').value;
+  const payload = {
+    name,
+    url,
+    page_placement: document.getElementById('scenePage').value,
+    description: document.getElementById('sceneDescription').value.trim() || null,
+  };
+  let error;
+  if (id) {
+    ({ error } = await db.from('spline_scenes').update(payload).eq('id', id));
+  } else {
+    ({ error } = await db.from('spline_scenes').insert({ ...payload, active: false }));
+  }
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast(id ? 'Scene updated' : 'Scene saved!');
+  resetForm();
+  loadScenes();
+}
+
+async function toggleActive(id, current) {
+  // Several scenes can be active per room — visitors get a view switcher
+  const s = scenes.find(x => x.id === id);
+  const { error } = await db.from('spline_scenes').update({ active: !current }).eq('id', id);
+  if (error) { showToast('Update failed', 'error'); return; }
+  showToast(!current ? 'Scene is now live on ' + (s ? s.page_placement : 'its page') : 'Scene deactivated');
+  loadScenes();
+}
+
+async function deleteScene(id) {
+  if (!confirm('Delete this scene?')) return;
+  const { error } = await db.from('spline_scenes').delete().eq('id', id);
+  if (error) { showToast('Delete failed', 'error'); return; }
+  showToast('Scene deleted');
+  loadScenes();
+}
+</script>
+</body>
+</html>

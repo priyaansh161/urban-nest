@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Nest — Urban Nest Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  /* FORM PANEL */
+  .form-panel { background: var(--white); border: 0.5px solid var(--border); padding: 32px; margin-bottom: 32px; }
+  .form-panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey); }
+  input, textarea, select {
+    padding: 11px 14px; border: 0.5px solid var(--border); background: var(--white);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black);
+    outline: none; transition: border-color 0.2s; resize: vertical;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+  textarea { min-height: 120px; }
+  .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+  .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover { background: #222; }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover { color: var(--black); border-color: var(--black); }
+  .btn-danger { background: transparent; color: #c0392b; border: 0.5px solid rgba(192,57,43,0.3); }
+  .btn-danger:hover { background: rgba(192,57,43,0.05); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* POSTS TABLE */
+  .posts-panel { background: var(--white); border: 0.5px solid var(--border); }
+  .posts-header { padding: 20px 24px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .posts-header-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 24px; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey); text-align: left; border-bottom: 0.5px solid var(--border); font-weight: 400; }
+  td { padding: 16px 24px; font-size: 13px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #faf9f5; }
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+  .badge-grey { background: #eee; color: var(--grey); }
+  .row-actions { display: flex; gap: 8px; }
+  .row-btn { padding: 5px 12px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .row-btn:hover { border-color: var(--black); color: var(--black); }
+  .row-btn.danger { color: #c0392b; border-color: rgba(192,57,43,0.3); }
+  .row-btn.danger:hover { background: rgba(192,57,43,0.05); }
+  .empty-state { padding: 48px 24px; text-align: center; color: var(--grey); font-size: 13px; }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+
+  .pinned-icon { color: var(--gold); margin-left: 6px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item active"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <h1>The Nest</h1>
+      <p>Write and publish community posts and announcements</p>
+    </div>
+  </div>
+
+  <!-- CREATE / EDIT FORM -->
+  <div class="form-panel">
+    <div class="form-panel-title">
+      <span id="formTitle">New Post</span>
+      <button class="btn btn-secondary" id="resetFormBtn" onclick="resetForm()" style="display:none">Cancel Edit</button>
+    </div>
+    <input type="hidden" id="editingId"/>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="postTitle">Title</label>
+        <input type="text" id="postTitle" placeholder="Post title…" required/>
+      </div>
+      <div class="form-group">
+        <label for="postCategory">Category</label>
+        <select id="postCategory">
+          <option value="general">General</option>
+          <option value="announcement">Announcement</option>
+          <option value="collection">Collection Update</option>
+          <option value="community">Community</option>
+          <option value="behind-the-scenes">Behind the Scenes</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label for="postContent">Content</label>
+        <textarea id="postContent" placeholder="Write your post…"></textarea>
+      </div>
+      <div class="form-group full">
+        <label for="postImage">Image URL (optional)</label>
+        <input type="url" id="postImage" placeholder="https://…"/>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="savePost(false)" id="saveDraftBtn">Save as Draft</button>
+      <button class="btn btn-primary" onclick="savePost(true)" id="publishBtn">Publish Post</button>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--grey);cursor:pointer;margin-left:auto;">
+        <input type="checkbox" id="postPinned"/> Pin to top
+      </label>
+    </div>
+  </div>
+
+  <!-- POSTS LIST -->
+  <div class="posts-panel">
+    <div class="posts-header">
+      <span class="posts-header-title">All Posts</span>
+    </div>
+    <div id="postsTable">
+      <div class="empty-state">Loading posts…</div>
+    </div>
+  </div>
+</main>
+
+<script>
+let posts = [];
+
+(async () => {
+  await requireAuth();
+  loadPosts();
+})();
+
+async function loadPosts() {
+  const { data, error } = await db.from('nest_posts')
+    .select('*').order('created_at', { ascending: false });
+  if (error) { showToast('Failed to load posts', 'error'); return; }
+  posts = data || [];
+  renderTable();
+}
+
+function renderTable() {
+  const el = document.getElementById('postsTable');
+  if (!posts.length) {
+    el.innerHTML = '<div class="empty-state">No posts yet. Write your first post above.</div>';
+    return;
+  }
+  el.innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Title</th><th>Category</th><th>Status</th><th>Date</th><th>Actions</th>
+      </tr></thead>
+      <tbody>${posts.map(p => `
+        <tr>
+          <td><strong>${p.title}</strong>${p.pinned ? '<span class="pinned-icon">📌</span>' : ''}</td>
+          <td>${p.category}</td>
+          <td><span class="badge ${p.published ? 'badge-gold' : 'badge-grey'}">${p.published ? 'Live' : 'Draft'}</span></td>
+          <td style="color:var(--grey);font-size:12px;">${new Date(p.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</td>
+          <td><div class="row-actions">
+            <button class="row-btn" onclick="editPost('${p.id}')">Edit</button>
+            <button class="row-btn" onclick="togglePublish('${p.id}', ${p.published})">${p.published ? 'Unpublish' : 'Publish'}</button>
+            <button class="row-btn danger" onclick="deletePost('${p.id}')">Delete</button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function editPost(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('editingId').value = id;
+  document.getElementById('postTitle').value = p.title;
+  document.getElementById('postContent').value = p.content || '';
+  document.getElementById('postCategory').value = p.category || 'general';
+  document.getElementById('postImage').value = p.image_url || '';
+  document.getElementById('postPinned').checked = !!p.pinned;
+  document.getElementById('formTitle').textContent = 'Edit Post';
+  document.getElementById('resetFormBtn').style.display = '';
+  document.getElementById('publishBtn').textContent = p.published ? 'Update & Keep Live' : 'Publish';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  document.getElementById('editingId').value = '';
+  document.getElementById('postTitle').value = '';
+  document.getElementById('postContent').value = '';
+  document.getElementById('postCategory').value = 'general';
+  document.getElementById('postImage').value = '';
+  document.getElementById('postPinned').checked = false;
+  document.getElementById('formTitle').textContent = 'New Post';
+  document.getElementById('resetFormBtn').style.display = 'none';
+  document.getElementById('publishBtn').textContent = 'Publish Post';
+}
+
+async function savePost(publish) {
+  const title = document.getElementById('postTitle').value.trim();
+  if (!title) { showToast('Please enter a title', 'error'); return; }
+  const id = document.getElementById('editingId').value;
+  const payload = {
+    title,
+    content: document.getElementById('postContent').value.trim(),
+    category: document.getElementById('postCategory').value,
+    image_url: document.getElementById('postImage').value.trim() || null,
+    pinned: document.getElementById('postPinned').checked,
+    published: publish,
+    updated_at: new Date().toISOString(),
+  };
+  let error;
+  if (id) {
+    ({ error } = await db.from('nest_posts').update(payload).eq('id', id));
+  } else {
+    ({ error } = await db.from('nest_posts').insert(payload));
+  }
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast(publish ? 'Post published!' : 'Draft saved');
+  resetForm();
+  loadPosts();
+}
+
+async function togglePublish(id, current) {
+  const { error } = await db.from('nest_posts')
+    .update({ published: !current, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) { showToast('Update failed', 'error'); return; }
+  showToast(!current ? 'Post is now live' : 'Post unpublished');
+  loadPosts();
+}
+
+async function deletePost(id) {
+  if (!confirm('Delete this post? This cannot be undone.')) return;
+  const { error } = await db.from('nest_posts').delete().eq('id', id);
+  if (error) { showToast('Delete failed', 'error'); return; }
+  showToast('Post deleted');
+  loadPosts();
+}
+</script>
+</body>
+</html>

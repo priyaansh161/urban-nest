@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dashboard — Urban Nest Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --gold: #B8956A; --gold-light: rgba(184,149,106,0.1);
+    --white: #FAFAF8; --black: #111110;
+    --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px; min-height: 100vh; background: var(--black);
+    display: flex; flex-direction: column;
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 50;
+  }
+  .sidebar-brand {
+    padding: 32px 24px 24px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-brand-name {
+    font-family: 'Bodoni Moda', serif; font-size: 15px;
+    letter-spacing: 0.16em; color: var(--white); display: block;
+  }
+  .sidebar-brand-tag {
+    font-size: 9px; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block;
+  }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label {
+    font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: rgba(255,255,255,0.25); padding: 16px 24px 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 24px; text-decoration: none;
+    font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5);
+    transition: all 0.2s; border-left: 2px solid transparent;
+  }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer {
+    padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08);
+  }
+  .sign-out-btn {
+    width: 100%; padding: 10px 16px; background: transparent;
+    border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4);
+    font-family: 'DM Sans', sans-serif; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link {
+    display: block; font-size: 10px; letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.25); text-decoration: none;
+    text-align: center; margin-top: 12px; transition: color 0.2s;
+  }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  /* MAIN */
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 40px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; margin-bottom: 4px; }
+  .page-header p { font-size: 13px; color: var(--grey); }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+  .stat-card {
+    background: var(--white); padding: 28px 24px;
+    border: 0.5px solid var(--border);
+  }
+  .stat-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 12px; }
+  .stat-value { font-family: 'Bodoni Moda', serif; font-size: 40px; font-weight: 400; line-height: 1; }
+  .stat-sub { font-size: 11px; color: var(--grey); margin-top: 6px; }
+  .stat-card.highlight .stat-value { color: var(--gold); }
+
+  /* CONTENT GRID */
+  .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .panel { background: var(--white); border: 0.5px solid var(--border); }
+  .panel-header {
+    padding: 20px 24px; border-bottom: 0.5px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  .panel-link { font-size: 11px; color: var(--gold); text-decoration: none; letter-spacing: 0.08em; }
+  .panel-body { padding: 0; }
+  .list-row {
+    padding: 14px 24px; border-bottom: 0.5px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px;
+  }
+  .list-row:last-child { border-bottom: none; }
+  .list-row-title { font-weight: 400; }
+  .list-row-meta { font-size: 11px; color: var(--grey); }
+  .badge {
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 2px;
+  }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+  .badge-grey { background: #eee; color: var(--grey); }
+  .badge-red { background: rgba(192,57,43,0.1); color: #c0392b; }
+  .empty-state { padding: 40px 24px; text-align: center; font-size: 13px; color: var(--grey); }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px; z-index: 9999;
+    padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    background: var(--black); color: var(--white);
+    transform: translateY(20px); opacity: 0; transition: all 0.3s;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item active">
+      <span class="icon">◈</span> Dashboard
+    </a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item">
+      <span class="icon">✦</span> The Nest
+    </a>
+    <a href="collection.html" class="nav-item">
+      <span class="icon">◻</span> Collection
+    </a>
+    <a href="spline.html" class="nav-item">
+      <span class="icon">◉</span> Spline Scenes
+    </a>
+    <a href="products.html" class="nav-item">
+      <span class="icon">◆</span> 3D Products
+    </a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item">
+      <span class="icon">◌</span> Feedback
+    </a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p id="welcomeMsg">Welcome back</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Nest Posts</div>
+      <div class="stat-value" id="statPosts">—</div>
+      <div class="stat-sub">published</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Collection Items</div>
+      <div class="stat-value" id="statItems">—</div>
+      <div class="stat-sub">published</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-label">Unread Feedback</div>
+      <div class="stat-value" id="statFeedback">—</div>
+      <div class="stat-sub">new messages</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Spline Scenes</div>
+      <div class="stat-value" id="statSpline">—</div>
+      <div class="stat-sub">active</div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Recent Posts</span>
+        <a href="nest.html" class="panel-link">Manage →</a>
+      </div>
+      <div class="panel-body" id="recentPosts">
+        <div class="empty-state">Loading…</div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Recent Feedback</span>
+        <a href="feedback.html" class="panel-link">View all →</a>
+      </div>
+      <div class="panel-body" id="recentFeedback">
+        <div class="empty-state">Loading…</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+(async () => {
+  const session = await requireAuth();
+  if (!session) return;
+
+  document.getElementById('welcomeMsg').textContent =
+    'Welcome back, ' + (session.user.email.split('@')[0] || 'admin');
+
+  // Stats
+  const [posts, items, feedback, spline] = await Promise.all([
+    db.from('nest_posts').select('id', { count: 'exact' }).eq('published', true),
+    db.from('collection_items').select('id', { count: 'exact' }).eq('published', true),
+    db.from('feedback').select('id', { count: 'exact' }).eq('status', 'unread'),
+    db.from('spline_scenes').select('id', { count: 'exact' }).eq('active', true),
+  ]);
+  document.getElementById('statPosts').textContent    = posts.count ?? 0;
+  document.getElementById('statItems').textContent    = items.count ?? 0;
+  document.getElementById('statFeedback').textContent = feedback.count ?? 0;
+  document.getElementById('statSpline').textContent   = spline.count ?? 0;
+
+  // Recent posts
+  const { data: recentPosts } = await db.from('nest_posts')
+    .select('title, published, created_at')
+    .order('created_at', { ascending: false }).limit(5);
+  const postsEl = document.getElementById('recentPosts');
+  if (!recentPosts?.length) {
+    postsEl.innerHTML = '<div class="empty-state">No posts yet. <a href="nest.html">Create one →</a></div>';
+  } else {
+    postsEl.innerHTML = recentPosts.map(p => `
+      <div class="list-row">
+        <span class="list-row-title">${p.title}</span>
+        <span class="badge ${p.published ? 'badge-gold' : 'badge-grey'}">${p.published ? 'Live' : 'Draft'}</span>
+      </div>`).join('');
+  }
+
+  // Recent feedback
+  const { data: recentFeedback } = await db.from('feedback')
+    .select('name, message, status, created_at')
+    .order('created_at', { ascending: false }).limit(5);
+  const fbEl = document.getElementById('recentFeedback');
+  if (!recentFeedback?.length) {
+    fbEl.innerHTML = '<div class="empty-state">No feedback yet.</div>';
+  } else {
+    fbEl.innerHTML = recentFeedback.map(f => `
+      <div class="list-row">
+        <div>
+          <div class="list-row-title">${f.name || 'Anonymous'}</div>
+          <div class="list-row-meta">${(f.message || '').slice(0, 50)}…</div>
+        </div>
+        <span class="badge ${f.status === 'unread' ? 'badge-red' : 'badge-grey'}">${f.status}</span>
+      </div>`).join('');
+  }
+})();
+</script>
+</body>
+</html>

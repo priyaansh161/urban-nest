@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Collection — Urban Nest Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 32px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  .form-panel { background: var(--white); border: 0.5px solid var(--border); padding: 32px; margin-bottom: 32px; }
+  .form-panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey); }
+  input, textarea, select { padding: 11px 14px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black); outline: none; transition: border-color 0.2s; resize: vertical; }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+  textarea { min-height: 100px; }
+  .form-actions { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
+  .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover { background: #222; }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover { color: var(--black); border-color: var(--black); }
+
+  /* ITEMS GRID */
+  .items-panel { background: var(--white); border: 0.5px solid var(--border); }
+  .items-header { padding: 20px 24px; border-bottom: 0.5px solid var(--border); }
+  .items-header-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0; }
+  .item-card { border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); padding: 24px; }
+  .item-card:hover { background: #faf9f5; }
+  .item-image { width: 100%; height: 160px; object-fit: cover; background: var(--bg); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; overflow: hidden; }
+  .item-image img { width: 100%; height: 100%; object-fit: cover; }
+  .item-image-placeholder { font-size: 11px; letter-spacing: 0.15em; color: var(--grey); }
+  .item-name { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+  .item-cat { font-size: 11px; color: var(--grey); letter-spacing: 0.1em; margin-bottom: 8px; }
+  .item-price { font-size: 13px; color: var(--gold); margin-bottom: 12px; }
+  .item-desc { font-size: 12px; color: var(--grey); line-height: 1.6; margin-bottom: 16px; }
+  .item-badges { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+  .badge-grey { background: #eee; color: var(--grey); }
+  .badge-blue { background: rgba(41,128,185,0.1); color: #2980b9; }
+  .item-actions { display: flex; gap: 8px; }
+  .row-btn { padding: 5px 12px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .row-btn:hover { border-color: var(--black); color: var(--black); }
+  .row-btn.danger { color: #c0392b; border-color: rgba(192,57,43,0.3); }
+  .row-btn.danger:hover { background: rgba(192,57,43,0.05); }
+  .empty-state { padding: 48px 24px; text-align: center; color: var(--grey); font-size: 13px; }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item active"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Collection</h1>
+    <p>Manage upcoming products and collection previews</p>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-panel-title">
+      <span id="formTitle">Add Item</span>
+      <button class="btn btn-secondary" id="resetBtn" onclick="resetForm()" style="display:none">Cancel Edit</button>
+    </div>
+    <input type="hidden" id="editingId"/>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="itemName">Product Name</label>
+        <input type="text" id="itemName" placeholder="e.g. Arco Linen Throw" required/>
+      </div>
+      <div class="form-group">
+        <label for="itemCategory">Category</label>
+        <select id="itemCategory">
+          <option value="living">Living Room</option>
+          <option value="bedroom">Bedroom</option>
+          <option value="bathroom">Bathroom</option>
+          <option value="kitchen">Kitchen</option>
+          <option value="outdoor">Outdoor</option>
+          <option value="lighting">Lighting</option>
+          <option value="accessories">Accessories</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="itemPrice">Price / Range</label>
+        <input type="text" id="itemPrice" placeholder="e.g. ₹4,500 or From ₹3,200"/>
+      </div>
+      <div class="form-group">
+        <label for="itemImage">Image URL</label>
+        <input type="url" id="itemImage" placeholder="https://…"/>
+      </div>
+      <div class="form-group full">
+        <label for="itemDescription">Description</label>
+        <textarea id="itemDescription" placeholder="Short description of the product…"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="saveItem(false)">Save as Draft</button>
+      <button class="btn btn-primary" onclick="saveItem(true)">Publish</button>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--grey);cursor:pointer;margin-left:16px;">
+        <input type="checkbox" id="itemComingSoon" checked/> Coming soon tag
+      </label>
+    </div>
+  </div>
+
+  <div class="items-panel">
+    <div class="items-header">
+      <span class="items-header-title">All Items</span>
+    </div>
+    <div id="itemsGrid" class="items-grid"></div>
+  </div>
+</main>
+
+<script>
+let items = [];
+(async () => { await requireAuth(); loadItems(); })();
+
+async function loadItems() {
+  const { data, error } = await db.from('collection_items')
+    .select('*').order('created_at', { ascending: false });
+  if (error) { showToast('Failed to load items', 'error'); return; }
+  items = data || [];
+  renderGrid();
+}
+
+function renderGrid() {
+  const el = document.getElementById('itemsGrid');
+  if (!items.length) {
+    el.innerHTML = '<div class="empty-state">No items yet. Add your first collection piece above.</div>';
+    return;
+  }
+  el.innerHTML = items.map(item => `
+    <div class="item-card">
+      <div class="item-image">
+        ${item.image_url
+          ? `<img src="${item.image_url}" alt="${item.name}" onerror="this.parentElement.innerHTML='<span class=item-image-placeholder>No Image</span>'">`
+          : '<span class="item-image-placeholder">No Image</span>'}
+      </div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-cat">${item.category || ''}</div>
+      ${item.price ? `<div class="item-price">${item.price}</div>` : ''}
+      ${item.description ? `<div class="item-desc">${(item.description).slice(0,100)}${item.description.length > 100 ? '…' : ''}</div>` : ''}
+      <div class="item-badges">
+        <span class="badge ${item.published ? 'badge-gold' : 'badge-grey'}">${item.published ? 'Live' : 'Draft'}</span>
+        ${item.coming_soon ? '<span class="badge badge-blue">Coming Soon</span>' : ''}
+      </div>
+      <div class="item-actions">
+        <button class="row-btn" onclick="editItem('${item.id}')">Edit</button>
+        <button class="row-btn" onclick="toggleItemPublish('${item.id}', ${item.published})">${item.published ? 'Unpublish' : 'Publish'}</button>
+        <button class="row-btn danger" onclick="deleteItem('${item.id}')">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function editItem(id) {
+  const item = items.find(x => x.id === id);
+  if (!item) return;
+  document.getElementById('editingId').value = id;
+  document.getElementById('itemName').value = item.name;
+  document.getElementById('itemCategory').value = item.category || 'living';
+  document.getElementById('itemPrice').value = item.price || '';
+  document.getElementById('itemImage').value = item.image_url || '';
+  document.getElementById('itemDescription').value = item.description || '';
+  document.getElementById('itemComingSoon').checked = !!item.coming_soon;
+  document.getElementById('formTitle').textContent = 'Edit Item';
+  document.getElementById('resetBtn').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  ['editingId','itemName','itemPrice','itemImage','itemDescription'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('itemCategory').value = 'living';
+  document.getElementById('itemComingSoon').checked = true;
+  document.getElementById('formTitle').textContent = 'Add Item';
+  document.getElementById('resetBtn').style.display = 'none';
+}
+
+async function saveItem(publish) {
+  const name = document.getElementById('itemName').value.trim();
+  if (!name) { showToast('Please enter a product name', 'error'); return; }
+  const id = document.getElementById('editingId').value;
+  const payload = {
+    name,
+    category: document.getElementById('itemCategory').value,
+    price: document.getElementById('itemPrice').value.trim() || null,
+    image_url: document.getElementById('itemImage').value.trim() || null,
+    description: document.getElementById('itemDescription').value.trim() || null,
+    coming_soon: document.getElementById('itemComingSoon').checked,
+    published: publish,
+  };
+  let error;
+  if (id) {
+    ({ error } = await db.from('collection_items').update(payload).eq('id', id));
+  } else {
+    ({ error } = await db.from('collection_items').insert(payload));
+  }
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast(publish ? 'Item published!' : 'Draft saved');
+  resetForm();
+  loadItems();
+}
+
+async function toggleItemPublish(id, current) {
+  const { error } = await db.from('collection_items').update({ published: !current }).eq('id', id);
+  if (error) { showToast('Update failed', 'error'); return; }
+  showToast(!current ? 'Item is now live' : 'Item unpublished');
+  loadItems();
+}
+
+async function deleteItem(id) {
+  if (!confirm('Delete this item?')) return;
+  const { error } = await db.from('collection_items').delete().eq('id', id);
+  if (error) { showToast('Delete failed', 'error'); return; }
+  showToast('Item deleted');
+  loadItems();
+}
+</script>
+</body>
+</html>
