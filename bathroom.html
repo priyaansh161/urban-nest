@@ -238,8 +238,7 @@
       };
       viewer.addEventListener('load', () => {
         hideLoader();
-        splineApp = viewer.spline;
-        if (splineApp) setTimeout(() => { trackingEnabled = true; trackDots(); }, 300);
+        startTracking(viewer);
       });
       // The load event doesn't fire for newer .splinecode files — watch for the canvas instead
       const poll = setInterval(() => {
@@ -247,6 +246,7 @@
         if (viewer.shadowRoot && viewer.shadowRoot.querySelector('canvas')) {
           clearInterval(poll);
           hideLoader();
+          startTracking(viewer);
         }
       }, 400);
       wrap.appendChild(viewer);
@@ -275,23 +275,74 @@
       document.getElementById('dots-layer').appendChild(dot);
     }
 
-    // Dots with a Spline object name follow their 3D object as the camera moves
+    // ── DOT TRACKING ──
+    // Anchors dots to 3D objects in the scene so they follow the camera instead
+    // of sitting at fixed screen positions. Dots that can't be linked to an
+    // object keep their static dot_x/dot_y position from the admin.
+    let dotTargets = new Map(); // dot element → THREE object in the scene
+
+    function startTracking(viewer) {
+      if (trackingEnabled || !viewer.isConnected) return;
+      const app = viewer._spline || viewer.spline; // exposed name varies by viewer version
+      if (!app || !app._camera || !app._scene) { setTimeout(() => startTracking(viewer), 300); return; }
+      splineApp = app;
+      linkDotsToObjects();
+      trackingEnabled = true;
+      trackDots();
+    }
+
+    // The admin's "Spline object name" wins; otherwise product names are matched
+    // to scene object names — exact first, then by shared words, each object
+    // linked to at most one dot.
+    function linkDotsToObjects() {
+      dotTargets = new Map();
+      const objects = [];
+      splineApp._scene.traverse(o => { if (o.name && o.name.trim()) objects.push(o); });
+      const norm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
+      const dots = [...document.querySelectorAll('.dot')];
+      const taken = new Set();
+
+      dots.forEach(dot => {
+        if (!dot.dataset.objectName) return;
+        const target = norm(dot.dataset.objectName).join(' ');
+        const obj = objects.find(o => norm(o.name).join(' ') === target);
+        if (obj) { dotTargets.set(dot, obj); taken.add(obj); }
+      });
+
+      const candidates = [];
+      dots.forEach(dot => {
+        if (dotTargets.has(dot)) return;
+        const product = products[dot.dataset.pid];
+        if (!product || !product.name) return;
+        const pTokens = norm(product.name);
+        objects.forEach(obj => {
+          if (taken.has(obj)) return;
+          const oTokens = norm(obj.name);
+          const shared = oTokens.filter(t => pTokens.includes(t)).length;
+          if (!shared) return;
+          const exact = pTokens.join(' ') === oTokens.join(' ');
+          candidates.push({ dot, obj, score: exact ? 1000 : shared / Math.max(pTokens.length, oTokens.length) });
+        });
+      });
+      candidates.sort((a, b) => b.score - a.score);
+      candidates.forEach(c => {
+        if (dotTargets.has(c.dot) || taken.has(c.obj)) return;
+        dotTargets.set(c.dot, c.obj);
+        taken.add(c.obj);
+      });
+    }
+
     function trackDots() {
       if (!trackingEnabled || !splineApp) return;
-      const cam = splineApp.camera;
-      if (!cam) { requestAnimationFrame(trackDots); return; }
-      document.querySelectorAll('.dot[data-object-name]').forEach(dot => {
-        const obj = splineApp.findObjectByName(dot.dataset.objectName);
-        if (!obj) return;
+      const cam = splineApp._camera || splineApp.camera;
+      if (cam) dotTargets.forEach((obj, dot) => {
         try {
-          const wp = obj.position.clone();
-          if (typeof obj.getWorldPosition === 'function') obj.getWorldPosition(wp);
-          wp.project(cam);
-          const x = ((wp.x + 1) / 2) * 100;
-          const y = ((-wp.y + 1) / 2) * 100;
-          if (x > 0 && x < 100 && y > 0 && y < 100) {
-            dot.style.left = x + '%';
-            dot.style.top  = y + '%';
+          const v = obj.position.clone().setFromMatrixPosition(obj.matrixWorld).project(cam);
+          const behind = v.z > 1;
+          dot.style.visibility = behind ? 'hidden' : 'visible';
+          if (!behind) {
+            dot.style.left = (((v.x + 1) / 2) * 100) + '%';
+            dot.style.top  = (((-v.y + 1) / 2) * 100) + '%';
           }
         } catch (_) {}
       });
