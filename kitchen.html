@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Kitchen — Urban Nest</title>
+  <link rel="icon" type="image/png" href="logo-icon.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase.js"></script>
@@ -155,6 +156,12 @@
   <script>
     const ROOM = 'kitchen';
     const LOADING_TEXT = 'ENTERING THE KITCHEN';
+    // On touch devices the scene needs a two-finger gesture (one finger scrolls the page)
+    const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
+    if (IS_TOUCH) {
+      document.getElementById('hint').textContent = 'USE TWO FINGERS TO EXPLORE THE SPACE';
+      document.querySelector('.panel-3d-hint').textContent = 'ROTATE WITH TWO FINGERS';
+    }
     // Fallback scene when the database has no active scenes for this room
     const DEFAULT_SCENE = 'https://prod.spline.design/Sj5adFcvg1xrFk7n/scene.splinecode';
     const FALLBACK_PRODUCTS = [];
@@ -247,7 +254,9 @@
       const rows = allProducts.filter(p => !p.scene_id || p.scene_id === currentSceneId);
       rows.forEach(p => { products[p.id] = p; addDot(p); });
       document.getElementById('hint').textContent =
-        rows.length ? 'CLICK THE GOLD DOTS TO EXPLORE' : 'DRAG TO EXPLORE THE SPACE';
+        rows.length
+          ? (IS_TOUCH ? 'TAP THE GOLD DOTS · TWO FINGERS TO LOOK AROUND' : 'CLICK THE GOLD DOTS TO EXPLORE')
+          : (IS_TOUCH ? 'USE TWO FINGERS TO EXPLORE THE SPACE' : 'DRAG TO EXPLORE THE SPACE');
     }
 
     function addDot(p) {
