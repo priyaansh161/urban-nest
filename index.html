@@ -9,528 +9,595 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* ═══════════════════════════════════════════
+       TOKENS
+       Light is the default; dark is a full repaint,
+       not an inversion. Gold lifts on dark ground so
+       it keeps its contrast against text.
+       ═══════════════════════════════════════════ */
     :root {
-      --gold: #B8956A;
-      --gold-light: rgba(184,149,106,0.12);
-      --white: #FAFAF8;
-      --black: #111110;
-      --grey: #6B6B68;
-      --grey-light: #E8E7E3;
-      --border: #E0DFD9;
+      --paper:      #FAFAF8;
+      --ink:        #111110;
+      --stone:      #6B6B68;
+      --hairline:   #E0DFD9;
+      --gold:       #B8956A;
+
+      /* inverted band (philosophy / footer) */
+      --panel:      #111110;
+      --panel-ink:  #FAFAF8;
+      --panel-dim:  rgba(250,250,248,0.45);
+      --panel-line: rgba(250,250,248,0.09);
+
+      /* expressed in container units so the bleed below is computable */
+      --shell: min(1180px, 90cqw);
+      --gutter: calc((100cqw - var(--shell)) / 2);
+      --ease: cubic-bezier(.16,.7,.2,1);
+    }
+
+    /* follow the device unless the reader has chosen */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --paper:      #0E0E0C;
+        --ink:        #F2F0EA;
+        --stone:      #9C998F;
+        --hairline:   #26251F;
+        --gold:       #C9A87C;
+
+        --panel:      #171613;
+        --panel-ink:  #F2F0EA;
+        --panel-dim:  rgba(242,240,234,0.48);
+        --panel-line: rgba(242,240,234,0.10);
+      }
+    }
+    /* explicit choice always wins */
+    :root[data-theme="dark"] {
+      --paper:      #0E0E0C;
+      --ink:        #F2F0EA;
+      --stone:      #9C998F;
+      --hairline:   #26251F;
+      --gold:       #C9A87C;
+
+      --panel:      #171613;
+      --panel-ink:  #F2F0EA;
+      --panel-dim:  rgba(242,240,234,0.48);
+      --panel-line: rgba(242,240,234,0.10);
     }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--white);
-      color: var(--black);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-weight: 300;
+      background: var(--paper);
+      color: var(--ink);
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.4s ease, color 0.4s ease;
     }
 
-    /* ── NAV ── */
+    a { color: inherit; }
+    :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+    /* .site is a query container, so the layout rules at the bottom of this
+       sheet respond to its width. At full width that tracks the viewport,
+       giving normal responsive behaviour. */
+    .site {
+      container-type: inline-size;
+      container-name: site;
+      background: var(--paper);
+    }
+
+    .shell { width: var(--shell); margin-inline: auto; }
+
+    /* ═══════════════════════════════════════════
+       NAV
+       ═══════════════════════════════════════════ */
+    /* The bar runs edge to edge; its contents stay aligned to the shell,
+       so the logo lines up with the headline below it. */
     nav {
-      position: fixed; top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 18px 48px;
-      background: rgba(250,250,248,0.96);
-      border-bottom: 0.5px solid var(--border);
-      backdrop-filter: blur(8px);
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 20px;
+      width: 100%;
+      padding: 20px var(--gutter);
+      background: color-mix(in srgb, var(--paper) 92%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--hairline);
     }
 
-    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-    .nav-logo-icon {
-      width: 34px; height: 34px; border-radius: 50%;
-      overflow: hidden; flex-shrink: 0;
-    }
-    .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .nav-logo-icon { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .nav-logo-text {
-      font-family: 'Bodoni Moda', serif;
-      font-size: 17px; font-weight: 400;
-      letter-spacing: 0.16em; color: var(--black);
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-size: 15px; letter-spacing: 0.18em; white-space: nowrap;
     }
 
-    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-right { display: flex; align-items: center; gap: 18px; }
+
+    .nav-links { display: flex; gap: 28px; list-style: none; }
     .nav-links a {
-      font-size: 11px; letter-spacing: 0.14em;
-      color: var(--grey); text-decoration: none; transition: color 0.2s;
+      font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--stone); text-decoration: none; transition: color 0.2s;
     }
-    .nav-links a:hover { color: var(--black); }
+    .nav-links a:hover { color: var(--ink); }
 
-    /* ── HERO ── */
-    .hero {
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      text-align: center; padding: 120px 24px 80px;
-      position: relative; overflow: hidden;
-      background: var(--white);
+    .nav-join {
+      padding: 9px 20px;
+      background: var(--ink); color: var(--paper);
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      text-decoration: none; transition: background 0.25s, color 0.25s;
+      white-space: nowrap;
     }
+    .nav-join:hover { background: var(--gold); color: #FFF; }
 
-    .hero-bg-line {
-      position: absolute; inset: 0; pointer-events: none;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 80px 80px;
-      opacity: 0.4;
+    /* ── theme toggle ────────────────────────── */
+    .switch {
+      display: flex; align-items: center;
+      border: 1px solid var(--hairline);
+      background: transparent;
+      border-radius: 100px;
+      padding: 2px;
     }
+    .switch button {
+      display: grid; place-items: center;
+      width: 28px; height: 24px;
+      border: none; background: none; cursor: pointer;
+      color: var(--stone);
+      border-radius: 100px;
+      transition: background 0.25s, color 0.25s;
+      font-family: inherit;
+    }
+    .switch button:hover { color: var(--ink); }
+    .switch button[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .switch svg { width: 13px; height: 13px; display: block; }
+    .switch button[aria-pressed="true"] svg { stroke: var(--paper); }
 
-    .hero-glow {
-      position: absolute; inset: 0; pointer-events: none;
-      background: radial-gradient(ellipse at 50% 50%, rgba(184,149,106,0.06) 0%, transparent 65%);
+    /* hamburger */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; background: none; border: none; padding: 4px;
     }
-
-    .hero-content { position: relative; z-index: 2; max-width: 900px; }
-
-    .hero-eyebrow {
-      display: flex; align-items: center; gap: 16px;
-      justify-content: center; margin-bottom: 36px;
+    .hamburger span {
+      display: block; width: 20px; height: 1.5px;
+      background: var(--ink); transition: transform 0.3s, opacity 0.3s;
     }
-    .eyebrow-line { width: 36px; height: 0.5px; background: var(--gold); }
-    .eyebrow-text { font-size: 10px; letter-spacing: 0.36em; color: var(--gold); }
-
-    .hero-title {
-      font-family: 'Bodoni Moda', serif;
-      font-size: clamp(52px, 9vw, 108px);
-      font-weight: 400; line-height: 0.95;
-      color: var(--black); margin-bottom: 30px;
-    }
-    .hero-title em { font-style: italic; color: var(--gold); }
-
-    .hero-sub {
-      font-size: 14px; color: var(--grey);
-      line-height: 2; margin-bottom: 52px;
-      max-width: 400px; margin-left: auto; margin-right: auto;
-      letter-spacing: 0.02em;
-    }
-
-    .hero-cta {
-      display: inline-flex; align-items: center; gap: 14px;
-      padding: 14px 38px;
-      background: var(--black); color: var(--white);
-      font-size: 11px; font-weight: 500;
-      letter-spacing: 0.2em; text-decoration: none;
-      transition: all 0.3s;
-    }
-    .hero-cta:hover { background: var(--gold); gap: 20px; }
-
-    .scroll-hint {
-      position: absolute; bottom: 32px; left: 50%;
-      transform: translateX(-50%); z-index: 2;
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
-      font-size: 9px; letter-spacing: 0.25em; color: var(--grey);
-    }
-    .scroll-line {
-      width: 0.5px; height: 44px;
-      background: linear-gradient(to bottom, var(--gold), transparent);
-      animation: scrollpulse 2.2s ease-in-out infinite;
-    }
-    @keyframes scrollpulse {
-      0% { transform: scaleY(0); transform-origin: top; }
-      50% { transform: scaleY(1); transform-origin: top; }
-      51% { transform: scaleY(1); transform-origin: bottom; }
-      100% { transform: scaleY(0); transform-origin: bottom; }
-    }
-
-    /* ── MARQUEE ── */
-    .marquee-wrap {
-      border-top: 0.5px solid var(--border);
-      border-bottom: 0.5px solid var(--border);
-      overflow: hidden; background: var(--black);
-      padding: 13px 0;
-    }
-    .marquee-track {
-      display: flex; width: max-content;
-      animation: marquee 22s linear infinite;
-    }
-    .marquee-item {
-      display: flex; align-items: center; gap: 18px;
-      padding: 0 28px;
-      font-size: 10px; letter-spacing: 0.24em;
-      color: rgba(250,250,248,0.3); white-space: nowrap;
-    }
-    .marquee-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--gold); }
-    @keyframes marquee { to { transform: translateX(-50%); } }
-
-    /* ── STATEMENT ── */
-    .statement {
-      padding: 100px 48px;
-      border-bottom: 0.5px solid var(--border);
-      max-width: 1280px; margin: 0 auto;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center;
-    }
-    .statement-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 20px; }
-    .statement-title {
-      font-family: 'Bodoni Moda', serif;
-      font-size: clamp(30px, 4vw, 46px);
-      font-weight: 400; line-height: 1.15; color: var(--black);
-    }
-    .statement-title em { font-style: italic; }
-    .statement-body { font-size: 15px; color: var(--grey); line-height: 2; }
-    .statement-body p + p { margin-top: 16px; }
-    .statement-body strong { color: var(--black); font-weight: 400; }
-
-    /* ── ROOMS ── */
-    .rooms-section { padding: 80px 48px 100px; background: var(--white); }
-    .rooms-header {
-      display: flex; justify-content: space-between; align-items: baseline;
-      max-width: 1280px; margin: 0 auto 40px;
-    }
-    .rooms-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); }
-    .rooms-count { font-size: 10px; color: var(--grey); letter-spacing: 0.12em; }
-
-    .rooms-grid {
-      display: grid; grid-template-columns: repeat(3,1fr);
-      gap: 2px; max-width: 1280px; margin: 0 auto;
-    }
-
-    .room-card {
-      position: relative; height: 580px;
-      overflow: hidden; cursor: pointer;
-      text-decoration: none; display: block;
-    }
-
-    .room-img {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover;
-      transition: transform 0.9s cubic-bezier(0.4,0,0.2,1), filter 0.5s ease;
-      filter: brightness(0.65) saturate(0.85);
-    }
-    .room-card:hover .room-img { transform: scale(1.06); filter: brightness(0.5); }
-
-    .room-shimmer {
-      position: absolute; inset: 0; z-index: 2; pointer-events: none;
-      background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,0.04) 50%, transparent 65%);
-      transform: translateX(-100%); transition: transform 0.7s ease;
-    }
-    .room-card:hover .room-shimmer { transform: translateX(100%); }
-
-    .room-overlay {
-      position: absolute; inset: 0; z-index: 1;
-      background: linear-gradient(to top, rgba(17,17,16,0.96) 0%, rgba(17,17,16,0.25) 55%, transparent 100%);
-    }
-
-    .room-num {
-      position: absolute; top: 22px; left: 24px; z-index: 3;
-      font-family: 'Bodoni Moda', serif;
-      font-size: 12px; color: rgba(250,250,248,0.3); letter-spacing: 0.1em;
-    }
-
-    .room-info {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 32px 28px; z-index: 3;
-    }
-
-    .room-tag {
-      font-size: 9px; letter-spacing: 0.22em; color: var(--gold);
-      margin-bottom: 10px; opacity: 0;
-      transform: translateY(10px); transition: all 0.35s;
-    }
-    .room-card:hover .room-tag { opacity: 1; transform: translateY(0); }
-
-    .room-name {
-      font-family: 'Bodoni Moda', serif;
-      font-size: 38px; font-weight: 400; color: #FAFAF8;
-      margin-bottom: 10px; line-height: 1;
-      transition: transform 0.35s;
-    }
-    .room-card:hover .room-name { transform: translateY(-4px); }
-
-    .room-desc {
-      font-size: 12px; color: rgba(250,250,248,0.4);
-      line-height: 1.7; margin-bottom: 22px;
-    }
-
-    .room-enter {
-      display: flex; align-items: center; gap: 14px;
-      font-size: 10px; letter-spacing: 0.2em; color: rgba(250,250,248,0.4);
-      transition: color 0.25s;
-    }
-    .room-enter::after {
-      content: ''; width: 28px; height: 0.5px;
-      background: currentColor; transition: width 0.35s;
-    }
-    .room-card:hover .room-enter { color: var(--gold); }
-    .room-card:hover .room-enter::after { width: 56px; }
-
-    /* ── PHILOSOPHY ── */
-    .philosophy {
-      padding: 100px 48px;
-      background: var(--black);
-    }
-    .philosophy-inner {
-      max-width: 1280px; margin: 0 auto;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: start;
-    }
-    .philosophy-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 24px; }
-    .philosophy-title {
-      font-family: 'Bodoni Moda', serif;
-      font-size: clamp(28px, 3.5vw, 44px);
-      font-weight: 400; line-height: 1.15; color: #FAFAF8; margin-bottom: 20px;
-    }
-    .philosophy-title em { font-style: italic; color: var(--gold); }
-    .philosophy-body { font-size: 14px; color: rgba(250,250,248,0.45); line-height: 2; }
-
-    .pillars { display: flex; flex-direction: column; }
-    .pillar {
-      padding: 22px 0 22px 22px;
-      border-left: 1px solid rgba(250,250,248,0.07);
-      border-bottom: 0.5px solid rgba(250,250,248,0.04);
-      transition: border-left-color 0.3s, padding-left 0.3s;
-    }
-    .pillar:last-child { border-bottom: none; }
-    .pillar:hover { border-left-color: var(--gold); padding-left: 28px; }
-    .pillar-num { font-size: 10px; color: rgba(184,149,106,0.4); letter-spacing: 0.15em; margin-bottom: 7px; }
-    .pillar-name { font-size: 13px; font-weight: 500; color: #FAFAF8; margin-bottom: 5px; }
-    .pillar-desc { font-size: 12px; color: rgba(250,250,248,0.38); line-height: 1.7; }
-
-    /* ── CONTACT STRIP ── */
-    .contact-strip {
-      background: var(--white);
-      border-top: 0.5px solid var(--border);
-      border-bottom: 0.5px solid var(--border);
-      padding: 64px 48px;
-    }
-    .contact-inner {
-      max-width: 1280px; margin: 0 auto;
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px; align-items: center;
-    }
-    .contact-label { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 16px; }
-    .contact-title {
-      font-family: 'Bodoni Moda', serif;
-      font-size: 28px; font-weight: 400; color: var(--black);
-    }
-    .contact-item { display: flex; flex-direction: column; gap: 6px; }
-    .contact-type { font-size: 10px; letter-spacing: 0.2em; color: var(--gold); }
-    .contact-value {
-      font-size: 14px; color: var(--black);
-      text-decoration: none; transition: color 0.2s;
-    }
-    .contact-value:hover { color: var(--gold); }
-    .contact-note { font-size: 11px; color: var(--grey); margin-top: 2px; }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 32px 48px;
-      background: var(--black);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .footer-left { display: flex; align-items: center; gap: 12px; }
-    .footer-icon { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; }
-    .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
-    .footer-logo {
-      font-family: 'Bodoni Moda', serif;
-      font-size: 14px; letter-spacing: 0.18em; color: rgba(250,250,248,0.3);
-    }
-    .footer-note { font-size: 11px; color: rgba(250,250,248,0.18); letter-spacing: 0.06em; }
-
-    /* ── FONT SIZE INCREASES ── */
-    .hero-sub { font-size: 15px; }
-    .statement-body { font-size: 16px; }
-    .statement-label, .rooms-label, .philosophy-label, .contact-label { font-size: 11px; }
-    .philosophy-body { font-size: 15px; }
-    .pillar-name { font-size: 14px; }
-    .pillar-desc { font-size: 13px; }
-    .contact-value { font-size: 15px; }
-    .contact-note { font-size: 13px; }
-
-    /* ── HAMBURGER ── */
-    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; z-index: 101; }
-    .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--black); transition: all 0.3s; }
     .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
     .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
-    @media (max-width: 768px) {
-      nav { padding: 14px 20px; }
+    /* ═══════════════════════════════════════════
+       MOTION — masked line rise + drift
+       ═══════════════════════════════════════════ */
+    /* Content is visible by default. Only once JS has confirmed it is
+       running (html.js) do we hide it to animate it in — so a script
+       failure degrades to a plain, readable page instead of a blank one. */
+    .js .rv {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 1s var(--ease), transform 1s var(--ease);
+      transition-delay: var(--d, 0ms);
+    }
+    .js .rv.in { opacity: 1; transform: none; }
+
+    .mask { display: block; overflow: hidden; }
+    .js .mask > span {
+      display: block; transform: translateY(105%);
+      transition: transform 1.05s var(--ease);
+      transition-delay: var(--d, 0ms);
+    }
+    .js .in .mask > span, .js .mask.in > span { transform: none; }
+
+    /* ═══════════════════════════════════════════
+       HERO — big, left, and unafraid of space
+       ═══════════════════════════════════════════ */
+    .hero {
+      display: grid; align-content: center;
+      min-height: 82vh;
+      padding: clamp(60px, 10cqw, 130px) 0 clamp(50px, 7cqw, 90px);
+    }
+    .hero-type {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(46px, 11.5cqw, 152px);
+      line-height: 0.9; letter-spacing: -0.03em;
+      max-width: 14ch;
+    }
+    .hero-type em { font-style: italic; color: var(--gold); }
+
+    .hero-foot {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      gap: 32px; flex-wrap: wrap;
+      margin-top: clamp(38px, 5cqw, 64px);
+    }
+    .hero-sub {
+      font-size: 14.5px; line-height: 1.85; color: var(--stone);
+      max-width: 34ch;
+    }
+    .hero-cta {
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      text-decoration: none; white-space: nowrap;
+      border-bottom: 1px solid var(--gold); padding-bottom: 6px;
+      transition: color 0.25s;
+    }
+    .hero-cta:hover { color: var(--gold); }
+
+    /* ═══════════════════════════════════════════
+       MARQUEE — kept, but quieted right down
+       ═══════════════════════════════════════════ */
+    .marquee-wrap {
+      overflow: hidden;
+      border-block: 1px solid var(--hairline);
+      padding: 12px 0;
+    }
+    .marquee-track { display: flex; width: max-content; animation: marquee 34s linear infinite; }
+    .marquee-item {
+      display: flex; align-items: center; gap: 16px; padding: 0 26px;
+      font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--stone); white-space: nowrap; opacity: 0.6;
+    }
+    .marquee-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--gold); }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+
+    /* ═══════════════════════════════════════════
+       STATEMENT
+       ═══════════════════════════════════════════ */
+    .statement { padding: clamp(64px, 9cqw, 130px) 0; }
+    .statement-type {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-weight: 400; font-style: italic;
+      font-size: clamp(28px, 4.4cqw, 58px);
+      line-height: 1.18; letter-spacing: -0.015em;
+      max-width: 20ch;
+    }
+    .statement-type b { font-style: normal; font-weight: 400; color: var(--gold); }
+    .statement-body {
+      margin-top: clamp(30px, 4cqw, 52px);
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: clamp(24px, 4cqw, 64px);
+      max-width: 900px;
+    }
+    .statement-body p { font-size: 15px; line-height: 1.95; color: var(--stone); }
+    .statement-body strong { color: var(--ink); font-weight: 400; }
+
+    /* ═══════════════════════════════════════════
+       ROOMS — alternating, off-grid, bleeding out
+       ═══════════════════════════════════════════ */
+    .rooms { padding-bottom: clamp(20px, 4cqw, 50px); }
+
+    .room {
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: clamp(26px, 5cqw, 76px);
+      padding: clamp(50px, 8cqw, 120px) 0;
+      border-top: 1px solid var(--hairline);
+      text-decoration: none;
+    }
+    .room-fig {
+      position: relative; overflow: hidden;
+      aspect-ratio: 4 / 5;
+      background: var(--hairline);
+    }
+    /* break the margin — the crop that makes it feel composed */
+    .room:nth-child(odd)  .room-fig { margin-left:  calc(var(--gutter) * -1); }
+    .room:nth-child(even) .room-fig { order: 2; margin-right: calc(var(--gutter) * -1); }
+
+    .room-fig img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transform: scale(1.14);
+      will-change: transform;
+      transition: filter 0.6s ease;
+    }
+    .room:hover .room-fig img { filter: brightness(1.04); }
+
+    .room-name {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(34px, 5.4cqw, 72px);
+      line-height: 0.98; letter-spacing: -0.02em;
+      margin-bottom: 18px;
+    }
+    .room-desc {
+      font-size: 14px; line-height: 1.85; color: var(--stone);
+      max-width: 32ch; margin-bottom: 26px;
+    }
+    .room-link {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    .room-link::after {
+      content: ''; width: 34px; height: 1px; background: var(--gold);
+      transition: width 0.45s var(--ease);
+    }
+    .room:hover .room-link::after { width: 64px; }
+    .room-meta {
+      display: block; font-size: 10px; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 14px;
+    }
+
+    /* ═══════════════════════════════════════════
+       PHILOSOPHY — the one inverted band
+       ═══════════════════════════════════════════ */
+    .philosophy {
+      background: var(--panel); color: var(--panel-ink);
+      padding: clamp(64px, 9cqw, 130px) 0;
+      transition: background 0.4s ease;
+    }
+    .philosophy-inner {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(34px, 6cqw, 96px); align-items: start;
+    }
+    .philosophy-type {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(30px, 4.4cqw, 56px);
+      line-height: 1.1; letter-spacing: -0.015em;
+      margin-bottom: 22px;
+    }
+    .philosophy-type em { font-style: italic; color: var(--gold); }
+    .philosophy-body { font-size: 14.5px; line-height: 1.95; color: var(--panel-dim); }
+
+    .pillars { display: flex; flex-direction: column; }
+    .pillar {
+      padding: 20px 0 20px 22px;
+      border-left: 1px solid var(--panel-line);
+      border-bottom: 1px solid var(--panel-line);
+      transition: border-left-color 0.3s, padding-left 0.3s;
+    }
+    .pillar:last-child { border-bottom: none; }
+    .pillar:hover { border-left-color: var(--gold); padding-left: 28px; }
+    .pillar-name { font-size: 14px; font-weight: 400; margin-bottom: 6px; }
+    .pillar-desc { font-size: 13px; line-height: 1.75; color: var(--panel-dim); }
+
+    /* ═══════════════════════════════════════════
+       CONTACT
+       ═══════════════════════════════════════════ */
+    .contact { padding: clamp(60px, 8cqw, 110px) 0; }
+    .contact-type {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(26px, 3.6cqw, 44px);
+      line-height: 1.15; margin-bottom: clamp(30px, 4cqw, 52px);
+      max-width: 18ch;
+    }
+    .contact-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: clamp(24px, 4cqw, 56px);
+      border-top: 1px solid var(--hairline); padding-top: 30px;
+    }
+    .contact-item { display: flex; flex-direction: column; gap: 7px; }
+    .contact-type-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+    .contact-value { font-size: 15px; text-decoration: none; transition: color 0.2s; }
+    .contact-value:hover { color: var(--gold); }
+    .contact-note { font-size: 12.5px; color: var(--stone); }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════ */
+    footer {
+      background: var(--panel); color: var(--panel-dim);
+      padding: 30px 0;
+      transition: background 0.4s ease;
+    }
+    .footer-inner {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .footer-left { display: flex; align-items: center; gap: 11px; }
+    .footer-icon { width: 24px; height: 24px; border-radius: 50%; overflow: hidden; }
+    .footer-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .footer-logo {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-size: 13px; letter-spacing: 0.18em; color: var(--panel-dim);
+    }
+    .footer-note { font-size: 11px; }
+
+    /* ═══════════════════════════════════════════
+       CONTAINER QUERIES — the mobile layout.
+       Fires on a real phone AND when the reader
+       forces Mobile on a desktop.
+       ═══════════════════════════════════════════ */
+    @container site (max-width: 820px) {
       .nav-links {
-        display: none; position: fixed; top: 61px; left: 0; right: 0;
-        background: rgba(250,250,248,0.98); backdrop-filter: blur(12px);
-        flex-direction: column; padding: 0; z-index: 99; gap: 0;
-        border-bottom: 0.5px solid var(--border);
+        display: none;
+        position: absolute; top: 100%; left: 0; right: 0;
+        flex-direction: column; gap: 0;
+        background: var(--paper);
+        border-bottom: 1px solid var(--hairline);
       }
       .nav-links.open { display: flex; }
-      .nav-links li { border-bottom: 0.5px solid var(--border); }
-      .nav-links a { display: block; padding: 16px 20px; font-size: 13px; }
+      .nav-links li { border-bottom: 1px solid var(--hairline); }
+      .nav-links li:last-child { border-bottom: none; }
+      /* indent to the gutter so menu items line up with the logo above */
+      .nav-links a { display: block; padding: 15px var(--gutter); font-size: 12px; }
       .hamburger { display: flex; }
+      .nav-join { display: none; }
+      .nav-right { gap: 12px; }
 
-      .hero { padding: 100px 20px 60px; min-height: auto; }
-      .hero-sub { font-size: 13px; }
+      .hero { min-height: 0; padding-top: clamp(44px, 12cqw, 70px); }
+      .hero-type { max-width: 100%; }
+      .hero-foot { flex-direction: column; align-items: flex-start; gap: 24px; }
 
-      .statement { grid-template-columns: 1fr; gap: 32px; padding: 60px 20px; }
+      .statement-body { grid-template-columns: 1fr; }
 
-      .rooms-section { padding: 48px 20px 64px; }
-      .rooms-header { flex-direction: column; gap: 4px; }
-      .rooms-grid { grid-template-columns: 1fr; }
-      .room-card { height: 280px; }
+      .room { grid-template-columns: 1fr; gap: 26px; }
+      .room:nth-child(even) .room-fig { order: 0; }
+      .room:nth-child(odd) .room-fig,
+      .room:nth-child(even) .room-fig {
+        margin-inline: calc(var(--gutter) * -1);
+        aspect-ratio: 3 / 2;
+      }
 
-      .philosophy { padding: 60px 20px; }
-      .philosophy-inner { grid-template-columns: 1fr; gap: 40px; }
+      .philosophy-inner { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
 
-      .contact-strip { padding: 48px 20px; }
-      .contact-inner { grid-template-columns: 1fr; gap: 28px; }
-
-      footer { padding: 24px 20px; flex-direction: column; gap: 12px; text-align: center; }
+    @media (prefers-reduced-motion: reduce) {
+      .js .rv, .js .mask > span, .room-fig img, .site { transition-duration: 0.01ms !important; }
+      .js .rv { opacity: 1; transform: none; }
+      .js .mask > span { transform: none; }
+      .marquee-track { animation: none; }
     }
   </style>
+  <script>
+    /* Applied before first paint so the page never flashes the wrong theme,
+       and so the scroll animations only arm themselves when JS is alive. */
+    (function () {
+      document.documentElement.classList.add('js');
+      try {
+        var t = localStorage.getItem('un-theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 
+<div class="site">
+
   <nav>
     <a href="index.html" class="nav-logo">
-      <div class="nav-logo-icon">
-        <img src="logo-icon.png" alt="Urban Nest"/>
-      </div>
+      <span class="nav-logo-icon"><img src="logo-icon.png" alt=""/></span>
       <span class="nav-logo-text">URBAN NEST</span>
     </a>
-    <ul class="nav-links">
+
+    <ul class="nav-links" id="navLinks">
       <li><a href="#rooms">Spaces</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="community.html">The Nest Edit</a></li>
+      <li><a href="join.html">Join the Nest</a></li>
     </ul>
-    <div style="display:flex;align-items:center;gap:12px;">
-      <a href="join.html" style="padding:9px 20px;background:var(--black);color:var(--white);font-size:10px;letter-spacing:0.18em;text-decoration:none;text-transform:uppercase;transition:background 0.2s;" onmouseover="this.style.background='#B8956A'" onmouseout="this.style.background='var(--black)'">Join the Nest</a>
-      <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleNav()">
+
+    <div class="nav-right">
+      <div class="switch" role="group" aria-label="Colour theme">
+        <button type="button" id="themeLight" aria-pressed="false" title="Light" aria-label="Light theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4.2"/>
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>
+          </svg>
+        </button>
+        <button type="button" id="themeDark" aria-pressed="false" title="Dark" aria-label="Dark theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>
+          </svg>
+        </button>
+      </div>
+
+      <a href="join.html" class="nav-join">Join the Nest</a>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg-line"></div>
-    <div class="hero-glow"></div>
-    <div class="hero-content">
-      <div class="hero-eyebrow">
-        <div class="eyebrow-line"></div>
-        <span class="eyebrow-text">CURATED LIVING SPACES</span>
-        <div class="eyebrow-line"></div>
-      </div>
-      <h1 class="hero-title">
-        Small things.<br/>
-        <em>Big difference.</em>
-      </h1>
+  <!-- ── HERO ── -->
+  <header class="hero shell rv">
+    <h1 class="hero-type">
+      <span class="mask"><span>Small things.</span></span>
+      <span class="mask"><span style="--d:110ms"><em>Big difference.</em></span></span>
+    </h1>
+    <div class="hero-foot rv" style="--d:340ms">
       <p class="hero-sub">This is Urban Nest — where intentional living begins with the objects you choose every day.</p>
-      <a href="#rooms" class="hero-cta">EXPLORE SPACES →</a>
+      <a href="#rooms" class="hero-cta">Explore spaces</a>
     </div>
-    <div class="scroll-hint">
-      <div class="scroll-line"></div>
-      SCROLL
-    </div>
-  </section>
+  </header>
 
-  <!-- MARQUEE -->
+  <!-- ── MARQUEE ── -->
   <div class="marquee-wrap">
     <div class="marquee-track">
-      <div class="marquee-item">THE BATHROOM <span class="marquee-dot"></span></div>
-      <div class="marquee-item">THE KITCHEN <span class="marquee-dot"></span></div>
-      <div class="marquee-item">THE BEDROOM <span class="marquee-dot"></span></div>
-      <div class="marquee-item">AFFORDABLE LUXURY <span class="marquee-dot"></span></div>
-      <div class="marquee-item">CURATED LIVING <span class="marquee-dot"></span></div>
-      <div class="marquee-item">FUNCTIONAL DESIGN <span class="marquee-dot"></span></div>
-      <div class="marquee-item">URBAN NEST <span class="marquee-dot"></span></div>
-      <div class="marquee-item">THE BATHROOM <span class="marquee-dot"></span></div>
-      <div class="marquee-item">THE KITCHEN <span class="marquee-dot"></span></div>
-      <div class="marquee-item">THE BEDROOM <span class="marquee-dot"></span></div>
-      <div class="marquee-item">AFFORDABLE LUXURY <span class="marquee-dot"></span></div>
-      <div class="marquee-item">CURATED LIVING <span class="marquee-dot"></span></div>
-      <div class="marquee-item">FUNCTIONAL DESIGN <span class="marquee-dot"></span></div>
-      <div class="marquee-item">URBAN NEST <span class="marquee-dot"></span></div>
+      <span class="marquee-item">The Bathroom <i class="marquee-dot"></i></span>
+      <span class="marquee-item">The Kitchen <i class="marquee-dot"></i></span>
+      <span class="marquee-item">The Bedroom <i class="marquee-dot"></i></span>
+      <span class="marquee-item">Affordable luxury <i class="marquee-dot"></i></span>
+      <span class="marquee-item">Curated living <i class="marquee-dot"></i></span>
+      <span class="marquee-item">Functional design <i class="marquee-dot"></i></span>
+      <span class="marquee-item">Urban Nest <i class="marquee-dot"></i></span>
+      <span class="marquee-item">The Bathroom <i class="marquee-dot"></i></span>
+      <span class="marquee-item">The Kitchen <i class="marquee-dot"></i></span>
+      <span class="marquee-item">The Bedroom <i class="marquee-dot"></i></span>
+      <span class="marquee-item">Affordable luxury <i class="marquee-dot"></i></span>
+      <span class="marquee-item">Curated living <i class="marquee-dot"></i></span>
+      <span class="marquee-item">Functional design <i class="marquee-dot"></i></span>
+      <span class="marquee-item">Urban Nest <i class="marquee-dot"></i></span>
     </div>
   </div>
 
-  <!-- STATEMENT -->
-  <section class="statement">
-    <div>
-      <div class="statement-label">THE URBAN NEST IDEA</div>
-      <h2 class="statement-title">
-        It's the little things<br/>
-        that make a home<br/>
-        <em>a home.</em>
-      </h2>
-    </div>
+  <!-- ── STATEMENT ── -->
+  <section class="statement shell rv">
+    <p class="statement-type">
+      <span class="mask"><span>It's the little things</span></span>
+      <span class="mask"><span style="--d:90ms">that make a home</span></span>
+      <span class="mask"><span style="--d:180ms"><b>a home.</b></span></span>
+    </p>
     <div class="statement-body">
       <p>Home décor in India has long been treated as a luxury for the few — expensive chandeliers, lakh-worth furniture, inaccessible aesthetics. <strong>We disagree.</strong></p>
       <p>It's the soap dispenser, the bath rug, the cotton jar on your countertop. The small, intentional choices that quietly transform your everyday space into something beautiful. <strong>Urban Nest exists to make that possible for everyone.</strong></p>
     </div>
   </section>
 
-  <!-- ROOMS -->
-  <section class="rooms-section" id="rooms">
-    <div class="rooms-header">
-      <div class="rooms-label">EXPLORE SPACES</div>
-      <div class="rooms-count">01 — 03</div>
-    </div>
-    <div class="rooms-grid">
+  <!-- ── ROOMS ── -->
+  <section class="rooms shell" id="rooms">
 
-      <a href="bathroom.html" class="room-card">
-        <img class="room-img" src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=900&q=80" alt="Modern bathroom interior"/>
-        <div class="room-shimmer"></div>
-        <div class="room-overlay"></div>
-        <div class="room-num">01</div>
-        <div class="room-info">
-          <div class="room-tag">INTERACTIVE · 10 ITEMS</div>
-          <div class="room-name">The Bathroom</div>
-          <div class="room-desc">Where mornings begin.<br/>Discover accessories that elevate your ritual.</div>
-          <div class="room-enter">ENTER SPACE</div>
-        </div>
-      </a>
+    <a href="bathroom.html" class="room rv">
+      <figure class="room-fig" data-par>
+        <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=900&q=80" alt="The Bathroom"/>
+      </figure>
+      <div>
+        <span class="room-meta">Interactive · 10 items</span>
+        <h2 class="room-name"><span class="mask"><span>The Bathroom</span></span></h2>
+        <p class="room-desc">Where mornings begin. Discover accessories that elevate your ritual.</p>
+        <span class="room-link">Enter space</span>
+      </div>
+    </a>
 
-      <a href="kitchen.html" class="room-card">
-        <img class="room-img" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=80" alt="Modern kitchen interior"/>
-        <div class="room-shimmer"></div>
-        <div class="room-overlay"></div>
-        <div class="room-num">02</div>
-        <div class="room-info">
-          <div class="room-tag">INTERACTIVE · 3D SPACE</div>
-          <div class="room-name">The Kitchen</div>
-          <div class="room-desc">Where flavour meets form.<br/>Essentials that make cooking a pleasure.</div>
-          <div class="room-enter">ENTER SPACE</div>
-        </div>
-      </a>
+    <a href="kitchen.html" class="room rv">
+      <figure class="room-fig" data-par>
+        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=80" alt="The Kitchen"/>
+      </figure>
+      <div>
+        <span class="room-meta">Interactive · 3D space</span>
+        <h2 class="room-name"><span class="mask"><span>The Kitchen</span></span></h2>
+        <p class="room-desc">Where flavour meets form. Essentials that make cooking a pleasure.</p>
+        <span class="room-link">Enter space</span>
+      </div>
+    </a>
 
-      <a href="bedroom.html" class="room-card">
-        <img class="room-img" src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=900&q=80" alt="Modern bedroom interior"/>
-        <div class="room-shimmer"></div>
-        <div class="room-overlay"></div>
-        <div class="room-num">03</div>
-        <div class="room-info">
-          <div class="room-tag">INTERACTIVE · 3D SPACE</div>
-          <div class="room-name">The Bedroom</div>
-          <div class="room-desc">Where rest becomes sanctuary.<br/>Pieces that bring calm to your space.</div>
-          <div class="room-enter">ENTER SPACE</div>
-        </div>
-      </a>
+    <a href="bedroom.html" class="room rv">
+      <figure class="room-fig" data-par>
+        <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=900&q=80" alt="The Bedroom"/>
+      </figure>
+      <div>
+        <span class="room-meta">Interactive · 3D space</span>
+        <h2 class="room-name"><span class="mask"><span>The Bedroom</span></span></h2>
+        <p class="room-desc">Where rest becomes sanctuary. Pieces that bring calm to your space.</p>
+        <span class="room-link">Enter space</span>
+      </div>
+    </a>
 
-    </div>
   </section>
 
-  <!-- PHILOSOPHY -->
+  <!-- ── PHILOSOPHY ── -->
   <section class="philosophy" id="philosophy">
-    <div class="philosophy-inner">
+    <div class="philosophy-inner shell rv">
       <div>
-        <div class="philosophy-label">OUR PHILOSOPHY</div>
-        <h2 class="philosophy-title">Affordable luxury.<br/><em>For real homes.</em></h2>
+        <h2 class="philosophy-type">Affordable luxury.<br/><em>For real homes.</em></h2>
         <p class="philosophy-body">You should not need a budget of five lakhs to make your space feel beautiful. Urban Nest introduces affordable luxury that uplifts the everyday — one intentional object at a time.</p>
       </div>
       <div class="pillars">
         <div class="pillar">
-          <div class="pillar-num">01</div>
           <div class="pillar-name">Small things, big impact</div>
           <div class="pillar-desc">A soap dispenser, a bath rug, a cotton jar — the little things that quietly transform a home.</div>
         </div>
         <div class="pillar">
-          <div class="pillar-num">02</div>
           <div class="pillar-name">See it before you buy it</div>
           <div class="pillar-desc">Walk through curated rooms. Discover products in context, not on a shelf.</div>
         </div>
         <div class="pillar">
-          <div class="pillar-num">03</div>
           <div class="pillar-name">Curated, not catalogued</div>
           <div class="pillar-desc">Every item is chosen for how it functions, how it looks, and how it fits your life.</div>
         </div>
         <div class="pillar">
-          <div class="pillar-num">04</div>
           <div class="pillar-name">The complete look</div>
           <div class="pillar-desc">Buy the feeling, not just the product. Collections designed to work together beautifully.</div>
         </div>
@@ -538,53 +605,136 @@
     </div>
   </section>
 
-  <!-- CONTACT -->
-  <section class="contact-strip">
-    <div class="contact-inner">
-      <div>
-        <div class="contact-label">GET IN TOUCH</div>
-        <h3 class="contact-title">We'd love to hear from you.</h3>
-      </div>
+  <!-- ── CONTACT ── -->
+  <section class="contact shell rv">
+    <h2 class="contact-type">We'd love to hear from you.</h2>
+    <div class="contact-grid">
       <div class="contact-item">
-        <span class="contact-type">EMAIL</span>
+        <span class="contact-type-label">Email</span>
         <a href="mailto:reachus.urbannest@gmail.com" class="contact-value">reachus.urbannest@gmail.com</a>
         <span class="contact-note">For partnerships and general enquiries</span>
       </div>
-      <div>
-        <div class="contact-item" style="margin-bottom:20px">
-          <span class="contact-type">WHATSAPP / PHONE</span>
-          <a href="tel:+918588944583" class="contact-value">+91 85889 44583</a>
-        </div>
-        <div class="contact-item">
-          <span class="contact-type">INSTAGRAM</span>
-          <a href="https://instagram.com/store.urbannest" target="_blank" class="contact-value">@store.urbannest</a>
-        </div>
+      <div class="contact-item">
+        <span class="contact-type-label">WhatsApp / Phone</span>
+        <a href="tel:+918588944583" class="contact-value">+91 85889 44583</a>
+      </div>
+      <div class="contact-item">
+        <span class="contact-type-label">Instagram</span>
+        <a href="https://instagram.com/store.urbannest" target="_blank" rel="noopener" class="contact-value">@store.urbannest</a>
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
+  <!-- ── FOOTER ── -->
   <footer>
-    <div class="footer-left">
-      <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
-      <span class="footer-logo">URBAN NEST</span>
+    <div class="footer-inner shell">
+      <div class="footer-left">
+        <span class="footer-icon"><img src="logo-icon.png" alt=""/></span>
+        <span class="footer-logo">URBAN NEST</span>
+      </div>
+      <span class="footer-note">© 2025 Urban Nest · All rights reserved</span>
     </div>
-    <div class="footer-note">© 2025 Urban Nest · All rights reserved</div>
   </footer>
 
+</div>
+
 <script>
-  function toggleNav() {
-    const links = document.querySelector('.nav-links');
-    const btn = document.getElementById('hamburger');
-    links.classList.toggle('open');
-    btn.classList.toggle('open');
-  }
-  document.querySelectorAll('.nav-links a').forEach(a => {
-    a.addEventListener('click', () => {
-      document.querySelector('.nav-links').classList.remove('open');
-      document.getElementById('hamburger').classList.remove('open');
+  (function () {
+    var root = document.documentElement;
+
+    /* ── theme toggle ─────────────────────────── */
+    var themeBtns = { light: document.getElementById('themeLight'), dark: document.getElementById('themeDark') };
+
+    function paintTheme() {
+      var t = root.getAttribute('data-theme');
+      themeBtns.light.setAttribute('aria-pressed', String(t === 'light'));
+      themeBtns.dark.setAttribute('aria-pressed', String(t === 'dark'));
+    }
+    function setTheme(next) {
+      /* pressing the active one returns you to the device setting */
+      if (root.getAttribute('data-theme') === next) {
+        root.removeAttribute('data-theme');
+        try { localStorage.removeItem('un-theme'); } catch (e) {}
+      } else {
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('un-theme', next); } catch (e) {}
+      }
+      paintTheme();
+    }
+
+    themeBtns.light.addEventListener('click', function () { setTheme('light'); });
+    themeBtns.dark.addEventListener('click', function () { setTheme('dark'); });
+    paintTheme();
+
+    /* ── nav ──────────────────────────────────── */
+    var burger = document.getElementById('hamburger');
+    var links = document.getElementById('navLinks');
+    burger.addEventListener('click', function () {
+      var open = links.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', String(open));
     });
-  });
+    links.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        links.classList.remove('open');
+        burger.classList.remove('open');
+        burger.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    /* ── reveals ──────────────────────────────── */
+    function revealAll() {
+      document.querySelectorAll('.rv, .mask').forEach(function (el) { el.classList.add('in'); });
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      revealAll();
+    } else {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.15, rootMargin: '0px 0px -6% 0px' });
+      document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+
+      var mio = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add('in'); mio.unobserve(e.target); }
+        });
+      }, { threshold: 0.85 });
+      document.querySelectorAll('.mask').forEach(function (m) {
+        if (!m.closest('.rv')) mio.observe(m);
+      });
+
+      /* Safety net: nothing may stay invisible. If an element is already in
+         view but hasn't been revealed within 1.6s, show everything. */
+      setTimeout(function () {
+        var hidden = document.querySelector('.rv:not(.in)');
+        if (hidden && hidden.getBoundingClientRect().top < window.innerHeight) revealAll();
+      }, 1600);
+    }
+
+    /* ── images drift against the scroll ──────── */
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var figs = [].slice.call(document.querySelectorAll('[data-par]'));
+    var ticking = false;
+
+    function frame() {
+      ticking = false;
+      var vh = window.innerHeight;
+      figs.forEach(function (fig) {
+        var r = fig.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > vh + 200) return;
+        var p = (r.top + r.height / 2 - vh / 2) / vh;
+        var img = fig.querySelector('img');
+        if (img) img.style.transform = 'scale(1.14) translate3d(0,' + (p * -22).toFixed(2) + 'px,0)';
+      });
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    frame();
+  })();
 </script>
 
 </body>
