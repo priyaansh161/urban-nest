@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Kitchen — Urban Nest</title>
-  <link rel="icon" type="image/png" href="logo-icon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase.js"></script>
@@ -64,6 +64,9 @@
     .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 0.5px solid #E0DFD9; flex-shrink: 0; position: sticky; top: 0; background: #FAFAF8; z-index: 5; }
     .panel-back { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.12em; color: #6B6B68; cursor: pointer; border: none; background: none; transition: color 0.2s; padding: 6px 0; }
     .panel-back:hover { color: #111110; }
+    .panel-header-right { display: flex; align-items: center; gap: 14px; }
+    .panel-close { width: 30px; height: 30px; display: grid; place-items: center; border: none; background: none; cursor: pointer; color: #6B6B68; font-size: 24px; line-height: 1; border-radius: 50%; transition: background 0.2s, color 0.2s; }
+    .panel-close:hover { background: #EDECE7; color: #111110; }
     .panel-room-tag { font-size: 10px; letter-spacing: 0.2em; color: #B8956A; }
 
     .panel-3d { width: 100%; height: 50vh; background: #111110; flex-shrink: 0; position: relative; overflow: hidden; }
@@ -132,7 +135,10 @@
   <div id="panel">
     <div class="panel-header">
       <button class="panel-back" id="close-btn">← BACK TO KITCHEN</button>
-      <span class="panel-room-tag">THE KITCHEN</span>
+      <div class="panel-header-right">
+        <span class="panel-room-tag">THE KITCHEN</span>
+        <button class="panel-close" id="close-x" aria-label="Close" title="Close">×</button>
+      </div>
     </div>
     <div class="panel-3d" id="panel-3d">
       <div id="product-viewer-wrap"></div>
@@ -393,6 +399,10 @@
     }
 
     document.getElementById('close-btn').addEventListener('click', closePanel);
+    document.getElementById('close-x').addEventListener('click', closePanel);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.getElementById('panel').classList.contains('open')) closePanel();
+    });
     document.getElementById('zoom-in').addEventListener('click', () => {
       zoomLevel = Math.min(zoomLevel + 0.2, 3);
       if (currentViewer) currentViewer.style.transform = `scale(${zoomLevel})`;
