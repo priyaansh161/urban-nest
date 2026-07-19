@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Urban Nest — Curated Living Spaces</title>
-  <link rel="icon" type="image/png" href="logo-icon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -119,6 +119,9 @@
       color: var(--stone); text-decoration: none; transition: color 0.2s;
     }
     .nav-links a:hover { color: var(--ink); }
+    /* The black button already says this; only the mobile menu needs the
+       text link, since the button is hidden there. */
+    .nav-links .join-item { display: none; }
 
     .nav-join {
       padding: 9px 20px;
@@ -180,7 +183,13 @@
     }
     .js .rv.in { opacity: 1; transform: none; }
 
-    .mask { display: block; overflow: hidden; }
+    /* The mask clips the rising line. Line-height is 0.9, so descenders
+       (the g in "Big") fall outside the box — pad the bottom to make room
+       and pull it back with a negative margin so spacing is unchanged. */
+    .mask {
+      display: block; overflow: hidden;
+      padding-bottom: 0.16em; margin-bottom: -0.16em;
+    }
     .js .mask > span {
       display: block; transform: translateY(105%);
       transition: transform 1.05s var(--ease);
@@ -268,7 +277,7 @@
     .room {
       display: grid; grid-template-columns: 1fr 1fr;
       align-items: center; gap: clamp(26px, 5cqw, 76px);
-      padding: clamp(50px, 8cqw, 120px) 0;
+      padding: clamp(30px, 4.2cqw, 62px) 0;
       border-top: 1px solid var(--hairline);
       text-decoration: none;
     }
@@ -405,6 +414,7 @@
         border-bottom: 1px solid var(--hairline);
       }
       .nav-links.open { display: flex; }
+      .nav-links .join-item { display: block; }
       .nav-links li { border-bottom: 1px solid var(--hairline); }
       .nav-links li:last-child { border-bottom: none; }
       /* indent to the gutter so menu items line up with the logo above */
@@ -465,7 +475,7 @@
       <li><a href="#rooms">Spaces</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="community.html">The Nest Edit</a></li>
-      <li><a href="join.html">Join the Nest</a></li>
+      <li class="join-item"><a href="join.html">Join the Nest</a></li>
     </ul>
 
     <div class="nav-right">
@@ -541,7 +551,7 @@
 
     <a href="bathroom.html" class="room rv">
       <figure class="room-fig" data-par>
-        <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=900&q=80" alt="The Bathroom"/>
+        <img src="https://images.unsplash.com/photo-1753605788101-04d1e653e74a?w=900&q=80&auto=format&fit=crop" alt="The Bathroom"/>
       </figure>
       <div>
         <span class="room-meta">Interactive · 10 items</span>
@@ -553,7 +563,7 @@
 
     <a href="kitchen.html" class="room rv">
       <figure class="room-fig" data-par>
-        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&q=80" alt="The Kitchen"/>
+        <img src="https://images.unsplash.com/photo-1759239572496-4ec13e7643d6?w=900&q=80&auto=format&fit=crop" alt="The Kitchen"/>
       </figure>
       <div>
         <span class="room-meta">Interactive · 3D space</span>
@@ -565,7 +575,7 @@
 
     <a href="bedroom.html" class="room rv">
       <figure class="room-fig" data-par>
-        <img src="https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=900&q=80" alt="The Bedroom"/>
+        <img src="https://images.unsplash.com/photo-1616418928117-4e6d19be2df1?w=900&q=80&auto=format&fit=crop" alt="The Bedroom"/>
       </figure>
       <div>
         <span class="room-meta">Interactive · 3D space</span>
