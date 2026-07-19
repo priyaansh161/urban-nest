@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Nest Edit — Urban Nest</title>
-  <link rel="icon" type="image/png" href="logo-icon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +25,7 @@
     .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
     .nav-logo-text { font-family: 'Bodoni Moda', serif; font-size: 17px; letter-spacing: 0.16em; color: var(--black); }
     .nav-links { display: flex; gap: 36px; list-style: none; }
-    .nav-links a { font-size: 11px; letter-spacing: 0.14em; color: var(--grey); text-decoration: none; transition: color 0.2s; }
+    .nav-links a { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey); text-decoration: none; transition: color 0.2s; }
     .nav-links a:hover, .nav-links a.active { color: var(--gold); }
 
     /* PAGE HERO */
@@ -314,6 +314,15 @@
     .dynamic-card { background: var(--white); padding: 28px; display: flex; flex-direction: column; gap: 12px; }
     .dynamic-card-cat { font-size: 9px; letter-spacing: 0.2em; color: var(--gold); }
     .dynamic-card-img { width: 100%; height: 180px; object-fit: cover; }
+    /* Shown when a post has no image yet, so the card still reads as
+       finished rather than broken. Add an image in Admin → The Nest. */
+    .dynamic-card-ph {
+      width: 100%; height: 180px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, #F4F3EF 0%, #EAE7DF 100%);
+      border: 0.5px solid var(--border);
+    }
+    .dynamic-card-ph img { width: 38px; height: 38px; border-radius: 50%; opacity: 0.5; }
     .dynamic-card-title { font-family: 'Bodoni Moda', serif; font-size: 18px; font-weight: 400; line-height: 1.25; }
     .dynamic-card-content { font-size: 13px; color: var(--grey); line-height: 1.8; }
     .dynamic-card-date { font-size: 10px; color: var(--grey); margin-top: auto; }
@@ -380,7 +389,7 @@
     <div class="featured-label">EDITOR'S PICK</div>
     <a href="#article-1" class="featured-card" onclick="openArticle('article-1'); return false;">
       <div class="featured-img">
-        <img src="https://images.unsplash.com/photo-1584622781867-1b79ff7e0d21?w=800&q=80" alt="Indian bathroom decor trends"/>
+        <img src="https://images.unsplash.com/photo-1764526624453-db32c24eca55?w=800&q=80&auto=format&fit=crop" alt="Indian bathroom decor trends"/>
       </div>
       <div class="featured-body">
         <div>
@@ -802,7 +811,9 @@
         const grid = document.getElementById('dynamicGrid');
         grid.innerHTML = data.map(p => `
           <div class="dynamic-card ${p.pinned ? 'dynamic-pin' : ''}">
-            ${p.image_url ? `<img class="dynamic-card-img" src="${p.image_url}" alt="${p.title}" loading="lazy"/>` : ''}
+            ${p.image_url
+              ? `<img class="dynamic-card-img" src="${p.image_url}" alt="${p.title}" loading="lazy"/>`
+              : `<div class="dynamic-card-ph"><img src="favicon.png" alt="" aria-hidden="true"/></div>`}
             <div class="dynamic-card-cat">${p.category ? p.category.toUpperCase() : 'THE NEST'}${p.pinned ? ' · PINNED' : ''}</div>
             <div class="dynamic-card-title">${p.title}</div>
             <div class="dynamic-card-content">${(p.content || '').slice(0, 180)}${p.content && p.content.length > 180 ? '…' : ''}</div>
