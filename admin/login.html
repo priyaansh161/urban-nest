@@ -101,6 +101,16 @@
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // Explain why they were signed out, when that is why they are here.
+  (function showEndedNotice() {
+    const reason = new URLSearchParams(location.search).get('ended');
+    if (!reason) return;
+    document.getElementById('errorMsg').textContent =
+      reason === 'idle'
+        ? 'Signed out after an hour of inactivity. Please sign in again.'
+        : 'Your session expired. Please sign in again.';
+  })();
+
   // Already logged in → go to dashboard
   db.auth.getSession().then(({ data: { session } }) => {
     if (session) window.location.href = 'index.html';
@@ -124,6 +134,14 @@
       btn.disabled = false;
       btn.textContent = 'Enter';
     } else {
+      // Start the session clock fresh. Without this, timestamps left over
+      // from a previous session would read as expired and sign you straight
+      // back out — locking you out of the admin entirely.
+      try {
+        const now = String(Date.now());
+        localStorage.setItem('un-admin-started', now);
+        localStorage.setItem('un-admin-last-seen', now);
+      } catch (e) {}
       window.location.href = 'index.html';
     }
   });
