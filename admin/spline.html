@@ -141,6 +141,7 @@
           <input type="url" id="sceneUrl" placeholder="https://prod.spline.design/…/scene.splinecode"
             oninput="debouncedPreview(this.value)"/>
           <span class="form-hint">Copy from Spline → Export → Copy Link. Ends in <code>.splinecode</code></span>
+          <span class="form-hint">Re-publishing in Spline keeps this URL the same. Saving here — or “Push update” on a saved scene — is what makes visitors load the new version instead of the one their browser cached.</span>
         </div>
         <div class="form-group">
           <label for="scenePage">Page Placement</label>
@@ -192,6 +193,39 @@ let scenes = [];
 let previewTimer;
 (async () => { await requireAuth(); loadScenes(); })();
 
+/* ── SCENE VERSIONING ──────────────────────────────────────────────
+   Re-publishing a scene in Spline keeps the same URL, and Spline serves
+   .splinecode with no cache headers — so browsers keep showing the copy
+   they already have and visitors never see the update. Stamping a ?v=
+   on save gives the browser a fresh address, which forces a re-download.
+   Bumping it is the only way to push a re-published scene to visitors. */
+
+// The URL without our version stamp — what we show in the UI.
+function baseUrl(raw) {
+  if (!raw) return '';
+  try {
+    const u = new URL(raw);
+    u.searchParams.delete('v');
+    return u.toString().replace(/\?$/, '');
+  } catch (e) {
+    return raw.split(/[?&]v=/)[0];
+  }
+}
+
+// The URL with a new version stamp — what we store and what visitors load.
+function stampVersion(raw) {
+  const base = baseUrl(raw);
+  if (!base) return base;
+  const v = Date.now().toString(36);
+  try {
+    const u = new URL(base);
+    u.searchParams.set('v', v);
+    return u.toString();
+  } catch (e) {
+    return base + (base.includes('?') ? '&' : '?') + 'v=' + v;
+  }
+}
+
 function debouncedPreview(url) {
   clearTimeout(previewTimer);
   previewTimer = setTimeout(() => { if (url) loadPreview(); }, 800);
@@ -230,11 +264,12 @@ function renderScenes() {
           ${s.description ? `<span>${s.description}</span>` : ''}
           <span class="badge ${s.active ? 'badge-gold' : 'badge-grey'}">${s.active ? 'Active' : 'Inactive'}</span>
         </div>
-        <div class="scene-url">${s.url}</div>
+        <div class="scene-url">${baseUrl(s.url)}</div>
       </div>
       <div class="scene-actions">
         <button class="row-btn" onclick="previewScene('${s.url}')">Preview</button>
         <button class="row-btn" onclick="editScene('${s.id}')">Edit</button>
+        <button class="row-btn" onclick="refreshScene('${s.id}')" title="Re-published this scene in Spline? This pushes it to visitors.">Push update</button>
         <button class="row-btn ${s.active ? 'active-btn' : ''}" onclick="toggleActive('${s.id}', ${s.active})">
           ${s.active ? 'Active ✓' : 'Set Active'}
         </button>
@@ -244,7 +279,7 @@ function renderScenes() {
 }
 
 function previewScene(url) {
-  document.getElementById('sceneUrl').value = url;
+  document.getElementById('sceneUrl').value = baseUrl(url);
   loadPreview();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -254,7 +289,7 @@ function editScene(id) {
   if (!s) return;
   document.getElementById('editingId').value = id;
   document.getElementById('sceneName').value = s.name;
-  document.getElementById('sceneUrl').value = s.url;
+  document.getElementById('sceneUrl').value = baseUrl(s.url);
   document.getElementById('scenePage').value = s.page_placement || 'bath';
   document.getElementById('sceneDescription').value = s.description || '';
   document.getElementById('formTitle').textContent = 'Edit Scene';
@@ -282,6 +317,9 @@ async function saveScene() {
     page_placement: document.getElementById('scenePage').value,
     description: document.getElementById('sceneDescription').value.trim() || null,
   };
+  // Saving always re-stamps the version, so a scene you just re-published in
+  // Spline reaches visitors instead of sitting behind their browser cache.
+  payload.url = stampVersion(payload.url);
   let error;
   if (id) {
     ({ error } = await db.from('spline_scenes').update(payload).eq('id', id));
@@ -289,8 +327,18 @@ async function saveScene() {
     ({ error } = await db.from('spline_scenes').insert({ ...payload, active: false }));
   }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
-  showToast(id ? 'Scene updated' : 'Scene saved!');
+  showToast(id ? 'Scene updated — visitors will load the latest version' : 'Scene saved!');
   resetForm();
+  loadScenes();
+}
+
+// For when the scene changed in Spline but nothing here needs editing.
+async function refreshScene(id) {
+  const s = scenes.find(x => x.id === id);
+  if (!s) return;
+  const { error } = await db.from('spline_scenes').update({ url: stampVersion(s.url) }).eq('id', id);
+  if (error) { showToast('Could not push the update: ' + error.message, 'error'); return; }
+  showToast('Pushed — visitors now load the latest version of this scene');
   loadScenes();
 }
 
