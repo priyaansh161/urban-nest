@@ -708,7 +708,7 @@
       'article-1': {
         cat:'TRENDS', date:'June 2025', read:'8 min read', author:'Urban Nest Editorial',
         title:'Why Indian homes are finally embracing <em>the art of the small detail</em>',
-        img:'https://images.unsplash.com/photo-1584622781867-1b79ff7e0d21?w=1200&q=80',
+        img:'https://images.unsplash.com/photo-1764526624453-db32c24eca55?w=1200&q=80&auto=format&fit=crop',
         body:`<p>The era of the statement chandelier is giving way to something more quietly radical — the rise of the curated everyday object. For decades, "decorating your home" in India meant one of two things: a major renovation or doing nothing at all. The middle path — upgrading your space incrementally, deliberately, with small but perfectly chosen objects — was simply not available. The market didn't offer it. The culture didn't celebrate it. That is changing.</p>
         <h3>The shift we're seeing</h3>
         <p>Walk into any mid-market apartment in Bengaluru, Pune, or Delhi today and you'll notice something different. The bathroom has a matching set — soap dispenser, toothbrush holder, tray, all in the same material and tone. The kitchen counter has been cleared of accumulated clutter and replaced with two or three purposeful pieces: a chopping board beautiful enough to leave out, a spice rack that earns its counter space. No architect was involved. No lakhs were spent. And yet these spaces feel curated, considered, alive.</p>
@@ -872,8 +872,12 @@
       return (raw || '').replace(/\r/g,'').split(/\n\s*\n/).map(block => {
         const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
         if (!lines.length) return '';
-        if (lines[0].startsWith('## ')) {
-          return '<h3>' + linkify(esc(lines[0].slice(3))) + '</h3>' +
+        // Heading: a line starting with # / ## / ### — space optional, and any
+        // trailing #'s stripped. Tolerant of "## X", "##X" and "##X##".
+        const hm = lines[0].match(/^#{1,4}\s*(.*)$/);
+        if (hm) {
+          const heading = hm[1].replace(/\s*#+\s*$/, '').trim();
+          return '<h3>' + linkify(esc(heading)) + '</h3>' +
             (lines.length > 1 ? '<p>' + lines.slice(1).map(l => linkify(esc(l))).join('<br>') + '</p>' : '');
         }
         if (lines.every(l => /^[-*]\s+/.test(l))) {

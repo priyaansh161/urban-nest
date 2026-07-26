@@ -490,9 +490,12 @@ function linkDotsToObjects() {
       if (taken.has(obj)) return;
       const oTokens = norm(obj.name);
       const shared = oTokens.filter(t => pTokens.includes(t)).length;
-      if (!shared) return;
+      const minLen = Math.min(pTokens.length, oTokens.length);
+      // require a real subset match (all of the shorter name's words present),
+      // not just one shared word — stops "Toilet/Vanity/Shower Mat" cross-matching
+      if (!minLen || shared < minLen) return;
       const exact = pTokens.join(' ') === oTokens.join(' ');
-      candidates.push({ dot, obj, score: exact ? 1000 : shared / Math.max(pTokens.length, oTokens.length) });
+      candidates.push({ dot, obj, score: exact ? 1000 : shared });
     });
   });
   candidates.sort((a, b) => b.score - a.score);
