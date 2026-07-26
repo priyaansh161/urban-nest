@@ -74,6 +74,23 @@
     .view-chip.active { color: #B8956A; border-color: rgba(184,149,106,0.6); background: rgba(184,149,106,0.12); }
     body.panel-open #views { opacity: 0; pointer-events: none; }
 
+    /* SCENE CHOOSER (lobby) — pick which view to enter, before any 3D loads */
+    #lobby { position: fixed; inset: 0; z-index: 70; background: #0A0A0A; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .lobby-inner { width: 100%; max-width: 760px; text-align: center; }
+    .lobby-tag { font-size: 10px; letter-spacing: 0.3em; color: #B8956A; margin-bottom: 14px; }
+    .lobby-title { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: clamp(28px, 5vw, 44px); color: #F8F7F4; margin-bottom: 36px; }
+    .lobby-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+    .lobby-card { padding: 22px 18px; border: 0.5px solid rgba(248,247,244,0.15); background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.25s; text-align: left; font-family: 'DM Sans', sans-serif; }
+    .lobby-card:hover { border-color: #B8956A; background: rgba(184,149,106,0.08); }
+    .lobby-card-name { font-size: 15px; letter-spacing: 0.04em; color: #F8F7F4; margin-bottom: 6px; }
+    .lobby-card-desc { font-size: 12px; color: rgba(248,247,244,0.4); line-height: 1.5; }
+    .lobby-card-cta { font-size: 10px; letter-spacing: 0.15em; color: #B8956A; margin-top: 14px; }
+    .lobby-back { display: inline-block; margin-top: 36px; font-size: 11px; letter-spacing: 0.14em; color: rgba(248,247,244,0.5); text-decoration: none; transition: color 0.2s; }
+    .lobby-back:hover { color: #F8F7F4; }
+    .views-btn { position: fixed; bottom: 24px; left: 24px; z-index: 30; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(248,247,244,0.6); background: rgba(10,10,10,0.7); border: 0.5px solid rgba(248,247,244,0.15); padding: 9px 18px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+    .views-btn:hover { color: #F8F7F4; border-color: rgba(184,149,106,0.6); }
+    body.panel-open .views-btn { opacity: 0; pointer-events: none; }
+
     /* PANEL */
     #panel { position: fixed; top: 0; right: 0; bottom: 0; width: 50vw; background: #FAFAF8; z-index: 150; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; }
     #panel.open { transform: translateX(0); }
@@ -152,7 +169,17 @@
   <div id="dots-layer"></div>
   <div id="hint">DRAG TO EXPLORE THE SPACE</div>
   <div id="controls">DRAG TO ROTATE · SCROLL TO ZOOM · RIGHT-DRAG TO PAN</div>
-  <div id="views"></div>
+  <button id="viewsBtn" class="views-btn" style="display:none;" onclick="openLobby()">◫ Views</button>
+
+  <!-- 2D scene chooser shown before any 3D loads (rooms with several views) -->
+  <div id="lobby">
+    <div class="lobby-inner">
+      <div class="lobby-tag">THE KITCHEN</div>
+      <h2 class="lobby-title">Choose a view</h2>
+      <div class="lobby-grid" id="lobbyGrid"></div>
+      <a href="index.html" class="lobby-back">← All spaces</a>
+    </div>
+  </div>
 
   <div id="panel">
     <div class="panel-header">
@@ -206,7 +233,7 @@
 
     (async () => {
       const [sceneRes, prodRes] = await Promise.all([
-        db.from('spline_scenes').select('id,name,url')
+        db.from('spline_scenes').select('id,name,url,description')
           .eq('page_placement', ROOM).eq('active', true)
           .order('created_at').then(r => r.data, () => null),
         db.from('room_products').select('*')
@@ -222,33 +249,56 @@
         document.getElementById('no-scene').style.display = 'flex';
         return;
       }
-      renderViewChips();
-      // Poster gate: let the buffering logo sit for a few seconds before the
-      // Enter button fades in — then defer the heavy Spline download until tap.
+      // Several views → let the visitor choose one first (only the picked scene
+      // loads). A single view → straight to the poster + preload.
+      if (scenes.length >= 2) {
+        renderLobby();
+        openLobby();
+      } else {
+        chooseScene(0);
+      }
+    })();
+
+    // Tapping Enter reveals the (already-loading) scene.
+    document.getElementById('enterBtn').addEventListener('click', enterRoom);
+
+    // ── SCENE CHOOSER (lobby) ──
+    const POSTER_TITLE = document.getElementById('loadingText').textContent;
+
+    function renderLobby() {
+      document.getElementById('lobbyGrid').innerHTML = scenes.map((s, i) => `
+        <button class="lobby-card" onclick="pickScene(${i})">
+          <div class="lobby-card-name">${s.name || ('View ' + (i + 1))}</div>
+          ${s.description ? `<div class="lobby-card-desc">${s.description}</div>` : ''}
+          <div class="lobby-card-cta">ENTER →</div>
+        </button>`).join('');
+    }
+
+    function openLobby() {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('lobby').style.display = 'flex';
+    }
+
+    // Lobby pick: first time → poster + Enter button; already inside → smooth swap.
+    function pickScene(i) {
+      document.getElementById('lobby').style.display = 'none';
+      if (revealed) switchView(i);
+      else chooseScene(i);
+    }
+
+    // Show the poster and preload one scene, then fade the Enter button in.
+    function chooseScene(i) {
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('loadingText').textContent = POSTER_TITLE;
+      const b = document.getElementById('enterBtn');
+      b.style.display = 'none'; b.classList.remove('show'); b.disabled = true;
+      revealed = false;
+      beginScene(i);
       setTimeout(() => {
-        const b = document.getElementById('enterBtn');
         b.style.display = '';
         void b.offsetWidth;        // flush the hidden state so the fade-in plays
         b.classList.add('show');
       }, 2600);
-    })();
-
-    // Tapping Enter (or a view chip) is what actually loads the 3D scene.
-    document.getElementById('enterBtn').addEventListener('click', () => showScene(0));
-
-    // ── SCENES & VIEW SWITCHER ──
-    function renderViewChips() {
-      if (scenes.length < 2) return;
-      const views = document.getElementById('views');
-      views.style.display = 'flex';
-      views.innerHTML = '';
-      scenes.forEach((s, i) => {
-        const chip = document.createElement('button');
-        chip.className = 'view-chip';
-        chip.textContent = s.name || ('View ' + (i + 1));
-        chip.addEventListener('click', () => switchView(i));
-        views.appendChild(chip);
-      });
     }
 
     // Load a scene into the stage. On first load this runs *behind* the opaque
@@ -292,6 +342,8 @@
       document.getElementById('loading').style.display = 'none';
       document.getElementById('hint').style.display = 'flex';
       document.getElementById('controls').style.display = 'block';
+      // let the visitor reopen the chooser to switch views (multi-scene rooms)
+      if (scenes.length >= 2) { const vb = document.getElementById('viewsBtn'); if (vb) vb.style.display = ''; }
     }
 
     // Enter button: reveal the scene now if it's ready, otherwise keep the
