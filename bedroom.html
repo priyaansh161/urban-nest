@@ -32,6 +32,19 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading p { font-size: 11px; letter-spacing: 0.2em; color: rgba(248,247,244,0.35); }
 
+    /* Brand loader / 3D poster — the logo scoops into place (chair from the
+       right, bulb from the top) while the Spline scene is deferred until tap. */
+    .un-loader { width: 132px; height: 132px; }
+    .un-disc  { transform-origin: 250px 250px; animation: discIn 3s ease-in-out infinite; }
+    .un-chair { transform-box: fill-box; transform-origin: center; animation: chairIn 3s cubic-bezier(0.34,1.56,0.64,1) infinite; }
+    .un-bulb  { transform-box: fill-box; transform-origin: 50% 0%; animation: bulbIn 3s cubic-bezier(0.34,1.56,0.64,1) infinite; }
+    @keyframes discIn  { 0%{opacity:0;transform:scale(0.9)} 18%{opacity:1;transform:scale(1)} 82%{opacity:1;transform:scale(1)} 100%{opacity:0;transform:scale(0.9)} }
+    @keyframes chairIn { 0%{opacity:0;transform:translateX(130px) rotate(14deg)} 30%{opacity:1;transform:translateX(0) rotate(0deg)} 82%{opacity:1;transform:translateX(0) rotate(0deg)} 100%{opacity:0;transform:translateX(130px) rotate(14deg)} }
+    @keyframes bulbIn  { 0%{opacity:0;transform:translateY(-150px)} 12%{opacity:0;transform:translateY(-150px)} 40%{opacity:1;transform:translateY(0)} 82%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-150px)} }
+    @media (prefers-reduced-motion: reduce) { .un-disc,.un-chair,.un-bulb { animation: none; opacity: 1; } }
+    .enter-btn { pointer-events: auto; margin-top: 22px; padding: 12px 30px; background: transparent; border: 0.5px solid rgba(184,149,106,0.6); color: #B8956A; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: all 0.25s; }
+    .enter-btn:hover { background: #B8956A; color: #0A0A0A; }
+
     #no-scene { position: fixed; inset: 0; z-index: 5; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; }
     #no-scene h2 { font-family: 'Bodoni Moda', serif; font-size: 26px; font-weight: 400; color: rgba(248,247,244,0.8); }
     #no-scene p { font-size: 11px; letter-spacing: 0.2em; color: rgba(248,247,244,0.35); }
@@ -122,8 +135,13 @@
   <div id="scene-wrap"></div>
 
   <div id="loading">
-    <div class="spinner"></div>
-    <p>ENTERING THE BEDROOM</p>
+    <svg class="un-loader" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle class="un-disc" cx="250" cy="250" r="158" fill="#111110"/>
+      <g class="un-bulb"><line x1="253" y1="100" x2="253" y2="176" stroke="#FAFAF8" stroke-width="3.5" stroke-linecap="round"/><circle cx="253" cy="190" r="13" fill="#FAFAF8"/></g>
+      <path class="un-chair" fill="#FAFAF8" d="M 148 272 C 160 336, 226 360, 266 349 C 312 336, 346 296, 350 232 C 343 254, 326 280, 296 293 C 276 302, 262 305, 250 306 C 204 311, 168 300, 148 272 Z"/>
+    </svg>
+    <p id="loadingText">THE BEDROOM</p>
+    <button id="enterBtn" class="enter-btn" style="display:none;">ENTER IN 3D →</button>
   </div>
 
   <div id="no-scene">
@@ -203,8 +221,13 @@
         return;
       }
       renderViewChips();
-      showScene(0);
+      // Poster gate: show the animated logo with an Enter button and defer the
+      // heavy Spline download until the visitor opts in (keeps mobile snappy).
+      document.getElementById('enterBtn').style.display = '';
     })();
+
+    // Tapping Enter (or a view chip) is what actually loads the 3D scene.
+    document.getElementById('enterBtn').addEventListener('click', () => showScene(0));
 
     // ── SCENES & VIEW SWITCHER ──
     function renderViewChips() {
@@ -222,6 +245,13 @@
     }
 
     function showScene(i) {
+      // Leaving the poster: hide the Enter button and switch the caption to the
+      // loading message for the scene we're now fetching.
+      const enterBtn = document.getElementById('enterBtn');
+      if (enterBtn) enterBtn.style.display = 'none';
+      const lt = document.getElementById('loadingText');
+      if (lt) lt.textContent = LOADING_TEXT;
+
       const scene = scenes[i];
       currentSceneId = scene.id;
       document.querySelectorAll('#views .view-chip').forEach((c, j) => c.classList.toggle('active', j === i));

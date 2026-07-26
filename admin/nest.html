@@ -138,15 +138,43 @@
           <option value="collection">Collection Update</option>
           <option value="community">Community</option>
           <option value="behind-the-scenes">Behind the Scenes</option>
+          <option value="trends">Trends</option>
+          <option value="tips">Tips &amp; Guides</option>
+          <option value="inspiration">Inspiration</option>
         </select>
+      </div>
+      <div class="form-group">
+        <label for="postAuthor">Author</label>
+        <input type="text" id="postAuthor" placeholder="e.g. Urban Nest Editorial"/>
+      </div>
+      <div class="form-group">
+        <label for="postReadTime">Read Time</label>
+        <input type="text" id="postReadTime" placeholder="e.g. 6 min read"/>
+      </div>
+      <div class="form-group full">
+        <label for="postExcerpt">Excerpt / Summary</label>
+        <textarea id="postExcerpt" placeholder="A 1–2 line summary shown on the card and at the top of the article…" style="min-height:60px"></textarea>
       </div>
       <div class="form-group full">
         <label for="postContent">Content</label>
-        <textarea id="postContent" placeholder="Write your post…"></textarea>
+        <textarea id="postContent" placeholder="Write your article…"></textarea>
+        <span style="font-size:11px;color:var(--grey);line-height:1.6;margin-top:4px;">Tip: start a line with <strong>##</strong> for a section heading, leave a blank line between paragraphs, and use <strong>-</strong> for bullet points. Links (https://…) become clickable automatically.</span>
       </div>
       <div class="form-group full">
-        <label for="postImage">Image URL (optional)</label>
+        <label for="postImage">Cover Image URL (optional)</label>
         <input type="url" id="postImage" placeholder="https://…"/>
+      </div>
+      <div class="form-group">
+        <label for="postSlug">Slug (optional)</label>
+        <input type="text" id="postSlug" placeholder="auto-generated from title"/>
+      </div>
+      <div class="form-group">
+        <label for="postTags">Tags (comma-separated)</label>
+        <input type="text" id="postTags" placeholder="Interior Design, Trends"/>
+      </div>
+      <div class="form-group full">
+        <label for="postMeta">Meta Description (SEO, optional)</label>
+        <textarea id="postMeta" placeholder="~155 characters shown in Google search results…" style="min-height:60px"></textarea>
       </div>
     </div>
     <div class="form-actions">
@@ -220,6 +248,12 @@ function editPost(id) {
   document.getElementById('postContent').value = p.content || '';
   document.getElementById('postCategory').value = p.category || 'general';
   document.getElementById('postImage').value = p.image_url || '';
+  document.getElementById('postExcerpt').value = p.excerpt || '';
+  document.getElementById('postAuthor').value = p.author || '';
+  document.getElementById('postReadTime').value = p.read_time || '';
+  document.getElementById('postSlug').value = p.slug || '';
+  document.getElementById('postTags').value = p.tags || '';
+  document.getElementById('postMeta').value = p.meta_description || '';
   document.getElementById('postPinned').checked = !!p.pinned;
   document.getElementById('formTitle').textContent = 'Edit Post';
   document.getElementById('resetFormBtn').style.display = '';
@@ -233,6 +267,12 @@ function resetForm() {
   document.getElementById('postContent').value = '';
   document.getElementById('postCategory').value = 'general';
   document.getElementById('postImage').value = '';
+  document.getElementById('postExcerpt').value = '';
+  document.getElementById('postAuthor').value = '';
+  document.getElementById('postReadTime').value = '';
+  document.getElementById('postSlug').value = '';
+  document.getElementById('postTags').value = '';
+  document.getElementById('postMeta').value = '';
   document.getElementById('postPinned').checked = false;
   document.getElementById('formTitle').textContent = 'New Post';
   document.getElementById('resetFormBtn').style.display = 'none';
@@ -243,10 +283,19 @@ async function savePost(publish) {
   const title = document.getElementById('postTitle').value.trim();
   if (!title) { showToast('Please enter a title', 'error'); return; }
   const id = document.getElementById('editingId').value;
+  // Use the given slug, or make a URL-safe one from the title.
+  const slugRaw = document.getElementById('postSlug').value.trim() || title;
+  const slug = slugRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   const payload = {
     title,
     content: document.getElementById('postContent').value.trim(),
     category: document.getElementById('postCategory').value,
+    excerpt: document.getElementById('postExcerpt').value.trim() || null,
+    author: document.getElementById('postAuthor').value.trim() || null,
+    read_time: document.getElementById('postReadTime').value.trim() || null,
+    slug: slug || null,
+    tags: document.getElementById('postTags').value.trim() || null,
+    meta_description: document.getElementById('postMeta').value.trim() || null,
     image_url: document.getElementById('postImage').value.trim() || null,
     pinned: document.getElementById('postPinned').checked,
     published: publish,

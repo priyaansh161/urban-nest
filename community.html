@@ -264,8 +264,11 @@
     .modal-title { font-family: 'Bodoni Moda', serif; font-size: clamp(22px, 3.2vw, 40px); font-weight: 400; line-height: 1.12; margin-bottom: 22px; color: var(--black); }
     .modal-title em { font-style: italic; }
     .modal-meta { display: flex; gap: 24px; font-size: 12px; color: var(--grey); letter-spacing: 0.08em; margin-bottom: 36px; padding-bottom: 28px; border-bottom: 0.5px solid var(--border); }
-    .modal-content p { font-size: 15px; color: #4a4a47; line-height: 2.0; margin-bottom: 22px; }
+    .modal-content p { font-size: 15px; color: var(--black); line-height: 2.0; margin-bottom: 22px; }
     .modal-content h3 { font-family: 'Bodoni Moda', serif; font-size: 21px; font-weight: 400; font-style: italic; color: var(--black); margin: 36px 0 14px; }
+    .modal-content ul { margin: 0 0 22px 20px; padding: 0; }
+    .modal-content li { font-size: 15px; color: var(--black); line-height: 1.9; margin-bottom: 8px; }
+    .modal-content a { color: var(--gold); text-decoration: underline; word-break: break-word; }
     @media (max-width: 768px) {
       #articleModal { width: 96%; max-height: 92vh; }
       .modal-hero { height: 36vh; }
@@ -860,6 +863,52 @@
       setTimeout(() => { msg.style.display = 'none'; }, 4000);
     }
 
+    // Turns the plain-text content typed in the admin into formatted HTML:
+    // "## " lines become headings, "-"/"*" lines become bullets, blank lines
+    // separate paragraphs, and bare URLs become links.
+    function formatBody(raw) {
+      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const linkify = s => s.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+      return (raw || '').replace(/\r/g,'').split(/\n\s*\n/).map(block => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        if (!lines.length) return '';
+        if (lines[0].startsWith('## ')) {
+          return '<h3>' + linkify(esc(lines[0].slice(3))) + '</h3>' +
+            (lines.length > 1 ? '<p>' + lines.slice(1).map(l => linkify(esc(l))).join('<br>') + '</p>' : '');
+        }
+        if (lines.every(l => /^[-*]\s+/.test(l))) {
+          return '<ul>' + lines.map(l => '<li>' + linkify(esc(l.replace(/^[-*]\s+/, ''))) + '</li>').join('') + '</ul>';
+        }
+        return '<p>' + lines.map(l => linkify(esc(l))).join('<br>') + '</p>';
+      }).join('');
+    }
+
+    // Open an admin-authored Nest post in the same full-screen reader as the
+    // built-in articles.
+    let nestPosts = {};
+    function openNestArticle(id) {
+      const p = nestPosts[id];
+      if (!p) return;
+      const hero = document.querySelector('.modal-hero');
+      if (p.image_url) {
+        hero.style.display = '';
+        const img = document.getElementById('modalImg');
+        img.src = p.image_url; img.alt = p.title;
+      } else {
+        hero.style.display = 'none';
+      }
+      document.getElementById('modalCat').textContent = (p.category || 'The Nest').toUpperCase();
+      document.getElementById('modalTitle').textContent = p.title;
+      document.getElementById('modalAuthor').textContent = p.author || 'Urban Nest Editorial';
+      document.getElementById('modalRead').textContent = p.read_time || '';
+      document.getElementById('modalDate').textContent =
+        new Date(p.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+      document.getElementById('modalContent').innerHTML = formatBody(p.content);
+      document.getElementById('articleModal').scrollTop = 0;
+      document.getElementById('articleOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
     // Load published Nest posts from Supabase
     async function loadNestPosts() {
       try {
@@ -868,21 +917,31 @@
           .eq('published', true)
           .order('pinned', { ascending: false })
           .order('created_at', { ascending: false })
-          .limit(6);
+          .limit(12);
 
         if (!data || !data.length) return;
 
+        nestPosts = {};
         const grid = document.getElementById('dynamicGrid');
-        grid.innerHTML = data.map(p => `
-          <div class="dynamic-card ${p.pinned ? 'dynamic-pin' : ''}">
+        grid.innerHTML = data.map(p => {
+          nestPosts[p.id] = p;
+          const summary = (p.excerpt && p.excerpt.trim())
+            ? p.excerpt
+            : (p.content || '').slice(0, 180) + ((p.content || '').length > 180 ? '…' : '');
+          const meta = [p.author, p.read_time,
+            new Date(p.created_at).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})]
+            .filter(Boolean).join(' · ');
+          return `
+          <div class="dynamic-card ${p.pinned ? 'dynamic-pin' : ''}" style="cursor:pointer" onclick="openNestArticle('${p.id}')">
             ${p.image_url
               ? `<img class="dynamic-card-img" src="${p.image_url}" alt="${p.title}" loading="lazy"/>`
               : `<div class="dynamic-card-ph"><img src="favicon.png" alt="" aria-hidden="true"/></div>`}
             <div class="dynamic-card-cat">${p.category ? p.category.toUpperCase() : 'THE NEST'}${p.pinned ? ' · PINNED' : ''}</div>
             <div class="dynamic-card-title">${p.title}</div>
-            <div class="dynamic-card-content">${(p.content || '').slice(0, 180)}${p.content && p.content.length > 180 ? '…' : ''}</div>
-            <div class="dynamic-card-date">${new Date(p.created_at).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}</div>
-          </div>`).join('');
+            <div class="dynamic-card-content">${summary}</div>
+            <div class="dynamic-card-date">${meta}</div>
+          </div>`;
+        }).join('');
 
         document.getElementById('dynamicPostsWrap').style.display = '';
       } catch (e) {
