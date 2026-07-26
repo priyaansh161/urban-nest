@@ -48,8 +48,17 @@
   .stage-header { padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
   .stage-title { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.4); }
   .stage-hint { font-size: 10px; letter-spacing: 0.08em; color: rgba(184,149,106,0.8); }
+  .stage-header-right { display: flex; align-items: center; gap: 14px; }
+  .mode-toggle { display: inline-flex; border: 0.5px solid rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
+  .mode-btn { padding: 6px 15px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; background: transparent; color: rgba(255,255,255,0.45); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+  .mode-btn:hover { color: rgba(255,255,255,0.85); }
+  .mode-btn.active { background: var(--gold); color: var(--black); }
   #stage { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; }
   #stage spline-viewer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  /* Preview mode: the scene becomes orbitable and dots ride their 3D objects,
+     so drags go to the scene and dots are display-only (not draggable). */
+  #stage.preview-mode spline-viewer { pointer-events: auto; }
+  #stage.preview-mode .dot { pointer-events: none; cursor: default; }
   #stage-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: rgba(255,255,255,0.3); font-size: 12px; letter-spacing: 0.1em; text-align: center; padding: 24px; }
   #stage-empty a { color: var(--gold); }
 
@@ -98,6 +107,7 @@
   /* LIST */
   .list-panel { background: var(--white); border: 0.5px solid var(--border); margin-top: 24px; }
   .list-header { padding: 18px 24px; border-bottom: 0.5px solid var(--border); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  .list-subhead { padding: 12px 24px; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #c0392b; background: rgba(192,57,43,0.04); border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); }
   .item-row { padding: 16px 24px; border-bottom: 0.5px solid var(--border); display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; }
   .item-row:last-child { border-bottom: none; }
   .item-row:hover { background: #faf9f5; }
@@ -164,15 +174,20 @@
     <div class="stage-panel">
       <div class="stage-header">
         <span class="stage-title" id="stageTitle">Bathroom Scene</span>
-        <select id="sceneSelect" onchange="onSceneChange()" style="display:none;background:#1a1a19;color:#FAFAF8;border:0.5px solid rgba(255,255,255,0.2);font-size:11px;padding:6px 10px;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;max-width:220px;"></select>
-        <span class="stage-hint">DRAG DOTS ONTO PRODUCTS · CLICK A DOT TO EDIT</span>
+        <div class="stage-header-right">
+          <div class="mode-toggle">
+            <button id="modePlace" class="mode-btn active" onclick="setMode('place')">Place</button>
+            <button id="modePreview" class="mode-btn" onclick="setMode('preview')">Preview</button>
+          </div>
+          <select id="sceneSelect" onchange="onSceneChange()" style="display:none;background:#1a1a19;color:#FAFAF8;border:0.5px solid rgba(255,255,255,0.2);font-size:11px;padding:6px 10px;font-family:'DM Sans',sans-serif;letter-spacing:0.08em;max-width:220px;"></select>
+        </div>
       </div>
       <div id="stage">
         <div id="stage-empty" style="display:none;"></div>
       </div>
       <div class="stage-footer">
         <button class="btn btn-gold" onclick="addProduct()">+ Add Product Dot</button>
-        <span class="note">A new dot appears in the centre — drag it onto the product, then fill in the details</span>
+        <span class="note" id="stageHint">A new dot appears in the centre — drag it onto the product, then fill in the details</span>
       </div>
     </div>
 
@@ -257,6 +272,15 @@ let products = [];      // rows for current room
 let editing = null;     // product being edited (null = none, {id:null} = new)
 let tableMissing = false;
 
+// Place vs Preview. Place = scene frozen, drag dots to position (dot_x/dot_y).
+// Preview = scene orbitable, dots ride their matched 3D object like the live site.
+let mode = 'place';
+let trackingEnabled = false;
+let splineApp = null;
+let currentViewer = null;
+let dotTargets = new Map(); // dot element → THREE object in the scene
+let rafId = null;
+
 (async () => { await requireAuth(); switchRoom('bath'); })();
 
 // ── ROOM SWITCHING ─────────────────────────────────────────────
@@ -268,7 +292,6 @@ async function switchRoom(room) {
   clearForm();
   await Promise.all([loadScenes(room), loadProducts(room)]);
   showScene(roomScenes.length ? 0 : -1);
-  renderList();
 }
 
 // A room can have several active renders (views) — dots belong to one view
@@ -292,13 +315,16 @@ function onSceneChange() {
 
 function showScene(i) {
   const stage = document.getElementById('stage');
+  stopTracking();               // cancel any loop tied to the outgoing viewer
   stage.querySelectorAll('spline-viewer').forEach(v => v.remove());
+  currentViewer = null;
   const empty = document.getElementById('stage-empty');
   if (i < 0 || !roomScenes[i]) {
     currentSceneId = null;
     empty.style.display = 'flex';
     empty.innerHTML = 'No 3D scene for this room yet.<br/>Add one in <a href="spline.html">Spline Scenes</a> and set it Active — you can still place dots meanwhile.';
     renderDots();
+    renderList();
     return;
   }
   currentSceneId = roomScenes[i].id;
@@ -307,7 +333,10 @@ function showScene(i) {
   const viewer = document.createElement('spline-viewer');
   viewer.setAttribute('url', roomScenes[i].url);
   stage.appendChild(viewer);
+  currentViewer = viewer;
   renderDots();
+  renderList();
+  if (mode === 'preview') startTracking(viewer);
 }
 
 async function loadProducts(room) {
@@ -329,6 +358,12 @@ function renderDots() {
   // show only dots that belong to the view on screen (no scene_id = all views)
   products.filter(p => !p.scene_id || p.scene_id === currentSceneId)
     .forEach(p => createDot(p));
+  // keep an in-progress (unsaved) dot on screen across re-renders / mode switches
+  if (editing && !editing.id) {
+    createDot({ ...editing, name: document.getElementById('pName').value || 'New product' });
+  }
+  // dots were just rebuilt — re-anchor them to their objects if tracking is live
+  if (mode === 'preview' && trackingEnabled && splineApp) linkDotsToObjects();
 }
 
 function createDot(p) {
@@ -336,6 +371,7 @@ function createDot(p) {
   const dot = document.createElement('div');
   dot.className = 'dot' + (p.published ? '' : ' unpublished') + (editing && editing.id === p.id ? ' selected' : '');
   dot.dataset.pid = p.id || 'new';
+  if (p.object_name) dot.dataset.objectName = p.object_name; // lets preview anchor it
   dot.style.left = (p.dot_x ?? 50) + '%';
   dot.style.top  = (p.dot_y ?? 50) + '%';
   dot.innerHTML = `<span class="dot-label">${p.name || 'New product'}</span><div class="dot-ring"></div>`;
@@ -381,6 +417,110 @@ function makeDraggable(dot) {
   });
 }
 
+// ── PLACE / PREVIEW MODE ───────────────────────────────────────
+function setMode(m) {
+  if (m === mode) return;
+  mode = m;
+  const preview = m === 'preview';
+  document.getElementById('stage').classList.toggle('preview-mode', preview);
+  document.getElementById('modePlace').classList.toggle('active', !preview);
+  document.getElementById('modePreview').classList.toggle('active', preview);
+  document.getElementById('stageHint').textContent = preview
+    ? 'Orbit the scene — dots follow their matched products. Switch to Place to move a dot.'
+    : 'A new dot appears in the centre — drag it onto the product, then fill in the details';
+  if (preview) {
+    if (currentViewer) startTracking(currentViewer);
+  } else {
+    stopTracking();
+    renderDots(); // snap dots back to their saved dot_x/dot_y positions
+  }
+}
+
+// ── DOT TRACKING (mirrors the public rooms) ────────────────────
+// In preview, anchors each dot to a 3D object and projects its world position
+// through the camera every frame, so dots stay on their product as you orbit.
+function startTracking(viewer) {
+  if (mode !== 'preview' || !viewer || !viewer.isConnected) return;
+  const app = viewer._spline || viewer.spline; // exposed name varies by viewer version
+  if (!app || !app._camera || !app._scene) { setTimeout(() => startTracking(viewer), 300); return; }
+  splineApp = app;
+  linkDotsToObjects();
+  trackingEnabled = true;
+  trackDots();
+}
+
+function stopTracking() {
+  trackingEnabled = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+  splineApp = null;
+  dotTargets = new Map();
+}
+
+// The "Spline object name" field wins; otherwise product names are matched to
+// scene object names — exact first, then by shared words, one object per dot.
+function linkDotsToObjects() {
+  dotTargets = new Map();
+  if (!splineApp || !splineApp._scene) return;
+  const objects = [];
+  splineApp._scene.traverse(o => { if (o.name && o.name.trim()) objects.push(o); });
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
+  const dots = [...document.querySelectorAll('#stage .dot')];
+  const taken = new Set();
+
+  dots.forEach(dot => {
+    if (!dot.dataset.objectName) return;
+    const target = norm(dot.dataset.objectName).join(' ');
+    const obj = objects.find(o => norm(o.name).join(' ') === target);
+    if (obj) { dotTargets.set(dot, obj); taken.add(obj); }
+  });
+
+  const nameOf = dot => {
+    const pid = dot.dataset.pid;
+    const p = pid === 'new' ? editing : products.find(q => q.id === pid);
+    return p && p.name ? p.name : '';
+  };
+  const candidates = [];
+  dots.forEach(dot => {
+    if (dotTargets.has(dot)) return;
+    const nm = nameOf(dot);
+    if (!nm) return;
+    const pTokens = norm(nm);
+    objects.forEach(obj => {
+      if (taken.has(obj)) return;
+      const oTokens = norm(obj.name);
+      const shared = oTokens.filter(t => pTokens.includes(t)).length;
+      if (!shared) return;
+      const exact = pTokens.join(' ') === oTokens.join(' ');
+      candidates.push({ dot, obj, score: exact ? 1000 : shared / Math.max(pTokens.length, oTokens.length) });
+    });
+  });
+  candidates.sort((a, b) => b.score - a.score);
+  candidates.forEach(c => {
+    if (dotTargets.has(c.dot) || taken.has(c.obj)) return;
+    dotTargets.set(c.dot, c.obj);
+    taken.add(c.obj);
+  });
+}
+
+function trackDots() {
+  if (!trackingEnabled || mode !== 'preview' || !splineApp) return;
+  const cam = splineApp._camera || splineApp.camera;
+  if (cam) dotTargets.forEach((obj, dot) => {
+    if (!dot.isConnected) return;
+    try {
+      const v = obj.position.clone().setFromMatrixPosition(obj.matrixWorld).project(cam);
+      const behind = v.z > 1;
+      dot.style.visibility = behind ? 'hidden' : 'visible';
+      if (!behind) {
+        dot.style.left = (((v.x + 1) / 2) * 100) + '%';
+        dot.style.top  = (((-v.y + 1) / 2) * 100) + '%';
+      }
+    } catch (_) {}
+  });
+  rafId = requestAnimationFrame(trackDots);
+}
+
 // ── FORM ───────────────────────────────────────────────────────
 function selectProduct(pid) {
   const p = pid === 'new' ? editing : products.find(q => q.id === pid);
@@ -416,6 +556,8 @@ function addProduct() {
     showToast('Run setup-products.sql in Supabase first (see SQL Editor)', 'error');
     return;
   }
+  // a new dot is positioned by dragging, which needs the scene frozen
+  if (mode === 'preview') setMode('place');
   // discard a previous unsaved dot
   const stale = document.querySelector('#stage .dot[data-pid="new"]');
   if (stale) stale.remove();
@@ -470,12 +612,12 @@ async function saveProduct() {
     dot_x: editing.dot_x ?? 50,
     dot_y: editing.dot_y ?? 50,
   };
-  // for an existing product keep its (possibly re-dragged) live dot position
-  if (editing.id) {
-    const dot = document.querySelector(`#stage .dot[data-pid="${editing.id}"]`);
-    if (dot) { payload.dot_x = parseFloat(dot.style.left); payload.dot_y = parseFloat(dot.style.top); }
-  } else {
-    const dot = document.querySelector('#stage .dot[data-pid="new"]');
+  // Capture the dragged dot position only in Place mode. In Preview the dots sit
+  // at camera-projected spots, not their saved placement, so we keep the stored
+  // dot_x/dot_y (already on the payload from editing) instead of reading them back.
+  if (mode === 'place') {
+    const sel = editing.id ? `#stage .dot[data-pid="${editing.id}"]` : '#stage .dot[data-pid="new"]';
+    const dot = document.querySelector(sel);
     if (dot) { payload.dot_x = parseFloat(dot.style.left); payload.dot_y = parseFloat(dot.style.top); }
   }
   let error;
@@ -528,7 +670,16 @@ function renderList() {
     el.innerHTML = `<div class="empty-state">No products in the ${ROOM_LABELS[currentRoom].toLowerCase()} yet.<br/>Press <strong>+ Add Product Dot</strong> to place your first one.</div>`;
     return;
   }
-  el.innerHTML = products.map(p => `
+
+  // Match the stage: list only the products whose dots are on the current view
+  // (a product with no scene_id belongs to every view).
+  const inView = products.filter(p => !p.scene_id || p.scene_id === currentSceneId);
+  // Products pinned to a scene that is no longer active can't be reached from any
+  // view's dots, so surface them separately — otherwise they'd be uneditable.
+  const activeIds = new Set(roomScenes.map(s => s.id).filter(Boolean));
+  const orphaned = products.filter(p => p.scene_id && p.scene_id !== currentSceneId && !activeIds.has(p.scene_id));
+
+  const row = p => `
     <div class="item-row">
       <div>
         <div class="item-name">${p.name}</div>
@@ -544,7 +695,15 @@ function renderList() {
         <button class="row-btn" onclick="selectProduct('${p.id}')">Edit</button>
         <button class="row-btn ${p.published ? 'active-btn' : ''}" onclick="togglePublish('${p.id}', ${p.published})">${p.published ? 'Live ✓' : 'Publish'}</button>
       </div>
-    </div>`).join('');
+    </div>`;
+
+  let html = inView.length
+    ? inView.map(row).join('')
+    : `<div class="empty-state" style="padding:28px">No products on this view yet.<br/>Press <strong>+ Add Product Dot</strong> to place one here.</div>`;
+  if (orphaned.length) {
+    html += `<div class="list-subhead">Not on any active scene — reassign or delete</div>` + orphaned.map(row).join('');
+  }
+  el.innerHTML = html;
 }
 </script>
 </body>
