@@ -188,6 +188,7 @@
       <div class="stage-footer">
         <button class="btn btn-gold" onclick="addProduct()">+ Add Product Dot</button>
         <span class="note" id="stageHint">A new dot appears in the centre — drag it onto the product, then fill in the details</span>
+        <span class="note" id="trackReport" style="margin-left:auto;text-align:right;"></span>
       </div>
     </div>
 
@@ -234,8 +235,10 @@
           <summary>Advanced</summary>
           <div class="form-group">
             <label for="pObject">Spline Object Name (optional)</label>
-            <input type="text" id="pObject" placeholder="Exact object name inside the scene"/>
-            <span class="form-hint">If set, the dot follows this 3D object automatically when visitors rotate the room. Leave empty to keep the dot where you dragged it.</span>
+            <input type="text" id="pObject" list="splineObjects" placeholder="Exact object name inside the scene"/>
+            <datalist id="splineObjects"></datalist>
+            <span class="form-hint">If set, the dot follows this 3D object automatically when visitors rotate the room. Leave empty to match on the product name instead.</span>
+            <span class="form-hint" id="trackStatus"></span>
           </div>
         </details>
         <label class="publish-row">
@@ -280,6 +283,8 @@ let splineApp = null;
 let currentViewer = null;
 let dotTargets = new Map(); // dot element → THREE object in the scene
 let rafId = null;
+let sceneObjectNames = []; // every named object in the loaded scene
+let trackedByPid = {};     // product id → name of the object its dot follows
 
 (async () => { await requireAuth(); switchRoom('bath'); })();
 
@@ -433,6 +438,8 @@ function setMode(m) {
   } else {
     stopTracking();
     renderDots(); // snap dots back to their saved dot_x/dot_y positions
+    renderTrackReport();
+    updateTrackStatus();
   }
 }
 
@@ -504,6 +511,39 @@ function linkDotsToObjects() {
     dotTargets.set(c.dot, c.obj);
     taken.add(c.obj);
   });
+
+  // Surface what the scene actually contains and what matched, so object names
+  // can be picked from a list instead of guessed.
+  sceneObjectNames = [...new Set(objects.map(o => o.name))].sort();
+  document.getElementById('splineObjects').innerHTML =
+    sceneObjectNames.map(n => `<option value="${n.replace(/"/g, '&quot;')}"></option>`).join('');
+  trackedByPid = {};
+  dotTargets.forEach((obj, dot) => { trackedByPid[dot.dataset.pid] = obj.name; });
+  renderTrackReport();
+  updateTrackStatus();
+}
+
+// Stage footer: how many dots are actually following an object, and which aren't.
+function renderTrackReport() {
+  const el = document.getElementById('trackReport');
+  if (!el) return;
+  if (mode !== 'preview' || !splineApp) { el.textContent = ''; return; }
+  const onStage = products.filter(p => !p.scene_id || p.scene_id === currentSceneId);
+  const missing = onStage.filter(p => !trackedByPid[p.id]);
+  el.innerHTML = missing.length
+    ? `<span style="color:#d9a441">${onStage.length - missing.length}/${onStage.length} dots following · unmatched: ${missing.map(p => p.name).join(', ')}</span>`
+    : `<span style="color:#8ec07c">All ${onStage.length} dots are following their objects</span>`;
+}
+
+// Editor: whether the product being edited is linked to a 3D object.
+function updateTrackStatus() {
+  const el = document.getElementById('trackStatus');
+  if (!el) return;
+  if (!editing || mode !== 'preview' || !splineApp) { el.textContent = ''; return; }
+  const name = trackedByPid[editing.id || 'new'];
+  el.innerHTML = name
+    ? `<span style="color:#3d7a4f">✓ Following “${name}” in this scene</span>`
+    : `<span style="color:#c0392b">Not matched to any 3D object — this dot stays where you drag it. Pick the object name above (the list shows what's in the scene).</span>`;
 }
 
 function trackDots() {
@@ -552,6 +592,7 @@ function selectProduct(pid) {
   if (!(p.specs || []).length) addSpecRow();
   document.querySelectorAll('#stage .dot').forEach(d =>
     d.classList.toggle('selected', d.dataset.pid === (p.id || 'new')));
+  updateTrackStatus();
 }
 
 function addProduct() {
@@ -587,6 +628,7 @@ function clearForm() {
   document.getElementById('form-fields').style.display = 'none';
   document.getElementById('formTitle').textContent = 'Product Details';
   document.getElementById('cancelBtn').style.display = 'none';
+  document.getElementById('trackStatus').textContent = '';
   document.querySelectorAll('#stage .dot').forEach(d => d.classList.remove('selected'));
 }
 
