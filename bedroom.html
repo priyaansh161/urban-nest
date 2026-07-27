@@ -22,7 +22,12 @@
     .nav-room-label { font-size: 10px; letter-spacing: 0.22em; color: rgba(248,247,244,0.35); }
     .back-btn { font-size: 11px; letter-spacing: 0.14em; color: rgba(248,247,244,0.5); text-decoration: none; border: 0.5px solid rgba(248,247,244,0.15); padding: 7px 16px; border-radius: 20px; transition: all 0.2s; background: rgba(10,10,10,0.4); }
     .back-btn:hover { color: #F8F7F4; border-color: rgba(248,247,244,0.4); }
-    body.panel-open .nav-right { opacity: 0; pointer-events: none; }
+    /* The children need it too: `nav a, nav span` sets pointer-events:all, and a
+       descendant re-enables hit-testing even when its parent disables it — so
+       without this the faded-out links still swallow clicks over the drawer. */
+    body.panel-open .nav-right,
+    body.panel-open .nav-right a,
+    body.panel-open .nav-right span { opacity: 0; pointer-events: none; }
 
     /* The scene fades up as the poster clears, so entering feels like a
        dissolve into the room rather than an abrupt swap. */
@@ -96,16 +101,14 @@
     body.panel-open .views-btn { opacity: 0; pointer-events: none; }
 
     /* PANEL */
-    #panel { position: fixed; top: 0; right: 0; bottom: 0; width: 50vw; background: #FAFAF8; z-index: 150; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; }
+    /* Above the nav (200), so the nav's gradient and its links can never sit on
+       top of the drawer's own header controls. */
+    #panel { position: fixed; top: 0; right: 0; bottom: 0; width: 50vw; background: #FAFAF8; z-index: 250; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; }
     #panel.open { transform: translateX(0); }
 
     .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 0.5px solid #E0DFD9; flex-shrink: 0; position: sticky; top: 0; background: #FAFAF8; z-index: 5; }
     .panel-back { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.12em; color: #6B6B68; cursor: pointer; border: none; background: none; transition: color 0.2s; padding: 6px 0; }
     .panel-back:hover { color: #111110; }
-    .panel-header-right { display: flex; align-items: center; gap: 14px; }
-    .panel-close { width: 30px; height: 30px; display: grid; place-items: center; border: none; background: none; cursor: pointer; color: #6B6B68; font-size: 24px; line-height: 1; border-radius: 50%; transition: background 0.2s, color 0.2s; }
-    .panel-close:hover { background: #EDECE7; color: #111110; }
-    .panel-room-tag { font-size: 10px; letter-spacing: 0.2em; color: #B8956A; }
 
     .panel-3d { width: 100%; height: 50vh; background: #111110; flex-shrink: 0; position: relative; overflow: hidden; }
     #product-viewer-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -191,10 +194,6 @@
   <div id="panel">
     <div class="panel-header">
       <button class="panel-back" id="close-btn">← BACK TO BEDROOM</button>
-      <div class="panel-header-right">
-        <span class="panel-room-tag">THE BEDROOM</span>
-        <button class="panel-close" id="close-x" aria-label="Close" title="Close">×</button>
-      </div>
     </div>
     <div class="panel-3d" id="panel-3d">
       <div id="product-viewer-wrap"></div>
@@ -538,7 +537,6 @@
     }
 
     document.getElementById('close-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closePanel(); });
-    document.getElementById('close-x').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closePanel(); });
     // Clicking the scene — or anywhere outside the drawer — closes it. The
     // back button is easy to miss when the drawer covers half the screen.
     // Listens on capture so the 3D viewer cannot swallow the event first.
