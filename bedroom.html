@@ -24,10 +24,14 @@
     .back-btn:hover { color: #F8F7F4; border-color: rgba(248,247,244,0.4); }
     body.panel-open .nav-right { opacity: 0; pointer-events: none; }
 
-    #scene-wrap { position: fixed; inset: 0; z-index: 1; }
+    /* The scene fades up as the poster clears, so entering feels like a
+       dissolve into the room rather than an abrupt swap. */
+    #scene-wrap { position: fixed; inset: 0; z-index: 1; opacity: 0; transition: opacity 0.9s ease; }
+    #scene-wrap.revealed { opacity: 1; }
     #scene-wrap spline-viewer { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-    #loading { position: fixed; inset: 0; z-index: 60; background: #0A0A0A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; pointer-events: none; }
+    #loading { position: fixed; inset: 0; z-index: 60; background: #0A0A0A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; pointer-events: none; opacity: 1; transition: opacity 0.7s ease; }
+    #loading.fade-out { opacity: 0; }
     #loading .spinner { width: 28px; height: 28px; border: 1.5px solid rgba(184,149,106,0.2); border-top-color: #B8956A; border-radius: 50%; animation: spin 0.9s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading p { font-size: 11px; letter-spacing: 0.2em; color: rgba(248,247,244,0.35); }
@@ -131,9 +135,12 @@
       #panel { width: 100vw; top: auto; height: 85vh; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); }
       #panel.open { transform: translateY(0); }
       .panel-3d { height: 40vh; }
+      /* the touch hint is longer — shrink it and tuck it left of the zoom buttons */
+      .panel-3d-hint { font-size: 8.5px; letter-spacing: 0.05em; left: 12px; transform: none; max-width: calc(100% - 62px); }
       .panel-name { font-size: 22px; }
       #hint { font-size: 10px; bottom: 20px; }
-      #views { bottom: 60px; left: 16px; max-width: 70vw; }
+      /* sit above the centred hint/controls so they don't overlap */
+      .views-btn { bottom: 56px; left: 16px; }
     }
   </style>
 </head>
@@ -195,7 +202,7 @@
         <button class="zoom-btn" id="zoom-in">+</button>
         <button class="zoom-btn" id="zoom-out">−</button>
       </div>
-      <div class="panel-3d-hint">DRAG TO ROTATE</div>
+      <div class="panel-3d-hint">DRAG TO ROTATE · RIGHT-DRAG TO PAN</div>
     </div>
     <div class="panel-body">
       <div class="panel-tag" id="p-tag"></div>
@@ -215,7 +222,7 @@
     const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
     if (IS_TOUCH) {
       document.getElementById('hint').textContent = 'USE TWO FINGERS TO EXPLORE THE SPACE';
-      document.querySelector('.panel-3d-hint').textContent = 'ROTATE WITH TWO FINGERS';
+      document.querySelector('.panel-3d-hint').textContent = 'TWO FINGERS TO ROTATE · THREE TO PAN';
       document.getElementById('controls').textContent = 'TWO FINGERS TO ROTATE · PINCH TO ZOOM · THREE FINGERS TO PAN';
     }
     // Fallback scene when the database has no active scenes for this room
@@ -288,7 +295,10 @@
 
     // Show the poster and preload one scene, then fade the Enter button in.
     function chooseScene(i) {
-      document.getElementById('loading').style.display = 'flex';
+      const loading = document.getElementById('loading');
+      loading.classList.remove('fade-out');   // poster opaque again
+      loading.style.display = 'flex';
+      document.getElementById('scene-wrap').classList.remove('revealed');
       document.getElementById('loadingText').textContent = POSTER_TITLE;
       const b = document.getElementById('enterBtn');
       b.style.display = 'none'; b.classList.remove('show'); b.disabled = true;
@@ -337,9 +347,16 @@
       renderDots();
     }
 
-    // Drop the poster and show the room's controls.
+    // Cross-fade the poster out while the scene fades up.
     function finishReveal() {
-      document.getElementById('loading').style.display = 'none';
+      const loading = document.getElementById('loading');
+      document.getElementById('scene-wrap').classList.add('revealed');
+      loading.classList.add('fade-out');
+      // hide only once the fade is done — and only if a view switch hasn't
+      // re-shown the poster in the meantime
+      setTimeout(() => {
+        if (loading.classList.contains('fade-out')) loading.style.display = 'none';
+      }, 700);
       document.getElementById('hint').style.display = 'flex';
       document.getElementById('controls').style.display = 'block';
       // let the visitor reopen the chooser to switch views (multi-scene rooms)
@@ -360,7 +377,10 @@
     // comes in (the visitor has already entered).
     function switchView(i) {
       revealed = true;
-      document.getElementById('loading').style.display = 'flex';
+      const loading = document.getElementById('loading');
+      loading.classList.remove('fade-out');   // poster opaque again
+      loading.style.display = 'flex';
+      document.getElementById('scene-wrap').classList.remove('revealed');
       document.getElementById('hint').style.display = 'none';
       const b = document.getElementById('enterBtn');
       if (b) { b.style.display = 'none'; b.classList.remove('show'); }
