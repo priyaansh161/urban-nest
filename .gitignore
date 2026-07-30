@@ -2,3 +2,8 @@
 
 # Local Netlify folder
 .netlify
+
+# Full-resolution originals. Only the optimised variants generated from these
+# belong in the repo — a multi-megabyte original would be deployed otherwise.
+images/source/*
+!images/source/README.md

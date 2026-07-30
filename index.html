@@ -292,38 +292,117 @@
     .js .in .mask > span, .js .mask.in > span { transform: none; }
 
     /* ═══════════════════════════════════════════
-       HERO — big, left, and unafraid of space
+       HERO — the room fills the screen and the
+       words sit inside it. Type is deliberately
+       smaller than the image is loud.
        ═══════════════════════════════════════════ */
     .hero {
-      display: grid; align-content: center;
-      min-height: 72vh;
-      padding: clamp(44px, 7cqw, 96px) 0 clamp(38px, 5cqw, 68px);
+      position: relative;
+      min-height: 100svh;
+      display: grid; align-items: end;
+      overflow: hidden;
+      background: #0A0A09;
+    }
+    .hero-media { position: absolute; inset: 0; }
+    .hero-media img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transform: scale(1.05);
+      animation: heroDrift 20s ease-out both;
+    }
+    /* the image drifts in almost imperceptibly — enough to feel alive on arrival */
+    @keyframes heroDrift { from { transform: scale(1.09); } to { transform: scale(1.0); } }
+    /* dark at the feet so the type is always legible, whatever the photo does */
+    .hero-scrim {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        linear-gradient(to top, rgba(8,8,7,0.86) 0%, rgba(8,8,7,0.42) 38%, rgba(8,8,7,0.10) 66%),
+        linear-gradient(to bottom, rgba(8,8,7,0.42) 0%, transparent 26%);
+    }
+    /* fixed light colours — this sits on a photograph in both themes */
+    .hero-inner {
+      position: relative; z-index: 1;
+      padding: 140px 0 clamp(52px, 7cqw, 104px);
+      color: #FAFAF8;
+    }
+    .hero-eyebrow {
+      display: block;
+      font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+      color: rgba(250,250,248,0.62); margin-bottom: 20px;
     }
     .hero-type {
       font-family: 'Bodoni Moda', Didot, Georgia, serif;
       font-weight: 400;
-      font-size: clamp(46px, 11.5cqw, 152px);
-      line-height: 0.9; letter-spacing: -0.03em;
-      max-width: 15ch;
+      font-size: clamp(38px, 7.4cqw, 104px);
+      line-height: 0.96; letter-spacing: -0.025em;
+      max-width: 17ch;
+      color: #FAFAF8;
     }
-    .hero-type em { font-style: italic; color: var(--gold); }
+    .hero-type em { font-style: italic; color: #E4C89B; }
 
     .hero-foot {
       display: flex; justify-content: space-between; align-items: flex-end;
-      gap: 32px; flex-wrap: wrap;
-      margin-top: clamp(38px, 5cqw, 64px);
+      gap: 30px; flex-wrap: wrap;
+      margin-top: clamp(26px, 3.4cqw, 44px);
     }
     .hero-sub {
-      font-size: 14.5px; line-height: 1.85; color: var(--stone);
-      max-width: 30ch;
+      font-size: 13.5px; line-height: 1.8;
+      color: rgba(250,250,248,0.72);
+      max-width: 34ch;
     }
-    .hero-cta {
-      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-      text-decoration: none; white-space: nowrap;
-      border-bottom: 1px solid var(--gold); padding-bottom: 6px;
-      transition: color 0.25s;
+    /* buttons on a photograph invert: light outline, light fill */
+    .hero-foot .btn { border-color: rgba(250,250,248,0.55); color: #FAFAF8; }
+    .hero-foot .btn::before { background: #FAFAF8; }
+    .hero-foot .btn:hover { color: #111110; border-color: #FAFAF8; }
+    .hero-foot .btn-solid { background: #FAFAF8; color: #111110; border-color: #FAFAF8; }
+    .hero-foot .btn-solid::before { background: #E4C89B; }
+    .hero-foot .btn-solid:hover { color: #111110; border-color: #E4C89B; }
+
+    .hero-scroll {
+      position: absolute; z-index: 1; left: 50%; bottom: 18px; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 7px;
+      font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(250,250,248,0.5); pointer-events: none;
     }
-    .hero-cta:hover { color: var(--gold); }
+    .hero-scroll i { display: block; width: 1px; height: 26px; background: linear-gradient(to bottom, rgba(250,250,248,0.55), transparent); }
+
+    /* ═══════════════════════════════════════════
+       COLLAGE — a wall of the things themselves.
+       Dense mosaic, mixed shapes, quiet captions.
+       ═══════════════════════════════════════════ */
+    .collage { padding: clamp(50px, 6.6cqw, 96px) 0 clamp(30px, 4cqw, 56px); }
+    .collage-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      gap: 20px; flex-wrap: wrap; margin-bottom: 22px;
+    }
+    .collage-label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); }
+    .collage-note { font-size: 13px; color: var(--stone); max-width: 40ch; }
+    /* Row spans, not aspect ratios. Ratios look flush until you remember the
+       gaps are fixed while the columns are fluid, so any ratio pair goes ragged
+       at some width. A shared row unit can't. */
+    .collage-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      grid-auto-rows: 122px; gap: 10px; grid-auto-flow: dense;
+    }
+    .ct { position: relative; overflow: hidden; background: var(--hairline); text-decoration: none; }
+    .ct img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      transition: transform 1.2s var(--ease), filter 0.6s ease;
+    }
+    .ct:hover img { transform: scale(1.045); filter: brightness(1.03); }
+    .ct-cap {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 26px 16px 13px;
+      font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #FAFAF8;
+      background: linear-gradient(to top, rgba(8,8,7,0.72), transparent);
+      opacity: 0; transform: translateY(6px);
+      transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+    }
+    .ct:hover .ct-cap { opacity: 1; transform: none; }
+    /* shapes — spans and ratios do the composing */
+    .ct-tall { grid-column: span 2; grid-row: span 4; }
+    .ct-wide { grid-column: span 4; grid-row: span 4; }
+    .ct-full { grid-column: span 6; grid-row: span 3; }
 
     /* ═══════════════════════════════════════════
        MARQUEE — kept, but quieted right down
@@ -421,11 +500,24 @@
        PHILOSOPHY — the one inverted band
        ═══════════════════════════════════════════ */
     .philosophy {
+      position: relative; overflow: hidden;
       background: var(--panel); color: var(--panel-ink);
       padding: clamp(54px, 7.2cqw, 102px) 0;
       transition: background 0.4s ease;
     }
+    /* a photograph beneath the type, dimmed hard so it reads as texture rather
+       than as a subject competing with the words */
+    .philosophy::before {
+      content: ''; position: absolute; inset: 0;
+      background: url('images/band-dark.webp') center / cover no-repeat;
+      opacity: 0.3;
+    }
+    .philosophy::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(8,8,7,0.9) 0%, rgba(8,8,7,0.6) 62%, rgba(8,8,7,0.4) 100%);
+    }
     .philosophy-inner {
+      position: relative; z-index: 1;
       display: grid; grid-template-columns: 1fr 1fr;
       gap: clamp(34px, 6cqw, 96px); align-items: start;
     }
@@ -517,9 +609,19 @@
       .nav-join { display: none; }
       .nav-right { gap: 12px; }
 
-      .hero { min-height: 0; padding-top: clamp(44px, 12cqw, 70px); }
+      .hero { min-height: 92svh; }
+      .hero-inner { padding-top: 96px; }
       .hero-type { max-width: 100%; }
-      .hero-foot { flex-direction: column; align-items: flex-start; gap: 24px; }
+      .hero-foot { flex-direction: column; align-items: flex-start; gap: 22px; }
+      .hero-foot .btn-row { width: 100%; }
+
+      /* the mosaic folds to two columns; wide tiles take the full width */
+      /* Every span must be re-stated: a tile still spanning 6 of 2 columns makes
+         the grid invent implicit columns and collapses the real ones to zero. */
+      .collage-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 78px; gap: 8px; }
+      .ct-tall { grid-column: span 1; grid-row: span 3; }
+      .ct-wide { grid-column: span 2; grid-row: span 3; }
+      .ct-full { grid-column: span 2; grid-row: span 3; }
 
       .statement-body { grid-template-columns: 1fr; }
 
@@ -609,24 +711,36 @@
   </nav>
 
   <!-- ── HERO ── -->
-  <header class="hero shell rv">
-    <h1 class="hero-type">
-      <span class="mask"><span>Small things.</span></span>
-      <span class="mask"><span style="--d:110ms"><em>Big difference.</em></span></span>
-    </h1>
-    <div class="hero-foot rv" style="--d:340ms">
-      <p class="hero-sub">Intentional living, beginning with the objects you choose every day.</p>
-      <div class="btn-row">
-        <a href="#rooms" class="btn btn-solid">
-          Explore spaces
-          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-        <a href="community.html" class="btn">
-          The Nest Edit
-          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
+  <header class="hero">
+    <picture class="hero-media">
+      <source media="(max-width: 700px)" srcset="images/hero-mobile.webp"/>
+      <source media="(max-width: 1700px)" srcset="images/hero-1600.webp"/>
+      <img src="images/hero-2560.webp" alt="A warm, considered bedroom" fetchpriority="high" decoding="async"/>
+    </picture>
+    <div class="hero-scrim"></div>
+
+    <div class="hero-inner shell rv">
+      <span class="hero-eyebrow">Curated living · India</span>
+      <h1 class="hero-type">
+        <span class="mask"><span>Small things.</span></span>
+        <span class="mask"><span style="--d:110ms"><em>Big difference.</em></span></span>
+      </h1>
+      <div class="hero-foot rv" style="--d:300ms">
+        <p class="hero-sub">Intentional living, beginning with the objects you choose every day.</p>
+        <div class="btn-row">
+          <a href="#rooms" class="btn btn-solid">
+            Explore spaces
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="community.html" class="btn">
+            The Nest Edit
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
       </div>
     </div>
+
+    <span class="hero-scroll" aria-hidden="true">Scroll<i></i></span>
   </header>
 
   <!-- ── MARQUEE ── -->
@@ -662,12 +776,30 @@
     </div>
   </section>
 
+  <!-- ── COLLAGE ── -->
+  <section class="collage shell">
+    <div class="collage-head rv">
+      <span class="collage-label">The details</span>
+      <p class="collage-note">Not one statement piece — a room full of small, deliberate choices.</p>
+    </div>
+    <div class="collage-grid">
+      <a href="bathroom.html" class="ct ct-tall rv"><img src="images/tile-bath.webp" alt="Marble basin with a brass mirror" loading="lazy" decoding="async"/><span class="ct-cap">The marble bath</span></a>
+      <span class="ct ct-tall rv" style="--d:90ms"><img src="images/tile-chandelier.webp" alt="A brass chandelier" loading="lazy" decoding="async"/><span class="ct-cap">Light, gathered</span></span>
+      <span class="ct ct-tall rv" style="--d:180ms"><img src="images/tile-vase.webp" alt="A single stem in a white vase" loading="lazy" decoding="async"/><span class="ct-cap">One stem</span></span>
+
+      <a href="kitchen.html" class="ct ct-wide rv"><img src="images/tile-kitchen.webp" alt="Stone kitchen island" loading="lazy" decoding="async"/><span class="ct-cap">Stone &amp; steel</span></a>
+      <span class="ct ct-tall rv" style="--d:90ms"><img src="images/tile-peony.webp" alt="Peonies in a jug" loading="lazy" decoding="async"/><span class="ct-cap">In bloom</span></span>
+
+      <span class="ct ct-full rv"><img src="images/tile-living.webp" alt="A calm living room in cream and rattan" loading="lazy" decoding="async"/><span class="ct-cap">Where you land</span></span>
+    </div>
+  </section>
+
   <!-- ── ROOMS ── -->
   <section class="rooms shell" id="rooms">
 
     <a href="bathroom.html" class="room rv">
       <figure class="room-fig" data-par>
-        <img src="https://images.unsplash.com/photo-1753605788101-04d1e653e74a?w=900&q=80&auto=format&fit=crop" alt="The Bathroom"/>
+        <img src="images/room-bath.webp" alt="The Bathroom" loading="lazy" decoding="async"/>
       </figure>
       <div>
         <span class="room-icon" aria-hidden="true">
@@ -689,7 +821,7 @@
 
     <a href="kitchen.html" class="room rv">
       <figure class="room-fig" data-par>
-        <img src="https://images.unsplash.com/photo-1759239572496-4ec13e7643d6?w=900&q=80&auto=format&fit=crop" alt="The Kitchen"/>
+        <img src="images/room-kitchen.webp" alt="The Kitchen" loading="lazy" decoding="async"/>
       </figure>
       <div>
         <span class="room-icon" aria-hidden="true">
@@ -711,7 +843,7 @@
 
     <a href="bedroom.html" class="room rv">
       <figure class="room-fig" data-par>
-        <img src="https://images.unsplash.com/photo-1616418928117-4e6d19be2df1?w=900&q=80&auto=format&fit=crop" alt="The Bedroom"/>
+        <img src="images/room-bedroom.webp" alt="The Bedroom" loading="lazy" decoding="async"/>
       </figure>
       <div>
         <span class="room-icon" aria-hidden="true">
