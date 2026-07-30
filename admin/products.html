@@ -64,15 +64,13 @@
 
   .dot { position: absolute; transform: translate(-50%,-50%); cursor: grab; z-index: 10; }
   .dot:active { cursor: grabbing; }
-  /* Matches the public rooms: black dot, silver rim, silver glow on hover — so
-     what you place here is what visitors see. Selected stays gold, which is an
-     editor-only cue for "this is the one you're editing". */
-  .dot-ring { width: 20px; height: 20px; border-radius: 50%; background: #0B0B0A; border: 1.5px solid rgba(226,232,238,0.85); display: flex; align-items: center; justify-content: center; transition: transform 0.18s ease, box-shadow 0.28s ease, border-color 0.18s ease; }
-  .dot:hover .dot-ring { transform: scale(1.35); border-color: #F2F5F8; box-shadow: 0 0 0 4px rgba(214,222,230,0.28), 0 0 20px 6px rgba(226,232,238,0.7); }
-  .dot.selected .dot-ring { transform: scale(1.35); border-color: var(--gold); box-shadow: 0 0 0 5px rgba(184,149,106,0.3); }
-  .dot-ring::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #E8EDF2; }
-  .dot.selected .dot-ring::after { background: var(--gold); }
-  .dot.unpublished .dot-ring { border-style: dashed; opacity: 0.75; }
+  /* Matches the public rooms: one black dot at 80% with a silver glow — so what
+     you place here is what visitors see. Selected glows gold instead, which is
+     an editor-only cue for "this is the one you're editing". */
+  .dot-ring { width: 12px; height: 12px; border-radius: 50%; background: #0B0B0A; opacity: 0.8; transition: transform 0.18s ease, box-shadow 0.28s ease, opacity 0.18s ease; }
+  .dot:hover .dot-ring { transform: scale(1.45); opacity: 1; box-shadow: 0 0 0 3px rgba(214,222,230,0.3), 0 0 18px 6px rgba(226,232,238,0.8); }
+  .dot.selected .dot-ring { transform: scale(1.45); opacity: 1; box-shadow: 0 0 0 3px rgba(184,149,106,0.35), 0 0 16px 5px rgba(184,149,106,0.65); }
+  .dot.unpublished .dot-ring { opacity: 0.45; }
   .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(250,250,248,0.95); color: var(--black); font-size: 10px; letter-spacing: 0.06em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; pointer-events: none; }
 
   .stage-footer { padding: 12px 20px; display: flex; gap: 12px; align-items: center; border-top: 0.5px solid rgba(255,255,255,0.08); }
