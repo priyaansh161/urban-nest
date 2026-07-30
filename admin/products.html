@@ -64,10 +64,14 @@
 
   .dot { position: absolute; transform: translate(-50%,-50%); cursor: grab; z-index: 10; }
   .dot:active { cursor: grabbing; }
-  .dot-ring { width: 20px; height: 20px; border-radius: 50%; background: rgba(184,149,106,0.25); border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; transition: transform 0.15s; }
-  .dot:hover .dot-ring, .dot.selected .dot-ring { transform: scale(1.35); background: rgba(184,149,106,0.5); }
-  .dot.selected .dot-ring { box-shadow: 0 0 0 5px rgba(184,149,106,0.25); }
-  .dot-ring::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  /* Matches the public rooms: black dot, silver rim, silver glow on hover — so
+     what you place here is what visitors see. Selected stays gold, which is an
+     editor-only cue for "this is the one you're editing". */
+  .dot-ring { width: 20px; height: 20px; border-radius: 50%; background: #0B0B0A; border: 1.5px solid rgba(226,232,238,0.85); display: flex; align-items: center; justify-content: center; transition: transform 0.18s ease, box-shadow 0.28s ease, border-color 0.18s ease; }
+  .dot:hover .dot-ring { transform: scale(1.35); border-color: #F2F5F8; box-shadow: 0 0 0 4px rgba(214,222,230,0.28), 0 0 20px 6px rgba(226,232,238,0.7); }
+  .dot.selected .dot-ring { transform: scale(1.35); border-color: var(--gold); box-shadow: 0 0 0 5px rgba(184,149,106,0.3); }
+  .dot-ring::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #E8EDF2; }
+  .dot.selected .dot-ring::after { background: var(--gold); }
   .dot.unpublished .dot-ring { border-style: dashed; opacity: 0.75; }
   .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(250,250,248,0.95); color: var(--black); font-size: 10px; letter-spacing: 0.06em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; pointer-events: none; }
 
@@ -225,6 +229,14 @@
           <label for="pSpline">Product 3D Scene URL (optional)</label>
           <input type="url" id="pSpline" placeholder="https://prod.spline.design/…/scene.splinecode"/>
           <span class="form-hint">A close-up Spline scene of just this product, shown in the popup. Leave empty to skip the 3D preview.</span>
+        </div>
+        <div class="form-group">
+          <label for="pPopupBg">Popup Backdrop</label>
+          <select id="pPopupBg">
+            <option value="dark">Dark — for pale products (white ceramic, steel)</option>
+            <option value="light">Light — for dark products (black slippers, charcoal)</option>
+          </select>
+          <span class="form-hint">Only visible if this product's Spline scene background is set to <strong>transparent</strong> (Spline → Scene → Background → alpha 0). An opaque scene background covers it.</span>
         </div>
         <div class="form-group">
           <label>Specifications</label>
@@ -584,6 +596,7 @@ function selectProduct(pid) {
   document.getElementById('pDesc').value = p.description || '';
   document.getElementById('pBuy').value = p.buy_link || '';
   document.getElementById('pSpline').value = p.spline_url || '';
+  document.getElementById('pPopupBg').value = p.popup_bg === 'light' ? 'light' : 'dark';
   document.getElementById('pObject').value = p.object_name || '';
   document.getElementById('pPublished').checked = !!p.published;
   const rows = document.getElementById('specRows');
@@ -651,6 +664,7 @@ async function saveProduct() {
     description: document.getElementById('pDesc').value.trim() || null,
     buy_link: document.getElementById('pBuy').value.trim() || null,
     spline_url: document.getElementById('pSpline').value.trim() || null,
+    popup_bg: document.getElementById('pPopupBg').value,
     object_name: document.getElementById('pObject').value.trim() || null,
     specs: collectSpecs(),
     published: document.getElementById('pPublished').checked,
@@ -665,9 +679,18 @@ async function saveProduct() {
     const dot = document.querySelector(sel);
     if (dot) { payload.dot_x = parseFloat(dot.style.left); payload.dot_y = parseFloat(dot.style.top); }
   }
-  let error;
-  if (editing.id) ({ error } = await db.from('room_products').update(payload).eq('id', editing.id));
-  else ({ error } = await db.from('room_products').insert(payload));
+  const write = (body) => editing.id
+    ? db.from('room_products').update(body).eq('id', editing.id)
+    : db.from('room_products').insert(body);
+
+  let { error } = await write(payload);
+  // popup_bg is an optional column — on a database where add-popup-bg.sql
+  // hasn't been run yet, save everything else instead of failing outright.
+  if (error && /popup_bg/.test(error.message || '')) {
+    const { popup_bg, ...rest } = payload;
+    ({ error } = await write(rest));
+    if (!error) showToast('Saved — run admin/add-popup-bg.sql to store the backdrop choice');
+  }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
   showToast(editing.id ? 'Product updated' : 'Product added!');
   clearForm();

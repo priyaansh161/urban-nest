@@ -42,18 +42,11 @@
     #loading p { font-size: 11px; letter-spacing: 0.2em; color: rgba(248,247,244,0.35); }
 
     /* Brand loader / 3D poster — the real logo sits still inside a spinning
-       ring while the Spline scene is deferred until the visitor taps Enter. */
+       ring while the Spline scene loads behind it, then the room fades in. */
     .un-poster { position: relative; width: 128px; height: 128px; }
     .un-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(184,149,106,0.15); border-top-color: #B8956A; animation: spin 1s linear infinite; }
     .un-logo { position: absolute; inset: 16px; width: calc(100% - 32px); height: calc(100% - 32px); border-radius: 50%; object-fit: cover; }
     @media (prefers-reduced-motion: reduce) { .un-ring { animation: none; } }
-    .enter-btn { pointer-events: auto; margin-top: 22px; padding: 12px 30px; background: transparent; border: 0.5px solid rgba(184,149,106,0.6); color: #B8956A; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; opacity: 0; transform: translateY(6px); transition: opacity 0.5s ease, transform 0.5s ease, background 0.25s, color 0.25s; }
-    .enter-btn.show { opacity: 1; transform: none; }
-    .enter-btn:hover { background: #B8956A; color: #0A0A0A; }
-    /* While the scene is still downloading the button is shown but inactive;
-       it brightens and becomes clickable the moment the scene is ready. */
-    .enter-btn:disabled { opacity: 0.35; cursor: default; border-color: rgba(184,149,106,0.25); color: rgba(184,149,106,0.5); }
-    .enter-btn:disabled:hover { background: transparent; color: rgba(184,149,106,0.5); }
 
     #no-scene { position: fixed; inset: 0; z-index: 5; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; }
     #no-scene h2 { font-family: 'Bodoni Moda', serif; font-size: 26px; font-weight: 400; color: rgba(248,247,244,0.8); }
@@ -62,10 +55,12 @@
     /* DOTS */
     #dots-layer { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
     .dot { position: absolute; transform: translate(-50%,-50%); pointer-events: all; cursor: pointer; }
-    .dot-ring { width: 18px; height: 18px; border-radius: 50%; background: rgba(184,149,106,0.2); border: 1.5px solid #B8956A; display: flex; align-items: center; justify-content: center; animation: pulse 2.4s ease-in-out infinite; transition: transform 0.2s, background 0.2s; }
-    .dot:hover .dot-ring { transform: scale(1.3); background: rgba(184,149,106,0.4); }
-    .dot-ring::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #B8956A; }
-    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(184,149,106,0.5)} 50%{box-shadow:0 0 0 6px rgba(184,149,106,0)} }
+    /* Black dot with a thin silver rim so it reads against pale tile and dark
+       corners alike. Hover trades the idle pulse for a silver glow. */
+    .dot-ring { width: 18px; height: 18px; border-radius: 50%; background: #0B0B0A; border: 1.5px solid rgba(226,232,238,0.85); display: flex; align-items: center; justify-content: center; animation: pulse 2.4s ease-in-out infinite; transition: transform 0.22s ease, box-shadow 0.3s ease, border-color 0.22s ease; }
+    .dot:hover .dot-ring { transform: scale(1.35); border-color: #F2F5F8; animation: none; box-shadow: 0 0 0 4px rgba(214,222,230,0.25), 0 0 20px 6px rgba(226,232,238,0.7); }
+    .dot-ring::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #E8EDF2; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(220,228,235,0.4)} 50%{box-shadow:0 0 0 7px rgba(220,228,235,0)} }
     .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(250,250,248,0.95); color: #111110; font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
     .dot:hover .dot-label { opacity: 1; }
 
@@ -168,7 +163,6 @@
       <img class="un-logo" src="logo-icon.png" alt="Urban Nest"/>
     </div>
     <p id="loadingText">THE KITCHEN</p>
-    <button id="enterBtn" class="enter-btn" style="display:none;" disabled>ENTER IN 3D →</button>
   </div>
 
   <div id="no-scene">
@@ -235,7 +229,10 @@
     let splineApp = null;
     let trackingEnabled = false;
     let sceneReady = false;   // the current scene's canvas is up
-    let revealed = false;     // visitor has tapped Enter (poster dismissed)
+    let revealed = false;     // poster dismissed, room on screen
+    let posterUntil = 0;      // hold the logo until at least this timestamp
+    const POSTER_HOLD = 2000; // logo time before a room is revealed
+    const SWITCH_HOLD = 700;  // shorter hold when swapping views
 
     (async () => {
       const [sceneRes, prodRes] = await Promise.all([
@@ -265,9 +262,6 @@
       }
     })();
 
-    // Tapping Enter reveals the (already-loading) scene.
-    document.getElementById('enterBtn').addEventListener('click', enterRoom);
-
     // ── SCENE CHOOSER (lobby) ──
     const POSTER_TITLE = document.getElementById('loadingText').textContent;
 
@@ -292,22 +286,22 @@
       else chooseScene(i);
     }
 
-    // Show the poster and preload one scene, then fade the Enter button in.
+    // Show the poster, preload the scene behind it, and reveal it automatically
+    // once it's ready — no click needed.
     function chooseScene(i) {
+      showPoster(POSTER_HOLD);
+      beginScene(i);
+    }
+
+    // Bring the poster back up and arm the auto-reveal.
+    function showPoster(holdMs) {
       const loading = document.getElementById('loading');
       loading.classList.remove('fade-out');   // poster opaque again
       loading.style.display = 'flex';
       document.getElementById('scene-wrap').classList.remove('revealed');
       document.getElementById('loadingText').textContent = POSTER_TITLE;
-      const b = document.getElementById('enterBtn');
-      b.style.display = 'none'; b.classList.remove('show'); b.disabled = true;
-      revealed = false;
-      beginScene(i);
-      setTimeout(() => {
-        b.style.display = '';
-        void b.offsetWidth;        // flush the hidden state so the fade-in plays
-        b.classList.add('show');
-      }, 2600);
+      revealed = true;                        // reveal as soon as it's loaded
+      posterUntil = Date.now() + holdMs;      // but not before the logo has shown
     }
 
     // Load a scene into the stage. On first load this runs *behind* the opaque
@@ -329,9 +323,7 @@
       const onReady = () => {
         sceneReady = true;
         startTracking(viewer);
-        const b = document.getElementById('enterBtn');
-        if (b) b.disabled = false;      // fully loaded → the Enter button goes live
-        if (revealed) finishReveal();   // (view switch) already inside → show it
+        if (revealed) revealWhenSettled();
       };
       viewer.addEventListener('load', onReady);
       // The load event doesn't fire for newer .splinecode files — watch for the canvas instead
@@ -362,29 +354,18 @@
       if (scenes.length >= 2) { const vb = document.getElementById('viewsBtn'); if (vb) vb.style.display = ''; }
     }
 
-    // Enter button: reveal the scene now if it's ready, otherwise keep the
-    // poster up as the loading state until it finishes.
-    function enterRoom() {
-      const b = document.getElementById('enterBtn');
-      if (b && b.disabled) return;   // scene still loading — not enterable yet
-      revealed = true;
-      if (b) { b.style.display = 'none'; b.classList.remove('show'); }
-      finishReveal();                // scene is fully loaded, so this is instant
+    // Reveal the loaded scene — but never before the logo has had its minimum
+    // moment, or a cached scene would flash past too fast to register.
+    function revealWhenSettled() {
+      setTimeout(finishReveal, Math.max(0, posterUntil - Date.now()));
     }
 
-    // View chip: load another render, showing the poster as the loader while it
-    // comes in (the visitor has already entered).
+    // Lobby pick while already inside: swap to another render, using the poster
+    // as the loader with a shorter hold.
     function switchView(i) {
-      revealed = true;
-      const loading = document.getElementById('loading');
-      loading.classList.remove('fade-out');   // poster opaque again
-      loading.style.display = 'flex';
-      document.getElementById('scene-wrap').classList.remove('revealed');
+      showPoster(SWITCH_HOLD);
       document.getElementById('hint').style.display = 'none';
-      const b = document.getElementById('enterBtn');
-      if (b) { b.style.display = 'none'; b.classList.remove('show'); }
-      const lt = document.getElementById('loadingText');
-      if (lt) lt.textContent = LOADING_TEXT;
+      document.getElementById('loadingText').textContent = LOADING_TEXT;
       beginScene(i);
     }
 
@@ -501,6 +482,9 @@
       const panel3d = document.getElementById('panel-3d');
       if (p.spline_url) {
         panel3d.style.display = '';
+        // a pale ground for dark products, dark for pale ones (only shows when
+        // the product's Spline scene background is transparent)
+        panel3d.style.background = p.popup_bg === 'light' ? '#F2F0EA' : '#111110';
         const viewer = document.createElement('spline-viewer');
         viewer.setAttribute('url', p.spline_url);
         viewer.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';

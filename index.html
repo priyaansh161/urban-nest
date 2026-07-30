@@ -124,7 +124,7 @@
     .nav-links .join-item { display: none; }
 
     .nav-join {
-      padding: 9px 20px;
+      padding: 9px 20px; border-radius: 100px;
       background: var(--ink); color: var(--paper);
       font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
       text-decoration: none; transition: background 0.25s, color 0.25s;
@@ -171,8 +171,102 @@
     .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
 
     /* ═══════════════════════════════════════════
+       WELCOME — one beat of brand before the page.
+       Exists only when JS is alive, so a script
+       failure can never leave a blank screen.
+       ═══════════════════════════════════════════ */
+    #welcome { display: none; }
+    .js #welcome {
+      display: grid; place-items: center;
+      position: fixed; inset: 0; z-index: 900;
+      background: var(--paper);
+      transition: opacity 0.7s var(--ease), visibility 0.7s;
+    }
+    .js #welcome.done { opacity: 0; visibility: hidden; }
+    .welcome-mark { position: relative; width: 74px; height: 74px; }
+    .welcome-mark img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      border-radius: 50%; object-fit: cover;
+      animation: markIn 0.85s var(--ease) both;
+    }
+    /* a single ring breathing outward — the "we're alive" beat */
+    .welcome-ring {
+      position: absolute; inset: -13px; border-radius: 50%;
+      border: 1px solid var(--gold); opacity: 0;
+      animation: ringOut 1.2s var(--ease) 0.12s both;
+    }
+    @keyframes markIn { from { opacity: 0; transform: scale(0.84); } to { opacity: 1; transform: none; } }
+    @keyframes ringOut { 0% { opacity: 0; transform: scale(0.72); } 45% { opacity: 0.85; } 100% { opacity: 0; transform: scale(1.22); } }
+
+    /* ═══════════════════════════════════════════
+       BUTTONS — a real target instead of bare text.
+       The fill wipes in from the left, the arrow
+       steps forward, the whole thing lifts.
+       ═══════════════════════════════════════════ */
+    .btn {
+      position: relative; isolation: isolate;
+      display: inline-flex; align-items: center; gap: 11px;
+      padding: 13px 25px;
+      border: 1px solid var(--ink); border-radius: 100px;
+      background: transparent; color: var(--ink);
+      font-family: inherit; font-size: 10.5px; font-weight: 400;
+      letter-spacing: 0.19em; text-transform: uppercase;
+      text-decoration: none; white-space: nowrap; cursor: pointer;
+      overflow: hidden;
+      transition: color 0.35s var(--ease), border-color 0.35s var(--ease), transform 0.35s var(--ease);
+    }
+    .btn::before {
+      content: ''; position: absolute; inset: 0; z-index: -1;
+      background: var(--ink);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.45s var(--ease);
+    }
+    .btn-arrow { width: 14px; height: 14px; flex-shrink: 0; transition: transform 0.35s var(--ease); }
+
+    .btn:hover, .btn:focus-visible { color: var(--paper); transform: translateY(-2px); }
+    .btn:hover::before, .btn:focus-visible::before { transform: scaleX(1); }
+    .btn:hover .btn-arrow, .btn:focus-visible .btn-arrow { transform: translateX(5px); }
+
+    /* solid sits filled already, so its wipe is gold */
+    .btn-solid { background: var(--ink); color: var(--paper); }
+    .btn-solid::before { background: var(--gold); }
+    .btn-solid:hover, .btn-solid:focus-visible { color: #FFF; border-color: var(--gold); }
+
+    .btn-row { display: flex; align-items: center; gap: 11px; flex-wrap: wrap; }
+
+    /* the room card is one big link, so its button is a span that reacts to
+       the card's hover rather than its own */
+    .room:hover .btn { color: var(--paper); transform: translateY(-2px); }
+    .room:hover .btn::before { transform: scaleX(1); }
+    .room:hover .btn-arrow { transform: translateX(5px); }
+
+    /* ═══════════════════════════════════════════
+       ICONS
+       ═══════════════════════════════════════════ */
+    .room-icon {
+      width: 30px; height: 30px; margin-bottom: 15px; color: var(--gold);
+      transition: transform 0.5s var(--ease);
+    }
+    .room-icon svg { width: 100%; height: 100%; display: block; }
+    .room:hover .room-icon { transform: translateY(-3px); }
+
+    .contact-value-row { display: inline-flex; align-items: center; gap: 9px; }
+    .contact-ico { width: 14px; height: 14px; color: var(--gold); flex-shrink: 0; }
+    .contact-ico svg { width: 100%; height: 100%; display: block; }
+
+    /* ═══════════════════════════════════════════
        MOTION — masked line rise + drift
        ═══════════════════════════════════════════ */
+    /* Nothing animates while the welcome beat is on screen, so the hero
+       actually performs when it is uncovered instead of being revealed
+       already-finished behind it. */
+    .js.booting .rv { transition: none !important; }
+    .js.booting .mask > span { transition: none !important; }
+
+    /* nav pieces drift down as the page takes hold */
+    .js .nav-in { opacity: 0; transform: translateY(-8px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); transition-delay: var(--d, 0ms); }
+    .js .nav-in.in { opacity: 1; transform: none; }
+    .js.booting .nav-in { transition: none !important; }
     /* Content is visible by default. Only once JS has confirmed it is
        running (html.js) do we hide it to animate it in — so a script
        failure degrades to a plain, readable page instead of a blank one. */
@@ -202,15 +296,15 @@
        ═══════════════════════════════════════════ */
     .hero {
       display: grid; align-content: center;
-      min-height: 82vh;
-      padding: clamp(60px, 10cqw, 130px) 0 clamp(50px, 7cqw, 90px);
+      min-height: 72vh;
+      padding: clamp(44px, 7cqw, 96px) 0 clamp(38px, 5cqw, 68px);
     }
     .hero-type {
       font-family: 'Bodoni Moda', Didot, Georgia, serif;
       font-weight: 400;
       font-size: clamp(46px, 11.5cqw, 152px);
       line-height: 0.9; letter-spacing: -0.03em;
-      max-width: 14ch;
+      max-width: 15ch;
     }
     .hero-type em { font-style: italic; color: var(--gold); }
 
@@ -221,7 +315,7 @@
     }
     .hero-sub {
       font-size: 14.5px; line-height: 1.85; color: var(--stone);
-      max-width: 34ch;
+      max-width: 30ch;
     }
     .hero-cta {
       font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
@@ -251,7 +345,7 @@
     /* ═══════════════════════════════════════════
        STATEMENT
        ═══════════════════════════════════════════ */
-    .statement { padding: clamp(64px, 9cqw, 130px) 0; }
+    .statement { padding: clamp(50px, 6.6cqw, 96px) 0; }
     .statement-type {
       font-family: 'Bodoni Moda', Didot, Georgia, serif;
       font-weight: 400; font-style: italic;
@@ -277,7 +371,7 @@
     .room {
       display: grid; grid-template-columns: 1fr 1fr;
       align-items: center; gap: clamp(26px, 5cqw, 76px);
-      padding: clamp(30px, 4.2cqw, 62px) 0;
+      padding: clamp(26px, 3.5cqw, 50px) 0;
       border-top: 1px solid var(--hairline);
       text-decoration: none;
     }
@@ -328,7 +422,7 @@
        ═══════════════════════════════════════════ */
     .philosophy {
       background: var(--panel); color: var(--panel-ink);
-      padding: clamp(64px, 9cqw, 130px) 0;
+      padding: clamp(54px, 7.2cqw, 102px) 0;
       transition: background 0.4s ease;
     }
     .philosophy-inner {
@@ -360,7 +454,7 @@
     /* ═══════════════════════════════════════════
        CONTACT
        ═══════════════════════════════════════════ */
-    .contact { padding: clamp(60px, 8cqw, 110px) 0; }
+    .contact { padding: clamp(48px, 6.2cqw, 86px) 0; }
     .contact-type {
       font-family: 'Bodoni Moda', Didot, Georgia, serif;
       font-weight: 400;
@@ -443,17 +537,22 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .js .rv, .js .mask > span, .room-fig img, .site { transition-duration: 0.01ms !important; }
-      .js .rv { opacity: 1; transform: none; }
+      .js .rv, .js .mask > span, .room-fig img, .site, .js .nav-in { transition-duration: 0.01ms !important; }
+      .js .rv, .js .nav-in { opacity: 1; transform: none; }
       .js .mask > span { transform: none; }
       .marquee-track { animation: none; }
+      .js #welcome { transition-duration: 0.01ms; }
+      .welcome-mark img, .welcome-ring { animation: none; }
+      .btn, .btn::before, .btn-arrow, .room-icon { transition-duration: 0.01ms !important; }
     }
   </style>
   <script>
     /* Applied before first paint so the page never flashes the wrong theme,
        and so the scroll animations only arm themselves when JS is alive. */
     (function () {
-      document.documentElement.classList.add('js');
+      /* `booting` freezes the entrance animations while the welcome mark is on
+         screen, so the hero performs when it is uncovered — not behind it. */
+      document.documentElement.classList.add('js', 'booting');
       try {
         var t = localStorage.getItem('un-theme');
         if (t) document.documentElement.setAttribute('data-theme', t);
@@ -463,22 +562,30 @@
 </head>
 <body>
 
+<!-- one beat of brand before the page takes over -->
+<div id="welcome" aria-hidden="true">
+  <div class="welcome-mark">
+    <span class="welcome-ring"></span>
+    <img src="logo-icon.png" alt=""/>
+  </div>
+</div>
+
 <div class="site">
 
   <nav>
-    <a href="index.html" class="nav-logo">
+    <a href="index.html" class="nav-logo nav-in">
       <span class="nav-logo-icon"><img src="logo-icon.png" alt=""/></span>
       <span class="nav-logo-text">URBAN NEST</span>
     </a>
 
-    <ul class="nav-links" id="navLinks">
+    <ul class="nav-links nav-in" id="navLinks" style="--d:90ms">
       <li><a href="#rooms">Spaces</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="community.html">The Nest Edit</a></li>
       <li class="join-item"><a href="join.html">Join the Nest</a></li>
     </ul>
 
-    <div class="nav-right">
+    <div class="nav-right nav-in" style="--d:170ms">
       <div class="switch" role="group" aria-label="Colour theme">
         <button type="button" id="themeLight" aria-pressed="false" title="Light" aria-label="Light theme">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
@@ -508,8 +615,17 @@
       <span class="mask"><span style="--d:110ms"><em>Big difference.</em></span></span>
     </h1>
     <div class="hero-foot rv" style="--d:340ms">
-      <p class="hero-sub">This is Urban Nest — where intentional living begins with the objects you choose every day.</p>
-      <a href="#rooms" class="hero-cta">Explore spaces</a>
+      <p class="hero-sub">Intentional living, beginning with the objects you choose every day.</p>
+      <div class="btn-row">
+        <a href="#rooms" class="btn btn-solid">
+          Explore spaces
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="community.html" class="btn">
+          The Nest Edit
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
     </div>
   </header>
 
@@ -541,8 +657,8 @@
       <span class="mask"><span style="--d:180ms"><b>a home.</b></span></span>
     </p>
     <div class="statement-body">
-      <p>Home décor in India has long been treated as a luxury for the few — expensive chandeliers, lakh-worth furniture, inaccessible aesthetics. <strong>We disagree.</strong></p>
-      <p>It's the soap dispenser, the bath rug, the cotton jar on your countertop. The small, intentional choices that quietly transform your everyday space into something beautiful. <strong>Urban Nest exists to make that possible for everyone.</strong></p>
+      <p>Home décor in India has long been a luxury for the few — chandeliers, lakh-worth furniture, aesthetics kept out of reach. <strong>We disagree.</strong></p>
+      <p>It's the soap dispenser, the bath rug, the jar on your countertop. Small choices that quietly transform a space. <strong>We exist to make those possible for everyone.</strong></p>
     </div>
   </section>
 
@@ -554,10 +670,20 @@
         <img src="https://images.unsplash.com/photo-1753605788101-04d1e653e74a?w=900&q=80&auto=format&fit=crop" alt="The Bathroom"/>
       </figure>
       <div>
+        <span class="room-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h18v3a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-3Z"/>
+            <path d="M6.5 12V6.6A2.6 2.6 0 0 1 9.1 4a2.6 2.6 0 0 1 2.6 2.6"/>
+            <path d="M6.5 19v1.6M17.5 19v1.6"/>
+          </svg>
+        </span>
         <span class="room-meta">Interactive · 10 items</span>
         <h2 class="room-name"><span class="mask"><span>The Bathroom</span></span></h2>
-        <p class="room-desc">Where mornings begin. Discover accessories that elevate your ritual.</p>
-        <span class="room-link">Enter space</span>
+        <p class="room-desc">Where mornings begin. Accessories that elevate the ritual.</p>
+        <span class="btn">
+          Enter space
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
       </div>
     </a>
 
@@ -566,10 +692,20 @@
         <img src="https://images.unsplash.com/photo-1759239572496-4ec13e7643d6?w=900&q=80&auto=format&fit=crop" alt="The Kitchen"/>
       </figure>
       <div>
+        <span class="room-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.5 9.5h15v5.5a4 4 0 0 1-4 4h-7a4 4 0 0 1-4-4V9.5Z"/>
+            <path d="M2.8 9.5h18.4"/>
+            <path d="M9.3 6.2c0-1.1 1.4-1.1 1.4-2.2M13.7 6.2c0-1.1 1.4-1.1 1.4-2.2"/>
+          </svg>
+        </span>
         <span class="room-meta">Interactive · 3D space</span>
         <h2 class="room-name"><span class="mask"><span>The Kitchen</span></span></h2>
         <p class="room-desc">Where flavour meets form. Essentials that make cooking a pleasure.</p>
-        <span class="room-link">Enter space</span>
+        <span class="btn">
+          Enter space
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
       </div>
     </a>
 
@@ -578,10 +714,20 @@
         <img src="https://images.unsplash.com/photo-1616418928117-4e6d19be2df1?w=900&q=80&auto=format&fit=crop" alt="The Bedroom"/>
       </figure>
       <div>
+        <span class="room-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 18.5v-7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7"/>
+            <path d="M3 14.5h18"/>
+            <path d="M7.5 9.5V7h5v2.5"/>
+          </svg>
+        </span>
         <span class="room-meta">Interactive · 3D space</span>
         <h2 class="room-name"><span class="mask"><span>The Bedroom</span></span></h2>
-        <p class="room-desc">Where rest becomes sanctuary. Pieces that bring calm to your space.</p>
-        <span class="room-link">Enter space</span>
+        <p class="room-desc">Where rest becomes sanctuary. Pieces that bring calm.</p>
+        <span class="btn">
+          Enter space
+          <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </span>
       </div>
     </a>
 
@@ -621,16 +767,16 @@
     <div class="contact-grid">
       <div class="contact-item">
         <span class="contact-type-label">Email</span>
-        <a href="mailto:reachus.urbannest@gmail.com" class="contact-value">reachus.urbannest@gmail.com</a>
+        <a href="mailto:reachus.urbannest@gmail.com" class="contact-value contact-value-row"><span class="contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="m3 6.5 9 6 9-6"/></svg></span>reachus.urbannest@gmail.com</a>
         <span class="contact-note">For partnerships and general enquiries</span>
       </div>
       <div class="contact-item">
         <span class="contact-type-label">WhatsApp / Phone</span>
-        <a href="tel:+918588944583" class="contact-value">+91 85889 44583</a>
+        <a href="tel:+918588944583" class="contact-value contact-value-row"><span class="contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h3l1.5 4-2 1.5a11 11 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"/></svg></span>+91 85889 44583</a>
       </div>
       <div class="contact-item">
         <span class="contact-type-label">Instagram</span>
-        <a href="https://instagram.com/store.urbannest" target="_blank" rel="noopener" class="contact-value">@store.urbannest</a>
+        <a href="https://instagram.com/store.urbannest" target="_blank" rel="noopener" class="contact-value contact-value-row"><span class="contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg></span>@store.urbannest</a>
       </div>
     </div>
   </section>
@@ -697,9 +843,9 @@
       document.querySelectorAll('.rv, .mask').forEach(function (el) { el.classList.add('in'); });
     }
 
-    if (!('IntersectionObserver' in window)) {
-      revealAll();
-    } else {
+    function armReveals() {
+      if (!('IntersectionObserver' in window)) { revealAll(); return; }
+
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
           if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
@@ -723,6 +869,30 @@
         if (hidden && hidden.getBoundingClientRect().top < window.innerHeight) revealAll();
       }, 1600);
     }
+
+    /* ── the welcome beat, then the page performs ── */
+    var welcome = document.getElementById('welcome');
+    var wantsCalm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var HOLD = wantsCalm ? 0 : 1100;   /* about a second of brand, no more */
+    var started = false;
+
+    function startPage() {
+      if (started) return;
+      started = true;
+      if (welcome) welcome.classList.add('done');
+      setTimeout(function () {
+        document.documentElement.classList.remove('booting');
+        /* flush, so the transitions we just re-enabled actually run */
+        void document.body.offsetWidth;
+        document.querySelectorAll('.nav-in').forEach(function (el) { el.classList.add('in'); });
+        armReveals();
+      }, wantsCalm ? 0 : 120);
+    }
+
+    if (document.readyState === 'complete') setTimeout(startPage, HOLD);
+    else window.addEventListener('load', function () { setTimeout(startPage, HOLD); });
+    /* a stalled asset must never trap the visitor behind the cover */
+    setTimeout(startPage, HOLD + 2600);
 
     /* ── images drift against the scroll ──────── */
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
