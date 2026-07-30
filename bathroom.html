@@ -264,9 +264,14 @@
         document.getElementById('no-scene').style.display = 'flex';
         return;
       }
-      // Several views → let the visitor choose one first (only the picked scene
-      // loads). A single view → straight to the poster + preload.
-      if (scenes.length >= 2) {
+      // A tile on the homepage links to one specific scene — honour it and skip
+      // the chooser. Otherwise: several views → choose first; one view → straight in.
+      var wanted = new URLSearchParams(location.search).get('scene');
+      var picked = wanted ? scenes.findIndex(function (s) { return String(s.id) === wanted; }) : -1;
+      if (picked >= 0) {
+        if (scenes.length >= 2) renderLobby();   // so the Views button still works
+        chooseScene(picked);
+      } else if (scenes.length >= 2) {
         renderLobby();
         openLobby();
       } else {

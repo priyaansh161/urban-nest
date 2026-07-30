@@ -133,8 +133,19 @@
         </div>
         <input type="hidden" id="editingId"/>
         <div class="form-group">
-          <label for="sceneName">Scene Name</label>
-          <input type="text" id="sceneName" placeholder="e.g. Bathroom Hero"/>
+          <label for="sceneName">Scene Name <span style="text-transform:none;letter-spacing:0;color:var(--grey)">— internal</span></label>
+          <input type="text" id="sceneName" placeholder="e.g. Bathroom MK2"/>
+          <span class="form-hint">How you file it. Only ever shown in this admin.</span>
+        </div>
+        <div class="form-group">
+          <label for="sceneDisplayName">Display Name <span style="text-transform:none;letter-spacing:0;color:var(--grey)">— public</span></label>
+          <input type="text" id="sceneDisplayName" placeholder="e.g. The Stone Bath"/>
+          <span class="form-hint">What visitors read on the homepage. Leave empty to fall back to the internal name.</span>
+        </div>
+        <div class="form-group">
+          <label for="sceneCover">Cover Image URL</label>
+          <input type="url" id="sceneCover" placeholder="https://…"/>
+          <span class="form-hint">The photo on this scene's homepage tile. Leave empty and a stock shot for the room is used.</span>
         </div>
         <div class="form-group">
           <label for="sceneUrl">Spline Scene URL</label>
@@ -258,7 +269,7 @@ function renderScenes() {
   el.innerHTML = scenes.map(s => `
     <div class="scene-card">
       <div>
-        <div class="scene-name">${s.name}</div>
+        <div class="scene-name">${s.name}${s.display_name ? ' <span style="color:var(--gold)">· ' + s.display_name + '</span>' : ''}</div>
         <div class="scene-meta">
           <span>Page: <strong>${s.page_placement}</strong></span>
           ${s.description ? `<span>${s.description}</span>` : ''}
@@ -289,6 +300,8 @@ function editScene(id) {
   if (!s) return;
   document.getElementById('editingId').value = id;
   document.getElementById('sceneName').value = s.name;
+  document.getElementById('sceneDisplayName').value = s.display_name || '';
+  document.getElementById('sceneCover').value = s.cover_url || '';
   document.getElementById('sceneUrl').value = baseUrl(s.url);
   document.getElementById('scenePage').value = s.page_placement || 'bath';
   document.getElementById('sceneDescription').value = s.description || '';
@@ -299,7 +312,7 @@ function editScene(id) {
 }
 
 function resetForm() {
-  ['editingId','sceneName','sceneUrl','sceneDescription'].forEach(id => document.getElementById(id).value = '');
+  ['editingId','sceneName','sceneDisplayName','sceneCover','sceneUrl','sceneDescription'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('scenePage').value = 'bath';
   document.getElementById('formTitle').textContent = 'Add Scene';
   document.getElementById('resetBtn').style.display = 'none';
@@ -315,16 +328,24 @@ async function saveScene() {
     name,
     url,
     page_placement: document.getElementById('scenePage').value,
+    display_name: document.getElementById('sceneDisplayName').value.trim() || null,
+    cover_url: document.getElementById('sceneCover').value.trim() || null,
     description: document.getElementById('sceneDescription').value.trim() || null,
   };
   // Saving always re-stamps the version, so a scene you just re-published in
   // Spline reaches visitors instead of sitting behind their browser cache.
   payload.url = stampVersion(payload.url);
-  let error;
-  if (id) {
-    ({ error } = await db.from('spline_scenes').update(payload).eq('id', id));
-  } else {
-    ({ error } = await db.from('spline_scenes').insert({ ...payload, active: false }));
+  const write = (body) => id
+    ? db.from('spline_scenes').update(body).eq('id', id)
+    : db.from('spline_scenes').insert({ ...body, active: false });
+
+  let { error } = await write(payload);
+  // display_name / cover_url are optional columns — on a database where
+  // add-scene-display.sql hasn't been run, save the rest rather than fail.
+  if (error && /display_name|cover_url/.test(error.message || '')) {
+    const { display_name, cover_url, ...rest } = payload;
+    ({ error } = await write(rest));
+    if (!error) showToast('Saved — run admin/add-scene-display.sql to store the display name and cover');
   }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
   showToast(id ? 'Scene updated — visitors will load the latest version' : 'Scene saved!');
