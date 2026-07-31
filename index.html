@@ -417,11 +417,18 @@
       font-size: clamp(17px, 2.2cqw, 28px); color: #FAFAF8;
     }
 
-    /* a row of details — punctuation between the bigger blocks */
-    .wstrip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: clamp(26px, 3.4cqw, 48px); }
+    .collect { padding-top: clamp(26px, 3.4cqw, 44px); }
+    .collect-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px; }
+    .collect-label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); }
+    .collect-all { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; text-decoration: none; color: var(--stone); transition: color .2s; }
+    .collect-all:hover { color: var(--ink); }
+
+    /* a row of pieces — punctuation between the bigger blocks */
+    .wstrip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .wstrip figure { position: relative; overflow: hidden; aspect-ratio: 1 / 1; background: var(--hairline); }
     .wstrip img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.1s var(--ease); }
     .wstrip figure:hover img { transform: scale(1.05); }
+    .ct-piece { display: block; text-decoration: none; color: inherit; }
     .wstrip figcaption {
       position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 11px;
       font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #FAFAF8;
@@ -838,12 +845,16 @@
     </div>
   </section>
 
-  <!-- ── DETAILS ── -->
-  <div class="wstrip shell">
-    <figure><img src="images/det-vase.webp" alt="A glazed ceramic vase" loading="lazy" decoding="async"/><figcaption>Ceramic</figcaption></figure>
-    <figure><img src="images/det-knobs.webp" alt="Brass cabinet knobs" loading="lazy" decoding="async"/><figcaption>Brass</figcaption></figure>
-    <figure><img src="images/det-woodgrain.webp" alt="Wood grain" loading="lazy" decoding="async"/><figcaption>Oak</figcaption></figure>
-  </div>
+  <!-- ── COLLECTION ──
+       Stays out of the page until there are published pieces to put in it.
+       An empty strip of decoration was doing no work. -->
+  <section class="collect shell" id="collect" style="display:none">
+    <div class="collect-head rv">
+      <span class="collect-label">The collection</span>
+      <a class="collect-all" href="collection.html">See all →</a>
+    </div>
+    <div class="wstrip" id="collectGrid"></div>
+  </section>
 
   <!-- ── A PAUSE ── -->
   <div class="band">
@@ -893,11 +904,6 @@
       </div>
     </div>
   </section>
-
-  <div class="band">
-    <img src="images/tex-stone.webp" alt="" loading="lazy" decoding="async"/>
-    <span class="band-line">Considered, not decorated.</span>
-  </div>
 
   <!-- ── CONTACT ── -->
   <section class="contact shell rv">
@@ -1031,6 +1037,27 @@
     else window.addEventListener('load', function () { setTimeout(startPage, HOLD); });
     /* a stalled asset must never trap the visitor behind the cover */
     setTimeout(startPage, HOLD + 2600);
+
+    /* ── the collection preview ──
+       Three published pieces, linking through to the full page. If nothing is
+       published the section never appears, rather than showing filler. */
+    (function loadCollection() {
+      if (typeof db === 'undefined') return;
+      db.from('collection_items').select('id,name,category,image_url,model_url')
+        .eq('published', true).order('sort_order').order('created_at').limit(3)
+        .then(function (r) {
+          var rows = (r && r.data) || [];
+          if (!rows.length) return;
+          var grid = document.getElementById('collectGrid');
+          grid.innerHTML = rows.map(function (it) {
+            var img = it.image_url || 'images/det-vase.webp';
+            return '<a class="ct-piece" href="collection.html">' +
+              '<figure><img src="' + img + '" alt="" loading="lazy" decoding="async"/>' +
+              '<figcaption>' + (it.name || '') + (it.model_url ? ' · 3D' : '') + '</figcaption></figure></a>';
+          }).join('');
+          document.getElementById('collect').style.display = '';
+        }, function () {});
+    })();
 
     /* ── the spaces collage, from the live scene list ──
        Names are split in the admin: the internal one (Bathroom MK2) stays
