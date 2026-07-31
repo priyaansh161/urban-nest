@@ -7,3 +7,8 @@
 # belong in the repo — a multi-megabyte original would be deployed otherwise.
 images/source/*
 !images/source/README.md
+
+# GLB models are committed, but never the raw Meshy project files
+*.blend
+*.fbx
+*.obj

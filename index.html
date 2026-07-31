@@ -743,6 +743,7 @@
 
     <ul class="nav-links nav-in" id="navLinks" style="--d:90ms">
       <li><a href="#rooms">Spaces</a></li>
+      <li><a href="collection.html">Collection</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="community.html">The Nest Edit</a></li>
       <li class="join-item"><a href="join.html">Join the Nest</a></li>
@@ -1039,6 +1040,16 @@
     var ROOM_PAGE  = { bath: 'bathroom.html', kitchen: 'kitchen.html', bed: 'bedroom.html' };
     // One cover per scene, cycled per room — two bathrooms should not wear the
     // same photograph. A cover set in the admin always wins over these.
+    // Until a display name is set in the admin, these stand in for the working
+    // names — nobody visiting should read "Bathroom MK2". A name set in the
+    // admin always wins over this list.
+    var NAME_FALLBACK = {
+      'bathroom mk1': 'The Quiet Bath',
+      'bathroom mk2': 'The Marble Bath',
+      'kitchen mk1':  'The Stone Kitchen',
+      'kitchen mk2':  'The Open Kitchen',
+      'bedroom mk1':  'The Still Bedroom'
+    };
     var ROOM_COVERS = {
       bath:    ['images/cover-bath-1.webp', 'images/cover-bath-2.webp'],
       kitchen: ['images/cover-kitchen-1.webp', 'images/cover-kitchen-2.webp'],
@@ -1078,7 +1089,7 @@
           var nth   = (seenPerRoom[room] = (seenPerRoom[room] || 0) + 1) - 1;
           var cover = sc.cover_url || pool[nth % pool.length];
           var label = ROOM_LABEL[room] || 'Space';
-          var title = sc.display_name || sc.name || label;
+          var title = sc.display_name || NAME_FALLBACK[String(sc.name || '').toLowerCase().trim()] || sc.name || label;
           // a scene with no id is the built-in fallback — it has nothing to deep-link to
           var href  = sc.id ? (page + '?scene=' + encodeURIComponent(sc.id)) : page;
           var cls   = (i % 5 < 2) ? 'sp-a' : 'sp-b';

@@ -144,6 +144,15 @@
         <input type="url" id="itemImage" placeholder="https://…"/>
       </div>
       <div class="form-group full">
+        <label for="itemModel">3D Model URL (optional)</label>
+        <input type="url" id="itemModel" placeholder="models/chandelier.glb"/>
+        <span style="font-size:11px;color:var(--grey);line-height:1.5">A <strong>.glb</strong> exported from Meshy, dropped into the site's <code>models/</code> folder. Shown as a rotatable object instead of a photo. No Spline scene needed.</span>
+      </div>
+      <div class="form-group">
+        <label for="itemBuy">Buy Link (optional)</label>
+        <input type="url" id="itemBuy" placeholder="https://amzn.to/…"/>
+      </div>
+      <div class="form-group">
         <label for="itemDescription">Description</label>
         <textarea id="itemDescription" placeholder="Short description of the product…"></textarea>
       </div>
@@ -215,6 +224,8 @@ function editItem(id) {
   document.getElementById('itemPrice').value = item.price || '';
   document.getElementById('itemImage').value = item.image_url || '';
   document.getElementById('itemDescription').value = item.description || '';
+  document.getElementById('itemModel').value = item.model_url || '';
+  document.getElementById('itemBuy').value = item.buy_link || '';
   document.getElementById('itemComingSoon').checked = !!item.coming_soon;
   document.getElementById('formTitle').textContent = 'Edit Item';
   document.getElementById('resetBtn').style.display = '';
@@ -239,14 +250,19 @@ async function saveItem(publish) {
     price: document.getElementById('itemPrice').value.trim() || null,
     image_url: document.getElementById('itemImage').value.trim() || null,
     description: document.getElementById('itemDescription').value.trim() || null,
+    model_url: document.getElementById('itemModel').value.trim() || null,
+    buy_link: document.getElementById('itemBuy').value.trim() || null,
     coming_soon: document.getElementById('itemComingSoon').checked,
     published: publish,
   };
-  let error;
-  if (id) {
-    ({ error } = await db.from('collection_items').update(payload).eq('id', id));
-  } else {
-    ({ error } = await db.from('collection_items').insert(payload));
+  const write = (body) => id
+    ? db.from('collection_items').update(body).eq('id', id)
+    : db.from('collection_items').insert(body);
+  let { error } = await write(payload);
+  if (error && /model_url|buy_link/.test(error.message || '')) {
+    const { model_url, buy_link, ...rest } = payload;
+    ({ error } = await write(rest));
+    if (!error) showToast('Saved — run admin/add-collection-3d.sql to store the model and buy link');
   }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
   showToast(publish ? 'Item published!' : 'Draft saved');
