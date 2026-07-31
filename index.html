@@ -418,7 +418,7 @@
       width: min(860px, 88%);
       text-align: center; text-wrap: balance;
       font-family: 'Bodoni Moda', Didot, Georgia, serif; font-style: italic;
-      font-size: clamp(14px, 1.55cqw, 21px); line-height: 1.45; color: #FAFAF8;
+      font-size: clamp(17px, 1.95cqw, 27px); line-height: 1.42; color: #FAFAF8;
       text-shadow: 0 1px 18px rgba(0,0,0,0.45);
     }
     .band-line em { font-style: inherit; }
@@ -685,7 +685,7 @@
 
       /* the mosaic folds to two columns; wide tiles take the full width */
       .band { height: clamp(190px, 46cqw, 250px); }
-      .band-line { width: 92%; font-size: clamp(13px, 3.6cqw, 17px); bottom: 14px; }
+      .band-line { width: 92%; font-size: clamp(15px, 4.4cqw, 20px); bottom: 14px; }
       .spaces-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 84px; gap: 8px; }
       .sp-a { grid-column: span 2; grid-row: span 3; }
       .sp-b { grid-column: span 1; grid-row: span 3; }
@@ -720,6 +720,21 @@
       .js #welcome { transition-duration: 0.01ms; }
       .welcome-mark img, .welcome-ring { animation: none; }
       .btn, .btn::before, .btn-arrow, .room-icon { transition-duration: 0.01ms !important; }
+    }
+
+    /* ── touch targets ──
+       A fingertip covers about 34px. Several controls were half that, which is
+       fine with a mouse and a lottery on a phone. Padding grows the hit area
+       without changing how anything looks. */
+    @media (max-width: 768px) {
+      .switch button { width: 34px; height: 34px; }
+      .contact-value, .contact-value-row { padding-block: 7px; }
+      .nav-logo { padding-block: 4px; }
+      .nav-links a { min-height: 44px; display: flex; align-items: center; }
+    }
+
+    @media (max-width: 768px) {
+      .hamburger { min-height: 34px; min-width: 34px; justify-content: center; align-items: center; }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>

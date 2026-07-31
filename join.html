@@ -114,7 +114,14 @@
   .switch button[aria-pressed="true"] { background: var(--black); color: var(--white); }
   .switch svg { width: 13px; height: 13px; display: block; }
   .switch button[aria-pressed="true"] svg { stroke: var(--white); }
-</style>
+
+    @media (max-width: 768px) {
+      .privacy-note { font-size: 12px; }
+      .nav-back { min-height: 34px; display: inline-flex; align-items: center; padding-block: 8px; }
+      .nav-logo { padding-block: 4px; }
+      .switch button { width: 34px; height: 34px; }
+    }
+  </style>
 </head>
 <body>
 

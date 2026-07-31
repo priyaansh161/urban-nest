@@ -449,6 +449,30 @@
     .nband::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,7,0.55), transparent 62%); }
     .nband-line { position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(14px,1.8vw,26px); text-align: center;
                   font-family: 'Bodoni Moda', serif; font-style: italic; font-size: clamp(15px,1.9vw,24px); color: #FAFAF8; }
+
+    /* The filter row used to be a flex line with desktop padding written in,
+       which pushed the last two buttons off a phone screen. */
+    .filter-bar { padding: 20px 48px; border-bottom: 0.5px solid var(--border); }
+    .filter-row { max-width: 1280px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .filter-label { font-size: 10px; letter-spacing: 0.2em; color: var(--grey); margin-right: 8px; }
+    /* 34px is the smallest a finger reliably hits */
+    .filter-btn { min-height: 34px; padding: 8px 16px; }
+    @media (max-width: 768px) {
+      .filter-bar { padding: 16px 20px; }
+      .filter-label { width: 100%; margin-bottom: 2px; }
+    }
+
+    @media (max-width: 768px) {
+      .switch button { width: 34px; height: 34px; }
+      .nav-links a { min-height: 44px; display: flex; align-items: center; }
+    }
+
+    @media (max-width: 768px) {
+      /* a heart is a small thing to hit — grow the target, not the glyph */
+      .comment-like { min-height: 34px; padding-block: 8px; }
+    }
+
+    @media (max-width: 768px) { .hamburger { min-height: 34px; min-width: 34px; justify-content: center; align-items: center; } }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
@@ -500,9 +524,9 @@
   </div>
 
   <!-- FILTERS -->
-  <div style="padding:24px 48px;border-bottom:0.5px solid var(--border);">
-    <div style="max-width:1280px;margin:0 auto;display:flex;gap:8px;align-items:center;">
-      <span style="font-size:10px;letter-spacing:0.2em;color:var(--grey);margin-right:8px;">FILTER</span>
+  <div class="filter-bar">
+    <div class="filter-row">
+      <span class="filter-label">FILTER</span>
       <button class="filter-btn active" onclick="filterArticles('all', this)">All</button>
       <button class="filter-btn" onclick="filterArticles('trends', this)">Trends</button>
       <button class="filter-btn" onclick="filterArticles('tips', this)">Tips & Guides</button>
