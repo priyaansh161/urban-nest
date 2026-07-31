@@ -404,18 +404,24 @@
        BAND — a full-width pause between sections.
        Somewhere for the eye to rest while scrolling.
        ═══════════════════════════════════════════ */
-    .band { position: relative; width: 100%; height: clamp(210px, 27cqw, 400px); overflow: hidden; background: #0A0A09; }
+    .band { position: relative; width: 100%; height: clamp(180px, 19cqw, 290px); overflow: hidden; background: #0A0A09; }
     .band img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .band::after {
       content: ''; position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(8,8,7,0.6), transparent 55%);
+      background: linear-gradient(to top, rgba(8,8,7,0.72), transparent 62%);
     }
+    /* Held to a readable measure and centred, so a full quote wraps as two
+       tidy lines instead of running the width of the screen. */
     .band-line {
-      position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(18px, 2.4cqw, 34px);
-      text-align: center;
+      position: absolute; z-index: 1; left: 50%; bottom: clamp(16px, 2cqw, 26px);
+      transform: translateX(-50%);
+      width: min(860px, 88%);
+      text-align: center; text-wrap: balance;
       font-family: 'Bodoni Moda', Didot, Georgia, serif; font-style: italic;
-      font-size: clamp(17px, 2.2cqw, 28px); color: #FAFAF8;
+      font-size: clamp(14px, 1.55cqw, 21px); line-height: 1.45; color: #FAFAF8;
+      text-shadow: 0 1px 18px rgba(0,0,0,0.45);
     }
+    .band-line em { font-style: inherit; }
 
     .collect { padding-top: clamp(26px, 3.4cqw, 44px); }
     .collect-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px; }
@@ -570,7 +576,7 @@
        than as a subject competing with the words */
     .philosophy::before {
       content: ''; position: absolute; inset: 0;
-      <!-- IMG: BACKGROUND behind the dark philosophy band  ·  swap the file below -->
+      /* IMG: BACKGROUND behind the dark philosophy band — swap the file below */
       background: url('images/band-dark.webp') center / cover no-repeat;
       opacity: 0.3;
     }
@@ -678,7 +684,8 @@
       .hero-foot .btn-row { width: 100%; }
 
       /* the mosaic folds to two columns; wide tiles take the full width */
-      .band { height: clamp(170px, 44cqw, 240px); }
+      .band { height: clamp(190px, 46cqw, 250px); }
+      .band-line { width: 92%; font-size: clamp(13px, 3.6cqw, 17px); bottom: 14px; }
       .spaces-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 84px; gap: 8px; }
       .sp-a { grid-column: span 2; grid-row: span 3; }
       .sp-b { grid-column: span 1; grid-row: span 3; }
@@ -783,11 +790,11 @@
   <!-- ── HERO ── -->
   <header class="hero">
     <picture class="hero-media">
-      <!-- IMG: HERO (phones)  ·  swap the file below -->
+      <!-- IMG: HERO (phones) -->
       <source media="(max-width: 700px)" srcset="images/hero-mobile.webp"/>
-      <!-- IMG: HERO (laptops)  ·  swap the file below -->
+      <!-- IMG: HERO (laptops) -->
       <source media="(max-width: 1700px)" srcset="images/hero-1600.webp"/>
-      <!-- IMG: HERO (large screens)  ·  swap the file below -->
+      <!-- IMG: HERO (large screens) -->
       <img src="images/hero-2560.webp" alt="A warm, considered bedroom" fetchpriority="high" decoding="async"/>
     </picture>
     <div class="hero-scrim"></div>
@@ -862,9 +869,13 @@
 
   <!-- ── A PAUSE ── -->
   <div class="band">
-    <!-- IMG: FULL-WIDTH BAND between the statement and the spaces  ·  swap the file below -->
-    <img src="images/tile-chandelier.webp" alt="" loading="lazy" decoding="async"/>
-    <span class="band-line">Light, gathered.</span>
+    <!-- IMG: FULL-WIDTH BAND between the statement and the spaces -->
+    <img src="images/Chandelier-homepge.webp" alt="" loading="lazy" decoding="async"/>
+    <span class="band-line"><em>
+            "Have nothing in your house that you do not know to be useful, or believe to be beautiful."
+            <br>
+            &mdash; William Morris
+        </em></span>
   </div>
 
   <!-- ── SPACES ──
@@ -876,11 +887,8 @@
       <p class="spaces-note">Every room we have built in 3D. Step into any of them.</p>
     </div>
     <div class="spaces-grid" id="spacesGrid">
-      <!-- IMG: SCENE TILE fallback — bathroom  ·  swap the file below -->
       <a class="sp sp-a" href="bathroom.html"><span class="sp-media"><img src="images/cover-bath-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bathroom</span><span class="sp-name">The Bathroom</span></span></a>
-      <!-- IMG: SCENE TILE fallback — kitchen  ·  swap the file below -->
       <a class="sp sp-a" href="kitchen.html"><span class="sp-media"><img src="images/cover-kitchen-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Kitchen</span><span class="sp-name">The Kitchen</span></span></a>
-      <!-- IMG: SCENE TILE fallback — bedroom  ·  swap the file below -->
       <a class="sp sp-b" href="bedroom.html"><span class="sp-media"><img src="images/cover-bed-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bedroom</span><span class="sp-name">The Bedroom</span></span></a>
     </div>
   </section>
@@ -1058,7 +1066,7 @@
           if (!rows.length) return;
           var grid = document.getElementById('collectGrid');
           grid.innerHTML = rows.map(function (it) {
-            <!-- IMG: COLLECTION placeholder, if a piece has no photo  ·  swap the file below -->
+            // IMG: COLLECTION placeholder, when a piece has no photo of its own
             var img = it.image_url || 'images/det-vase.webp';
             return '<a class="ct-piece" href="collection.html">' +
               '<figure><img src="' + img + '" alt="" loading="lazy" decoding="async"/>' +
