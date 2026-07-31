@@ -841,7 +841,7 @@
   <div class="wstrip shell">
     <figure><img src="images/det-vase.webp" alt="A glazed ceramic vase" loading="lazy" decoding="async"/><figcaption>Ceramic</figcaption></figure>
     <figure><img src="images/det-knobs.webp" alt="Brass cabinet knobs" loading="lazy" decoding="async"/><figcaption>Brass</figcaption></figure>
-    <figure><img src="images/det-jug.webp" alt="A stoneware jug" loading="lazy" decoding="async"/><figcaption>Stoneware</figcaption></figure>
+    <figure><img src="images/det-woodgrain.webp" alt="Wood grain" loading="lazy" decoding="async"/><figcaption>Oak</figcaption></figure>
   </div>
 
   <!-- ── A PAUSE ── -->
@@ -859,9 +859,9 @@
       <p class="spaces-note">Every room we have built in 3D. Step into any of them.</p>
     </div>
     <div class="spaces-grid" id="spacesGrid">
-      <a class="sp sp-a" href="bathroom.html"><span class="sp-media"><img src="images/room-bath.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bathroom</span><span class="sp-name">The Bathroom</span></span></a>
-      <a class="sp sp-a" href="kitchen.html"><span class="sp-media"><img src="images/room-kitchen.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Kitchen</span><span class="sp-name">The Kitchen</span></span></a>
-      <a class="sp sp-b" href="bedroom.html"><span class="sp-media"><img src="images/room-bedroom.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bedroom</span><span class="sp-name">The Bedroom</span></span></a>
+      <a class="sp sp-a" href="bathroom.html"><span class="sp-media"><img src="images/cover-bath-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bathroom</span><span class="sp-name">The Bathroom</span></span></a>
+      <a class="sp sp-a" href="kitchen.html"><span class="sp-media"><img src="images/cover-kitchen-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Kitchen</span><span class="sp-name">The Kitchen</span></span></a>
+      <a class="sp sp-b" href="bedroom.html"><span class="sp-media"><img src="images/cover-bed-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bedroom</span><span class="sp-name">The Bedroom</span></span></a>
     </div>
   </section>
 
@@ -1037,7 +1037,13 @@
        name and a stock cover wherever those are still empty. */
     var ROOM_LABEL = { bath: 'Bathroom', kitchen: 'Kitchen', bed: 'Bedroom' };
     var ROOM_PAGE  = { bath: 'bathroom.html', kitchen: 'kitchen.html', bed: 'bedroom.html' };
-    var ROOM_COVER = { bath: 'images/room-bath.webp', kitchen: 'images/room-kitchen.webp', bed: 'images/room-bedroom.webp' };
+    // One cover per scene, cycled per room — two bathrooms should not wear the
+    // same photograph. A cover set in the admin always wins over these.
+    var ROOM_COVERS = {
+      bath:    ['images/cover-bath-1.webp', 'images/cover-bath-2.webp'],
+      kitchen: ['images/cover-kitchen-1.webp', 'images/cover-kitchen-2.webp'],
+      bed:     ['images/cover-bed-1.webp', 'images/cover-bed-2.webp']
+    };
 
     (function loadSpaces() {
       if (typeof db === 'undefined') return;          // keep the fallback tiles
@@ -1064,10 +1070,13 @@
         if (!rows || !rows.length) return;            // nothing active — keep the fallback
         var grid = document.getElementById('spacesGrid');
         if (!grid) return;
+        var seenPerRoom = {};
         grid.innerHTML = rows.map(function (sc, i) {
           var room  = sc.page_placement || 'bath';
           var page  = ROOM_PAGE[room] || 'index.html';
-          var cover = sc.cover_url || ROOM_COVER[room] || 'images/room-bath.webp';
+          var pool  = ROOM_COVERS[room] || ROOM_COVERS.bath;
+          var nth   = (seenPerRoom[room] = (seenPerRoom[room] || 0) + 1) - 1;
+          var cover = sc.cover_url || pool[nth % pool.length];
           var label = ROOM_LABEL[room] || 'Space';
           var title = sc.display_name || sc.name || label;
           // a scene with no id is the built-in fallback — it has nothing to deep-link to
