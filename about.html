@@ -166,6 +166,33 @@
     .switch button[aria-pressed="true"] { background: var(--black); color: var(--white); }
     .switch svg { width: 13px; height: 13px; display: block; }
     .switch button[aria-pressed="true"] svg { stroke: var(--white); }
+
+    /* ═══════════════════════════════════════════
+       WOVEN IMAGERY — full-width pauses and a strip
+       of details, so the page is read by scrolling
+       rather than by reading every word.
+       ═══════════════════════════════════════════ */
+    .wband { position: relative; width: 100%; height: clamp(180px, 24vw, 340px); overflow: hidden; background: #0A0A09; }
+    .wband img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .wband::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,7,0.55), transparent 60%); }
+    .wband-line {
+      position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(16px, 2vw, 30px);
+      text-align: center; font-family: 'Bodoni Moda', serif; font-style: italic;
+      font-size: clamp(16px, 2vw, 26px); color: #FAFAF8;
+    }
+    .wstrip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 1280px; margin: 0 auto; padding: 0 48px; }
+    .wstrip figure { position: relative; overflow: hidden; aspect-ratio: 1 / 1; background: var(--grey-light); }
+    .wstrip img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.1s cubic-bezier(.16,.7,.2,1); }
+    .wstrip figure:hover img { transform: scale(1.05); }
+    .wstrip figcaption {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 24px 14px 11px;
+      font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #FAFAF8;
+      background: linear-gradient(to top, rgba(8,8,7,0.7), transparent);
+    }
+    @media (max-width: 768px) {
+      .wstrip { padding: 0 20px; gap: 8px; }
+      .wband { height: clamp(150px, 40vw, 220px); }
+    }
   </style>
 </head>
 <body>
@@ -221,6 +248,11 @@
     </div>
   </div>
 
+  <div class="wband">
+    <img src="images/tex-marble.webp" alt="" loading="lazy" decoding="async"/>
+    <span class="wband-line">You should not need a five-lakh budget to feel at home.</span>
+  </div>
+
   <!-- OUR MISSION -->
   <div class="about-section">
     <div class="section-inner">
@@ -234,6 +266,12 @@
     </div>
   </div>
 
+  <div class="wstrip">
+    <figure><img src="images/det-tap.webp" alt="A brass tap" loading="lazy" decoding="async"/><figcaption>Brass</figcaption></figure>
+    <figure><img src="images/det-bowl.webp" alt="The rim of a ceramic bowl" loading="lazy" decoding="async"/><figcaption>Ceramic</figcaption></figure>
+    <figure><img src="images/det-linen.webp" alt="Folded linen" loading="lazy" decoding="async"/><figcaption>Linen</figcaption></figure>
+  </div>
+
   <!-- OUR VISION -->
   <div class="about-section">
     <div class="section-inner">
@@ -245,6 +283,11 @@
         <p>Because the Indian consumer deserves to touch, feel, and truly understand what they are bringing home.</p>
       </div>
     </div>
+  </div>
+
+  <div class="wband">
+    <img src="images/tex-linen.webp" alt="" loading="lazy" decoding="async"/>
+    <span class="wband-line">Touch, feel, and truly understand what you bring home.</span>
   </div>
 
   <!-- WHAT WE ARE -->

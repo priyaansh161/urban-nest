@@ -417,6 +417,17 @@
       font-size: clamp(17px, 2.2cqw, 28px); color: #FAFAF8;
     }
 
+    /* a row of details — punctuation between the bigger blocks */
+    .wstrip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: clamp(26px, 3.4cqw, 48px); }
+    .wstrip figure { position: relative; overflow: hidden; aspect-ratio: 1 / 1; background: var(--hairline); }
+    .wstrip img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.1s var(--ease); }
+    .wstrip figure:hover img { transform: scale(1.05); }
+    .wstrip figcaption {
+      position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 11px;
+      font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #FAFAF8;
+      background: linear-gradient(to top, rgba(8,8,7,0.72), transparent);
+    }
+
     /* ═══════════════════════════════════════════
        SPACES — every 3D scene, not just the rooms.
        Names come from the admin: internal names stay
@@ -826,6 +837,13 @@
     </div>
   </section>
 
+  <!-- ── DETAILS ── -->
+  <div class="wstrip shell">
+    <figure><img src="images/det-vase.webp" alt="A glazed ceramic vase" loading="lazy" decoding="async"/><figcaption>Ceramic</figcaption></figure>
+    <figure><img src="images/det-knobs.webp" alt="Brass cabinet knobs" loading="lazy" decoding="async"/><figcaption>Brass</figcaption></figure>
+    <figure><img src="images/det-jug.webp" alt="A stoneware jug" loading="lazy" decoding="async"/><figcaption>Stoneware</figcaption></figure>
+  </div>
+
   <!-- ── A PAUSE ── -->
   <div class="band">
     <img src="images/tile-chandelier.webp" alt="" loading="lazy" decoding="async"/>
@@ -874,6 +892,11 @@
       </div>
     </div>
   </section>
+
+  <div class="band">
+    <img src="images/tex-stone.webp" alt="" loading="lazy" decoding="async"/>
+    <span class="band-line">Considered, not decorated.</span>
+  </div>
 
   <!-- ── CONTACT ── -->
   <section class="contact shell rv">
