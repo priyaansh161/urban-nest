@@ -570,6 +570,7 @@
        than as a subject competing with the words */
     .philosophy::before {
       content: ''; position: absolute; inset: 0;
+      <!-- IMG: BACKGROUND behind the dark philosophy band  ·  swap the file below -->
       background: url('images/band-dark.webp') center / cover no-repeat;
       opacity: 0.3;
     }
@@ -782,8 +783,11 @@
   <!-- ── HERO ── -->
   <header class="hero">
     <picture class="hero-media">
+      <!-- IMG: HERO (phones)  ·  swap the file below -->
       <source media="(max-width: 700px)" srcset="images/hero-mobile.webp"/>
+      <!-- IMG: HERO (laptops)  ·  swap the file below -->
       <source media="(max-width: 1700px)" srcset="images/hero-1600.webp"/>
+      <!-- IMG: HERO (large screens)  ·  swap the file below -->
       <img src="images/hero-2560.webp" alt="A warm, considered bedroom" fetchpriority="high" decoding="async"/>
     </picture>
     <div class="hero-scrim"></div>
@@ -858,6 +862,7 @@
 
   <!-- ── A PAUSE ── -->
   <div class="band">
+    <!-- IMG: FULL-WIDTH BAND between the statement and the spaces  ·  swap the file below -->
     <img src="images/tile-chandelier.webp" alt="" loading="lazy" decoding="async"/>
     <span class="band-line">Light, gathered.</span>
   </div>
@@ -871,8 +876,11 @@
       <p class="spaces-note">Every room we have built in 3D. Step into any of them.</p>
     </div>
     <div class="spaces-grid" id="spacesGrid">
+      <!-- IMG: SCENE TILE fallback — bathroom  ·  swap the file below -->
       <a class="sp sp-a" href="bathroom.html"><span class="sp-media"><img src="images/cover-bath-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bathroom</span><span class="sp-name">The Bathroom</span></span></a>
+      <!-- IMG: SCENE TILE fallback — kitchen  ·  swap the file below -->
       <a class="sp sp-a" href="kitchen.html"><span class="sp-media"><img src="images/cover-kitchen-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Kitchen</span><span class="sp-name">The Kitchen</span></span></a>
+      <!-- IMG: SCENE TILE fallback — bedroom  ·  swap the file below -->
       <a class="sp sp-b" href="bedroom.html"><span class="sp-media"><img src="images/cover-bed-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bedroom</span><span class="sp-name">The Bedroom</span></span></a>
     </div>
   </section>
@@ -1050,6 +1058,7 @@
           if (!rows.length) return;
           var grid = document.getElementById('collectGrid');
           grid.innerHTML = rows.map(function (it) {
+            <!-- IMG: COLLECTION placeholder, if a piece has no photo  ·  swap the file below -->
             var img = it.image_url || 'images/det-vase.webp';
             return '<a class="ct-piece" href="collection.html">' +
               '<figure><img src="' + img + '" alt="" loading="lazy" decoding="async"/>' +
