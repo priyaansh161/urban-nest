@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>The Kitchen — Urban Nest</title>
+  <title>The Kitchen · Urban Nest</title>
   <link rel="icon" type="image/png" href="favicon.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -11,6 +11,14 @@
   <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ── WEIGHT ON COLOUR ──
+       Card and caption text sits on the teal or over photographs, where a
+       light weight goes muddy. */
+    .cat, .name, .price, .buy, .page-tag, .nav-links a, .badge3d, .badge-soon,
+    .d-cat, .d-price, .d-buy, .d-spec-k, .footer-logo, .nav-logo-text,
+    .pillar-title, .perk-text strong, .lobby-tag, .lobby-card-cta,
+    .view-chip, .dot-label { font-weight: 500; }
+
     body { font-family: 'DM Sans', sans-serif; background: #0A0A0A; color: #F8F7F4; overflow: hidden; height: 100vh; width: 100vw; }
 
     nav { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: space-between; align-items: center; padding: 18px 36px; background: linear-gradient(to bottom, rgba(10,10,10,0.9), transparent); pointer-events: none; }
@@ -37,14 +45,14 @@
 
     #loading { position: fixed; inset: 0; z-index: 60; background: #0A0A0A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; pointer-events: none; opacity: 1; transition: opacity 0.7s ease; }
     #loading.fade-out { opacity: 0; }
-    #loading .spinner { width: 28px; height: 28px; border: 1.5px solid rgba(184,149,106,0.2); border-top-color: #B8956A; border-radius: 50%; animation: spin 0.9s linear infinite; }
+    #loading .spinner { width: 28px; height: 28px; border: 1.5px solid rgba(163,123,63,0.2); border-top-color: #A37B3F; border-radius: 50%; animation: spin 0.9s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     #loading p { font-size: 11px; letter-spacing: 0.2em; color: rgba(248,247,244,0.35); }
 
     /* Brand loader / 3D poster — the real logo sits still inside a spinning
        ring while the Spline scene loads behind it, then the room fades in. */
     .un-poster { position: relative; width: 128px; height: 128px; }
-    .un-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(184,149,106,0.15); border-top-color: #B8956A; animation: spin 1s linear infinite; }
+    .un-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(163,123,63,0.15); border-top-color: #A37B3F; animation: spin 1s linear infinite; }
     .un-logo { position: absolute; inset: 16px; width: calc(100% - 32px); height: calc(100% - 32px); border-radius: 50%; object-fit: cover; }
     @media (prefers-reduced-motion: reduce) { .un-ring { animation: none; } }
 
@@ -60,11 +68,11 @@
     .dot-ring { width: 11px; height: 11px; border-radius: 50%; background: #9A6F3A; opacity: 0.85; animation: pulse 2.4s ease-in-out infinite; transition: transform 0.22s ease, box-shadow 0.3s ease, opacity 0.22s ease, background 0.22s ease; }
     .dot:hover .dot-ring { transform: scale(1.45); opacity: 1; background: #CB9950; animation: none; box-shadow: 0 0 0 3px rgba(226,178,104,0.35), 0 0 20px 7px rgba(232,186,116,0.85); }
     @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(226,178,104,0.55)} 50%{box-shadow:0 0 0 8px rgba(226,178,104,0)} }
-    .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(250,250,248,0.95); color: #111110; font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(238,244,243,0.95); color: #0F1F22; font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
     .dot:hover .dot-label { opacity: 1; }
 
     #hint { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 20; display: none; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.15em; color: rgba(248,247,244,0.3); pointer-events: none; white-space: nowrap; transition: opacity 0.5s; }
-    #hint::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #B8956A; animation: blink 2s infinite; }
+    #hint::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #A37B3F; animation: blink 2s infinite; }
     #controls { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 20; display: none; font-size: 9px; letter-spacing: 0.16em; color: rgba(248,247,244,0.25); pointer-events: none; white-space: nowrap; transition: opacity 0.5s; }
     body.panel-open #controls { opacity: 0; }
     @media (max-width: 640px) { #controls { font-size: 8px; letter-spacing: 0.1em; } }
@@ -74,57 +82,57 @@
     #views { position: fixed; bottom: 24px; left: 24px; z-index: 30; display: none; gap: 8px; flex-wrap: wrap; max-width: 40vw; }
     .view-chip { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(248,247,244,0.5); background: rgba(10,10,10,0.7); border: 0.5px solid rgba(248,247,244,0.15); padding: 8px 16px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
     .view-chip:hover { color: #F8F7F4; border-color: rgba(248,247,244,0.4); }
-    .view-chip.active { color: #B8956A; border-color: rgba(184,149,106,0.6); background: rgba(184,149,106,0.12); }
+    .view-chip.active { color: #A37B3F; border-color: rgba(163,123,63,0.6); background: rgba(163,123,63,0.12); }
     body.panel-open #views { opacity: 0; pointer-events: none; }
 
     /* SCENE CHOOSER (lobby) — pick which view to enter, before any 3D loads */
     #lobby { position: fixed; inset: 0; z-index: 70; background: #0A0A0A; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
     .lobby-inner { width: 100%; max-width: 760px; text-align: center; }
-    .lobby-tag { font-size: 10px; letter-spacing: 0.3em; color: #B8956A; margin-bottom: 14px; }
+    .lobby-tag { font-size: 10px; letter-spacing: 0.3em; color: #A37B3F; margin-bottom: 14px; }
     .lobby-title { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: clamp(28px, 5vw, 44px); color: #F8F7F4; margin-bottom: 36px; }
     .lobby-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
     .lobby-card { padding: 22px 18px; border: 0.5px solid rgba(248,247,244,0.15); background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.25s; text-align: left; font-family: 'DM Sans', sans-serif; }
-    .lobby-card:hover { border-color: #B8956A; background: rgba(184,149,106,0.08); }
+    .lobby-card:hover { border-color: #A37B3F; background: rgba(163,123,63,0.08); }
     .lobby-card-name { font-size: 15px; letter-spacing: 0.04em; color: #F8F7F4; margin-bottom: 6px; }
     .lobby-card-desc { font-size: 12px; color: rgba(248,247,244,0.4); line-height: 1.5; }
-    .lobby-card-cta { font-size: 10px; letter-spacing: 0.15em; color: #B8956A; margin-top: 14px; }
+    .lobby-card-cta { font-size: 10px; letter-spacing: 0.15em; color: #A37B3F; margin-top: 14px; }
     .lobby-back { display: inline-block; margin-top: 36px; font-size: 11px; letter-spacing: 0.14em; color: rgba(248,247,244,0.5); text-decoration: none; transition: color 0.2s; }
     .lobby-back:hover { color: #F8F7F4; }
     .views-btn { position: fixed; bottom: 24px; left: 24px; z-index: 30; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(248,247,244,0.6); background: rgba(10,10,10,0.7); border: 0.5px solid rgba(248,247,244,0.15); padding: 9px 18px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-    .views-btn:hover { color: #F8F7F4; border-color: rgba(184,149,106,0.6); }
+    .views-btn:hover { color: #F8F7F4; border-color: rgba(163,123,63,0.6); }
     body.panel-open .views-btn { opacity: 0; pointer-events: none; }
 
     /* PANEL */
     /* Above the nav (200), so the nav's gradient and its links can never sit on
        top of the drawer's own header controls. */
-    #panel { position: fixed; top: 0; right: 0; bottom: 0; width: 50vw; background: #FAFAF8; z-index: 250; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; }
+    #panel { position: fixed; top: 0; right: 0; bottom: 0; width: 50vw; background: #F5F7F6; z-index: 250; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); overflow-y: auto; }
     #panel.open { transform: translateX(0); }
 
-    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 0.5px solid #E0DFD9; flex-shrink: 0; position: sticky; top: 0; background: #FAFAF8; z-index: 5; }
-    .panel-back { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.12em; color: #6B6B68; cursor: pointer; border: none; background: none; transition: color 0.2s; padding: 6px 0; }
-    .panel-back:hover { color: #111110; }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 0.5px solid #D9E0DE; flex-shrink: 0; position: sticky; top: 0; background: #F5F7F6; z-index: 5; }
+    .panel-back { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.12em; color: #586366; cursor: pointer; border: none; background: none; transition: color 0.2s; padding: 6px 0; }
+    .panel-back:hover { color: #0F1F22; }
 
-    .panel-3d { width: 100%; height: 50vh; background: #111110; flex-shrink: 0; position: relative; overflow: hidden; }
+    .panel-3d { width: 100%; height: 50vh; background: #0F1F22; flex-shrink: 0; position: relative; overflow: hidden; }
     #product-viewer-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
     .zoom-controls { position: absolute; bottom: 14px; right: 14px; z-index: 10; display: flex; flex-direction: column; gap: 4px; }
-    .zoom-btn { width: 32px; height: 32px; background: rgba(250,250,248,0.1); border: 0.5px solid rgba(250,250,248,0.2); color: #FAFAF8; font-size: 18px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-    .zoom-btn:hover { background: rgba(184,149,106,0.2); border-color: #B8956A; color: #B8956A; }
-    .panel-3d-hint { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.1em; color: rgba(250,250,248,0.2); pointer-events: none; white-space: nowrap; }
+    .zoom-btn { width: 32px; height: 32px; background: rgba(238,244,243,0.1); border: 0.5px solid rgba(238,244,243,0.2); color: #F5F7F6; font-size: 18px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .zoom-btn:hover { background: rgba(163,123,63,0.2); border-color: #A37B3F; color: #A37B3F; }
+    .panel-3d-hint { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.1em; color: rgba(238,244,243,0.2); pointer-events: none; white-space: nowrap; }
 
     .panel-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
-    .panel-tag { font-size: 10px; letter-spacing: 0.22em; color: #B8956A; }
-    .panel-name { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; color: #111110; line-height: 1.15; }
-    .panel-desc { font-size: 14px; color: #6B6B68; line-height: 1.9; }
-    .divider { height: 0.5px; background: #E0DFD9; }
-    .specs { display: flex; flex-direction: column; border: 0.5px solid #E0DFD9; border-radius: 4px; overflow: hidden; }
+    .panel-tag { font-size: 10px; letter-spacing: 0.22em; color: #A37B3F; }
+    .panel-name { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; color: #0F1F22; line-height: 1.15; }
+    .panel-desc { font-size: 14px; color: #586366; line-height: 1.9; }
+    .divider { height: 0.5px; background: #D9E0DE; }
+    .specs { display: flex; flex-direction: column; border: 0.5px solid #D9E0DE; border-radius: 4px; overflow: hidden; }
     .specs:empty { display: none; }
-    .spec-row { display: flex; justify-content: space-between; padding: 10px 14px; font-size: 12px; border-bottom: 0.5px solid #E0DFD9; }
+    .spec-row { display: flex; justify-content: space-between; padding: 10px 14px; font-size: 12px; border-bottom: 0.5px solid #D9E0DE; }
     .spec-row:last-child { border-bottom: none; }
-    .spec-label { color: #6B6B68; }
-    .spec-val { color: #111110; font-weight: 500; }
-    .similar-note { font-size: 11px; color: #6B6B68; font-style: italic; }
-    .btn-similar { display: block; text-align: center; padding: 14px; background: #111110; color: #FAFAF8; font-size: 11px; font-weight: 500; letter-spacing: 0.18em; border-radius: 4px; text-decoration: none; transition: background 0.2s; margin-bottom: 24px; }
-    .btn-similar:hover { background: #B8956A; }
+    .spec-label { color: #586366; }
+    .spec-val { color: #0F1F22; font-weight: 500; }
+    .similar-note { font-size: 11px; color: #586366; font-style: italic; }
+    .btn-similar { display: block; text-align: center; padding: 14px; background: #0F1F22; color: #F5F7F6; font-size: 11px; font-weight: 500; letter-spacing: 0.18em; border-radius: 4px; text-decoration: none; transition: background 0.2s; margin-bottom: 24px; }
+    .btn-similar:hover { background: #A37B3F; }
 
     @media (max-width: 768px) {
       nav { padding: 14px 16px; }
@@ -503,7 +511,7 @@
         panel3d.style.display = '';
         // a pale ground for dark products, dark for pale ones (only shows when
         // the product's Spline scene background is transparent)
-        panel3d.style.background = p.popup_bg === 'light' ? '#F2F0EA' : '#111110';
+        panel3d.style.background = p.popup_bg === 'light' ? '#EEF4F3' : '#0F1F22';
         const viewer = document.createElement('spline-viewer');
         viewer.setAttribute('url', p.spline_url);
         viewer.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
