@@ -65,9 +65,9 @@
     .dot { position: absolute; transform: translate(-50%,-50%); pointer-events: all; cursor: pointer; }
     /* A golden-brown point wearing a warm gold glow — the light does the work
        of separating it from the surface, so it reads without going stark. */
-    .dot-ring { width: 11px; height: 11px; border-radius: 50%; background: #9A6F3A; opacity: 0.85; animation: pulse 2.4s ease-in-out infinite; transition: transform 0.22s ease, box-shadow 0.3s ease, opacity 0.22s ease, background 0.22s ease; }
-    .dot:hover .dot-ring { transform: scale(1.45); opacity: 1; background: #CB9950; animation: none; box-shadow: 0 0 0 3px rgba(226,178,104,0.35), 0 0 20px 7px rgba(232,186,116,0.85); }
-    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(226,178,104,0.55)} 50%{box-shadow:0 0 0 8px rgba(226,178,104,0)} }
+    .dot-ring { width: 11px; height: 11px; border-radius: 50%; background: #2E8F92; opacity: 0.85; animation: pulse 2.4s ease-in-out infinite; transition: transform 0.22s ease, box-shadow 0.3s ease, opacity 0.22s ease, background 0.22s ease; }
+    .dot:hover .dot-ring { transform: scale(1.45); opacity: 1; background: #4FBFC2; animation: none; box-shadow: 0 0 0 3px rgba(79,191,194,0.35), 0 0 20px 7px rgba(110,214,216,0.85); }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(79,191,194,0.55)} 50%{box-shadow:0 0 0 8px rgba(79,191,194,0)} }
     .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(238,244,243,0.95); color: #0F1F22; font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
     .dot:hover .dot-label { opacity: 1; }
 
