@@ -49,7 +49,13 @@ create policy "Admin full access collection"
 -- ── feedback ───────────────────────────────────────────────────
 -- Public keeps INSERT (the "Public can submit feedback" policy);
 -- only admin may read / update / delete.
-drop policy if exists "Admin reads feedback" on feedback;
+-- All four are dropped, not just the first. Getting the email wrong on line
+-- 21 locks you out of writing, and the fix is to correct it and run again —
+-- which only works if every policy below can be recreated.
+drop policy if exists "Admin reads feedback"   on feedback;
+drop policy if exists "Admin manages feedback" on feedback;
+drop policy if exists "Admin updates feedback" on feedback;
+drop policy if exists "Admin deletes feedback" on feedback;
 create policy "Admin manages feedback"
   on feedback for select using (is_admin());
 create policy "Admin updates feedback"
