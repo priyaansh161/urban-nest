@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>The Nest Edit — Urban Nest</title>
+  <title>The Nest Edit · Urban Nest</title>
   <link rel="icon" type="image/png" href="favicon.png"/>
 <script>
   /* Applied before first paint so the page never flashes the wrong theme. */
@@ -18,13 +18,21 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --gold: #B8956A;
-      --white: #FAFAF8;
-      --black: #111110;
-      --grey: #6B6B68;
-      --grey-light: #F4F3EF;
-      --border: #E0DFD9;
+      --gold: #A37B3F;
+      --white: #F5F7F6;
+      --black: #0F1F22;
+      --grey: #586366;
+      --grey-light: #EAEFED;
+      --border: #D9E0DE;
     }
+    /* ── WEIGHT ON COLOUR ──
+       Card and caption text sits on the teal or over photographs, where a
+       light weight goes muddy. */
+    .cat, .name, .price, .buy, .page-tag, .nav-links a, .badge3d, .badge-soon,
+    .d-cat, .d-price, .d-buy, .d-spec-k, .footer-logo, .nav-logo-text,
+    .pillar-title, .perk-text strong, .lobby-tag, .lobby-card-cta,
+    .view-chip, .dot-label { font-weight: 500; }
+
     body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--black); overflow-x: hidden; transition: background 0.4s ease, color 0.4s ease; }
 
     /* NAV */
@@ -46,14 +54,14 @@
     }
     .page-hero-grid {
       position: absolute; inset: 0;
-      background-image: linear-gradient(rgba(250,250,248,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(250,250,248,0.03) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(238,244,243,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(238,244,243,0.03) 1px, transparent 1px);
       background-size: 80px 80px; pointer-events: none;
     }
     .hero-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; }
     .page-tag { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 20px; }
-    .page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 400; line-height: 1.0; color: #FAFAF8; }
+    .page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 400; line-height: 1.0; color: #F5F7F6; }
     .page-title em { font-style: italic; color: var(--gold); }
-    .page-sub { font-size: 14px; color: rgba(250,250,248,0.4); line-height: 1.9; max-width: 440px; align-self: end; padding-bottom: 8px; }
+    .page-sub { font-size: 14px; color: rgba(238,244,243,0.4); line-height: 1.9; max-width: 440px; align-self: end; padding-bottom: 8px; }
 
     /* FILTERS */
     .filters {
@@ -205,21 +213,21 @@
       text-align: center;
     }
     .newsletter-tag { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 16px; }
-    .newsletter-title { font-family: 'Bodoni Moda', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 400; color: #FAFAF8; margin-bottom: 12px; }
+    .newsletter-title { font-family: 'Bodoni Moda', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 400; color: #F5F7F6; margin-bottom: 12px; }
     .newsletter-title em { font-style: italic; color: var(--gold); }
-    .newsletter-sub { font-size: 14px; color: rgba(250,250,248,0.4); margin-bottom: 36px; }
+    .newsletter-sub { font-size: 14px; color: rgba(238,244,243,0.4); margin-bottom: 36px; }
     .newsletter-form { display: flex; gap: 0; max-width: 480px; margin: 0 auto; }
-    .newsletter-input { flex: 1; padding: 13px 20px; background: rgba(250,250,248,0.06); border: 0.5px solid rgba(250,250,248,0.15); color: #FAFAF8; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; }
-    .newsletter-input::placeholder { color: rgba(250,250,248,0.3); }
+    .newsletter-input { flex: 1; padding: 13px 20px; background: rgba(238,244,243,0.06); border: 0.5px solid rgba(238,244,243,0.15); color: #F5F7F6; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; }
+    .newsletter-input::placeholder { color: rgba(238,244,243,0.3); }
     .newsletter-btn { padding: 13px 24px; background: var(--gold); color: var(--black); font-size: 11px; font-weight: 500; letter-spacing: 0.15em; border: none; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
     .newsletter-btn:hover { opacity: 0.85; }
 
-    footer { padding: 32px 48px; background: var(--panel); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid rgba(250,250,248,0.06); }
+    footer { padding: 32px 48px; background: var(--panel); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid rgba(238,244,243,0.06); }
     .footer-left { display: flex; align-items: center; gap: 12px; }
     .footer-icon { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; }
     .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
-    .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.18em; color: rgba(250,250,248,0.3); }
-    .footer-note { font-size: 11px; color: rgba(250,250,248,0.18); letter-spacing: 0.06em; }
+    .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.18em; color: rgba(238,244,243,0.3); }
+    .footer-note { font-size: 11px; color: rgba(238,244,243,0.18); letter-spacing: 0.06em; }
 
     /* ═══════════════════════════════════════════
        EDITORIAL GRID — one field, many spans.
@@ -241,7 +249,7 @@
     .na-media { overflow: hidden; background: var(--grey-light); }
     .na-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.9s cubic-bezier(.16,.7,.2,1); }
     .na:hover .na-media img { transform: scale(1.045); }
-    .na-ph { display: grid; place-items: center; background: linear-gradient(135deg, #F4F3EF 0%, #EAE7DF 100%); border: 0.5px solid var(--border); }
+    .na-ph { display: grid; place-items: center; background: linear-gradient(135deg, #EAEFED 0%, #EAE7DF 100%); border: 0.5px solid var(--border); }
     .na-ph img { width: 32px; height: 32px; border-radius: 50%; opacity: 0.4; object-fit: cover; }
     .na-cat { font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); }
     .na-title { font-family: 'Bodoni Moda', serif; font-weight: 400; line-height: 1.12; color: var(--black); }
@@ -398,7 +406,7 @@
     .dynamic-card-ph {
       width: 100%; height: 180px;
       display: grid; place-items: center;
-      background: linear-gradient(135deg, #F4F3EF 0%, #EAE7DF 100%);
+      background: linear-gradient(135deg, #EAEFED 0%, #EAE7DF 100%);
       border: 0.5px solid var(--border);
     }
     .dynamic-card-ph img { width: 38px; height: 38px; border-radius: 50%; opacity: 0.5; }
@@ -412,27 +420,27 @@
        between themes. --panel is a deliberately dark band (page hero,
        newsletter, footer) and stays dark in both, which keeps the light
        text already written inside those bands readable.                */
-    :root { --panel: #111110; }
+    :root { --panel: #0E3238; }
 
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --white: #0E0E0C;
-        --black: #F2F0EA;
-        --grey: #9C998F;
-        --border: #26251F;
-        --grey-light: #1A1916;
-        --gold: #C9A87C;
-        --panel: #171613;
+        --white: #080C0D;
+        --black: #EEF4F3;
+        --grey: #849090;
+        --border: #18211F;
+        --grey-light: #141C1B;
+        --gold: #B5843C;
+        --panel: #0D2B31;
       }
     }
     :root[data-theme="dark"] {
-      --white: #0E0E0C;
-      --black: #F2F0EA;
-      --grey: #9C998F;
-      --border: #26251F;
-      --grey-light: #1A1916;
-      --gold: #C9A87C;
-      --panel: #171613;
+      --white: #080C0D;
+      --black: #EEF4F3;
+      --grey: #849090;
+      --border: #18211F;
+      --grey-light: #141C1B;
+      --gold: #B5843C;
+      --panel: #0D2B31;
     }
 
     /* theme toggle */
@@ -448,7 +456,7 @@
     .nband img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .nband::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,7,0.55), transparent 62%); }
     .nband-line { position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(14px,1.8vw,26px); text-align: center;
-                  font-family: 'Bodoni Moda', serif; font-style: italic; font-size: clamp(15px,1.9vw,24px); color: #FAFAF8; }
+                  font-family: 'Bodoni Moda', serif; font-style: italic; font-size: clamp(15px,1.9vw,24px); color: #F5F7F6; }
 
     /* The filter row used to be a flex line with desktop padding written in,
        which pushed the last two buttons off a phone screen. */
@@ -580,7 +588,7 @@
           <div>
             <div class="comment-name">Priya M. <span style="font-size:10px;color:var(--grey);font-weight:400;">· Mumbai</span></div>
             <div class="comment-date">June 12, 2025</div>
-            <p class="comment-text">I never thought a soap dispenser could make me feel good about my bathroom until I actually bought a nice one. It sounds silly but it genuinely changed how I feel about getting ready in the morning. Urban Nest is right — it really is the small things.</p>
+            <p class="comment-text">I never thought a soap dispenser could make me feel good about my bathroom until I actually bought a nice one. It sounds silly but it genuinely changed how I feel about getting ready in the morning. Urban Nest is right, it really is the small things.</p>
             <button class="comment-like" onclick="likeComment(this)">♡ <span>24</span></button>
           </div>
         </div>
@@ -613,7 +621,7 @@
   <div class="newsletter">
     <div class="newsletter-tag">STAY IN THE LOOP</div>
     <h2 class="newsletter-title">The Nest Edit,<br/><em>in your inbox.</em></h2>
-    <p class="newsletter-sub">New articles, décor guides, and curated finds — every two weeks.</p>
+    <p class="newsletter-sub">New articles, décor guides, and curated finds, every two weeks.</p>
     <div class="newsletter-form">
       <input type="email" class="newsletter-input" id="nlEmail" placeholder="your@email.com"/>
       <button class="newsletter-btn" id="nlBtn" onclick="quickSubscribe()">SUBSCRIBE →</button>

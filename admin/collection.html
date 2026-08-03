@@ -43,6 +43,17 @@
   input, textarea, select { padding: 11px 14px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black); outline: none; transition: border-color 0.2s; resize: vertical; }
   input:focus, textarea:focus, select:focus { border-color: var(--gold); }
   textarea { min-height: 100px; }
+  .hint { font-size: 11px; color: var(--grey); line-height: 1.5; }
+  /* the URL field and its uploader read as one control */
+  .field-row { display: flex; gap: 10px; align-items: stretch; }
+  .field-row input { flex: 1; min-width: 0; }
+  .field-row .btn { white-space: nowrap; padding: 11px 20px; border: 0.5px solid var(--border); }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  /* label / value pairs, same control as the 3D Products page */
+  .spec-row { display: grid; grid-template-columns: 1fr 1fr 28px; gap: 6px; margin-bottom: 6px; }
+  .spec-remove { border: 0.5px solid var(--border); background: transparent; color: var(--grey); cursor: pointer; font-size: 13px; transition: all 0.2s; }
+  .spec-remove:hover { color: #c0392b; border-color: rgba(192,57,43,0.4); }
+  .add-spec { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; background: none; border: none; color: var(--gold); cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 4px 0; }
   .form-actions { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
   .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
   .btn-primary { background: var(--black); color: var(--white); }
@@ -145,8 +156,13 @@
       </div>
       <div class="form-group full">
         <label for="itemModel">3D Model URL (optional)</label>
-        <input type="url" id="itemModel" placeholder="models/chandelier.glb"/>
-        <span style="font-size:11px;color:var(--grey);line-height:1.5">A <strong>.glb</strong> exported from Meshy, dropped into the site's <code>models/</code> folder. Shown as a rotatable object instead of a photo. No Spline scene needed.</span>
+        <div class="field-row">
+          <input type="url" id="itemModel" placeholder="https://…/storage/v1/object/public/models/chandelier.glb"/>
+          <button type="button" class="btn btn-secondary" id="modelUploadBtn"
+                  onclick="document.getElementById('modelFile').click()">Upload .glb</button>
+        </div>
+        <input type="file" id="modelFile" accept=".glb" style="display:none" onchange="uploadModel(this)"/>
+        <span class="hint" id="modelHint">A <strong>.glb</strong> exported from Meshy. Upload it here and it goes straight to Supabase Storage — no site deploy. Shown as a rotatable object instead of a photo.</span>
       </div>
       <div class="form-group">
         <label for="itemBuy">Buy Link (optional)</label>
@@ -155,6 +171,12 @@
       <div class="form-group">
         <label for="itemDescription">Description</label>
         <textarea id="itemDescription" placeholder="Short description of the product…"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Specifications</label>
+        <div id="specRows"></div>
+        <button type="button" class="add-spec" onclick="addSpecRow()">+ Add specification</button>
+        <span class="hint">Material, dimensions, bulb type, finish. Shown as a list on the piece's detail view.</span>
       </div>
     </div>
     <div class="form-actions">
@@ -227,17 +249,116 @@ function editItem(id) {
   document.getElementById('itemModel').value = item.model_url || '';
   document.getElementById('itemBuy').value = item.buy_link || '';
   document.getElementById('itemComingSoon').checked = !!item.coming_soon;
+  document.getElementById('specRows').innerHTML = '';
+  (Array.isArray(item.specs) ? item.specs : []).forEach(([k, v]) => addSpecRow(k, v));
   document.getElementById('formTitle').textContent = 'Edit Item';
   document.getElementById('resetBtn').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+/* ── SPECIFICATIONS ──────────────────────────────────────────────────
+   Stored as ordered [label, value] pairs rather than an object, so the
+   order you type them in is the order they show — same as the 3D
+   Products page, and the same jsonb shape.                            */
+function addSpecRow(k = '', v = '') {
+  const row = document.createElement('div');
+  row.className = 'spec-row';
+  row.innerHTML = `<input type="text" placeholder="Label (e.g. Material)" value="${String(k).replace(/"/g,'&quot;')}"/>
+    <input type="text" placeholder="Value (e.g. Crystal glass)" value="${String(v).replace(/"/g,'&quot;')}"/>
+    <button type="button" class="spec-remove" onclick="this.parentElement.remove()">×</button>`;
+  document.getElementById('specRows').appendChild(row);
+}
+
+function collectSpecs() {
+  return Array.from(document.querySelectorAll('#specRows .spec-row'))
+    .map(r => Array.from(r.querySelectorAll('input')).map(i => i.value.trim()))
+    .filter(([k, v]) => k || v);
+}
+
 function resetForm() {
-  ['editingId','itemName','itemPrice','itemImage','itemDescription'].forEach(id => document.getElementById(id).value = '');
+  ['editingId','itemName','itemPrice','itemImage','itemDescription','itemModel','itemBuy']
+    .forEach(id => document.getElementById(id).value = '');
   document.getElementById('itemCategory').value = 'living';
   document.getElementById('itemComingSoon').checked = true;
   document.getElementById('formTitle').textContent = 'Add Item';
   document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('modelHint').innerHTML = MODEL_HINT;
+  document.getElementById('specRows').innerHTML = '';
+}
+
+/* ── MODEL UPLOAD ────────────────────────────────────────────────────
+   The .glb goes to Supabase Storage rather than into the repo, so a new
+   piece never needs a site deploy — the same trade Spline makes, and the
+   rest of the collection is already data rather than code.            */
+const MODEL_BUCKET  = 'Models';   // capital M — matches the bucket as created
+const MODEL_WARN_MB = 8;
+const MODEL_HINT    = document.getElementById('modelHint').innerHTML;
+
+function slugify(s) {
+  return String(s || '').toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+}
+
+async function uploadModel(input) {
+  const file = input.files && input.files[0];
+  input.value = '';   // so picking the same file twice still fires change
+  if (!file) return;
+
+  if (!/\.glb$/i.test(file.name)) {
+    showToast('Export as .glb — a .gltf leaves its textures in separate files the viewer cannot reach', 'error');
+    return;
+  }
+
+  const mb = file.size / 1048576;
+  if (mb > MODEL_WARN_MB && !confirm(
+      `This file is ${mb.toFixed(1)} MB.\n\nA model downloads in full before the piece renders, so anything over ` +
+      `${MODEL_WARN_MB} MB is a long wait on a phone. Lower the texture resolution in Meshy and re-export ` +
+      `if you can.\n\nUpload it anyway?`)) return;
+
+  // Stamped name: every upload is its own immutable object, so it can be
+  // cached for a year and a re-export never serves stale behind a live URL.
+  const base = slugify(document.getElementById('itemName').value)
+            || slugify(file.name.replace(/\.glb$/i, ''))
+            || 'model';
+  const path = `${base}-${Date.now().toString(36)}.glb`;
+
+  const btn  = document.getElementById('modelUploadBtn');
+  const hint = document.getElementById('modelHint');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Uploading…';
+  hint.textContent = `Uploading ${file.name} — ${mb.toFixed(1)} MB. Keep this tab open.`;
+
+  const { error } = await db.storage.from(MODEL_BUCKET).upload(path, file, {
+    contentType: 'model/gltf-binary',
+    cacheControl: '31536000',
+    upsert: false,
+  });
+
+  btn.disabled = false;
+  btn.textContent = label;
+
+  if (error) {
+    hint.innerHTML = MODEL_HINT;
+    showToast(storageError(error), 'error');
+    return;
+  }
+
+  const { data } = db.storage.from(MODEL_BUCKET).getPublicUrl(path);
+  document.getElementById('itemModel').value = data.publicUrl;
+  hint.textContent = `Uploaded ${path} — ${mb.toFixed(1)} MB. Publish or save the item to keep this link.`;
+  showToast('Model uploaded');
+}
+
+// Both likely failures are fixed in the Supabase dashboard, so name them
+// rather than passing the raw message through.
+function storageError(error) {
+  const m = (error && error.message) || '';
+  if (/bucket not found/i.test(m))        return 'No "models" bucket yet — create a public bucket called models in Supabase → Storage';
+  if (/row-level security|policy/i.test(m)) return 'The models bucket is rejecting uploads — add an INSERT policy for authenticated users';
+  if (/payload too large|exceeded|size/i.test(m)) return 'Rejected as too large — shrink the export, or raise the size limit on the models bucket';
+  if (/mime|content type/i.test(m))       return 'Rejected as the wrong file type — the models bucket accepts model/gltf-binary (.glb) only';
+  return 'Upload failed: ' + (m || 'unknown error');
 }
 
 async function saveItem(publish) {
@@ -252,6 +373,7 @@ async function saveItem(publish) {
     description: document.getElementById('itemDescription').value.trim() || null,
     model_url: document.getElementById('itemModel').value.trim() || null,
     buy_link: document.getElementById('itemBuy').value.trim() || null,
+    specs: collectSpecs(),
     coming_soon: document.getElementById('itemComingSoon').checked,
     published: publish,
   };
@@ -259,10 +381,12 @@ async function saveItem(publish) {
     ? db.from('collection_items').update(body).eq('id', id)
     : db.from('collection_items').insert(body);
   let { error } = await write(payload);
-  if (error && /model_url|buy_link/.test(error.message || '')) {
-    const { model_url, buy_link, ...rest } = payload;
+  // These columns arrive in separate migrations. If one has not been run,
+  // save what the table does have rather than losing the whole edit.
+  if (error && /model_url|buy_link|specs/.test(error.message || '')) {
+    const { model_url, buy_link, specs, ...rest } = payload;
     ({ error } = await write(rest));
-    if (!error) showToast('Saved — run admin/add-collection-3d.sql to store the model and buy link');
+    if (!error) showToast('Saved, but some fields were dropped — run add-collection-3d.sql and add-collection-specs.sql');
   }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
   showToast(publish ? 'Item published!' : 'Draft saved');

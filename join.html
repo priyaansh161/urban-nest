@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Join the Nest — Urban Nest</title>
+<title>Join the Nest · Urban Nest</title>
 <link rel="icon" type="image/png" href="favicon.png"/>
 <script>
   /* Applied before first paint so the page never flashes the wrong theme. */
@@ -19,8 +19,16 @@
 <script src="supabase.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); min-height: 100vh; transition: background 0.4s ease, color 0.4s ease; }
+  :root { --gold: #A37B3F; --gold-light: rgba(163,123,63,0.1); --white: #F5F7F6; --black: #0F1F22; --grey: #586366; --border: #D9E0DE; --bg: #EAEFED; }
+  /* ── WEIGHT ON COLOUR ──
+       Card and caption text sits on the teal or over photographs, where a
+       light weight goes muddy. */
+    .cat, .name, .price, .buy, .page-tag, .nav-links a, .badge3d, .badge-soon,
+    .d-cat, .d-price, .d-buy, .d-spec-k, .footer-logo, .nav-logo-text,
+    .pillar-title, .perk-text strong, .lobby-tag, .lobby-card-cta,
+    .view-chip, .dot-label { font-weight: 500; }
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); min-height: 100vh; transition: background 0.4s ease, color 0.4s ease; }
 
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 48px; display: flex; justify-content: space-between; align-items: center; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(12px); border-bottom: 0.5px solid var(--border); }
   .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
@@ -82,29 +90,29 @@
   /* ── THEME ────────────────────────────────────────────────────────
      --bg / --white are surfaces and --black is their text, so they swap
      between themes. --panel is a deliberately dark band and stays dark. */
-  :root { --panel: #111110; }
+  :root { --panel: #0E3238; }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --white: #0E0E0C;
-      --black: #F2F0EA;
-      --grey: #9C998F;
-      --border: #26251F;
+      --white: #080C0D;
+      --black: #EEF4F3;
+      --grey: #849090;
+      --border: #18211F;
       --bg: #131210;
-      --gold: #C9A87C;
-      --gold-light: rgba(201,168,124,0.12);
-      --panel: #171613;
+      --gold: #B5843C;
+      --gold-light: rgba(181,132,60,0.12);
+      --panel: #0D2B31;
     }
   }
   :root[data-theme="dark"] {
-    --white: #0E0E0C;
-    --black: #F2F0EA;
-    --grey: #9C998F;
-    --border: #26251F;
+    --white: #080C0D;
+    --black: #EEF4F3;
+    --grey: #849090;
+    --border: #18211F;
     --bg: #131210;
-    --gold: #C9A87C;
-    --gold-light: rgba(201,168,124,0.12);
-    --panel: #171613;
+    --gold: #B5843C;
+    --gold-light: rgba(181,132,60,0.12);
+    --panel: #0D2B31;
   }
 
   /* theme toggle */
@@ -150,7 +158,7 @@
   <div class="hero-left">
     <div class="hero-tag">Community · Early Access</div>
     <h1 class="hero-title">Be part of<br/>the <em>Nest.</em></h1>
-    <p class="hero-desc">Urban Nest is building something physical — curated home décor stores rooted in Indian design sensibility. Join our community and be the first to know when we open near you.</p>
+    <p class="hero-desc">Urban Nest is building something physical: curated home décor stores rooted in Indian design sensibility. Join our community and be the first to know when we open near you.</p>
     <div class="perks">
       <div class="perk">
         <div class="perk-icon">◈</div>
@@ -158,11 +166,11 @@
       </div>
       <div class="perk">
         <div class="perk-icon">◌</div>
-        <div class="perk-text"><strong>Store openings</strong> — know first when we open in your city</div>
+        <div class="perk-text"><strong>Store openings.</strong> Know first when we open in your city</div>
       </div>
       <div class="perk">
         <div class="perk-icon">✦</div>
-        <div class="perk-text"><strong>The Nest Edit</strong> — curated décor ideas, trends and inspiration delivered to you</div>
+        <div class="perk-text"><strong>The Nest Edit.</strong> Curated décor ideas, trends and inspiration delivered to you</div>
       </div>
     </div>
   </div>
@@ -198,9 +206,9 @@
                 <option value="Central Delhi">Central Delhi</option>
               </optgroup>
               <optgroup label="Noida">
-                <option value="Noida — City Centre">Noida — City Centre (Sector 18 area)</option>
-                <option value="Noida — Central">Noida — Central</option>
-                <option value="Noida — Expressway">Noida — Expressway</option>
+                <option value="Noida — City Centre">Noida, City Centre (Sector 18 area)</option>
+                <option value="Noida — Central">Noida, Central</option>
+                <option value="Noida — Expressway">Noida, Expressway</option>
                 <option value="Greater Noida West">Greater Noida West (Noida Extension)</option>
                 <option value="Greater Noida">Greater Noida</option>
               </optgroup>
@@ -231,7 +239,7 @@
                 <option value="Chandigarh">Chandigarh</option>
               </optgroup>
               <optgroup label="─────────────">
-                <option value="other">Other — not listed above</option>
+                <option value="other">Other (not listed above)</option>
               </optgroup>
             </select>
             <div id="otherAreaWrap">
@@ -244,7 +252,7 @@
           <input type="text" id="address" placeholder="e.g. Sector 50, near Metro Station"/>
         </div>
         <button class="submit-btn" type="submit" id="submitBtn">Join the Nest →</button>
-        <p class="privacy-note">We respect your privacy. No spam — ever. Your data helps us understand where our community lives so we can open stores near you.</p>
+        <p class="privacy-note">We respect your privacy. No spam, ever. Your data helps us understand where our community lives so we can open stores near you.</p>
       </form>
     </div>
 
@@ -265,7 +273,7 @@
   .jband img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .jband::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,7,0.55), transparent 60%); }
   .jband-line { position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(14px,2vw,26px); text-align: center;
-                font-family: 'Bodoni Moda', serif; font-style: italic; font-size: clamp(15px,1.9vw,24px); color: #FAFAF8; }
+                font-family: 'Bodoni Moda', serif; font-style: italic; font-size: clamp(15px,1.9vw,24px); color: #F5F7F6; }
 </style>
 
 
