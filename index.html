@@ -122,11 +122,45 @@
 
 
 
-    /* Photographs were chosen against a stone-and-gold palette. Until they are
-       reshot, a light grade settles them into the teal: a touch less
-       saturation, a touch warmer. Remove this block once the new set lands. */
-    .sp img, .ct img, .wstrip img, .room-fig img, .band img {
-      filter: saturate(0.94) sepia(0.05) contrast(1.02);
+    /* ═══════════════════════════════════════════
+       PHOTOGRAPHS ON TWO GROUNDS
+       The same image sits on #F5F7F6 by day and #061E23 by night. Left
+       alone, one that reads as calm on the ivory reads as a lightbox
+       against the teal — the eye adapts to the dark page and the photo
+       becomes the brightest thing on screen.
+       ═══════════════════════════════════════════ */
+    .sp img, .ct img, .wstrip img, .room-fig img, .band img { transition: filter 0.4s ease; }
+
+    /* TEMPORARY. The current set was shot for stone and gold, so it is
+       pulled cooler here. Delete this one rule when the new photographs
+       land; the dark-mode rule below is permanent and stays. */
+    .sp img, .ct img, .wstrip img, .room-fig img, .band img { filter: saturate(0.94) sepia(0.05) contrast(1.02); }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .sp img, .ct img, .wstrip img, .room-fig img, .band img {
+        filter: brightness(0.86) contrast(1.06) saturate(0.96);
+      }
+    }
+    :root[data-theme="dark"] .sp img, .ct img, .wstrip img, .room-fig img, .band img {
+      filter: brightness(0.86) contrast(1.06) saturate(0.96);
+    }
+
+    /* A drop shadow is how a tile gets an edge on a light page, and it is
+       invisible on a dark one. Swap it for a hairline inset at night so
+       photographs still stop somewhere instead of bleeding into the page. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) :is(.ct, .sp, .wstrip figure) {
+        box-shadow: inset 0 0 0 1px rgba(234,242,241,0.10);
+      }
+      :root:not([data-theme="light"]) :is(.ct, .sp, .wstrip figure):hover {
+        box-shadow: inset 0 0 0 1px rgba(234,242,241,0.18);
+      }
+    }
+    :root[data-theme="dark"] :is(.ct, .sp, .wstrip figure) {
+      box-shadow: inset 0 0 0 1px rgba(234,242,241,0.10);
+    }
+    :root[data-theme="dark"] :is(.ct, .sp, .wstrip figure):hover {
+      box-shadow: inset 0 0 0 1px rgba(234,242,241,0.18);
     }
 
     /* ═══════════════════════════════════════════
