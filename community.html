@@ -54,14 +54,14 @@
     }
     .page-hero-grid {
       position: absolute; inset: 0;
-      background-image: linear-gradient(rgba(238,244,243,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(238,244,243,0.03) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(234,242,241,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(234,242,241,0.03) 1px, transparent 1px);
       background-size: 80px 80px; pointer-events: none;
     }
     .hero-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: end; }
     .page-tag { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 20px; }
     .page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 400; line-height: 1.0; color: #F5F7F6; }
     .page-title em { font-style: italic; color: var(--gold); }
-    .page-sub { font-size: 14px; color: rgba(238,244,243,0.4); line-height: 1.9; max-width: 440px; align-self: end; padding-bottom: 8px; }
+    .page-sub { font-size: 14px; color: rgba(234,242,241,0.4); line-height: 1.9; max-width: 440px; align-self: end; padding-bottom: 8px; }
 
     /* FILTERS */
     .filters {
@@ -215,19 +215,19 @@
     .newsletter-tag { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 16px; }
     .newsletter-title { font-family: 'Bodoni Moda', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 400; color: #F5F7F6; margin-bottom: 12px; }
     .newsletter-title em { font-style: italic; color: var(--gold); }
-    .newsletter-sub { font-size: 14px; color: rgba(238,244,243,0.4); margin-bottom: 36px; }
+    .newsletter-sub { font-size: 14px; color: rgba(234,242,241,0.4); margin-bottom: 36px; }
     .newsletter-form { display: flex; gap: 0; max-width: 480px; margin: 0 auto; }
-    .newsletter-input { flex: 1; padding: 13px 20px; background: rgba(238,244,243,0.06); border: 0.5px solid rgba(238,244,243,0.15); color: #F5F7F6; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; }
-    .newsletter-input::placeholder { color: rgba(238,244,243,0.3); }
+    .newsletter-input { flex: 1; padding: 13px 20px; background: rgba(234,242,241,0.06); border: 0.5px solid rgba(234,242,241,0.15); color: #F5F7F6; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; }
+    .newsletter-input::placeholder { color: rgba(234,242,241,0.3); }
     .newsletter-btn { padding: 13px 24px; background: var(--gold); color: var(--black); font-size: 11px; font-weight: 500; letter-spacing: 0.15em; border: none; cursor: pointer; transition: opacity 0.2s; white-space: nowrap; }
     .newsletter-btn:hover { opacity: 0.85; }
 
-    footer { padding: 32px 48px; background: var(--panel); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid rgba(238,244,243,0.06); }
+    footer { padding: 32px 48px; background: var(--panel); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid rgba(234,242,241,0.06); }
     .footer-left { display: flex; align-items: center; gap: 12px; }
     .footer-icon { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; }
     .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
-    .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.18em; color: rgba(238,244,243,0.3); }
-    .footer-note { font-size: 11px; color: rgba(238,244,243,0.18); letter-spacing: 0.06em; }
+    .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.18em; color: rgba(234,242,241,0.3); }
+    .footer-note { font-size: 11px; color: rgba(234,242,241,0.18); letter-spacing: 0.06em; }
 
     /* ═══════════════════════════════════════════
        EDITORIAL GRID — one field, many spans.
@@ -424,23 +424,23 @@
 
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --white: #080C0D;
-        --black: #EEF4F3;
-        --grey: #849090;
-        --border: #18211F;
-        --grey-light: #141C1B;
-        --gold: #B5843C;
-        --panel: #0D2B31;
+        --white: #061E23;
+        --black: #EAF2F1;
+        --grey: #7F9295;
+        --border: #123037;
+        --grey-light: #0C272C;
+        --gold: #C2934D;
+        --panel: #0B343C;
       }
     }
     :root[data-theme="dark"] {
-      --white: #080C0D;
-      --black: #EEF4F3;
-      --grey: #849090;
-      --border: #18211F;
-      --grey-light: #141C1B;
-      --gold: #B5843C;
-      --panel: #0D2B31;
+      --white: #061E23;
+      --black: #EAF2F1;
+      --grey: #7F9295;
+      --border: #123037;
+      --grey-light: #0C272C;
+      --gold: #C2934D;
+      --panel: #0B343C;
     }
 
     /* theme toggle */

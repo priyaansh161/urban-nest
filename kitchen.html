@@ -68,7 +68,7 @@
     .dot-ring { width: 11px; height: 11px; border-radius: 50%; background: #2E8F92; opacity: 0.85; animation: pulse 2.4s ease-in-out infinite; transition: transform 0.22s ease, box-shadow 0.3s ease, opacity 0.22s ease, background 0.22s ease; }
     .dot:hover .dot-ring { transform: scale(1.45); opacity: 1; background: #4FBFC2; animation: none; box-shadow: 0 0 0 3px rgba(79,191,194,0.35), 0 0 20px 7px rgba(110,214,216,0.85); }
     @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(79,191,194,0.55)} 50%{box-shadow:0 0 0 8px rgba(79,191,194,0)} }
-    .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(238,244,243,0.95); color: #0F1F22; font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .dot-label { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: rgba(234,242,241,0.95); color: #0F1F22; font-size: 10px; letter-spacing: 0.08em; white-space: nowrap; padding: 3px 8px; border-radius: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
     .dot:hover .dot-label { opacity: 1; }
 
     #hint { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 20; display: none; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.15em; color: rgba(248,247,244,0.3); pointer-events: none; white-space: nowrap; transition: opacity 0.5s; }
@@ -115,9 +115,9 @@
     .panel-3d { width: 100%; height: 50vh; background: #0F1F22; flex-shrink: 0; position: relative; overflow: hidden; }
     #product-viewer-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
     .zoom-controls { position: absolute; bottom: 14px; right: 14px; z-index: 10; display: flex; flex-direction: column; gap: 4px; }
-    .zoom-btn { width: 32px; height: 32px; background: rgba(238,244,243,0.1); border: 0.5px solid rgba(238,244,243,0.2); color: #F5F7F6; font-size: 18px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .zoom-btn { width: 32px; height: 32px; background: rgba(234,242,241,0.1); border: 0.5px solid rgba(234,242,241,0.2); color: #F5F7F6; font-size: 18px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
     .zoom-btn:hover { background: rgba(163,123,63,0.2); border-color: #A37B3F; color: #A37B3F; }
-    .panel-3d-hint { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.1em; color: rgba(238,244,243,0.2); pointer-events: none; white-space: nowrap; }
+    .panel-3d-hint { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.1em; color: rgba(234,242,241,0.2); pointer-events: none; white-space: nowrap; }
 
     .panel-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
     .panel-tag { font-size: 10px; letter-spacing: 0.22em; color: #A37B3F; }
@@ -511,7 +511,7 @@
         panel3d.style.display = '';
         // a pale ground for dark products, dark for pale ones (only shows when
         // the product's Spline scene background is transparent)
-        panel3d.style.background = p.popup_bg === 'light' ? '#EEF4F3' : '#0F1F22';
+        panel3d.style.background = p.popup_bg === 'light' ? '#EAF2F1' : '#0F1F22';
         const viewer = document.createElement('spline-viewer');
         viewer.setAttribute('url', p.spline_url);
         viewer.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
