@@ -175,6 +175,26 @@
       .nav-links a { min-height: 44px; display: flex; align-items: center; }
       .hamburger { min-height: 34px; justify-content: center; }
     }
+
+    /* ── TILE RECEDE ──
+       The tile you point at steps back and shrinks rather than lifting, so
+       the rest of a grid appears to come forward without anything else
+       moving. Matches the homepage. Last in the sheet so it wins on source
+       order against the hover rules declared above. */
+    .item {
+      transition: transform .55s cubic-bezier(.16,.7,.2,1), filter .55s cubic-bezier(.16,.7,.2,1);
+      will-change: transform;
+    }
+    .item:hover {
+      transform: scale(0.938);
+      filter: saturate(1.06);
+    }
+    .buy, .d-buy { transition: transform .35s cubic-bezier(.16,.7,.2,1), background .25s, color .25s; }
+    .buy:hover,
+    .d-buy:hover { transform: scale(0.966); }
+    @media (prefers-reduced-motion: reduce) {
+      .item, .buy, .d-buy { transition: none !important; transform: none !important; }
+    }
   </style>
 </head>
 <body>

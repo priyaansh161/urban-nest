@@ -858,14 +858,30 @@
   .btn:hover .btn-arrow { transform: translateX(4px); }
   .btn-arrow { transition: transform .35s var(--ease); }
 
-  /* children of a revealed grid arrive one after another, not all at once */
-  .js .rv-stagger > * { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
-  .js .rv-stagger.in > * { opacity: 1; transform: none; }
+  /* Children of a revealed grid arrive one after another, not all at once.
+
+     Animated rather than transitioned, deliberately. A transition here sets
+     the `transition` property on the tile, which outranks the tiles' own rule
+     and replaces it — and the per-child delay then sits on the element for
+     good, so a later hover waited up to 420ms before it moved. That is why
+     the room tiles looked like they had no hover while the collection strip
+     did: that strip's direct children are the anchors, not the figures the
+     hover is on, so it never inherited either problem.
+
+     `backwards` fill applies the from-state during the delay and nothing
+     after it ends, leaving hover free to own transform again. */
+  /* :not(.in) matters. Once a group is revealed nothing forces opacity to 0
+     any more, so if the animation is prevented from running the content is
+     simply visible rather than stuck hidden. */
+  .js .rv-stagger:not(.in) > * { opacity: 0; }
+  .js .rv-stagger.in > * { animation: staggerIn .7s var(--ease) var(--sd, 0ms) backwards; }
+  @keyframes staggerIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
     .ct, .sp, .wstrip figure, .btn, .nav-join, .parx, .js .rv-stagger > * {
-      transition: none !important; transform: none !important;
+      transition: none !important; transform: none !important; animation: none !important;
     }
+    .js .rv-stagger > * { opacity: 1 !important; }
   }
 
     /* ── WEIGHT ON COLOUR ──
@@ -1313,7 +1329,11 @@
     if (!('IntersectionObserver' in window)) return;
 
     var io = new IntersectionObserver(function (es) {
-      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      });
     }, { threshold: 0.12 });
 
     var shots = [];
@@ -1322,7 +1342,7 @@
         if (!g.children.length) return;
         g.classList.add('rv-stagger');
         Array.prototype.forEach.call(g.children, function (c, i) {
-          c.style.transitionDelay = Math.min(i * 70, 420) + 'ms';
+          c.style.setProperty('--sd', Math.min(i * 70, 420) + 'ms');
         });
         io.observe(g);
       });
@@ -1349,6 +1369,15 @@
     }, { passive: true });
 
     wire();
+
+    /* Safety net, matching the one the reveal animations already have. The
+       stagger starts its children at opacity 0, so anything that stops the
+       observer firing — a background tab at load, an odd browser — would
+       leave a grid permanently blank. Nothing may stay invisible. */
+    setTimeout(function () {
+      document.querySelectorAll('.rv-stagger').forEach(function (g) { g.classList.add('in'); });
+    }, 2200);
+
     // The spaces and collection tiles arrive from Supabase after this runs.
     var mo = new MutationObserver(wire);
     ['.spaces-grid', '.collage-grid', '#collectGrid'].forEach(function (sel) {

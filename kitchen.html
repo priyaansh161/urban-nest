@@ -162,6 +162,25 @@
       /* 8px was below the point where a hint is worth printing */
       #controls { font-size: 9.5px; letter-spacing: 0.12em; }
     }
+
+    /* ── TILE RECEDE ──
+       The tile you point at steps back and shrinks rather than lifting, so
+       the rest of a grid appears to come forward without anything else
+       moving. Matches the homepage. Last in the sheet so it wins on source
+       order against the hover rules declared above. */
+    .lobby-card {
+      transition: transform .55s cubic-bezier(.16,.7,.2,1), filter .55s cubic-bezier(.16,.7,.2,1);
+      will-change: transform;
+    }
+    .lobby-card:hover {
+      transform: scale(0.938);
+      filter: saturate(1.06);
+    }
+    .view-chip { transition: transform .35s cubic-bezier(.16,.7,.2,1), background .25s, color .25s; }
+    .view-chip:hover { transform: scale(0.966); }
+    @media (prefers-reduced-motion: reduce) {
+      .lobby-card, .view-chip { transition: none !important; transform: none !important; }
+    }
   </style>
 </head>
 <body>

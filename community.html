@@ -481,6 +481,25 @@
     }
 
     @media (max-width: 768px) { .hamburger { min-height: 34px; min-width: 34px; justify-content: center; align-items: center; } }
+
+    /* ── TILE RECEDE ──
+       The tile you point at steps back and shrinks rather than lifting, so
+       the rest of a grid appears to come forward without anything else
+       moving. Matches the homepage. Last in the sheet so it wins on source
+       order against the hover rules declared above. */
+    .na, .featured-card, .article-card {
+      transition: transform .55s cubic-bezier(.16,.7,.2,1), filter .55s cubic-bezier(.16,.7,.2,1);
+      will-change: transform;
+    }
+    .na:hover,
+    .featured-card:hover,
+    .article-card:hover {
+      transform: scale(0.938);
+      filter: saturate(1.06);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .na, .featured-card, .article-card { transition: none !important; transform: none !important; }
+    }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
