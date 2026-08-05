@@ -488,7 +488,7 @@
        moving. Matches the homepage. Last in the sheet so it wins on source
        order against the hover rules declared above. */
     .na, .featured-card, .article-card {
-      transition: transform .55s cubic-bezier(.16,.7,.2,1), filter .55s cubic-bezier(.16,.7,.2,1);
+      transition: transform .55s cubic-bezier(.16,.7,.2,1), filter .55s cubic-bezier(.16,.7,.2,1), box-shadow .55s cubic-bezier(.16,.7,.2,1);
       will-change: transform;
     }
     .na:hover,
@@ -500,6 +500,21 @@
     @media (prefers-reduced-motion: reduce) {
       .na, .featured-card, .article-card { transition: none !important; transform: none !important; }
     }
+    /* -- ELEVATION --
+       A black shadow barely registers on the dark page, so the dark step
+       is deeper and carries a faint rim in the same declaration: shadow
+       for depth, rim so the tile has an edge to end on. Resting tiles sit
+       at lift-2 and drop to lift-1 as they recede. */
+    :root { --lift-1: 0 1px 2px rgba(8,8,7,.06), 0 4px 10px rgba(8,8,7,.05); --lift-2: 0 2px 6px rgba(8,8,7,.09), 0 18px 40px rgba(8,8,7,.14); }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --lift-1: inset 0 0 0 1px rgba(234,242,241,0.09), 0 1px 3px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.34); --lift-2: inset 0 0 0 1px rgba(234,242,241,0.11), 0 3px 10px rgba(0,0,0,0.54), 0 16px 38px rgba(0,0,0,0.44); }
+    }
+    :root[data-theme="dark"] { --lift-1: inset 0 0 0 1px rgba(234,242,241,0.09), 0 1px 3px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.34); --lift-2: inset 0 0 0 1px rgba(234,242,241,0.11), 0 3px 10px rgba(0,0,0,0.54), 0 16px 38px rgba(0,0,0,0.44); }
+
+    .na, .featured-card, .article-card { box-shadow: var(--lift-2); }
+    .na:hover,
+    .featured-card:hover,
+    .article-card:hover { box-shadow: var(--lift-1); }
   </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
