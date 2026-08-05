@@ -93,9 +93,18 @@
     .contact-note { font-size: 11px; color: var(--grey); margin-top: 6px; line-height: 1.6; }
 
     /* CLOSING */
-    .closing { padding: 100px 48px; background: var(--panel); text-align: center; }
-    .closing-quote { font-family: 'Bodoni Moda', serif; font-size: clamp(22px, 3.5vw, 38px); font-weight: 400; color: rgba(234,242,241,0.3); line-height: 1.5; max-width: 700px; margin: 0 auto 40px; }
-    .closing-quote em { color: #F5F7F6; font-style: italic; }
+    .closing { padding: clamp(48px, 6vw, 78px) 48px; background: var(--panel); text-align: center; }
+    .closing-quote {
+      font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400;
+      font-size: clamp(23px, 3.4vw, 44px); line-height: 1.24; letter-spacing: -0.005em;
+      color: #F5F7F6; max-width: 900px; margin: 0 auto; text-wrap: balance;
+    }
+    .closing-attr {
+      display: block; margin: clamp(10px, 1.1vw, 16px) 0 clamp(26px, 3vw, 38px);
+      font-style: normal; font-family: 'DM Sans', sans-serif; font-weight: 500;
+      font-size: 9.5px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(234,242,241,0.55);
+    }
     .back-home { display: inline-flex; align-items: center; gap: 12px; padding: 13px 36px; background: transparent; color: rgba(234,242,241,0.6); font-size: 11px; letter-spacing: 0.2em; text-decoration: none; border: 0.5px solid rgba(234,242,241,0.2); transition: all 0.3s; }
     .back-home:hover { background: var(--gold); color: var(--black); border-color: var(--gold); }
 
@@ -180,13 +189,28 @@
        of details, so the page is read by scrolling
        rather than by reading every word.
        ═══════════════════════════════════════════ */
-    .wband { position: relative; width: 100%; height: clamp(180px, 24vw, 340px); overflow: hidden; background: #0A0A09; }
-    .wband img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .wband::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,7,0.55), transparent 60%); }
+    /* The quote is the content, not a caption on the bottom edge, so the band
+       is only as tall as the words need. Matches the homepage. */
+    .wband {
+      position: relative; width: 100%; overflow: hidden; background: #0A0A09;
+      display: grid; place-items: center;
+      padding: clamp(26px, 3vw, 48px) 24px;
+      min-height: clamp(120px, 12vw, 190px);
+    }
+    .wband img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .wband::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,7,0.80), rgba(8,8,7,0.40)); }
+    .wband-quote { position: relative; z-index: 1; width: min(1100px, 100%); text-align: center; }
     .wband-line {
-      position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(16px, 2vw, 30px);
-      text-align: center; font-family: 'Bodoni Moda', serif; font-style: italic;
-      font-size: clamp(16px, 2vw, 26px); color: #F5F7F6;
+      display: block; text-wrap: balance;
+      font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400;
+      font-size: clamp(20px, 2.9vw, 40px); line-height: 1.24; letter-spacing: -0.005em;
+      color: #F5F7F6; text-shadow: 0 1px 20px rgba(0,0,0,0.5);
+    }
+    .wband-attr {
+      display: block; margin-top: clamp(9px, 1vw, 15px); font-style: normal;
+      font-family: 'DM Sans', sans-serif; font-weight: 500;
+      font-size: 9.5px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(245,247,246,0.55);
     }
     .wstrip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 1280px; margin: 0 auto; padding: 0 48px; }
     .wstrip figure { position: relative; overflow: hidden; aspect-ratio: 1 / 1; background: var(--grey-light); }
@@ -199,7 +223,7 @@
     }
     @media (max-width: 768px) {
       .wstrip { padding: 0 20px; gap: 8px; }
-      .wband { height: clamp(150px, 40vw, 220px); }
+      .wband { min-height: clamp(110px, 30vw, 170px); padding: clamp(22px, 6vw, 34px) 20px; }
     }
 
     @media (max-width: 768px) {
@@ -303,7 +327,10 @@
   <div class="wband">
     <!-- IMG: FULL-WIDTH BAND 1 — after "Where the idea began"  ·  swap the file below -->
     <img src="images/band-living.webp" alt="" loading="lazy" decoding="async"/>
-    <span class="wband-line">You should not need a five-lakh budget to feel at home.</span>
+    <blockquote class="wband-quote">
+      <span class="wband-line">"The home should be the treasure chest of living."</span>
+      <cite class="wband-attr">Le Corbusier</cite>
+    </blockquote>
   </div>
 
   <!-- OUR MISSION -->
@@ -322,7 +349,10 @@
   <div class="wband">
     <!-- IMG: FULL-WIDTH BAND 2 — after "Affordable luxury"  ·  swap the file below -->
     <img src="images/band-modern.webp" alt="" loading="lazy" decoding="async"/>
-    <span class="wband-line">Rooms you walk through, not pages you scroll.</span>
+    <blockquote class="wband-quote">
+      <span class="wband-line">"Form ever follows function."</span>
+      <cite class="wband-attr">Louis Sullivan</cite>
+    </blockquote>
   </div>
 
   <!-- OUR VISION -->
@@ -341,7 +371,10 @@
   <div class="wband">
     <!-- IMG: FULL-WIDTH BAND 3 — after "The Experience Nest"  ·  swap the file below -->
     <img src="images/band-warm.webp" alt="" loading="lazy" decoding="async"/>
-    <span class="wband-line">Touch, feel, and truly understand what you bring home.</span>
+    <blockquote class="wband-quote">
+      <span class="wband-line">"We shape our buildings; thereafter they shape us."</span>
+      <cite class="wband-attr">Winston Churchill</cite>
+    </blockquote>
   </div>
 
   <!-- WHAT WE ARE -->
@@ -408,7 +441,8 @@
 
   <!-- CLOSING -->
   <div class="closing">
-    <p class="closing-quote">"Your home is not a backdrop.<br/>It is <em>the story you tell every day.</em>"</p>
+    <blockquote class="closing-quote">"The ache for home lives in all of us."</blockquote>
+    <cite class="closing-attr">Maya Angelou</cite>
     <a href="index.html" class="back-home">← BACK TO HOME</a>
   </div>
 
