@@ -131,11 +131,6 @@
        ═══════════════════════════════════════════ */
     .sp img, .ct img, .wstrip img, .room-fig img, .band img { transition: filter 0.4s ease; }
 
-    /* TEMPORARY. The current set was shot for stone and gold, so it is
-       pulled cooler here. Delete this one rule when the new photographs
-       land; the dark-mode rule below is permanent and stays. */
-    .sp img, .ct img, .wstrip img, .room-fig img, .band img { filter: saturate(0.94) sepia(0.05) contrast(1.02); }
-
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) .sp img, .ct img, .wstrip img, .room-fig img, .band img {
         filter: brightness(0.86) contrast(1.06) saturate(0.96);

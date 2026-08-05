@@ -3,8 +3,12 @@
 # Local Netlify folder
 .netlify
 
-# Full-resolution originals. Only the optimised variants generated from these
-# belong in the repo — a multi-megabyte original would be deployed otherwise.
+# Full-resolution originals and photograph candidates. Only the cropped WebP
+# files sitting directly in images/ ship; every subfolder is working material.
+# 82 candidates arrived as 244 MB of JPG, and Netlify deploys whatever it is
+# not told to ignore, so this keeps them out of both the repo and the site.
+images/*/
+!images/source/
 images/source/*
 !images/source/README.md
 
