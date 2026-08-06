@@ -216,6 +216,11 @@
     .switch svg { width: 13px; height: 13px; display: block; }
     .switch button[aria-pressed="true"] svg { stroke: var(--white); }
     .nav-right { display: flex; align-items: center; gap: 16px; }
+    /* A fingertip covers about 34px. These measured 28x24 and 30 wide. */
+    @media (max-width: 768px) {
+      .switch button { width: 34px; height: 34px; }
+      .hamburger { min-width: 34px; min-height: 34px; align-items: center; justify-content: center; }
+    }
   </style>
 </head>
 <body>

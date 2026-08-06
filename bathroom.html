@@ -36,7 +36,24 @@
     .nav-links { display: flex; gap: 30px; list-style: none; pointer-events: all; }
     .nav-links a { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(248,247,244,0.55); text-decoration: none; font-weight: 500; transition: color 0.2s; }
     .nav-links a:hover { color: #F8F7F4; }
-    @media (max-width: 1000px) { .nav-links { display: none; } }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; pointer-events: all;
+                 background: rgba(10,10,10,0.45); border: 0.5px solid rgba(248,247,244,0.15);
+                 border-radius: 20px; padding: 10px 11px; min-width: 40px; min-height: 38px; align-items: center; justify-content: center; }
+    .hamburger span { display: block; width: 17px; height: 1.5px; background: #F8F7F4; transition: transform 0.3s, opacity 0.3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+    @media (max-width: 1000px) {
+      .hamburger { display: flex; }
+      .nav-links { display: none; position: fixed; top: 0; left: 0; right: 0;
+                   flex-direction: column; gap: 0; pointer-events: all;
+                   padding: 74px 20px 18px; background: rgba(8,14,15,0.97); backdrop-filter: blur(10px);
+                   border-bottom: 0.5px solid rgba(248,247,244,0.12); }
+      .nav-links.open { display: flex; }
+      .nav-links li { border-bottom: 0.5px solid rgba(248,247,244,0.10); }
+      .nav-links li:last-child { border-bottom: none; }
+      .nav-links a { display: block; padding: 15px 2px; font-size: 13px; letter-spacing: 0.12em; min-height: 34px; }
+    }
     /* The children need it too: `nav a, nav span` sets pointer-events:all, and a
        descendant re-enables hit-testing even when its parent disables it — so
        without this the faded-out links still swallow clicks over the drawer. */
@@ -219,6 +236,7 @@
     <div class="nav-right">
       <span class="nav-room-label">THE BATHROOM</span>
       <a href="index.html" class="back-btn">← ALL SPACES</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
@@ -634,5 +652,16 @@
     });
   </script>
 
+<script>
+  /* The room pages and join had no way to reach the menu on a phone. */
+  function toggleNav() {
+    var links = document.querySelector(".nav-links");
+    var btn = document.getElementById("hamburger");
+    if (!links || !btn) return;
+    var open = links.classList.toggle("open");
+    btn.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", String(open));
+  }
+</script>
 </body>
 </html>
