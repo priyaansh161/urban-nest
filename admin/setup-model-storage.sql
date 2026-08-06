@@ -19,12 +19,18 @@
 -- public = true so model-viewer can fetch by URL with no auth.
 -- 25 MB ceiling guards against an un-decimated Meshy export going up
 -- by accident; a good model is under 3 MB.
+--
+-- application/octet-stream is allowed alongside model/gltf-binary because a
+-- browser types an upload from the file extension, and Windows has no registry
+-- entry for .glb — so it sends "" and the bucket rejects a perfectly good
+-- model. The size limit is the guard that actually matters here.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('Models', 'Models', true, 26214400, array['model/gltf-binary'])
+values ('Models', 'Models', true, 26214400,
+        array['model/gltf-binary', 'application/octet-stream'])
 on conflict (id) do update
   set public             = true,
       file_size_limit    = 26214400,
-      allowed_mime_types = array['model/gltf-binary'];
+      allowed_mime_types = array['model/gltf-binary', 'application/octet-stream'];
 
 -- ── The policies ───────────────────────────────────────────────
 -- Wrapped in a block that picks its own admin test, because the whole

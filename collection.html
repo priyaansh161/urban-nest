@@ -125,21 +125,31 @@
     #detail.open { opacity: 1; pointer-events: all; }
     /* The object is the point of this page, so the stage takes the larger
        share of the sheet — the words fit comfortably in what is left. */
-    .sheet { width: min(1220px, 100%); max-height: 92vh; background: var(--white); overflow-y: auto;
+    /* The sheet itself never scrolls. A long specification list used to carry
+       the object off the top of the screen with it, which defeats the point of
+       a 3D view — you read the dimensions with nothing left to look at. Only
+       the words move now; the stage holds still beside them. */
+    .sheet { position: relative; width: min(1220px, 100%); max-height: 92vh; background: var(--white); overflow: hidden;
              display: grid; grid-template-columns: 1.45fr 1fr;
              transform: scale(.95) translateY(22px); opacity: 0; transition: transform .38s var(--ease), opacity .3s ease; }
     #detail.open .sheet { transform: none; opacity: 1; }
-    .sheet-close { position: absolute; top: 0; right: 0; width: 50px; height: 50px; border: none; background: var(--black);
-                   color: var(--white); font-size: 22px; cursor: pointer; z-index: 10; }
-    .sheet-close:hover { background: var(--gold); }
+    /* Bare mark, no filled square. A solid block in the corner reads as a
+       second piece of furniture in a sheet that is otherwise all whitespace. */
+    .sheet-close { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border: none; background: none;
+                   color: var(--grey); font-size: 26px; line-height: 1; cursor: pointer; z-index: 10;
+                   transition: color .25s, transform .25s var(--ease); }
+    .sheet-close:hover { color: var(--gold); transform: scale(1.15); }
 
-    .d-stage { position: relative; background: #0F1F22; min-height: 560px; }
+    .d-stage { position: relative; background: var(--stage-bg); min-height: 560px; --stage-bg: #0F1F22; }
+    /* Some pieces are dark enough to disappear against the teal.
+       The swatches let the object be read against either. */
+    .d-stage.light { --stage-bg: #F2F0EB; }
     .d-stage model-viewer { width: 100%; height: 100%; background: transparent; --poster-color: transparent;
                             opacity: 0; transition: opacity .8s ease; }
     .d-stage model-viewer.ready { opacity: 1; }
     /* the same brand poster the rooms use, for the same reason */
     .d-poster { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-                gap: 14px; background: #0F1F22; transition: opacity .6s ease; }
+                gap: 14px; background: var(--stage-bg); transition: opacity .6s ease; }
     .d-poster.gone { opacity: 0; pointer-events: none; }
     .d-mark { position: relative; width: 92px; height: 92px; }
     .d-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(163,123,63,.16);
@@ -150,8 +160,33 @@
     .d-hint { position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; font-size: 9px; letter-spacing: .18em;
               text-transform: uppercase; color: rgba(234,242,241,.35); pointer-events: none; opacity: 0; transition: opacity .5s; }
     .d-hint.show { opacity: 1; }
+    .d-stage.light .d-status,
+    .d-stage.light .d-hint { color: rgba(16,16,16,.42); }
 
-    .d-body { padding: 44px 40px; display: flex; flex-direction: column; gap: 14px; }
+    /* ── STAGE BACKGROUND SWATCHES ──
+       Two dots rather than a labelled switch: the choice is a colour, so the
+       control may as well be the colour. The pick is remembered, because a
+       visitor who needs the pale background needs it for every piece. */
+    .d-bg { position: absolute; top: 14px; left: 14px; z-index: 6; display: flex; gap: 7px;
+            padding: 6px; border-radius: 100px; background: rgba(128,128,128,.14); backdrop-filter: blur(6px); }
+    .d-bg-btn { width: 15px; height: 15px; padding: 0; border-radius: 50%; cursor: pointer;
+                border: .5px solid rgba(255,255,255,.28); transition: box-shadow .25s, transform .25s; }
+    .d-bg-btn:hover { transform: scale(1.12); }
+    .d-bg-btn[data-bg="dark"]  { background: #0F1F22; }
+    .d-bg-btn[data-bg="light"] { background: #F2F0EB; }
+    .d-bg-btn[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gold); }
+    .d-stage.light .d-bg-btn { border-color: rgba(0,0,0,.22); }
+
+    /* Capped at the sheet's own height so this column, and only this column,
+       is what scrolls. min-height:0 keeps the grid track from stretching to
+       the text instead of clipping it. */
+    .d-body { padding: 44px 40px; display: flex; flex-direction: column; gap: 14px;
+              max-height: 92vh; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+    .d-body::-webkit-scrollbar { width: 6px; }
+    .d-body::-webkit-scrollbar-track { background: transparent; }
+    .d-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .d-body::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+    .d-body { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
     .d-cat { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
     .d-name { font-family: 'Bodoni Moda', serif; font-size: clamp(26px, 3vw, 38px); font-weight: 400; line-height: 1.14; }
     .d-desc { font-size: 14.5px; line-height: 1.95; color: var(--grey); }
@@ -165,10 +200,17 @@
              background: var(--black); color: var(--white); font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
              text-decoration: none; border-radius: 100px; transition: background .25s; }
     .d-buy:hover { background: var(--gold); }
+    /* Stacked, there is no column to scroll on its own — so the sheet scrolls
+       again and the stage sticks to the top of it, which keeps the object in
+       view for the same reason the two-column layout does. */
     @media (max-width: 820px) {
-      .sheet { grid-template-columns: 1fr; }
-      .d-stage { min-height: 380px; aspect-ratio: 1/1; }
-      .d-body { padding: 28px 22px 34px; }
+      .sheet { grid-template-columns: 1fr; overflow-y: auto; }
+      .d-stage { min-height: 380px; aspect-ratio: 1/1; position: sticky; top: 0; z-index: 2; }
+      .d-body { padding: 28px 22px 34px; max-height: none; overflow: visible; background: var(--white); }
+      /* Stacked, the mark lands on the stage rather than on the page, so it
+         takes its colour from whichever background the swatches have set. */
+      .sheet-close { color: rgba(234,242,241,.72); }
+      .sheet:has(.d-stage.light) .sheet-close { color: rgba(16,16,16,.55); }
     }
 
     @media (max-width: 768px) {
@@ -272,6 +314,10 @@
     <div class="sheet" role="dialog" aria-modal="true">
       <button class="sheet-close" onclick="closeDetail()" aria-label="Close">×</button>
       <div class="d-stage" id="dStage">
+        <div class="d-bg" role="group" aria-label="Preview background">
+          <button type="button" class="d-bg-btn" data-bg="dark"  aria-pressed="true"  aria-label="Dark background" onclick="setStageBg('dark')"></button>
+          <button type="button" class="d-bg-btn" data-bg="light" aria-pressed="false" aria-label="Light background" onclick="setStageBg('light')"></button>
+        </div>
         <div class="d-poster" id="dPoster">
           <div class="d-mark"><span class="d-ring"></span><img src="logo-icon.png" alt=""/></div>
           <span class="d-status" id="dStatus">Preparing the 3D view</span>
@@ -376,6 +422,11 @@
     poster.classList.remove('gone');
     hint.classList.remove('show');
 
+    // A piece opened after a long one would otherwise inherit its scroll
+    // position and start halfway down the specifications.
+    var body = document.querySelector('.d-body');
+    if (body) body.scrollTop = 0;
+
     document.getElementById('detail').classList.add('open');
     document.body.style.overflow = 'hidden';
 
@@ -417,6 +468,21 @@
     stageEl.insertBefore(mv, poster);
     dViewer = mv;
   }
+
+  function setStageBg(mode) {
+    document.getElementById('dStage').classList.toggle('light', mode === 'light');
+    var dots = document.querySelectorAll('.d-bg-btn');
+    for (var i = 0; i < dots.length; i++)
+      dots[i].setAttribute('aria-pressed', String(dots[i].getAttribute('data-bg') === mode));
+    try { localStorage.setItem('un-stage-bg', mode); } catch (e) {}
+  }
+  // Restore the choice before the first piece is opened, so the sheet never
+  // flashes the other background on its way in.
+  (function () {
+    var saved;
+    try { saved = localStorage.getItem('un-stage-bg'); } catch (e) {}
+    if (saved === 'light') setStageBg('light');
+  })();
 
   function closeDetail() {
     document.getElementById('detail').classList.remove('open');

@@ -1,0 +1,64 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Verify a .glb</title>
+<!-- Open this file straight from the folder — double-click it. Pick a .glb and
+     watch it load. The point is the load event: a compressed model can pass
+     every numerical check, report the right triangle count and the right
+     bounding box, and still never appear on screen. That is exactly how the
+     meshopt chandelier stayed broken. Needs internet for model-viewer. -->
+<script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+  body { margin: 0; font: 15px/1.5 system-ui, sans-serif; background: #0f2b2b; color: #e8efee; }
+  header { padding: 20px 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  model-viewer { width: 100%; height: calc(100vh - 150px); background: #163636; }
+  #status { padding: 8px 24px 16px; font-variant-numeric: tabular-nums; }
+  .ok   { color: #7fe0b0; }
+  .bad  { color: #ff9a8c; }
+  .wait { color: #d8c48a; }
+</style>
+
+<header>
+  <input type="file" accept=".glb" id="pick">
+  <span id="meta"></span>
+</header>
+<div id="status" class="wait">Pick a .glb file.</div>
+<model-viewer id="mv" camera-controls auto-rotate shadow-intensity="1" exposure="1"></model-viewer>
+
+<script type="module">
+  const mv = document.getElementById('mv');
+  const status = document.getElementById('status');
+  const meta = document.getElementById('meta');
+  let timer;
+
+  const say = (text, cls) => { status.textContent = text; status.className = cls; };
+
+  document.getElementById('pick').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    clearTimeout(timer);
+    meta.textContent = `${file.name} — ${(file.size / 1048576).toFixed(2)} MB`;
+    say('Loading…', 'wait');
+    mv.src = URL.createObjectURL(file);
+
+    // A silent failure looks exactly like a slow load, so give it a deadline.
+    timer = setTimeout(() => {
+      if (status.className === 'wait')
+        say('Still nothing after 30s. Treat this as a failure — it is the meshopt symptom.', 'bad');
+    }, 30000);
+  });
+
+  mv.addEventListener('load', () => {
+    clearTimeout(timer);
+    const d = mv.getDimensions();
+    say(
+      `RENDERS. Dimensions ${d.x.toFixed(4)} × ${d.y.toFixed(4)} × ${d.z.toFixed(4)} — ` +
+      `compare these against the raw export; they should match to four decimals.`,
+      'ok'
+    );
+  });
+
+  mv.addEventListener('error', (e) => {
+    clearTimeout(timer);
+    say(`FAILED: ${e.detail?.type || 'unknown'}. If this says loadfailure, the file is meshopt-compressed — redo it with draco.`, 'bad');
+  });
+</script>

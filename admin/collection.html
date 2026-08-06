@@ -45,6 +45,18 @@
   textarea { min-height: 100px; }
   .hint { font-size: 11px; color: var(--grey); line-height: 1.5; }
   /* the URL field and its uploader read as one control */
+  /* The compress command, kept beside the upload button because that is the
+     one moment it is ever needed — a raw Meshy export uploaded straight from
+     the folder is 15–100 MB and downloads in full before the piece appears. */
+  .cmd { display: flex; align-items: stretch; gap: 0; margin-top: 8px; border: 0.5px solid var(--border); background: var(--bg); }
+  .cmd code { flex: 1; min-width: 0; padding: 9px 12px; font-family: Consolas, 'SF Mono', monospace; font-size: 10.5px;
+              line-height: 1.6; color: var(--black); overflow-x: auto; white-space: nowrap; }
+  .cmd code em { color: var(--gold); font-style: normal; }
+  .cmd-copy { border: none; border-left: 0.5px solid var(--border); background: transparent; color: var(--grey); cursor: pointer;
+              padding: 0 14px; font-family: 'DM Sans', sans-serif; font-size: 9px; letter-spacing: 0.14em;
+              text-transform: uppercase; transition: color 0.2s, background 0.2s; }
+  .cmd-copy:hover { color: var(--gold); background: var(--gold-light); }
+
   .field-row { display: flex; gap: 10px; align-items: stretch; }
   .field-row input { flex: 1; min-width: 0; }
   .field-row .btn { white-space: nowrap; padding: 11px 20px; border: 0.5px solid var(--border); }
@@ -163,6 +175,11 @@
         </div>
         <input type="file" id="modelFile" accept=".glb" style="display:none" onchange="uploadModel(this)"/>
         <span class="hint" id="modelHint">A <strong>.glb</strong> exported from Meshy. Upload it here and it goes straight to Supabase Storage — no site deploy. Shown as a rotatable object instead of a photo.</span>
+        <div class="cmd">
+          <code id="compressCmd">node "C:\Users\priya\OneDrive\Projects\urban-nest\tools\compress-model.mjs" "C:\Users\priya\OneDrive\Projects\urban-nest\models\source\<em>your-file-raw.glb</em>"</code>
+          <button type="button" class="cmd-copy" onclick="copyCmd(this)">Copy</button>
+        </div>
+        <span class="hint">Compress first — PowerShell, any folder. Swap in your filename. Writes the finished .glb to <strong>models\</strong>, typically 26 MB down to 1.6 MB, then check it renders with <strong>tools\verify.html</strong> before uploading here.</span>
       </div>
       <div class="form-group">
         <label for="itemBuy">Buy Link (optional)</label>
@@ -299,6 +316,28 @@ function slugify(s) {
     .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
 }
 
+function copyCmd(btn) {
+  const text = document.getElementById('compressCmd').textContent;
+  const done = () => {
+    btn.textContent = 'Copied';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 1600);
+  };
+  // clipboard.writeText needs a secure context; the fallback covers a plain
+  // http:// preview, where it is simply absent.
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(done, () => showToast('Could not copy — select the line by hand', 'error'));
+    return;
+  }
+  const scratch = document.createElement('textarea');
+  scratch.value = text;
+  scratch.style.cssText = 'position:fixed;top:-999px';
+  document.body.appendChild(scratch);
+  scratch.select();
+  try { document.execCommand('copy'); done(); }
+  catch (e) { showToast('Could not copy — select the line by hand', 'error'); }
+  scratch.remove();
+}
+
 async function uploadModel(input) {
   const file = input.files && input.files[0];
   input.value = '';   // so picking the same file twice still fires change
@@ -329,7 +368,15 @@ async function uploadModel(input) {
   btn.textContent = 'Uploading…';
   hint.textContent = `Uploading ${file.name} — ${mb.toFixed(1)} MB. Keep this tab open.`;
 
-  const { error } = await db.storage.from(MODEL_BUCKET).upload(path, file, {
+  // Re-wrapped in a Blob that declares its own type, because the contentType
+  // option below does nothing for a File: supabase-js puts Blobs into a
+  // FormData part and only applies contentType on the raw-body path, so the
+  // bucket sees whatever the browser guessed from the extension. Windows has
+  // no registry entry for .glb, so that is "" — and a bucket restricted to
+  // model/gltf-binary rejects it.
+  const body = new Blob([file], { type: 'model/gltf-binary' });
+
+  const { error } = await db.storage.from(MODEL_BUCKET).upload(path, body, {
     contentType: 'model/gltf-binary',
     cacheControl: '31536000',
     upsert: false,
