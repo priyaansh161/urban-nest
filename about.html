@@ -23,6 +23,7 @@
       --black: #0F1F22;
       --grey: #586366;
       --border: #D9E0DE;
+      --grey-light: #EAEFED;
     }
     /* ── WEIGHT ON COLOUR ──
        Card and caption text sits on the teal or over photographs, where a
@@ -77,7 +78,7 @@
     /* WHAT WE ARE GRID */
     .pillars-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 1px; margin-top: 8px; background: var(--border); }
     .pillar-card { background: var(--white); padding: 32px; transition: background 0.2s; }
-    .pillar-card:hover { background: #EAEFED; }
+    .pillar-card:hover { background: var(--grey-light); }
     .pillar-num { font-family: 'Bodoni Moda', serif; font-size: 32px; color: rgba(163,123,63,0.2); margin-bottom: 14px; }
     .pillar-title { font-size: 13px; font-weight: 500; color: var(--black); margin-bottom: 8px; letter-spacing: 0.02em; }
     .pillar-text { font-size: 13px; color: var(--grey); line-height: 1.8; }
@@ -85,7 +86,7 @@
     /* CONTACT */
     .contact-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; margin-top: 8px; background: var(--border); }
     .contact-card { background: var(--white); padding: 28px; transition: background 0.2s; }
-    .contact-card:hover { background: #EAEFED; }
+    .contact-card:hover { background: var(--grey-light); }
     .contact-icon { font-size: 18px; margin-bottom: 14px; color: var(--gold); }
     .contact-type { font-size: 9px; letter-spacing: 0.22em; color: var(--gold); margin-bottom: 8px; }
     .contact-value { font-size: 14px; color: var(--black); text-decoration: none; display: block; transition: color 0.2s; line-height: 1.5; }
