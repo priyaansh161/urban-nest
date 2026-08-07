@@ -16,6 +16,9 @@ images/source/*
 models/source/*
 !models/source/README.md
 
+# The deploy folder, assembled by tools/build-site.mjs. Generated, never edited.
+dist/
+
 # Local tooling. The scripts are committed, their dependencies are not —
 # sharp alone is ~100 MB, and Netlify deploys whatever it is not told to ignore.
 tools/node_modules/
