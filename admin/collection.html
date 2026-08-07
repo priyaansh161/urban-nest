@@ -66,6 +66,7 @@
   .cat-row-name { font-size: 13px; color: var(--black); }
   .cat-row-slug { font-family: Consolas, monospace; font-size: 10.5px; color: var(--grey); }
   .cat-row-sum { font-size: 11px; color: var(--grey); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cat-row-warn { font-size: 11px; color: #B4552F; margin-top: 4px; }
   .cat-row-actions { display: flex; gap: 6px; flex: none; }
   .cat-empty { padding: 22px 0; font-size: 12px; color: var(--grey); }
 
@@ -445,6 +446,11 @@ function renderCatGrid() {
       <div class="cat-row-main">
         <div class="cat-row-name">${c.name} <span class="cat-row-slug">${c.slug}</span></div>
         <div class="cat-row-sum">${c.summary ? c.summary : '<em>no summary</em>'} · ${n} piece${n === 1 ? '' : 's'}</div>
+        ${!c.published && n
+          // Easy to miss: the pieces are published, the category is not, and
+          // the site shows neither — no error anywhere to say so.
+          ? `<div class="cat-row-warn">${n} published piece${n === 1 ? ' is' : 's are'} hidden from the site while this category is a draft</div>`
+          : ''}
       </div>
       <span class="badge ${c.published ? 'badge-gold' : 'badge-grey'}">${c.published ? 'Live' : 'Draft'}</span>
       <div class="cat-row-actions">

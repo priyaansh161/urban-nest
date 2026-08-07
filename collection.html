@@ -75,6 +75,10 @@
        single grid of both says neither is worth dwelling on. Wider than a
        product tile — this is a door, not a listing. */
     .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 28px; }
+    /* display:grid above beats the browser's own [hidden] { display: none },
+       so hiding either of these needs saying again — without this the grid
+       kept its "Loading the collection…" line visible under the tiles. */
+    .grid[hidden], .cats[hidden] { display: none; }
     .cat-tile { display: flex; flex-direction: column; text-decoration: none; color: inherit;
                 border: .5px solid var(--border); background: var(--white); transition: border-color .3s; }
     .cat-tile:hover { border-color: var(--gold); }
@@ -559,13 +563,38 @@
      its photograph and paragraph above its pieces. Tiles are ordinary links,
      so the back button, a middle click and a shared URL all behave the way
      they look like they should, with no history handling of our own. */
+  /* A category with no photograph of its own still needs one. A tile showing
+     the logo on a flat panel reads as broken rather than as new, and the
+     category header is worse — a whole empty half of the screen. These are
+     photographs already in the project, chosen per slug; anything set in the
+     admin wins over them, and an unrecognised slug still gets something. */
+  var CAT_FALLBACK = {
+    chandeliers: 'images/tile-chandelier.webp',
+    lighting:    'images/det-pendants.webp',
+    sculptures:  'images/det-vase.webp',
+    artifacts:   'images/det-bowl.webp',
+    decor:       'images/det-jug.webp',
+    accessories: 'images/det-knobs.webp',
+    living:      'images/tile-living.webp',
+    bedroom:     'images/room-bedroom.webp',
+    bathroom:    'images/room-bath.webp',
+    kitchen:     'images/room-kitchen.webp',
+  };
+  var CAT_FALLBACK_ANY = 'images/tile-vase.webp';
+
+  function catImage(cat, which) {
+    var set = which === 'hero'
+      ? (cat.hero_image_url || cat.tile_image_url)
+      : (cat.tile_image_url || cat.hero_image_url);
+    return set || CAT_FALLBACK[cat.slug] || CAT_FALLBACK_ANY;
+  }
+
   function categoryTile(cat, count) {
-    var img = cat.tile_image_url || cat.hero_image_url;
+    var img = catImage(cat, 'tile');
     return '<a class="cat-tile" href="collection.html?c=' + encodeURIComponent(cat.slug) + '">' +
       '<div class="cat-tile-media">' +
-        (img
-          ? '<img src="' + esc(img) + '" alt="' + esc(cat.name) + '" loading="lazy" decoding="async"/>'
-          : '<span class="cat-tile-ph"><img src="favicon.png" alt="" aria-hidden="true"/></span>') +
+        '<img src="' + esc(img) + '" alt="' + esc(cat.name) + '" loading="lazy" decoding="async"' +
+        ' onerror="this.remove()"/>' +
         '<span class="cat-tile-count">' + count + (count === 1 ? ' piece' : ' pieces') + '</span>' +
       '</div>' +
       '<div class="cat-tile-body">' +
@@ -645,14 +674,16 @@
       hero.hidden = false;
       document.title = cat.name + ' · The Collection · Urban Nest';
 
-      var img = cat.hero_image_url || cat.tile_image_url;
+      var img = catImage(cat, 'hero');
       var media = document.getElementById('catHeroMedia');
-      if (img) {
-        document.getElementById('catHeroImg').src = img;
-      } else {
+      var heroImg = document.getElementById('catHeroImg');
+      heroImg.src = img;
+      // Only if even the fallback fails to load — a missing file, someone
+      // offline — rather than leaving half the header blank.
+      heroImg.onerror = function () {
         media.hidden = true;
         media.parentNode.classList.add('no-media');
-      }
+      };
 
       document.getElementById('catHeroName').textContent = cat.name;
       document.getElementById('catHeroAbout').textContent = cat.about || cat.summary || '';
