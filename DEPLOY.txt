@@ -1,0 +1,135 @@
+HOW TO PUT URBAN NEST LIVE
+==========================================================
+
+Live site:  https://storeurbannest.netlify.app
+Admin:      https://storeurbannest.netlify.app/admin/login.html
+
+
+STEP 1 — OPEN A TERMINAL IN THE PROJECT FOLDER
+----------------------------------------------------------
+
+Easiest way: open the folder
+
+    C:\Users\priya\OneDrive\Projects\urban-nest
+
+in File Explorer, click the address bar at the top, type
+
+    powershell
+
+and press Enter. A blue window opens, already in the right folder.
+
+(In VS Code it is Terminal > New Terminal, which also opens in the
+right folder. Either is fine.)
+
+To check you are in the right place, run:
+
+    dir
+
+You should see index.html, collection.html, admin, models, tools.
+
+
+STEP 2 — RUN THESE TWO COMMANDS, IN THIS ORDER
+----------------------------------------------------------
+
+    node tools/build-site.mjs
+
+    netlify deploy --prod --dir dist
+
+Copy one, press Enter, wait for it to finish, then the next.
+
+
+WHAT GOOD OUTPUT LOOKS LIKE
+----------------------------------------------------------
+
+The first command prints a short list and ends with something like:
+
+    dist/ - 64 files, 14.6 MB
+    Deploy it with:  netlify deploy --prod --dir dist
+
+The second takes 20-60 seconds and ends with:
+
+    Deploy complete
+    Production URL: https://storeurbannest.netlify.app
+
+If you see that, it is live. Open the site and press Ctrl+Shift+R
+to force a fresh copy rather than the one your browser saved.
+
+
+THE ONE RULE
+----------------------------------------------------------
+
+NEVER run:  netlify deploy --prod --dir .
+
+The dot means "this whole folder". Netlify then uploads everything
+on your disk - including models\source (raw Meshy exports, hundreds
+of MB) and images\source (the unedited photographs). Those were
+publicly downloadable from the live site until 7 Aug 2026.
+
+Netlify does NOT read .gitignore, and .netlifyignore does not work
+either. The only thing that keeps files off the site is that
+build-site.mjs did not copy them into dist.
+
+Always --dir dist. Never --dir .
+
+
+WHAT GOES INTO DIST
+----------------------------------------------------------
+
+build-site.mjs copies, by an allow list:
+
+    every .html at the top level        (index, collection, rooms...)
+    admin\*.html and admin\*.js         (not the .sql files)
+    images\*.webp and .png              (top level only, no subfolders)
+    models\*.glb                        (top level only, not source)
+    netlify.toml, supabase.js, favicon.png, logo-icon.png,
+    bathroom.splinecode
+
+IF YOU ADD A NEW PAGE OR A NEW KIND OF FILE and it does not appear
+on the live site, it is because it is not on that list. The list is
+the RULES block near the top of tools\build-site.mjs. Ask Claude, or
+add the extension yourself.
+
+
+THINGS THAT DO NOT NEED A DEPLOY
+----------------------------------------------------------
+
+Anything you change in the admin - products, categories, photos,
+3D models, blog posts - is stored in Supabase and is live the
+moment you save it. No deploy needed.
+
+Deploying is only for changes to the SITE ITSELF: pages, layout,
+styling, the admin screens.
+
+This matters because deploys use up Netlify credits and admin edits
+do not.
+
+
+IF SOMETHING GOES WRONG
+----------------------------------------------------------
+
+"netlify: command not found"
+    Run:  npm install -g netlify-cli
+
+"Not logged in" or it asks you to authorise
+    Run:  netlify login
+    A browser tab opens. Approve it, then try the deploy again.
+
+It deployed but the site looks unchanged
+    Hard refresh: Ctrl+Shift+R. If still unchanged, check you ran
+    step 1 first - deploying without rebuilding sends the old dist.
+
+A page or image is missing after deploying
+    It is not in the allow list. See WHAT GOES INTO DIST above.
+
+
+COMPRESSING A 3D MODEL (separate job, no deploy involved)
+----------------------------------------------------------
+
+    node "C:\Users\priya\OneDrive\Projects\urban-nest\tools\compress-model.mjs" "C:\Users\priya\OneDrive\Projects\urban-nest\models\source\your-file-raw.glb"
+
+Then open tools\verify.html, pick the file, check it renders.
+Then upload it in Admin > Collection with the Upload .glb button.
+That is a Supabase upload, so no deploy is needed for it either.
+
+The same command, with a Copy button, is in the admin under the
+3D Model URL field.
