@@ -45,6 +45,30 @@
   textarea { min-height: 100px; }
   .hint { font-size: 11px; color: var(--grey); line-height: 1.5; }
   /* the URL field and its uploader read as one control */
+  /* ── CATEGORIES ──
+     A disclosure rather than a panel: open it to set the collection up,
+     leave it shut on every visit after that. */
+  .cat-panel { background: var(--white); border: 0.5px solid var(--border); margin-bottom: 32px; }
+  .cat-panel > summary { padding: 18px 32px; cursor: pointer; list-style: none; display: flex; align-items: center; gap: 12px;
+                         font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  .cat-panel > summary::-webkit-details-marker { display: none; }
+  .cat-panel > summary::before { content: '+'; font-size: 15px; line-height: 1; color: var(--gold); width: 12px; }
+  .cat-panel[open] > summary::before { content: '−'; }
+  .cat-panel > summary:hover { color: var(--black); }
+  .cat-count { margin-left: auto; letter-spacing: 0.1em; text-transform: none; font-size: 11px; }
+  .cat-panel-body { padding: 0 32px 32px; border-top: 0.5px solid var(--border); padding-top: 24px; }
+
+  .cat-grid { margin-top: 28px; border-top: 0.5px solid var(--border); }
+  .cat-row { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-bottom: 0.5px solid var(--border); }
+  .cat-thumb { width: 54px; height: 40px; flex: none; background: var(--bg); border: 0.5px solid var(--border); overflow: hidden; }
+  .cat-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cat-row-main { flex: 1; min-width: 0; }
+  .cat-row-name { font-size: 13px; color: var(--black); }
+  .cat-row-slug { font-family: Consolas, monospace; font-size: 10.5px; color: var(--grey); }
+  .cat-row-sum { font-size: 11px; color: var(--grey); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cat-row-actions { display: flex; gap: 6px; flex: none; }
+  .cat-empty { padding: 22px 0; font-size: 12px; color: var(--grey); }
+
   /* The compress command, kept beside the upload button because that is the
      one moment it is ever needed — a raw Meshy export uploaded straight from
      the folder is 15–100 MB and downloads in full before the piece appears. */
@@ -135,6 +159,63 @@
     <p>Manage upcoming products and collection previews</p>
   </div>
 
+  <!-- Collapsed by default. Categories are set up once and then left alone,
+       while items are the daily job — open by default, this would push the
+       actual work below the fold every visit. -->
+  <details class="cat-panel" id="catPanel">
+    <summary>
+      <span>Categories</span>
+      <span class="cat-count" id="catCount"></span>
+    </summary>
+    <div class="cat-panel-body">
+      <div class="form-panel-title">
+        <span id="catFormTitle">Add Category</span>
+        <button class="btn btn-secondary" id="catResetBtn" onclick="resetCatForm()" style="display:none">Cancel Edit</button>
+      </div>
+      <input type="hidden" id="editingCatId"/>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="catName">Category Name</label>
+          <input type="text" id="catName" placeholder="e.g. Chandeliers" oninput="syncSlug()"/>
+        </div>
+        <div class="form-group">
+          <label for="catSlug">Slug</label>
+          <input type="text" id="catSlug" placeholder="chandeliers"/>
+          <span class="hint">Its address — <strong>collection.html?c=chandeliers</strong> — and the value stored on each item. Changing it on a live category detaches every piece already filed under it.</span>
+        </div>
+        <div class="form-group full">
+          <label for="catSummary">Summary</label>
+          <input type="text" id="catSummary" maxlength="150" placeholder="One line, e.g. Crystal, brass and glass, modelled close enough to count the drops"/>
+          <span class="hint">Sits under the name on the category tile. One line — it is a label, not an introduction.</span>
+        </div>
+        <div class="form-group full">
+          <label for="catAbout">About</label>
+          <textarea id="catAbout" rows="3" placeholder="A short paragraph shown beside the photograph at the top of the category's own page."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="catTileImage">Tile Image URL</label>
+          <input type="url" id="catTileImage" placeholder="https://…"/>
+          <span class="hint">The photograph on the tile, on the Collection page.</span>
+        </div>
+        <div class="form-group">
+          <label for="catHeroImage">Hero Image URL</label>
+          <input type="url" id="catHeroImage" placeholder="https://…"/>
+          <span class="hint">The wide photograph at the top of the category page. Falls back to the tile image.</span>
+        </div>
+        <div class="form-group">
+          <label for="catSort">Sort Order</label>
+          <input type="number" id="catSort" value="0" step="1"/>
+          <span class="hint">Low numbers first. Ties fall back to the name.</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary" onclick="saveCategory(false)">Save as Draft</button>
+        <button class="btn btn-primary" onclick="saveCategory(true)">Publish</button>
+      </div>
+      <div id="catGrid" class="cat-grid"></div>
+    </div>
+  </details>
+
   <div class="form-panel">
     <div class="form-panel-title">
       <span id="formTitle">Add Item</span>
@@ -148,15 +229,9 @@
       </div>
       <div class="form-group">
         <label for="itemCategory">Category</label>
-        <select id="itemCategory">
-          <option value="living">Living Room</option>
-          <option value="bedroom">Bedroom</option>
-          <option value="bathroom">Bathroom</option>
-          <option value="kitchen">Kitchen</option>
-          <option value="outdoor">Outdoor</option>
-          <option value="lighting">Lighting</option>
-          <option value="accessories">Accessories</option>
-        </select>
+        <!-- Filled from collection_categories. Empty until they load, so a
+             piece can never be filed under a category that does not exist. -->
+        <select id="itemCategory"></select>
       </div>
       <div class="form-group">
         <label for="itemPrice">Price / Range</label>
@@ -215,7 +290,11 @@
 
 <script>
 let items = [];
-(async () => { await requireAuth(); loadItems(); })();
+let categories = [];
+// Categories first: the item form's Category select is built from them, and
+// an item saved against a category that does not exist would vanish from the
+// site without any error to show for it.
+(async () => { await requireAuth(); await loadCategories(); loadItems(); })();
 
 async function loadItems() {
   const { data, error } = await db.from('collection_items')
@@ -223,6 +302,7 @@ async function loadItems() {
   if (error) { showToast('Failed to load items', 'error'); return; }
   items = data || [];
   renderGrid();
+  renderCatGrid();   // its per-category counts are read off items
 }
 
 function renderGrid() {
@@ -239,7 +319,7 @@ function renderGrid() {
           : '<span class="item-image-placeholder">No Image</span>'}
       </div>
       <div class="item-name">${item.name}</div>
-      <div class="item-cat">${item.category || ''}</div>
+      <div class="item-cat">${categoryName(item.category)}</div>
       ${item.price ? `<div class="item-price">${item.price}</div>` : ''}
       ${item.description ? `<div class="item-desc">${(item.description).slice(0,100)}${item.description.length > 100 ? '…' : ''}</div>` : ''}
       <div class="item-badges">
@@ -259,7 +339,7 @@ function editItem(id) {
   if (!item) return;
   document.getElementById('editingId').value = id;
   document.getElementById('itemName').value = item.name;
-  document.getElementById('itemCategory').value = item.category || 'living';
+  fillCategorySelect(item.category || '');
   document.getElementById('itemPrice').value = item.price || '';
   document.getElementById('itemImage').value = item.image_url || '';
   document.getElementById('itemDescription').value = item.description || '';
@@ -295,12 +375,193 @@ function collectSpecs() {
 function resetForm() {
   ['editingId','itemName','itemPrice','itemImage','itemDescription','itemModel','itemBuy']
     .forEach(id => document.getElementById(id).value = '');
-  document.getElementById('itemCategory').value = 'living';
+  fillCategorySelect(categories.length ? categories[0].slug : '');
   document.getElementById('itemComingSoon').checked = true;
   document.getElementById('formTitle').textContent = 'Add Item';
   document.getElementById('resetBtn').style.display = 'none';
   document.getElementById('modelHint').innerHTML = MODEL_HINT;
   document.getElementById('specRows').innerHTML = '';
+}
+
+/* ── CATEGORIES ──────────────────────────────────────────────────────
+   The link to an item is collection_items.category holding the slug, not
+   a foreign key. That is what the column already was, so nothing had to
+   be migrated — but it also means a rename of a slug silently detaches
+   its pieces, which is why the form says so and deleteCategory counts
+   first.                                                             */
+async function loadCategories() {
+  const { data, error } = await db.from('collection_categories')
+    .select('*').order('sort_order').order('name');
+  if (error) {
+    // The page is still usable for editing existing items without it.
+    showToast('Categories could not be loaded — run setup-collection-categories.sql', 'error');
+    categories = [];
+  } else {
+    categories = data || [];
+  }
+  renderCatGrid();
+  fillCategorySelect();
+}
+
+function categoryName(slug) {
+  const c = categories.find(x => x.slug === slug);
+  return c ? c.name : (slug || '');
+}
+
+function itemsIn(slug) {
+  return items.filter(i => (i.category || '') === slug).length;
+}
+
+function fillCategorySelect(selected) {
+  const sel = document.getElementById('itemCategory');
+  const keep = selected !== undefined ? selected : sel.value;
+  sel.innerHTML = categories.map(c =>
+    `<option value="${c.slug}">${c.name}${c.published ? '' : ' (draft)'}</option>`).join('');
+  // A piece filed under a slug with no category row — left over from the
+  // old hard-coded list — keeps its value rather than being silently moved.
+  if (keep && !categories.some(c => c.slug === keep)) {
+    sel.insertAdjacentHTML('afterbegin', `<option value="${keep}">${keep} — no category row</option>`);
+  }
+  if (keep) sel.value = keep;
+  if (!categories.length && !keep) {
+    sel.innerHTML = '<option value="">No categories yet — add one above</option>';
+  }
+}
+
+function renderCatGrid() {
+  document.getElementById('catCount').textContent =
+    categories.length ? `${categories.length} categor${categories.length === 1 ? 'y' : 'ies'}` : 'none yet';
+  const el = document.getElementById('catGrid');
+  if (!categories.length) {
+    el.innerHTML = '<div class="cat-empty">No categories yet. The Collection page shows nothing until at least one exists with a published piece in it.</div>';
+    return;
+  }
+  el.innerHTML = categories.map(c => {
+    const img = c.tile_image_url || c.hero_image_url;
+    const n = itemsIn(c.slug);
+    return `
+    <div class="cat-row">
+      <div class="cat-thumb">${img ? `<img src="${c.tile_image_url || c.hero_image_url}" alt="" onerror="this.remove()">` : ''}</div>
+      <div class="cat-row-main">
+        <div class="cat-row-name">${c.name} <span class="cat-row-slug">${c.slug}</span></div>
+        <div class="cat-row-sum">${c.summary ? c.summary : '<em>no summary</em>'} · ${n} piece${n === 1 ? '' : 's'}</div>
+      </div>
+      <span class="badge ${c.published ? 'badge-gold' : 'badge-grey'}">${c.published ? 'Live' : 'Draft'}</span>
+      <div class="cat-row-actions">
+        <button class="row-btn" onclick="editCategory('${c.id}')">Edit</button>
+        <button class="row-btn" onclick="toggleCatPublish('${c.id}', ${c.published})">${c.published ? 'Unpublish' : 'Publish'}</button>
+        <button class="row-btn danger" onclick="deleteCategory('${c.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Only while the slug is untouched or still matches the name — so a
+// deliberate slug survives further typing in the name field.
+function syncSlug() {
+  const slug = document.getElementById('catSlug');
+  if (document.getElementById('editingCatId').value) return;  // never on an edit
+  if (slug.dataset.touched === '1') return;
+  slug.value = slugify(document.getElementById('catName').value);
+}
+document.getElementById('catSlug').addEventListener('input', function () { this.dataset.touched = '1'; });
+
+function editCategory(id) {
+  const c = categories.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('editingCatId').value = id;
+  document.getElementById('catName').value = c.name || '';
+  document.getElementById('catSlug').value = c.slug || '';
+  document.getElementById('catSummary').value = c.summary || '';
+  document.getElementById('catAbout').value = c.about || '';
+  document.getElementById('catTileImage').value = c.tile_image_url || '';
+  document.getElementById('catHeroImage').value = c.hero_image_url || '';
+  document.getElementById('catSort').value = c.sort_order == null ? 0 : c.sort_order;
+  document.getElementById('catFormTitle').textContent = 'Edit Category';
+  document.getElementById('catResetBtn').style.display = '';
+  document.getElementById('catPanel').open = true;
+  document.getElementById('catName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function resetCatForm() {
+  ['editingCatId','catName','catSlug','catSummary','catAbout','catTileImage','catHeroImage']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('catSort').value = 0;
+  document.getElementById('catSlug').dataset.touched = '';
+  document.getElementById('catFormTitle').textContent = 'Add Category';
+  document.getElementById('catResetBtn').style.display = 'none';
+}
+
+async function saveCategory(publish) {
+  const name = document.getElementById('catName').value.trim();
+  const slug = slugify(document.getElementById('catSlug').value || name);
+  if (!name) { showToast('Give the category a name', 'error'); return; }
+  if (!slug) { showToast('Give the category a slug', 'error'); return; }
+
+  const id = document.getElementById('editingCatId').value;
+  const clash = categories.find(c => c.slug === slug && c.id !== id);
+  if (clash) { showToast(`"${slug}" is already used by ${clash.name}`, 'error'); return; }
+
+  // Renaming a slug leaves its pieces pointing at the old one, so move them
+  // in the same breath rather than letting them fall off the site.
+  const previous = id ? categories.find(c => c.id === id) : null;
+  const slugChanged = previous && previous.slug !== slug;
+  const affected = slugChanged ? itemsIn(previous.slug) : 0;
+  if (affected && !confirm(
+      `${affected} piece${affected === 1 ? ' is' : 's are'} filed under "${previous.slug}".\n\n` +
+      `Change the slug to "${slug}" and move ${affected === 1 ? 'it' : 'them'} across?`)) return;
+
+  const body = {
+    name,
+    slug,
+    summary: document.getElementById('catSummary').value.trim() || null,
+    about: document.getElementById('catAbout').value.trim() || null,
+    tile_image_url: document.getElementById('catTileImage').value.trim() || null,
+    hero_image_url: document.getElementById('catHeroImage').value.trim() || null,
+    sort_order: parseInt(document.getElementById('catSort').value, 10) || 0,
+    published: publish,
+  };
+
+  const { error } = id
+    ? await db.from('collection_categories').update(body).eq('id', id)
+    : await db.from('collection_categories').insert(body);
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+
+  if (affected) {
+    const { error: moveErr } = await db.from('collection_items')
+      .update({ category: slug }).eq('category', previous.slug);
+    if (moveErr) {
+      showToast(`Category saved, but its ${affected} piece${affected === 1 ? '' : 's'} could not be moved`, 'error');
+    }
+  }
+
+  showToast(id ? 'Category updated' : 'Category added');
+  resetCatForm();
+  await loadCategories();
+  loadItems();
+}
+
+async function toggleCatPublish(id, current) {
+  const { error } = await db.from('collection_categories').update({ published: !current }).eq('id', id);
+  if (error) { showToast('Could not change that', 'error'); return; }
+  showToast(current ? 'Category hidden' : 'Category published');
+  loadCategories();
+}
+
+async function deleteCategory(id) {
+  const c = categories.find(x => x.id === id);
+  if (!c) return;
+  const n = itemsIn(c.slug);
+  if (n) {
+    showToast(`${c.name} still holds ${n} piece${n === 1 ? '' : 's'} — move them first, or unpublish the category`, 'error');
+    return;
+  }
+  if (!confirm(`Delete the category "${c.name}"? It holds no pieces.`)) return;
+  const { error } = await db.from('collection_categories').delete().eq('id', id);
+  if (error) { showToast('Delete failed', 'error'); return; }
+  showToast('Category deleted');
+  if (document.getElementById('editingCatId').value === id) resetCatForm();
+  loadCategories();
 }
 
 /* ── MODEL UPLOAD ────────────────────────────────────────────────────

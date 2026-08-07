@@ -69,6 +69,51 @@
     .grid-wrap { max-width: 1280px; margin: 0 auto; padding: 56px 48px 90px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 28px; }
 
+    /* ── CATEGORY TILES ──
+       The Collection opens on these rather than on every piece at once. A
+       chandelier and a sculpture want to be looked at differently, and a
+       single grid of both says neither is worth dwelling on. Wider than a
+       product tile — this is a door, not a listing. */
+    .cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 28px; }
+    .cat-tile { display: flex; flex-direction: column; text-decoration: none; color: inherit;
+                border: .5px solid var(--border); background: var(--white); transition: border-color .3s; }
+    .cat-tile:hover { border-color: var(--gold); }
+    .cat-tile-media { position: relative; aspect-ratio: 3 / 2; background: var(--panel); overflow: hidden; }
+    .cat-tile-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cat-tile-ph { position: absolute; inset: 0; display: grid; place-items: center; }
+    .cat-tile-ph img { width: 44px; height: 44px; border-radius: 50%; opacity: .3; object-fit: cover; }
+    .cat-tile-count { position: absolute; bottom: 12px; left: 12px; font-size: 9px; letter-spacing: .2em;
+                      text-transform: uppercase; color: #061E23; background: rgba(234,242,241,.9);
+                      padding: 4px 10px; border-radius: 20px; }
+    .cat-tile-body { padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+    .cat-tile-name { font-family: 'Bodoni Moda', serif; font-size: 25px; font-weight: 400; line-height: 1.15; }
+    .cat-tile-sum { font-size: 13px; line-height: 1.8; color: var(--grey); flex: 1; }
+    .cat-tile-go { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+
+    /* ── CATEGORY HEADER ──
+       Replaces the page hero once a category is open: its photograph on one
+       side, what it holds on the other. */
+    .cat-hero { background: var(--panel); border-bottom: .5px solid var(--border); padding: 118px 48px 0; }
+    .cat-hero-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr;
+                      gap: 48px; align-items: center; padding-bottom: 56px; }
+    /* Without a photograph there is no second column to balance, and the
+       words would sit in the right-hand half against an empty left one. */
+    .cat-hero-inner.no-media { grid-template-columns: 1fr; }
+    .cat-hero-media { aspect-ratio: 16 / 10; background: #0F1F22; overflow: hidden; }
+    .cat-hero-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cat-back { display: inline-block; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+                color: rgba(234,242,241,.45); text-decoration: none; margin-bottom: 20px; transition: color .25s; }
+    .cat-back:hover { color: var(--gold); }
+    .cat-hero-count { display: block; margin-top: 22px; font-size: 10px; letter-spacing: .22em;
+                      text-transform: uppercase; color: var(--gold); }
+    @media (max-width: 900px) {
+      .cat-hero { padding: 100px 24px 0; }
+      .cat-hero-inner { grid-template-columns: 1fr; gap: 28px; padding-bottom: 40px; }
+      /* The words first on a phone — a photograph that fills the screen
+         before them makes the page feel like it starts below the fold. */
+      .cat-hero-media { order: 2; aspect-ratio: 3 / 2; }
+    }
+
     .item { display: flex; flex-direction: column; border: .5px solid var(--border); background: var(--white); transition: border-color .3s; }
     .item:hover { border-color: var(--gold); }
     /* The stage is dark so pale ceramics and brass both read against it. */
@@ -83,6 +128,7 @@
 
     .body { padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
     .cat { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+    .in-category .item .cat { display: none; }
     .name { font-family: 'Bodoni Moda', serif; font-size: 21px; font-weight: 400; line-height: 1.2; }
     .desc { font-size: 13px; line-height: 1.8; color: var(--grey); flex: 1; }
     .foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
@@ -296,7 +342,7 @@
     </div>
   </nav>
 
-  <div class="page-hero">
+  <div class="page-hero" id="pageHero">
     <div class="hero-inner">
       <div class="page-tag">SINGLE PIECES</div>
       <h1 class="page-title">The <em>Collection.</em></h1>
@@ -304,7 +350,20 @@
     </div>
   </div>
 
+  <header class="cat-hero" id="catHero" hidden>
+    <div class="cat-hero-inner">
+      <div class="cat-hero-media" id="catHeroMedia"><img id="catHeroImg" alt="" decoding="async"/></div>
+      <div>
+        <a class="cat-back" href="collection.html">← All categories</a>
+        <h1 class="page-title" id="catHeroName"></h1>
+        <p class="page-sub" id="catHeroAbout"></p>
+        <span class="cat-hero-count" id="catHeroCount"></span>
+      </div>
+    </div>
+  </header>
+
   <div class="grid-wrap">
+    <div class="cats" id="cats" hidden></div>
     <div class="grid" id="grid">
       <div class="empty">Loading the collection…</div>
     </div>
@@ -368,7 +427,7 @@
   function card(item) {
     return '<article class="item" data-id="' + esc(item.id) + '">' + stage(item) +
       '<div class="body">' +
-        (item.category ? '<span class="cat">' + esc(item.category) + '</span>' : '') +
+        (item.category ? '<span class="cat">' + esc(catLabel(item.category)) + '</span>' : '') +
         '<h2 class="name">' + esc(item.name) + '</h2>' +
         (item.description ? '<p class="desc">' + esc(item.description) + '</p>' : '<p class="desc"></p>') +
         '<div class="foot">' +
@@ -379,6 +438,9 @@
   }
 
   var ITEMS = {};
+  // Items store a slug. Everything a visitor reads should say the name.
+  var CAT_NAMES = {};
+  function catLabel(slug) { return CAT_NAMES[slug] || slug || ''; }
 
   // One listener for the whole grid, so cards carry an id rather than a
   // handler — no quoting of ids into markup, nothing to escape wrong.
@@ -395,7 +457,7 @@
   function openDetail(id) {
     var it = ITEMS[id];
     if (!it) return;
-    document.getElementById('dCat').textContent = it.category || '';
+    document.getElementById('dCat').textContent = catLabel(it.category);
     document.getElementById('dName').textContent = it.name || '';
     document.getElementById('dDesc').textContent = it.description || '';
 
@@ -492,30 +554,125 @@
   }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDetail(); });
 
+  /* ── THE TWO VIEWS ──
+     No query string: a tile per category. ?c=slug: that category's own page,
+     its photograph and paragraph above its pieces. Tiles are ordinary links,
+     so the back button, a middle click and a shared URL all behave the way
+     they look like they should, with no history handling of our own. */
+  function categoryTile(cat, count) {
+    var img = cat.tile_image_url || cat.hero_image_url;
+    return '<a class="cat-tile" href="collection.html?c=' + encodeURIComponent(cat.slug) + '">' +
+      '<div class="cat-tile-media">' +
+        (img
+          ? '<img src="' + esc(img) + '" alt="' + esc(cat.name) + '" loading="lazy" decoding="async"/>'
+          : '<span class="cat-tile-ph"><img src="favicon.png" alt="" aria-hidden="true"/></span>') +
+        '<span class="cat-tile-count">' + count + (count === 1 ? ' piece' : ' pieces') + '</span>' +
+      '</div>' +
+      '<div class="cat-tile-body">' +
+        '<h2 class="cat-tile-name">' + esc(cat.name) + '</h2>' +
+        (cat.summary ? '<p class="cat-tile-sum">' + esc(cat.summary) + '</p>' : '<p class="cat-tile-sum"></p>') +
+        '<span class="cat-tile-go">View the pieces →</span>' +
+      '</div></a>';
+  }
+
   (function load() {
     var grid = document.getElementById('grid');
-    var ask = function (cols) {
+    var catsEl = document.getElementById('cats');
+    var slug = new URLSearchParams(location.search).get('c') || '';
+
+    var askItems = function (cols) {
       return db.from('collection_items').select(cols)
         .eq('published', true).order('sort_order').order('created_at');
     };
     // model_url / buy_link are optional columns — fall back to the ones that
     // have always existed if add-collection-3d.sql has not been run yet.
-    ask('*').then(function (r) {
-      if (r.error) { return ask('id,name,category,price,image_url,description,coming_soon').then(paint, fail); }
-      paint(r);
+    var items = askItems('*').then(function (r) {
+      if (r.error) return askItems('id,name,category,price,image_url,description,coming_soon');
+      return r;
+    });
+    // Categories are optional in the same way: before
+    // setup-collection-categories.sql is run there is no table, and the page
+    // should still list every piece rather than show nothing at all.
+    var cats = db.from('collection_categories').select('*')
+      .eq('published', true).order('sort_order').order('name')
+      .then(function (r) { return r.error ? { data: [] } : r; }, function () { return { data: [] }; });
+
+    Promise.all([items, cats]).then(function (res) {
+      var rows = (res[0] && res[0].data) || [];
+      var cs   = (res[1] && res[1].data) || [];
+      if (res[0] && res[0].error) return fail();
+
+      ITEMS = {};
+      rows.forEach(function (it) { ITEMS[it.id] = it; });
+      cs.forEach(function (c) { CAT_NAMES[c.slug] = c.name; });
+
+      var counts = {};
+      rows.forEach(function (it) { counts[it.category || ''] = (counts[it.category || ''] || 0) + 1; });
+
+      var current = null;
+      for (var i = 0; i < cs.length; i++) if (cs[i].slug === slug) current = cs[i];
+
+      if (slug && current) return paintCategory(current, rows.filter(function (it) {
+        return (it.category || '') === slug;
+      }));
+
+      // An unknown or unpublished slug is not an error worth a message — the
+      // category was probably taken down. Show the doors instead.
+      if (!cs.length) return paintAll(rows);
+      paintTiles(cs, counts, rows);
     }, fail);
 
     function fail() {
       grid.innerHTML = '<div class="empty">The collection could not be loaded just now.<br/>Please try again shortly.</div>';
     }
-    function paint(r) {
-      var rows = (r && r.data) || [];
+
+    // Categories exist: the landing view is the tiles. A category holding
+    // nothing published is left out rather than shown as an empty room.
+    function paintTiles(cs, counts, rows) {
+      var shown = cs.filter(function (c) { return (counts[c.slug] || 0) > 0; });
+      if (!shown.length) return paintAll(rows);
+      grid.hidden = true;
+      catsEl.hidden = false;
+      catsEl.innerHTML = shown.map(function (c) { return categoryTile(c, counts[c.slug] || 0); }).join('');
+    }
+
+    function paintCategory(cat, rows) {
+      // Every piece here shares the category, so repeating it above each
+      // name is noise the header has already covered.
+      document.body.classList.add('in-category');
+      document.getElementById('pageHero').hidden = true;
+      var hero = document.getElementById('catHero');
+      hero.hidden = false;
+      document.title = cat.name + ' · The Collection · Urban Nest';
+
+      var img = cat.hero_image_url || cat.tile_image_url;
+      var media = document.getElementById('catHeroMedia');
+      if (img) {
+        document.getElementById('catHeroImg').src = img;
+      } else {
+        media.hidden = true;
+        media.parentNode.classList.add('no-media');
+      }
+
+      document.getElementById('catHeroName').textContent = cat.name;
+      document.getElementById('catHeroAbout').textContent = cat.about || cat.summary || '';
+      document.getElementById('catHeroCount').textContent =
+        rows.length + (rows.length === 1 ? ' piece' : ' pieces');
+
+      if (!rows.length) {
+        grid.innerHTML = '<div class="empty">Nothing in this category just yet.<br/>Check back very soon.</div>';
+        return;
+      }
+      grid.innerHTML = rows.map(card).join('');
+    }
+
+    // No categories set up at all, or none of them holds anything: the page
+    // behaves exactly as it did before they existed.
+    function paintAll(rows) {
       if (!rows.length) {
         grid.innerHTML = '<div class="empty">The first pieces are being photographed and modelled.<br/>Check back very soon.</div>';
         return;
       }
-      ITEMS = {};
-      rows.forEach(function (it) { ITEMS[it.id] = it; });
       grid.innerHTML = rows.map(card).join('');
     }
   })();
