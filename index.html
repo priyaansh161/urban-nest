@@ -741,6 +741,19 @@
       font-family: 'Bodoni Moda', Didot, Georgia, serif;
       font-size: 13px; letter-spacing: 0.18em; color: var(--panel-dim);
     }
+    /* Said once, on every page that has a footer, because it is a claim about
+       everything on the site rather than about any one piece. order:-1 puts it
+       above the logo row: an admission printed under the copyright reads as
+       something being got out of the way. */
+    .footer-disclosure {
+      flex-basis: 100%; order: -1; max-width: 86ch;
+      padding-bottom: 20px; margin-bottom: 4px;
+      border-bottom: .5px solid rgba(234,242,241,.08);
+      font-size: 11.5px; line-height: 1.85; color: rgba(234,242,241,.34);
+      text-align: left;
+    }
+    .footer-disclosure a { color: var(--gold); text-decoration: none; white-space: nowrap; }
+    .footer-disclosure a:hover { text-decoration: underline; }
     .footer-note { font-size: 11px; }
 
     /* ═══════════════════════════════════════════
@@ -1101,6 +1114,13 @@
   <!-- ── FOOTER ── -->
   <footer>
     <div class="footer-inner shell">
+    <div class="footer-disclosure">
+      Every piece here is shown as a 3D model, built with AI assistance from the
+      maker&rsquo;s own photographs. It is a close likeness, not a photograph of the
+      object itself &mdash; colour, finish and scale can differ from what arrives.
+      Treat the specification and the retailer&rsquo;s own page as the final word.
+      <a href="about.html#renders">How we model things &rarr;</a>
+    </div>
       <div class="footer-left">
         <span class="footer-icon"><img src="logo-icon.png" alt=""/></span>
         <span class="footer-logo">URBAN NEST</span>

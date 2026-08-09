@@ -143,6 +143,11 @@
     .zoom-btn:hover { background: rgba(163,123,63,0.2); border-color: #A37B3F; color: #A37B3F; }
     .panel-3d-hint { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); font-size: 10px; letter-spacing: 0.1em; color: rgba(234,242,241,0.2); pointer-events: none; white-space: nowrap; }
 
+    /* The rooms have no footer to carry the site-wide note, so it sits at the
+       end of the panel — which is where a product is actually being looked at. */
+    .panel-render-note { font-size: 10.5px; line-height: 1.75; color: #7C8A8D; border-top: 0.5px solid #D9E0DE; padding-top: 14px; }
+    .panel-render-note a { color: #A37B3F; text-decoration: none; }
+    .panel-render-note a:hover { text-decoration: underline; }
     .panel-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
     .panel-tag { font-size: 10px; letter-spacing: 0.22em; color: #A37B3F; }
     .panel-name { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; color: #0F1F22; line-height: 1.15; }
@@ -289,6 +294,10 @@
       <div class="divider"></div>
       <div class="specs" id="p-specs"></div>
       <p class="similar-note">Similar style · Available in India</p>
+      <p class="panel-render-note">Shown as a 3D model built with AI assistance from the
+      maker&rsquo;s photographs &mdash; a close likeness, not the object itself. Colour, finish
+      and scale can differ from what arrives.
+      <a href="about.html#renders">How we model things &rarr;</a></p>
       <a class="btn-similar" id="p-buy" href="#" target="_blank" rel="noopener sponsored">SHOP ON AMAZON →</a>
     </div>
   </div>
