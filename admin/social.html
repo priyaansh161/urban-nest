@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Social — Urban Nest Admin</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  .studio { display: grid; grid-template-columns: 320px 1fr; gap: 32px; align-items: start; }
+  .controls { background: var(--white); border: 0.5px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 22px; }
+  .ctrl-group { display: flex; flex-direction: column; gap: 8px; }
+  .ctrl-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  select, input[type="text"] { padding: 10px 12px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--black); outline: none; width: 100%; }
+  select:focus, input[type="text"]:focus { border-color: var(--gold); }
+  .hint { font-size: 10.5px; color: var(--grey); line-height: 1.6; }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { padding: 7px 13px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 10.5px; letter-spacing: 0.08em; color: var(--grey); cursor: pointer; transition: all 0.2s; }
+  .chip:hover { color: var(--black); border-color: var(--black); }
+  .chip[aria-pressed="true"] { background: var(--black); color: var(--white); border-color: var(--black); }
+  .swatches { display: flex; gap: 8px; }
+  .swatch { width: 30px; height: 30px; border-radius: 50%; border: 0.5px solid var(--border); cursor: pointer; padding: 0; transition: box-shadow 0.2s, transform 0.2s; }
+  .swatch:hover { transform: scale(1.1); }
+  .swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gold); }
+  .toggle-row { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--grey); cursor: pointer; }
+  .toggle-row input { accent-color: var(--gold); }
+  .toggle-row span.secs { margin-left: auto; font-size: 10.5px; color: var(--grey); }
+
+  .btn { padding: 12px 22px; border: none; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover:not(:disabled) { background: var(--gold); }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover:not(:disabled) { border-color: var(--black); color: var(--black); }
+  .btn:disabled { opacity: 0.45; cursor: default; }
+  .btn-row { display: flex; flex-direction: column; gap: 8px; }
+
+  /* ── STAGE ──
+     The model-viewer is what you see while setting up; the canvas takes over
+     for the preview and the export, because the canvas is what gets recorded. */
+  .stage-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  #stage { position: relative; overflow: hidden; aspect-ratio: 9 / 16; height: min(74vh, 800px);
+           background: #0F1F22; box-shadow: 0 14px 50px rgba(17,17,16,0.16); }
+  #mv { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
+  #sheet { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+  #stage.showing-canvas #sheet { display: block; }
+  #stage.showing-canvas #mv { visibility: hidden; }
+  .stage-meta { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); }
+
+  #busy { position: absolute; inset: 0; z-index: 5; display: none; flex-direction: column;
+          align-items: center; justify-content: center; gap: 16px; background: rgba(9,20,22,0.88); }
+  #busy.on { display: flex; }
+  .busy-text { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(245,247,246,0.7); }
+  .busy-bar { width: 62%; height: 2px; background: rgba(245,247,246,0.14); }
+  .busy-fill { height: 100%; width: 0%; background: var(--gold); transition: width 0.2s linear; }
+
+  .guide { background: var(--white); border: 0.5px solid var(--border); padding: 20px 24px; margin-top: 28px; }
+  .guide h2 { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 12px; font-weight: 500; }
+  .guide ol { margin-left: 18px; display: flex; flex-direction: column; gap: 7px; }
+  .guide li { font-size: 12.5px; line-height: 1.7; color: var(--grey); }
+  .guide strong { color: var(--black); }
+  .warn { color: #B4552F; }
+  @media (max-width: 1150px) { .studio { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Social</div>
+    <a href="social.html" class="nav-item active"><span class="icon">▣</span> Slideshow</a>
+    <a href="reel.html" class="nav-item"><span class="icon">▶</span> Turntable</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Slideshow</h1>
+    <p>Builds a finished MP4 at Instagram's own resolution — no screen recording, nothing to crop</p>
+  </div>
+
+  <div class="studio">
+    <div class="controls">
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="pick">Piece</label>
+        <select id="pick"><option>Loading…</option></select>
+        <span class="hint" id="pickHint"></span>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Shape</span>
+        <div class="chips" id="ratios">
+          <button type="button" class="chip" data-w="1080" data-h="1920" aria-pressed="true">9:16 · 1080×1920</button>
+          <button type="button" class="chip" data-w="1080" data-h="1350" aria-pressed="false">4:5 · 1080×1350</button>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Ground</span>
+        <div class="swatches" id="grounds">
+          <button type="button" class="swatch" data-bg="#0F1F22" data-tone="dark"  style="background:#0F1F22" aria-pressed="true"  aria-label="Teal"></button>
+          <button type="button" class="swatch" data-bg="#101010" data-tone="dark"  style="background:#101010" aria-pressed="false" aria-label="Black"></button>
+          <button type="button" class="swatch" data-bg="#F2F0EB" data-tone="light" style="background:#F2F0EB" aria-pressed="false" aria-label="Bone"></button>
+          <button type="button" class="swatch" data-bg="#FFFFFF" data-tone="light" style="background:#FFFFFF" aria-pressed="false" aria-label="White"></button>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Scenes</span>
+        <label class="toggle-row"><input type="checkbox" id="scPhoto" checked/> Photograph <span class="secs">3.5s</span></label>
+        <label class="toggle-row"><input type="checkbox" id="scTurn" checked/> The piece turning <span class="secs">5s</span></label>
+        <label class="toggle-row"><input type="checkbox" id="scSpecs" checked/> Specification <span class="secs">4.5s</span></label>
+        <label class="toggle-row"><input type="checkbox" id="scClose" checked/> Name and price <span class="secs">3s</span></label>
+        <span class="hint" id="lenHint"></span>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="nameOverride">Name in the video</label>
+        <input type="text" id="nameOverride" placeholder="Leave empty to shorten it automatically"/>
+        <span class="hint">Cut at the first comma or bracket by default, where the keyword stuffing starts.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="preview">Play a preview</button>
+        <button class="btn btn-primary" id="export">Export MP4</button>
+      </div>
+      <span class="hint" id="exportHint"></span>
+    </div>
+
+    <div class="stage-wrap">
+      <div id="stage">
+        <model-viewer id="mv" camera-controls shadow-intensity="0.9" auto-rotate auto-rotate-delay="0"
+                      rotation-per-second="30deg" interaction-prompt="none"></model-viewer>
+        <canvas id="sheet"></canvas>
+        <div id="busy">
+          <span class="busy-text" id="busyText">Working</span>
+          <div class="busy-bar"><div class="busy-fill" id="busyFill"></div></div>
+        </div>
+      </div>
+      <span class="stage-meta" id="meta"></span>
+    </div>
+  </div>
+
+  <div class="guide">
+    <h2>How this one works</h2>
+    <ol>
+      <li>Pick the piece. Drag the model to set the height and zoom the turn will use — the video starts from whatever angle you leave it at.</li>
+      <li><strong>Play a preview</strong> renders the whole thing in the frame at speed, so you can see it before committing.</li>
+      <li><strong>Export MP4</strong> captures the turn frame by frame, then records the slideshow to a real MP4 at full resolution. It runs in real time, so a 16-second video takes about 16 seconds plus the capture.</li>
+      <li>The file lands in <strong>Downloads</strong>. Upload it to Instagram as a Reel and add music there — the video is silent by design, since Instagram's audio library is where reels get their sound.</li>
+    </ol>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   A slideshow drawn onto a canvas at Instagram's exact pixel size,
+   then recorded off that canvas with MediaRecorder.
+
+   WHY NOT SCREEN RECORDING: a browser window is never 1080×1920, so
+   recording one always leaves a crop to guess at, and re-encodes an
+   already-compressed capture. Recording the canvas instead gives the
+   exact resolution, no crop, and one generation of encoding.
+
+   The one thing a canvas cannot do is read a WebGL canvas reliably
+   frame by frame, so the turning piece is captured to still frames
+   first — 48 of them, cross-faded on playback so the motion reads as
+   continuous rather than as a flick-book.
+   ═══════════════════════════════════════════════════════════════ */
+
+let pieces = [];
+let piece = null;
+let W = 1080, H = 1920;
+let ground = '#0F1F22', tone = 'dark';
+let turnFrames = [];          // ImageBitmaps of the model, one per angle
+let photo = null;             // the product photograph, or null
+let photoBlocked = false;     // loaded but unusable — see loadPhoto()
+let running = false;
+
+const FPS = 30;
+const TURN_FRAMES = 48;
+const SCENES = [
+  { id: 'scPhoto', key: 'photo', secs: 3.5 },
+  { id: 'scTurn',  key: 'turn',  secs: 5.0 },
+  { id: 'scSpecs', key: 'specs', secs: 4.5 },
+  { id: 'scClose', key: 'close', secs: 3.0 },
+];
+const FADE = 0.5;             // seconds of cross-fade between scenes
+
+const mv = document.getElementById('mv');
+const canvas = document.getElementById('sheet');
+const ctx = canvas.getContext('2d');
+
+(async () => { await requireAuth(); await load(); })();
+
+/* ── DATA ─────────────────────────────────────────────────────── */
+
+async function load() {
+  const { data, error } = await db.from('collection_items')
+    .select('id,name,price,category,description,image_url,model_url,specs')
+    .order('created_at', { ascending: false });
+  if (error) { showToast('Could not load the pieces', 'error'); return; }
+
+  pieces = data || [];
+  const sel = document.getElementById('pick');
+  if (!pieces.length) {
+    sel.innerHTML = '<option value="">Nothing in the collection yet</option>';
+    document.getElementById('export').disabled = true;
+    document.getElementById('preview').disabled = true;
+    return;
+  }
+  sel.innerHTML = pieces.map((p, i) =>
+    `<option value="${i}">${shorten(p.name, 56)}</option>`).join('');
+  sel.onchange = () => choose(pieces[sel.value]);
+  await choose(pieces[0]);
+}
+
+function shorten(s, n) {
+  s = String(s || '');
+  return s.length > n ? s.slice(0, n - 1) + '…' : s;
+}
+function reelName(name) {
+  return String(name || '').split(/[,(|]/)[0].trim();
+}
+function displayName() {
+  return document.getElementById('nameOverride').value.trim() || reelName(piece && piece.name);
+}
+function specRows() {
+  return (Array.isArray(piece && piece.specs) ? piece.specs : [])
+    .filter(s => s && (s[0] || s[1])).slice(0, 6);
+}
+
+async function choose(p) {
+  piece = p;
+  turnFrames = [];
+  photo = null;
+  photoBlocked = false;
+  document.getElementById('stage').classList.remove('showing-canvas');
+
+  document.getElementById('mv').removeAttribute('src');
+  if (p.model_url) mv.setAttribute('src', p.model_url);
+
+  const bits = [];
+  if (!p.model_url) bits.push('no 3D model — the turn scene will be skipped');
+  if (!p.image_url) bits.push('no photograph — that scene will be skipped');
+  if (!specRows().length) bits.push('no specifications — that scene will be skipped');
+  document.getElementById('pickHint').innerHTML =
+    bits.length ? '<span class="warn">' + bits.join(' · ') + '</span>' : 'Photograph, model and specifications all present.';
+
+  loadPhoto(p.image_url);
+  paintMeta();
+}
+
+/* Anonymous CORS on purpose: an image drawn without it taints the canvas,
+   and a tainted canvas cannot be recorded at all — the export would fail
+   with a SecurityError rather than merely look wrong. */
+function loadPhoto(url) {
+  if (!url) return;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => { photo = img; };
+  img.onerror = () => {
+    photoBlocked = true;
+    document.getElementById('pickHint').innerHTML =
+      '<span class="warn">The photograph would not load for export — its host does not allow it. That scene will be skipped.</span>';
+  };
+  img.src = url;
+}
+
+/* ── THE TURN, CAPTURED ───────────────────────────────────────── */
+
+async function captureTurn(onProgress) {
+  turnFrames = [];
+  if (!piece.model_url || !mv.loaded) return;
+
+  const orbit = mv.getCameraOrbit();          // keep the height and zoom set by hand
+  const wasAuto = mv.hasAttribute('auto-rotate');
+  mv.removeAttribute('auto-rotate');
+
+  // Rendered at full frame size so the stills are not upscaled later. It
+  // overflows its container for a moment, which #busy is covering.
+  const prev = { w: mv.style.width, h: mv.style.height };
+  mv.style.width = W + 'px';
+  mv.style.height = H + 'px';
+
+  const start = orbit.theta * 180 / Math.PI;
+  for (let i = 0; i < TURN_FRAMES; i++) {
+    const theta = start + (360 * i / TURN_FRAMES);
+    mv.cameraOrbit = `${theta}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
+    await mv.updateComplete;
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const blob = await mv.toBlob({ mimeType: 'image/webp', qualityArgument: 0.92 });
+    turnFrames.push(await createImageBitmap(blob));
+    onProgress((i + 1) / TURN_FRAMES);
+  }
+
+  mv.style.width = prev.w;
+  mv.style.height = prev.h;
+  mv.cameraOrbit = `${start}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
+  if (wasAuto) mv.setAttribute('auto-rotate', '');
+}
+
+/* ── DRAWING ──────────────────────────────────────────────────── */
+
+const INK   = () => tone === 'dark' ? '#F5F7F6' : '#14282B';
+const ACCENT = () => tone === 'dark' ? '#C2934D' : '#8A6A34';
+const DIM   = () => tone === 'dark' ? 'rgba(245,247,246,0.55)' : 'rgba(20,40,43,0.55)';
+const S = () => W / 1080;                    // one scale for every measurement
+
+function fill(colour) { ctx.fillStyle = colour; ctx.fillRect(0, 0, W, H); }
+
+function wrap(text, font, maxWidth) {
+  ctx.font = font;
+  const words = String(text || '').split(/\s+/);
+  const lines = [];
+  let line = '';
+  for (const word of words) {
+    const next = line ? line + ' ' + word : word;
+    if (ctx.measureText(next).width > maxWidth && line) { lines.push(line); line = word; }
+    else line = next;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function centred(lines, font, y, lh, colour) {
+  ctx.font = font; ctx.fillStyle = colour; ctx.textAlign = 'center';
+  lines.forEach((l, i) => ctx.fillText(l, W / 2, y + i * lh));
+  return y + lines.length * lh;
+}
+
+function tracked(text, font, y, colour, spacing) {
+  ctx.font = font; ctx.fillStyle = colour; ctx.textAlign = 'left';
+  const chars = String(text).split('');
+  const total = chars.reduce((w, c) => w + ctx.measureText(c).width + spacing, 0) - spacing;
+  let x = (W - total) / 2;
+  for (const c of chars) { ctx.fillText(c, x, y); x += ctx.measureText(c).width + spacing; }
+}
+
+function wordmark(y) {
+  tracked('URBAN NEST', `${28 * S()}px "Bodoni Moda", serif`, y, DIM(), 7 * S());
+}
+
+// object-fit: cover, by hand
+function cover(img, dx, dy, dw, dh, zoom) {
+  const scale = Math.max(dw / img.width, dh / img.height) * (zoom || 1);
+  const w = img.width * scale, h = img.height * scale;
+  ctx.drawImage(img, dx + (dw - w) / 2, dy + (dh - h) / 2, w, h);
+}
+
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+
+function drawPhoto(t, dur) {
+  fill(ground);
+  if (photo) {
+    // A slow push-in: a still photograph for three seconds reads as a stall.
+    cover(photo, 0, 0, W, H, 1 + 0.09 * (t / dur));
+    const g = ctx.createLinearGradient(0, H * 0.44, 0, H);
+    g.addColorStop(0, 'rgba(8,12,13,0)');
+    g.addColorStop(1, 'rgba(8,12,13,0.90)');
+    ctx.fillStyle = g; ctx.fillRect(0, H * 0.44, W, H * 0.56);
+  }
+  const a = Math.min(1, easeOut(t / 0.9));
+  ctx.globalAlpha = a;
+  if (piece.category) tracked(String(piece.category).toUpperCase(),
+    `500 ${20 * S()}px "DM Sans", sans-serif`, H - 300 * S(), '#C2934D', 6 * S());
+  const lines = wrap(displayName(), `600 ${68 * S()}px "Bodoni Moda", serif`, W - 150 * S());
+  centred(lines.slice(0, 3), `600 ${68 * S()}px "Bodoni Moda", serif`, H - 210 * S(), 78 * S(), '#F5F7F6');
+  ctx.globalAlpha = 1;
+}
+
+function drawTurn(t, dur) {
+  fill(ground);
+  if (turnFrames.length) {
+    // Cross-fade neighbouring stills so 48 frames read as continuous motion.
+    const pos = (t / dur) * turnFrames.length;
+    const i = Math.floor(pos) % turnFrames.length;
+    const j = (i + 1) % turnFrames.length;
+    const f = pos - Math.floor(pos);
+    ctx.drawImage(turnFrames[i], 0, 0, W, H);
+    ctx.globalAlpha = f;
+    ctx.drawImage(turnFrames[j], 0, 0, W, H);
+    ctx.globalAlpha = 1;
+  }
+  wordmark(90 * S());
+  tracked('TURN IT OVER', `500 ${19 * S()}px "DM Sans", sans-serif`, H - 96 * S(), DIM(), 6 * S());
+}
+
+function drawSpecs(t) {
+  fill(ground);
+  wordmark(90 * S());
+  const rows = specRows();
+  let y = H * 0.30;
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.5));
+  tracked('SPECIFICATION', `500 ${20 * S()}px "DM Sans", sans-serif`, y, ACCENT(), 6 * S());
+  ctx.globalAlpha = 1;
+  y += 90 * S();
+
+  rows.forEach((row, i) => {
+    // Each line arrives on its own beat, 0.32s apart.
+    const a = Math.min(1, Math.max(0, easeOut((t - 0.45 - i * 0.32) / 0.5)));
+    if (a <= 0) return;
+    ctx.globalAlpha = a;
+    const slide = (1 - a) * 24 * S();
+    ctx.textAlign = 'center';
+    ctx.font = `500 ${17 * S()}px "DM Sans", sans-serif`;
+    ctx.fillStyle = ACCENT();
+    ctx.fillText(String(row[0] || '').toUpperCase(), W / 2, y + slide);
+    const vals = wrap(row[1], `${34 * S()}px "Bodoni Moda", serif`, W - 200 * S()).slice(0, 2);
+    centred(vals, `${34 * S()}px "Bodoni Moda", serif`, y + 48 * S() + slide, 42 * S(), INK());
+    ctx.globalAlpha = 1;
+    y += 62 * S() + vals.length * 42 * S();
+  });
+}
+
+function drawClose(t) {
+  fill(ground);
+  const a = Math.min(1, easeOut(t / 0.7));
+  ctx.globalAlpha = a;
+  wordmark(H * 0.34);
+  const lines = wrap(displayName(), `600 ${64 * S()}px "Bodoni Moda", serif`, W - 170 * S());
+  let y = centred(lines.slice(0, 3), `600 ${64 * S()}px "Bodoni Moda", serif`, H * 0.44, 74 * S(), INK());
+  if (piece.price) {
+    tracked(String(piece.price).toUpperCase(), `500 ${26 * S()}px "DM Sans", sans-serif`, y + 46 * S(), ACCENT(), 5 * S());
+    y += 46 * S();
+  }
+  tracked('LINK IN BIO', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 96 * S(), DIM(), 6 * S());
+  ctx.globalAlpha = 1;
+}
+
+const DRAW = { photo: drawPhoto, turn: drawTurn, specs: drawSpecs, close: drawClose };
+
+/* ── TIMELINE ─────────────────────────────────────────────────── */
+
+function timeline() {
+  const on = [];
+  for (const s of SCENES) {
+    if (!document.getElementById(s.id).checked) continue;
+    if (s.key === 'photo' && (!piece.image_url || photoBlocked)) continue;
+    if (s.key === 'turn' && !piece.model_url) continue;
+    if (s.key === 'specs' && !specRows().length) continue;
+    on.push(s);
+  }
+  let at = 0;
+  return on.map(s => { const o = { ...s, start: at }; at += s.secs; return o; });
+}
+
+function totalSecs() {
+  const t = timeline();
+  return t.length ? t[t.length - 1].start + t[t.length - 1].secs : 0;
+}
+
+// Draws the whole composition at absolute time `time`, including the
+// cross-fade where two scenes overlap.
+function drawAt(time, tl) {
+  const cur = tl.find(s => time >= s.start && time < s.start + s.secs) || tl[tl.length - 1];
+  if (!cur) { fill(ground); return; }
+  const local = Math.min(time - cur.start, cur.secs);
+
+  const prev = tl[tl.indexOf(cur) - 1];
+  const into = local;
+  if (prev && into < FADE) {
+    DRAW[prev.key](prev.secs, prev.secs);       // outgoing, held on its last frame
+    ctx.globalAlpha = into / FADE;
+    DRAW[cur.key](local, cur.secs);
+    ctx.globalAlpha = 1;
+  } else {
+    DRAW[cur.key](local, cur.secs);
+  }
+}
+
+function paintMeta() {
+  const secs = totalSecs();
+  document.getElementById('meta').textContent = `${W}×${H} · ${secs.toFixed(1)}s · silent`;
+  document.getElementById('lenHint').textContent = secs
+    ? `${secs.toFixed(1)} seconds in total.`
+    : 'Every scene is either switched off or has nothing to show.';
+}
+
+/* ── RUNNING IT ───────────────────────────────────────────────── */
+
+function busy(on, text, pct) {
+  document.getElementById('busy').classList.toggle('on', on);
+  if (text) document.getElementById('busyText').textContent = text;
+  document.getElementById('busyFill').style.width = ((pct || 0) * 100).toFixed(1) + '%';
+}
+
+function sizeCanvas() {
+  canvas.width = W; canvas.height = H;
+}
+
+async function play(record) {
+  if (running) return;
+  const tl = timeline();
+  if (!tl.length) { showToast('Nothing to show — every scene is empty', 'error'); return; }
+
+  running = true;
+  document.getElementById('preview').disabled = true;
+  document.getElementById('export').disabled = true;
+  sizeCanvas();
+
+  try {
+    if (tl.some(s => s.key === 'turn')) {
+      // The model loads on its own schedule. Exporting before it arrives used
+      // to give a turn scene of empty ground with no hint as to why.
+      if (!mv.loaded) {
+        busy(true, 'Waiting for the model', 0);
+        await new Promise(r => {
+          const t = setTimeout(r, 25000);
+          if (mv.loaded) { clearTimeout(t); return r(); }
+          mv.addEventListener('load', () => { clearTimeout(t); r(); }, { once: true });
+        });
+      }
+      if (!mv.loaded) {
+        showToast('The model did not load — the turn will be left out', 'error');
+      } else {
+        busy(true, 'Capturing the turn', 0);
+        await captureTurn(p => busy(true, 'Capturing the turn', p));
+      }
+    }
+    // Canvas text silently falls back to a system serif if the webfont has
+    // not arrived, and it looks nothing like the site.
+    if (document.fonts) {
+      await Promise.all([
+        document.fonts.load(`600 68px "Bodoni Moda"`),
+        document.fonts.load(`400 34px "Bodoni Moda"`),
+        document.fonts.load(`500 20px "DM Sans"`),
+      ]).catch(() => {});
+    }
+
+    document.getElementById('stage').classList.add('showing-canvas');
+    busy(false);
+
+    let recorder = null, chunks = [], track = null;
+    if (record) {
+      const mime = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9']
+        .find(m => MediaRecorder.isTypeSupported(m));
+      if (!mime) { showToast('This browser cannot record video', 'error'); return; }
+      // captureStream(0) hands frame timing to us: every frame in the video is
+      // one we drew, rather than whatever the browser happened to sample.
+      const stream = canvas.captureStream(0);
+      track = stream.getVideoTracks()[0];
+      recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 9000000 });
+      recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      recorder.start();
+      document.getElementById('exportHint').textContent = 'Recording — keep this tab in front until it finishes.';
+    }
+
+    /* A hidden tab stops calling requestAnimationFrame, which used to leave
+       the whole thing wedged: no frames, no end, buttons disabled forever.
+       There is no way to render a canvas animation in a background tab.
+       Two guards, because they catch different cases: the listener catches a
+       tab that goes away mid-run, and the watchdog catches every other reason
+       the loop might stop being called — including a tab that was already in
+       the background when the run started, which fires no event at all. */
+    const total = totalSecs();
+    const t0 = performance.now();
+    let lastPush = -1;
+    let watchdog = null, onHide = null;
+
+    try {
+      await new Promise((done, fail) => {
+        const give_up = () => fail(new Error('__hidden'));
+        onHide = () => { if (document.hidden) give_up(); };
+        document.addEventListener('visibilitychange', onHide);
+        // Timers keep firing in a background tab even when frames do not.
+        watchdog = setInterval(() => {
+          if (performance.now() - t0 > (total + 4) * 1000) give_up();
+        }, 1000);
+
+        (function frame() {
+          const time = (performance.now() - t0) / 1000;
+          drawAt(Math.min(time, total - 0.001), tl);
+          if (track && time - lastPush >= 1 / FPS) { track.requestFrame(); lastPush = time; }
+          if (time >= total) { if (track) track.requestFrame(); return done(); }
+          requestAnimationFrame(frame);
+        })();
+      });
+    } finally {
+      clearInterval(watchdog);
+      document.removeEventListener('visibilitychange', onHide);
+    }
+
+    if (recorder) {
+      await new Promise(r => { recorder.onstop = r; recorder.stop(); });
+      const ext = recorder.mimeType.includes('mp4') ? 'mp4' : 'webm';
+      const blob = new Blob(chunks, { type: recorder.mimeType });
+      const slug = (displayName() || 'piece').toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${slug}-${W}x${H}.${ext}`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      document.getElementById('exportHint').textContent =
+        `Saved ${a.download} — ${(blob.size / 1048576).toFixed(1)} MB. It is in your Downloads.`;
+      showToast('Video exported');
+    }
+  } catch (err) {
+    // Both likely failures explain nothing from their own message.
+    const msg = String(err && err.message);
+    const why = msg === '__hidden'
+      ? 'Stopped because the tab went to the background — a canvas cannot render there. Nothing was saved; run it again and leave this tab in front.'
+      : /secur|taint/i.test(msg)
+      ? 'The photograph blocked the export — its host does not allow reuse. Switch that scene off and try again.'
+      : 'Export failed: ' + msg;
+    showToast(why, 'error');
+    document.getElementById('exportHint').textContent = why;
+  } finally {
+    busy(false);
+    running = false;
+    document.getElementById('preview').disabled = false;
+    document.getElementById('export').disabled = false;
+  }
+}
+
+/* ── CONTROLS ─────────────────────────────────────────────────── */
+
+function wireChips(groupId, after) {
+  document.getElementById(groupId).addEventListener('click', (e) => {
+    const btn = e.target.closest('.chip, .swatch');
+    if (!btn) return;
+    document.querySelectorAll('#' + groupId + ' [aria-pressed]')
+      .forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    after(btn);
+  });
+}
+
+wireChips('ratios', (btn) => {
+  W = Number(btn.dataset.w); H = Number(btn.dataset.h);
+  document.getElementById('stage').style.aspectRatio = W + '/' + H;
+  turnFrames = [];              // captured at the old size, useless now
+  sizeCanvas();
+  paintMeta();
+});
+
+wireChips('grounds', (btn) => {
+  ground = btn.dataset.bg; tone = btn.dataset.tone;
+  document.getElementById('stage').style.background = ground;
+  turnFrames = [];              // the stills carry the old ground behind them
+});
+
+SCENES.forEach(s => document.getElementById(s.id).addEventListener('change', paintMeta));
+document.getElementById('nameOverride').addEventListener('input', paintMeta);
+document.getElementById('preview').onclick = () => play(false);
+document.getElementById('export').onclick  = () => play(true);
+
+// Leaving the canvas up after a run hides the model you were posing.
+document.getElementById('stage').addEventListener('dblclick', () => {
+  if (!running) document.getElementById('stage').classList.remove('showing-canvas');
+});
+</script>
+</body>
+</html>
