@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Urban Nest · Curated Living Spaces</title>
   <link rel="icon" type="image/png" href="favicon.png"/>
-  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <!-- 600 is here for the hero line only: gold on a photograph needs the
+       extra weight to hold its edges, and 500 was not enough of a step. -->
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -409,18 +411,29 @@
       padding: 140px 0 clamp(52px, 7cqw, 104px);
       color: var(--panel-ink);
     }
+    /* The eyebrow sits high in the frame, above where the scrim has any
+       strength left, so on a pale photograph it was disappearing entirely.
+       Nearly solid now, with its own shadow — the line is too small and too
+       widely tracked to survive on colour alone. */
     .hero-eyebrow {
       display: block;
-      font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
-      color: rgba(244,242,233,0.62); margin-bottom: 20px;
+      font-size: 10.5px; font-weight: 500; letter-spacing: 0.34em; text-transform: uppercase;
+      color: rgba(244,242,233,0.95); margin-bottom: 20px;
+      text-shadow: 0 1px 14px rgba(8,8,7,0.75), 0 0 4px rgba(8,8,7,0.5);
     }
+    /* Three lines rather than two, so the ceiling comes down from 104px. The
+       shadow is what lets gold sit on a photograph: it is a mid-tone, and
+       against a pale wall it has almost no contrast of its own to spend. */
     .hero-type {
       font-family: 'Bodoni Moda', Didot, Georgia, serif;
-      font-weight: 400;
-      font-size: clamp(38px, 7.4cqw, 104px);
-      line-height: 0.96; letter-spacing: -0.025em;
-      max-width: 17ch;
-      color: var(--panel-ink);
+      font-weight: 600;
+      /* Sized so three lines occupy what two used to: at 82px the buttons
+         were pushed below the fold on a 900px-tall laptop. */
+      font-size: clamp(29px, 4.9cqw, 67px);
+      line-height: 1.0; letter-spacing: -0.02em;
+      max-width: 18ch;
+      color: var(--gold);
+      text-shadow: 0 2px 26px rgba(8,8,7,0.55), 0 1px 3px rgba(8,8,7,0.35);
     }
     .hero-type em { font-style: italic; color: var(--gold); }
 
@@ -993,11 +1006,12 @@
     <div class="hero-inner shell rv">
       <span class="hero-eyebrow">Curated living · India</span>
       <h1 class="hero-type">
-        <span class="mask"><span>Small things.</span></span>
-        <span class="mask"><span style="--d:110ms"><em>Big difference.</em></span></span>
+        <span class="mask"><span>Your space.</span></span>
+        <span class="mask"><span style="--d:110ms">Your imagination.</span></span>
+        <span class="mask"><span style="--d:220ms">Your Urban Nest.</span></span>
       </h1>
       <div class="hero-foot rv" style="--d:300ms">
-        <p class="hero-sub">Intentional living, beginning with the objects you choose every day.</p>
+        <p class="hero-sub">For the designer in you.</p>
         <div class="btn-row">
           <a href="#rooms" class="btn btn-solid">
             Explore spaces
