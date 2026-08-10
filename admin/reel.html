@@ -76,10 +76,27 @@
   #frame model-viewer { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
   .frame-meta { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); }
 
-  /* Overlays live inside the frame, so they are recorded with it. */
-  .ov-mark { position: absolute; top: 30px; left: 0; right: 0; text-align: center; z-index: 3;
+  /* Overlays live inside the frame, so they are recorded with it — and so
+     they have to dodge Instagram's own interface, which is drawn over the
+     video and does not move: the Reels header across the top, the account
+     name, caption and audio row across the bottom, and the buttons up the
+     right edge. Both of these used to sit inside those bands, which is why
+     "store.urbannest" landed on top of the product name. Percentages, so
+     they hold at 9:16, 4:5 and square alike. */
+  .ov-mark { position: absolute; top: 15%; left: 0; right: 0; text-align: center; z-index: 3;
              font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.3em; }
-  .ov-lower { position: absolute; bottom: 46px; left: 32px; right: 32px; z-index: 3; text-align: center; }
+  .ov-lower { position: absolute; top: 20%; left: 12%; right: 12%; z-index: 3; text-align: center; }
+
+  /* Shown while you set the shot up and gone the moment recording mode
+     starts, so it cannot end up in the capture. */
+  .safe-guide { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+  .safe-guide::before, .safe-guide::after {
+    content: ''; position: absolute; left: 0; right: 0;
+    background: rgba(180,85,47,0.20); border-color: rgba(180,85,47,0.85);
+  }
+  .safe-guide::before { top: 0; height: 13.5%; border-bottom: 2px solid; }
+  .safe-guide::after  { bottom: 0; height: 22.5%; border-top: 2px solid; }
+  body.recording .safe-guide { display: none; }
   .ov-name { font-family: 'Bodoni Moda', serif; font-size: 21px; line-height: 1.25; }
   .ov-price { font-size: 12px; letter-spacing: 0.16em; margin-top: 9px; }
   .ov-cta { font-size: 9.5px; letter-spacing: 0.24em; text-transform: uppercase; margin-top: 14px; opacity: 0.62; }
@@ -218,6 +235,7 @@
           <div class="ov-price" id="priceEl"></div>
           <div class="ov-cta" id="ctaEl">Link in bio</div>
         </div>
+        <div class="safe-guide" aria-hidden="true"></div>
       </div>
       <span class="frame-meta" id="meta"></span>
     </div>
