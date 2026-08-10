@@ -53,7 +53,12 @@
   .swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gold); }
   .toggle-row { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--grey); cursor: pointer; }
   .toggle-row input { accent-color: var(--gold); }
-  .toggle-row span.secs { margin-left: auto; font-size: 10.5px; color: var(--grey); }
+  .toggle-row span.secs { margin-left: auto; font-size: 10.5px; color: var(--black); font-variant-numeric: tabular-nums; }
+  /* The dial belongs to the row above it, so they read as one control. */
+  .scene-row { display: flex; flex-direction: column; gap: 4px; }
+  .scene-row + .scene-row { margin-top: 10px; }
+  .dial { width: 100%; accent-color: var(--gold); height: 16px; cursor: pointer; }
+  .scene-row:has(input[type="checkbox"]:not(:checked)) { opacity: 0.45; }
 
   .btn { padding: 12px 22px; border: none; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
   .btn-primary { background: var(--black); color: var(--white); }
@@ -152,11 +157,23 @@
       </div>
 
       <div class="ctrl-group">
-        <span class="ctrl-label">Scenes</span>
-        <label class="toggle-row"><input type="checkbox" id="scPhoto" checked/> Photograph <span class="secs">3.5s</span></label>
-        <label class="toggle-row"><input type="checkbox" id="scTurn" checked/> The piece turning <span class="secs">5s</span></label>
-        <label class="toggle-row"><input type="checkbox" id="scSpecs" checked/> Specification <span class="secs">4.5s</span></label>
-        <label class="toggle-row"><input type="checkbox" id="scClose" checked/> Name and price <span class="secs">3s</span></label>
+        <span class="ctrl-label">Scenes and their length</span>
+        <div class="scene-row">
+          <label class="toggle-row"><input type="checkbox" id="scPhoto" checked/> Photograph <span class="secs" id="outPhoto"></span></label>
+          <input type="range" class="dial" id="dialPhoto" min="1" max="12" step="0.5" value="3.5"/>
+        </div>
+        <div class="scene-row">
+          <label class="toggle-row"><input type="checkbox" id="scTurn" checked/> The piece turning <span class="secs" id="outTurn"></span></label>
+          <input type="range" class="dial" id="dialTurn" min="2" max="14" step="0.5" value="5"/>
+        </div>
+        <div class="scene-row">
+          <label class="toggle-row"><input type="checkbox" id="scSpecs" checked/> Specification <span class="secs" id="outSpecs"></span></label>
+          <input type="range" class="dial" id="dialSpecs" min="2" max="14" step="0.5" value="4.5"/>
+        </div>
+        <div class="scene-row">
+          <label class="toggle-row"><input type="checkbox" id="scClose" checked/> Name and price <span class="secs" id="outClose"></span></label>
+          <input type="range" class="dial" id="dialClose" min="1" max="10" step="0.5" value="3"/>
+        </div>
         <span class="hint" id="lenHint"></span>
       </div>
 
@@ -224,13 +241,26 @@ let photoBlocked = false;     // loaded but unusable — see loadPhoto()
 let running = false;
 
 const FPS = 30;
-const TURN_FRAMES = 48;
 const SCENES = [
-  { id: 'scPhoto', key: 'photo', secs: 3.5 },
-  { id: 'scTurn',  key: 'turn',  secs: 5.0 },
-  { id: 'scSpecs', key: 'specs', secs: 4.5 },
-  { id: 'scClose', key: 'close', secs: 3.0 },
+  { id: 'scPhoto', key: 'photo', dial: 'dialPhoto', out: 'outPhoto' },
+  { id: 'scTurn',  key: 'turn',  dial: 'dialTurn',  out: 'outTurn'  },
+  { id: 'scSpecs', key: 'specs', dial: 'dialSpecs', out: 'outSpecs' },
+  { id: 'scClose', key: 'close', dial: 'dialClose', out: 'outClose' },
 ];
+const sceneSecs = s => Number(document.getElementById(s.dial).value);
+
+/* At 48 frames the cross-fade was dissolving between images 7.5 degrees
+   apart, which reads as a double image rather than as movement — the stutter.
+   One still per 3–4 degrees fixes it, but only if the piece keeps turning at
+   the same rate: a longer scene turns MORE TIMES rather than turning slower,
+   because stretching one revolution over nine seconds puts the stutter
+   straight back. Roughly five seconds per revolution either way. */
+const turnRevolutions = secs => Math.max(1, Math.round(secs / 5));
+const turnFrameCount = () => {
+  const secs = sceneSecs(SCENES.find(s => s.key === 'turn'));
+  const perRev = secs / turnRevolutions(secs);
+  return Math.min(120, Math.max(48, Math.round(perRev * 24)));
+};
 const FADE = 0.5;             // seconds of cross-fade between scenes
 
 const mv = document.getElementById('mv');
@@ -329,15 +359,16 @@ async function captureTurn(onProgress) {
   mv.style.width = W + 'px';
   mv.style.height = H + 'px';
 
+  const count = turnFrameCount();
   const start = orbit.theta * 180 / Math.PI;
-  for (let i = 0; i < TURN_FRAMES; i++) {
-    const theta = start + (360 * i / TURN_FRAMES);
+  for (let i = 0; i < count; i++) {
+    const theta = start + (360 * i / count);
     mv.cameraOrbit = `${theta}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
     await mv.updateComplete;
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     const blob = await mv.toBlob({ mimeType: 'image/webp', qualityArgument: 0.92 });
     turnFrames.push(await createImageBitmap(blob));
-    onProgress((i + 1) / TURN_FRAMES);
+    onProgress((i + 1) / count);
   }
 
   mv.style.width = prev.w;
@@ -383,8 +414,8 @@ function tracked(text, font, y, colour, spacing) {
   for (const c of chars) { ctx.fillText(c, x, y); x += ctx.measureText(c).width + spacing; }
 }
 
-function wordmark(y) {
-  tracked('URBAN NEST', `${28 * S()}px "Bodoni Moda", serif`, y, DIM(), 7 * S());
+function wordmark(y, colour) {
+  tracked('URBAN NEST', `${28 * S()}px "Bodoni Moda", serif`, y, colour || DIM(), 7 * S());
 }
 
 // object-fit: cover, by hand
@@ -418,15 +449,19 @@ function drawPhoto(t, dur) {
 function drawTurn(t, dur) {
   fill(ground);
   if (turnFrames.length) {
-    // Cross-fade neighbouring stills so 48 frames read as continuous motion.
-    const pos = (t / dur) * turnFrames.length;
+    // Cross-fade neighbouring stills so the angular steps read as motion.
+    const pos = (t / dur) * turnFrames.length * turnRevolutions(dur);
     const i = Math.floor(pos) % turnFrames.length;
     const j = (i + 1) % turnFrames.length;
     const f = pos - Math.floor(pos);
     ctx.drawImage(turnFrames[i], 0, 0, W, H);
-    ctx.globalAlpha = f;
-    ctx.drawImage(turnFrames[j], 0, 0, W, H);
-    ctx.globalAlpha = 1;
+    // Two full-size draws per frame is the expensive part of the whole
+    // slideshow; near the ends of a step the second one changes nothing.
+    if (f > 0.03) {
+      ctx.globalAlpha = f;
+      ctx.drawImage(turnFrames[j], 0, 0, W, H);
+      ctx.globalAlpha = 1;
+    }
   }
   wordmark(90 * S());
   tracked('TURN IT OVER', `500 ${19 * S()}px "DM Sans", sans-serif`, H - 96 * S(), DIM(), 6 * S());
@@ -459,18 +494,33 @@ function drawSpecs(t) {
   });
 }
 
-function drawClose(t) {
+/* The closing card on a flat ground was three lines of type in an empty
+   frame — the weakest three seconds of the video, and the ones people see
+   last. It sits on the photograph now, pushed the opposite way to the opening
+   scene so the two do not look like the same shot twice, under a scrim heavy
+   enough for centred type to hold against whatever the photo is doing. */
+function drawClose(t, dur) {
   fill(ground);
+  const onPhoto = !!photo;
+  if (onPhoto) {
+    cover(photo, 0, 0, W, H, 1.10 - 0.07 * (t / (dur || 3)));
+    ctx.fillStyle = 'rgba(8,12,13,0.74)';
+    ctx.fillRect(0, 0, W, H);
+  }
+  const ink    = onPhoto ? '#F5F7F6' : INK();
+  const accent = onPhoto ? '#C2934D' : ACCENT();
+  const dim    = onPhoto ? 'rgba(245,247,246,0.60)' : DIM();
+
   const a = Math.min(1, easeOut(t / 0.7));
   ctx.globalAlpha = a;
-  wordmark(H * 0.34);
+  wordmark(H * 0.34, dim);
   const lines = wrap(displayName(), `600 ${64 * S()}px "Bodoni Moda", serif`, W - 170 * S());
-  let y = centred(lines.slice(0, 3), `600 ${64 * S()}px "Bodoni Moda", serif`, H * 0.44, 74 * S(), INK());
+  let y = centred(lines.slice(0, 3), `600 ${64 * S()}px "Bodoni Moda", serif`, H * 0.44, 74 * S(), ink);
   if (piece.price) {
-    tracked(String(piece.price).toUpperCase(), `500 ${26 * S()}px "DM Sans", sans-serif`, y + 46 * S(), ACCENT(), 5 * S());
+    tracked(String(piece.price).toUpperCase(), `500 ${26 * S()}px "DM Sans", sans-serif`, y + 46 * S(), accent, 5 * S());
     y += 46 * S();
   }
-  tracked('LINK IN BIO', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 96 * S(), DIM(), 6 * S());
+  tracked('LINK IN BIO', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 96 * S(), dim, 6 * S());
   ctx.globalAlpha = 1;
 }
 
@@ -488,7 +538,11 @@ function timeline() {
     on.push(s);
   }
   let at = 0;
-  return on.map(s => { const o = { ...s, start: at }; at += s.secs; return o; });
+  return on.map(s => {
+    const o = { ...s, secs: sceneSecs(s), start: at };
+    at += o.secs;
+    return o;
+  });
 }
 
 function totalSecs() {
@@ -516,10 +570,14 @@ function drawAt(time, tl) {
 }
 
 function paintMeta() {
+  SCENES.forEach(s => {
+    document.getElementById(s.out).textContent = sceneSecs(s).toFixed(1) + 's';
+  });
   const secs = totalSecs();
   document.getElementById('meta').textContent = `${W}×${H} · ${secs.toFixed(1)}s · silent`;
   document.getElementById('lenHint').textContent = secs
-    ? `${secs.toFixed(1)} seconds in total.`
+    ? `${secs.toFixed(1)}s in total. The turn is ${turnFrameCount()} captured frames, ` +
+      `played ${turnRevolutions(sceneSecs(SCENES.find(s => s.key === 'turn')))}× round.`
     : 'Every scene is either switched off or has nothing to show.';
 }
 
@@ -614,11 +672,22 @@ async function play(record) {
           if (performance.now() - t0 > (total + 4) * 1000) give_up();
         }, 1000);
 
+        /* Capped at FPS rather than drawing on every animation frame. A 120Hz
+           screen was asking for four times the work the video can carry, and
+           two full-size draws per frame is what the turn scene costs — that
+           budget going over is the other half of the stutter. */
         (function frame() {
           const time = (performance.now() - t0) / 1000;
-          drawAt(Math.min(time, total - 0.001), tl);
-          if (track && time - lastPush >= 1 / FPS) { track.requestFrame(); lastPush = time; }
-          if (time >= total) { if (track) track.requestFrame(); return done(); }
+          if (time - lastPush >= 1 / FPS || lastPush < 0) {
+            drawAt(Math.min(time, total - 0.001), tl);
+            lastPush = time;
+            if (track) track.requestFrame();
+          }
+          if (time >= total) {
+            drawAt(total - 0.001, tl);
+            if (track) track.requestFrame();
+            return done();
+          }
           requestAnimationFrame(frame);
         })();
       });
@@ -686,7 +755,15 @@ wireChips('grounds', (btn) => {
   turnFrames = [];              // the stills carry the old ground behind them
 });
 
-SCENES.forEach(s => document.getElementById(s.id).addEventListener('change', paintMeta));
+SCENES.forEach(s => {
+  document.getElementById(s.id).addEventListener('change', paintMeta);
+  document.getElementById(s.dial).addEventListener('input', () => {
+    // A different turn length wants a different number of stills, so what is
+    // already captured no longer matches.
+    if (s.key === 'turn') turnFrames = [];
+    paintMeta();
+  });
+});
 document.getElementById('nameOverride').addEventListener('input', paintMeta);
 document.getElementById('preview').onclick = () => play(false);
 document.getElementById('export').onclick  = () => play(true);
