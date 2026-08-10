@@ -133,3 +133,29 @@ That is a Supabase upload, so no deploy is needed for it either.
 
 The same command, with a Copy button, is in the admin under the
 3D Model URL field.
+
+
+WORKING LOCALLY WHEN YOU CANNOT DEPLOY
+----------------------------------------------------------
+
+Netlify credits reset monthly. If they have run out, the live
+site is frozen — but the admin still works on your own machine,
+against the same live database. Anything you do in it is real.
+
+Open a terminal in the project folder (Step 1 above) and run:
+
+    npx serve .
+
+It prints a port, usually 3000. Then open:
+
+    http://localhost:3000/admin/login.html
+
+Sign in as normal. Collection, Categories, Slideshow, Turntable
+and The Nest all behave exactly as they will once deployed,
+because the data lives in Supabase, not in the site.
+
+What does NOT work locally: nothing a visitor would see. The
+public pages are served from Netlify at whatever version was
+last deployed, so new pages and new styling wait for the deploy.
+
+Stop the server with Ctrl+C when you are done.
