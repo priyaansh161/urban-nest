@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Caption — Urban Nest Admin</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; max-width: 1500px; }
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  .cols { display: grid; grid-template-columns: 320px 1fr; gap: 32px; align-items: start; }
+  .panel { background: var(--white); border: 0.5px solid var(--border); padding: 24px; }
+  .panel + .panel { margin-top: 24px; }
+  .panel-title { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey);
+                 margin-bottom: 18px; padding-bottom: 12px; border-bottom: 0.5px solid var(--border);
+                 display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .panel-title .count { letter-spacing: 0.08em; text-transform: none; font-variant-numeric: tabular-nums; }
+  .over { color: #B4552F; }
+
+  .ctrl-group { display: flex; flex-direction: column; gap: 8px; }
+  .ctrl-group + .ctrl-group { margin-top: 20px; }
+  .ctrl-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  select, input[type="text"], textarea { padding: 10px 12px; border: 0.5px solid var(--border); background: var(--white);
+    font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--black); outline: none; width: 100%; resize: vertical; }
+  select:focus, input:focus, textarea:focus { border-color: var(--gold); }
+  .hint { font-size: 10.5px; color: var(--grey); line-height: 1.6; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { padding: 7px 13px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif;
+          font-size: 10.5px; letter-spacing: 0.08em; color: var(--grey); cursor: pointer; transition: all 0.2s; }
+  .chip:hover { color: var(--black); border-color: var(--black); }
+  .chip[aria-pressed="true"] { background: var(--black); color: var(--white); border-color: var(--black); }
+  .toggle-row { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--grey); cursor: pointer; }
+  .toggle-row input { accent-color: var(--gold); }
+
+  .btn { padding: 12px 22px; border: none; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.14em;
+         text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover { background: var(--gold); }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--black); color: var(--black); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+  #caption { min-height: 260px; font-size: 13.5px; line-height: 1.75; }
+  #tagBox { min-height: 110px; font-family: Consolas, monospace; font-size: 12px; line-height: 1.9; }
+
+  /* The tag library. Tiers are shown because the mix matters more than the
+     individual choices — all-broad tags put a small account nowhere. */
+  .tier { margin-bottom: 16px; }
+  .tier-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .tier-name { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
+  .tier-why { font-size: 10.5px; color: var(--grey); }
+  .tag { padding: 5px 11px; border: 0.5px solid var(--border); background: transparent; font-family: Consolas, monospace;
+         font-size: 11px; color: var(--grey); cursor: pointer; transition: all 0.15s; }
+  .tag:hover { border-color: var(--black); color: var(--black); }
+  .tag[aria-pressed="true"] { background: var(--gold-light); border-color: var(--gold); color: #8A6A34; }
+  .guide { background: var(--white); border: 0.5px solid var(--border); padding: 20px 24px; margin-top: 24px; }
+  .guide h2 { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 12px; font-weight: 500; }
+  .guide p { font-size: 12.5px; line-height: 1.75; color: var(--grey); }
+  .guide p + p { margin-top: 10px; }
+  .guide strong { color: var(--black); }
+  @media (max-width: 1150px) { .cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Social</div>
+    <a href="social.html" class="nav-item"><span class="icon">▣</span> Slideshow</a>
+    <a href="reel.html" class="nav-item"><span class="icon">▶</span> Turntable</a>
+    <a href="caption.html" class="nav-item active"><span class="icon">✎</span> Caption</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Caption</h1>
+    <p>Writes the caption from the listing, then mixes hashtags across reach tiers</p>
+  </div>
+
+  <div class="cols">
+    <div>
+      <div class="panel">
+        <div class="panel-title"><span>The piece</span></div>
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="pick">Listing</label>
+          <select id="pick"><option>Loading…</option></select>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Voice</span>
+          <div class="chips" id="tones">
+            <button type="button" class="chip" data-tone="editorial" aria-pressed="true">Editorial</button>
+            <button type="button" class="chip" data-tone="plain" aria-pressed="false">Plain</button>
+            <button type="button" class="chip" data-tone="punchy" aria-pressed="false">Punchy</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Include</span>
+          <label class="toggle-row"><input type="checkbox" id="incSpecs" checked/> A line of specifications</label>
+          <label class="toggle-row"><input type="checkbox" id="incPrice" checked/> The price</label>
+          <label class="toggle-row"><input type="checkbox" id="inc3d" checked/> That it can be turned in 3D</label>
+          <label class="toggle-row"><input type="checkbox" id="incBrand" checked/> An Urban Nest sign-off</label>
+          <label class="toggle-row"><input type="checkbox" id="incCta" checked/> Link in bio</label>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="write">Write it</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><span>Your own tags</span></div>
+        <div class="ctrl-group">
+          <input type="text" id="mine" placeholder="#myown #another"/>
+          <span class="hint">Always included, never counted out by the shuffle. Kept in this browser.</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-title">
+          <span>Caption</span>
+          <span class="count" id="capCount"></span>
+        </div>
+        <textarea id="caption" spellcheck="true" placeholder="Pick a listing and press Write it."></textarea>
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="copyCap">Copy caption</button>
+          <button class="btn btn-secondary" id="copyBoth">Copy caption + tags</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <span>Hashtags</span>
+          <span class="count" id="tagCount"></span>
+        </div>
+        <textarea id="tagBox" spellcheck="false"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="shuffle">Shuffle the mix</button>
+          <button class="btn btn-secondary" id="copyTags">Copy tags only</button>
+        </div>
+        <p class="hint" style="margin-top:12px">Many accounts put the tags in the first comment instead of the caption, which is what <strong>Copy tags only</strong> is for.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title"><span>The library</span><span class="count" id="libCount"></span></div>
+        <div id="library"></div>
+        <p class="hint">Click any tag to force it in or out. The shuffle respects what you have set.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="guide">
+    <h2>About "trending"</h2>
+    <p>Instagram <strong>does not publish trending hashtags</strong>, and its API has no endpoint for them. The nearest thing it offers returns how many posts a hashtag already has, and only for about thirty different hashtags a week per account — not enough to search with. Anything that claims live Instagram trends is either a paid scraper or guessing, so this page does neither.</p>
+    <p>What it does instead is mix across <strong>reach tiers</strong>, which is the part that actually matters for an account this size. A post carrying only huge tags is buried within seconds; the niche and local ones are where a small account is genuinely findable. The tiers here are <strong>grouped by hand, not measured</strong> — treat them as a sensible starting set, edit them freely, and let what actually works guide you. Your own additions are kept in this browser.</p>
+    <p>The shuffle deliberately changes the mix each time. Posting an identical block of tags on every piece is the pattern most worth avoiding.</p>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   Captions are composed from the listing that already exists —
+   name, description, specs, price — because retyping what is
+   already in the database is where the errors come from.
+
+   No hashtag research happens here and none can: see the note in
+   the page. The library is a hand-grouped starting set.
+   ═══════════════════════════════════════════════════════════════ */
+
+const IG_CAPTION_MAX = 2200;
+const IG_TAG_MAX = 30;
+const TARGET_TAGS = 22;      // room left for your own, under the cap
+
+let pieces = [];
+let piece = null;
+let forced = {};             // tag -> true (always in) / false (always out)
+
+/* Grouped by intent, not by measured volume.
+   broad — the obvious ones, enormous and mostly decorative
+   mid   — narrower, still busy, where most discovery happens
+   niche — specific enough that a small account can rank
+   local — India, which is who is actually buying          */
+const LIBRARY = {
+  broad: ['#homedecor', '#interiordesign', '#homedesign', '#decor', '#interiors'],
+  mid:   ['#homedecorideas', '#homestyling', '#interiorstyling', '#homeinspo',
+          '#decorinspiration', '#interiorinspo', '#homeaccents', '#luxuryhomes'],
+  niche: ['#statementpiece', '#curatedhome', '#objectsofdesign', '#intentionalliving',
+          '#slowdecor', '#detailsmatter', '#shopsmallhome', '#3dproductview'],
+  local: ['#homedecorindia', '#indianhomes', '#interiordesignindia', '#indianinteriors',
+          '#homesofindia', '#indianhomedecor'],
+  brand: ['#urbannest', '#storeurbannest'],
+};
+
+/* Per category, layered on top. Keyed by the slug on the listing. */
+const BY_CATEGORY = {
+  chandeliers: ['#chandelier', '#chandelierlighting', '#crystalchandelier', '#lightingdesign', '#statementlighting'],
+  lighting:    ['#lighting', '#lightingdesign', '#pendantlight', '#homelighting', '#ambientlighting'],
+  sculptures:  ['#sculpture', '#sculpturalart', '#tabledecor', '#showpiece', '#artobject'],
+  artifacts:   ['#artefacts', '#collectibles', '#tabledecor', '#curio'],
+  decor:       ['#decorpieces', '#shelfdecor', '#tablescape'],
+  living:      ['#livingroomdecor', '#livingroominspo'],
+  bedroom:     ['#bedroomdecor', '#bedroominspo'],
+  bathroom:    ['#bathroomdecor', '#bathroominspo'],
+  kitchen:     ['#kitchendecor', '#kitcheninspo'],
+};
+
+// How many to take from each tier. Weighted towards the middle and the
+// niche, because that is where anything is findable.
+const MIX = { brand: 2, broad: 3, mid: 6, niche: 5, local: 4, category: 5 };
+
+async function load() {
+  const { data, error } = await db.from('collection_items')
+    .select('id,name,price,category,description,specs,buy_link,model_url')
+    .order('created_at', { ascending: false });
+  if (error) { showToast('Could not load the listings', 'error'); return; }
+  pieces = data || [];
+  const sel = document.getElementById('pick');
+  if (!pieces.length) {
+    sel.innerHTML = '<option value="">Nothing in the collection yet</option>';
+    return;
+  }
+  sel.innerHTML = pieces.map((p, i) => `<option value="${i}">${clip(p.name, 58)}</option>`).join('');
+  sel.onchange = () => { piece = pieces[sel.value]; forced = {}; paintLibrary(); write(); };
+  piece = pieces[0];
+  paintLibrary();
+  write();
+}
+
+const clip = (s, n) => { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
+const tone = () => document.querySelector('#tones .chip[aria-pressed="true"]').dataset.tone;
+const on = id => document.getElementById(id).checked;
+
+/* The retailer's title is a keyword list. The first clause is the product. */
+function shortName() {
+  return String(piece.name || '').split(/[,(|]/)[0].trim();
+}
+
+/* First two sentences of the listing description, which is already written
+   for a buyer — better than anything generated from the field names. */
+function twoSentences(text) {
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!clean) return '';
+  const parts = clean.match(/[^.!?]+[.!?]+/g);
+  if (!parts) return clean;
+  // Each match carries its own trailing space, so trim before joining.
+  return parts.slice(0, 2).map(s => s.trim()).join(' ');
+}
+
+function specLine() {
+  const rows = (Array.isArray(piece.specs) ? piece.specs : []).filter(s => s && s[0] && s[1]);
+  const want = ['material', 'colour', 'color', 'dimension', 'size', 'finish', 'bulb', 'brand'];
+  const picked = rows
+    .filter(r => want.some(w => String(r[0]).toLowerCase().includes(w)))
+    .slice(0, 3)
+    .map(r => `${r[0]}: ${r[1]}`);
+  return picked.join('  ·  ');
+}
+
+function write() {
+  if (!piece) return;
+  const name = shortName();
+  const body = twoSentences(piece.description);
+  const t = tone();
+  const L = [];
+
+  if (t === 'editorial') {
+    L.push(name + '.');
+    L.push('');
+    L.push(body || 'A piece chosen for the way it holds a room together rather than for the way it fills one.');
+    if (on('inc3d') && piece.model_url) {
+      L.push('');
+      L.push('Turn it over on the site before you decide — every angle, your own light.');
+    }
+  } else if (t === 'plain') {
+    L.push(name);
+    L.push('');
+    if (body) L.push(body);
+    if (on('inc3d') && piece.model_url) L.push('Viewable in 3D on the site.');
+  } else {
+    L.push(name.toUpperCase());
+    L.push('');
+    if (body) L.push(body);
+    if (on('inc3d') && piece.model_url) {
+      L.push('');
+      L.push('Spin it. Zoom in. Then decide.');
+    }
+  }
+
+  const specs = on('incSpecs') ? specLine() : '';
+  if (specs) { L.push(''); L.push(specs); }
+  if (on('incPrice') && piece.price) { L.push(''); L.push(String(piece.price)); }
+
+  // The line that says whose account this is. Same idea in three voices, so
+  // the sign-off is recognisable across posts without being copy-pasted.
+  if (on('incBrand')) {
+    L.push('');
+    L.push(t === 'editorial' ? 'Curated for Urban Nest — affordable luxury, for real homes.'
+         : t === 'plain'     ? 'From the Urban Nest collection.'
+         :                     'Urban Nest. Curated, not stocked.');
+  }
+  if (on('incCta')) {
+    L.push('');
+    L.push(t === 'punchy' ? 'Link in bio.' : 'Shop it through the link in bio.');
+  }
+
+  document.getElementById('caption').value = L.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  shuffle();
+  paintCounts();
+}
+
+/* ── HASHTAGS ─────────────────────────────────────────────────── */
+
+function categoryTags() {
+  return BY_CATEGORY[String(piece && piece.category || '').toLowerCase()] || [];
+}
+
+function myTags() {
+  return String(document.getElementById('mine').value || '')
+    .split(/[\s,]+/).map(s => s.trim()).filter(Boolean)
+    .map(s => s.startsWith('#') ? s : '#' + s);
+}
+
+function allTags() {
+  const seen = new Set();
+  const out = [];
+  [...Object.values(LIBRARY).flat(), ...categoryTags()].forEach(t => {
+    if (!seen.has(t)) { seen.add(t); out.push(t); }
+  });
+  return out;
+}
+
+function take(list, n, chosen) {
+  // Sampled without replacement so a shuffle genuinely changes the mix.
+  const pool = list.filter(t => forced[t] !== false && !chosen.has(t));
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  pool.slice(0, n).forEach(t => chosen.add(t));
+}
+
+function shuffle() {
+  if (!piece) return;
+  const chosen = new Set();
+  // Anything clicked ON is in before anything is sampled.
+  Object.keys(forced).filter(t => forced[t]).forEach(t => chosen.add(t));
+
+  take(LIBRARY.brand, MIX.brand, chosen);
+  take(categoryTags(), MIX.category, chosen);
+  take(LIBRARY.niche, MIX.niche, chosen);
+  take(LIBRARY.local, MIX.local, chosen);
+  take(LIBRARY.mid, MIX.mid, chosen);
+  take(LIBRARY.broad, MIX.broad, chosen);
+
+  const mine = myTags();
+  const room = Math.max(0, IG_TAG_MAX - mine.length);
+  const list = [...chosen].slice(0, Math.min(TARGET_TAGS, room));
+  document.getElementById('tagBox').value = [...new Set([...list, ...mine])].join(' ');
+  paintLibrary();
+  paintCounts();
+}
+
+function paintLibrary() {
+  const inBox = new Set(String(document.getElementById('tagBox').value || '').split(/\s+/));
+  const tiers = [
+    ['brand', 'Yours', 'always worth carrying'],
+    ['category', piece && piece.category ? 'For ' + piece.category : 'For this category', 'from the listing'],
+    ['niche', 'Niche', 'where a small account can actually rank'],
+    ['local', 'India', 'who is actually buying'],
+    ['mid', 'Middle', 'busy, but most discovery happens here'],
+    ['broad', 'Broad', 'enormous, mostly decorative'],
+  ];
+  document.getElementById('library').innerHTML = tiers.map(([key, label, why]) => {
+    const list = key === 'category' ? categoryTags() : LIBRARY[key];
+    if (!list || !list.length) return '';
+    return `<div class="tier">
+      <div class="tier-head"><span class="tier-name">${label}</span><span class="tier-why">${why}</span></div>
+      <div class="chips">${list.map(t => {
+        const state = forced[t] === true ? 'true' : (inBox.has(t) ? 'true' : 'false');
+        const dim = forced[t] === false ? ' style="opacity:.4"' : '';
+        return `<button type="button" class="tag" data-tag="${t}" aria-pressed="${state}"${dim}>${t}</button>`;
+      }).join('')}</div></div>`;
+  }).join('');
+  document.getElementById('libCount').textContent = allTags().length + ' in the library';
+}
+
+function paintCounts() {
+  const cap = document.getElementById('caption').value;
+  const tags = document.getElementById('tagBox').value.trim();
+  const tagN = tags ? tags.split(/\s+/).filter(Boolean).length : 0;
+  const capEl = document.getElementById('capCount');
+  const tagEl = document.getElementById('tagCount');
+  // Instagram counts the caption and its hashtags against the same 2,200.
+  const together = cap.length + (tags ? tags.length + 2 : 0);
+  capEl.textContent = `${cap.length} characters · ${together} with tags of ${IG_CAPTION_MAX}`;
+  capEl.classList.toggle('over', together > IG_CAPTION_MAX);
+  tagEl.textContent = `${tagN} of ${IG_TAG_MAX}`;
+  tagEl.classList.toggle('over', tagN > IG_TAG_MAX);
+}
+
+/* ── COPYING ──────────────────────────────────────────────────── */
+
+async function copy(text, btn) {
+  const label = btn.textContent;
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+    else throw new Error('no clipboard');
+  } catch (e) {
+    const s = document.createElement('textarea');
+    s.value = text; s.style.cssText = 'position:fixed;top:-999px';
+    document.body.appendChild(s); s.select();
+    try { document.execCommand('copy'); } catch (e2) { showToast('Could not copy — select it by hand', 'error'); }
+    s.remove();
+  }
+  btn.textContent = 'Copied';
+  setTimeout(() => { btn.textContent = label; }, 1600);
+}
+
+/* ── WIRING ───────────────────────────────────────────────────── */
+
+document.getElementById('tones').addEventListener('click', (e) => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  document.querySelectorAll('#tones .chip').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+  write();
+});
+
+['incSpecs', 'incPrice', 'inc3d', 'incBrand', 'incCta'].forEach(id =>
+  document.getElementById(id).addEventListener('change', write));
+
+// Click cycles: sampled → always in → always out → sampled.
+document.getElementById('library').addEventListener('click', (e) => {
+  const btn = e.target.closest('.tag');
+  if (!btn) return;
+  const t = btn.dataset.tag;
+  if (forced[t] === true) forced[t] = false;
+  else if (forced[t] === false) delete forced[t];
+  else forced[t] = true;
+  shuffle();
+});
+
+document.getElementById('mine').addEventListener('input', () => {
+  try { localStorage.setItem('un-my-tags', document.getElementById('mine').value); } catch (e) {}
+  shuffle();
+});
+function restoreMine() {
+  try {
+    const v = localStorage.getItem('un-my-tags');
+    if (v) document.getElementById('mine').value = v;
+  } catch (e) {}
+}
+
+document.getElementById('caption').addEventListener('input', paintCounts);
+document.getElementById('tagBox').addEventListener('input', () => { paintLibrary(); paintCounts(); });
+document.getElementById('write').onclick = write;
+document.getElementById('shuffle').onclick = shuffle;
+document.getElementById('copyCap').onclick  = (e) => copy(document.getElementById('caption').value, e.target);
+document.getElementById('copyTags').onclick = (e) => copy(document.getElementById('tagBox').value, e.target);
+document.getElementById('copyBoth').onclick = (e) => copy(
+  document.getElementById('caption').value + '\n\n' + document.getElementById('tagBox').value, e.target);
+
+/* Last, not first. Started at the top it depended on requireAuth() awaiting
+   something before load() touched a const declared further down — true today,
+   and a temporal-dead-zone error the moment it stops being. */
+(async () => { await requireAuth(); restoreMine(); await load(); })();
+</script>
+</body>
+</html>
