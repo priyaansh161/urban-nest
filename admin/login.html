@@ -57,6 +57,17 @@
     outline: none; transition: border-color 0.2s; margin-bottom: 20px;
   }
   input:focus { border-color: var(--gold); }
+  /* Targeted by id, not by [type="password"] — the type is what the toggle
+     changes, and a rule keyed to it would drop its own margin mid-click and
+     shift the form. */
+  #password { margin-bottom: 10px; }
+  .show-pw {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    font-size: 11.5px; letter-spacing: 0.04em; text-transform: none;
+    color: var(--grey); margin-bottom: 22px; user-select: none;
+  }
+  .show-pw:hover { color: var(--black); }
+  .show-pw input { width: auto; margin: 0; padding: 0; accent-color: var(--gold); cursor: pointer; }
   .btn {
     width: 100%; padding: 14px;
     background: var(--black); color: var(--white);
@@ -92,6 +103,9 @@
     <input type="email" id="email" placeholder="admin@urbannest.com" required autocomplete="email"/>
     <label for="password">Password</label>
     <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password"/>
+    <label class="show-pw" for="showPw">
+      <input type="checkbox" id="showPw"/> Show password
+    </label>
     <button class="btn" type="submit" id="loginBtn">Enter</button>
     <p class="error-msg" id="errorMsg"></p>
   </form>
@@ -100,6 +114,17 @@
 <script>
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* Reveal the password. Returns focus to the field with the caret at the end,
+     so a mistyped password can be corrected without reaching for the mouse
+     again — which is the whole reason for looking at it. */
+  document.getElementById('showPw').addEventListener('change', (e) => {
+    const pw = document.getElementById('password');
+    pw.type = e.target.checked ? 'text' : 'password';
+    pw.focus();
+    const end = pw.value.length;
+    try { pw.setSelectionRange(end, end); } catch (err) {}
+  });
 
   // Explain why they were signed out, when that is why they are here.
   (function showEndedNotice() {
