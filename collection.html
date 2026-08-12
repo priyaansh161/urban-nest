@@ -291,11 +291,14 @@
        the rest of a grid appears to come forward without anything else
        moving. Matches the homepage. Last in the sheet so it wins on source
        order against the hover rules declared above. */
-    .item {
+    /* The category tiles were left out when they were added: they are the
+       first thing on the page now, and the only tiles on the site that did
+       not step back. */
+    .item, .cat-tile {
       transition: transform .55s cubic-bezier(.16,.7,.2,1), filter .55s cubic-bezier(.16,.7,.2,1), box-shadow .55s cubic-bezier(.16,.7,.2,1);
       will-change: transform;
     }
-    .item:hover {
+    .item:hover, .cat-tile:hover {
       transform: scale(0.938);
       filter: saturate(1.06);
     }
@@ -303,7 +306,7 @@
     .buy:hover,
     .d-buy:hover { transform: scale(0.966); }
     @media (prefers-reduced-motion: reduce) {
-      .item, .buy, .d-buy { transition: none !important; transform: none !important; }
+      .item, .cat-tile, .buy, .d-buy { transition: none !important; transform: none !important; }
     }
     /* -- ELEVATION --
        A black shadow barely registers on the dark page, so the dark step
@@ -316,8 +319,8 @@
     }
     :root[data-theme="dark"] { --lift-1: inset 0 0 0 1px rgba(234,242,241,0.09), 0 1px 3px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.34); --lift-2: inset 0 0 0 1px rgba(234,242,241,0.11), 0 3px 10px rgba(0,0,0,0.54), 0 16px 38px rgba(0,0,0,0.44); }
 
-    .item { box-shadow: var(--lift-2); }
-    .item:hover { box-shadow: var(--lift-1); }
+    .item, .cat-tile { box-shadow: var(--lift-2); }
+    .item:hover, .cat-tile:hover { box-shadow: var(--lift-1); }
     /* Light / dark toggle */
     .switch { display: flex; align-items: center; border: 1px solid var(--border); background: transparent; border-radius: 100px; padding: 2px; }
     .switch button { display: grid; place-items: center; width: 28px; height: 24px; border: none; background: none; cursor: pointer; color: var(--grey); border-radius: 100px; transition: background .25s, color .25s; font-family: inherit; }

@@ -852,14 +852,16 @@
       .hamburger { min-height: 34px; min-width: 34px; justify-content: center; align-items: center; }
     }
   
-  .ct, .sp, .wstrip figure {
+  /* .ct-piece is the collection strip, which is its own anchor rather than a
+     .ct and so had been missing the gesture every other tile on the site has. */
+  .ct, .sp, .wstrip figure, .ct-piece {
     box-shadow: var(--lift-2);
     transition: transform .55s var(--ease), box-shadow .55s var(--ease), filter .55s var(--ease);
     will-change: transform;
   }
   /* the one you are pointing at withdraws, so the rest of the grid
      appears to come forward without any of them actually moving */
-  .ct:hover, .sp:hover, .wstrip figure:hover {
+  .ct:hover, .sp:hover, .wstrip figure:hover, .ct-piece:hover {
     transform: scale(0.938);
     box-shadow: var(--lift-1);
     filter: saturate(1.06);
@@ -909,7 +911,7 @@
   @keyframes staggerIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
-    .ct, .sp, .wstrip figure, .btn, .nav-join, .parx, .js .rv-stagger > * {
+    .ct, .sp, .wstrip figure, .ct-piece, .btn, .nav-join, .parx, .js .rv-stagger > * {
       transition: none !important; transform: none !important; animation: none !important;
     }
     .js .rv-stagger > * { opacity: 1 !important; }
