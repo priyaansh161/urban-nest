@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Social — Urban Nest Admin</title>
+<title>Reel Maker — Urban Nest Admin</title>
 <link rel="icon" type="image/png" href="../favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -111,9 +111,8 @@
     <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
     <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
     <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
-    <div class="nav-group-label">Social</div>
-    <a href="social.html" class="nav-item active"><span class="icon">▣</span> Slideshow</a>
-    <a href="reel.html" class="nav-item"><span class="icon">▶</span> Turntable</a>
+    <div class="nav-group-label">Content Creation</div>
+    <a href="social.html" class="nav-item active"><span class="icon">▣</span> Reel Maker</a>
     <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
     <div class="nav-group-label">Community</div>
     <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
@@ -127,7 +126,7 @@
 
 <main class="main">
   <div class="page-header">
-    <h1>Slideshow</h1>
+    <h1>Reel Maker</h1>
     <p>Builds a finished MP4 at Instagram's own resolution — no screen recording, nothing to crop</p>
   </div>
 
@@ -144,6 +143,8 @@
         <div class="chips" id="ratios">
           <button type="button" class="chip" data-w="1080" data-h="1920" aria-pressed="true">9:16 · 1080×1920</button>
           <button type="button" class="chip" data-w="1080" data-h="1350" aria-pressed="false">4:5 · 1080×1350</button>
+          <!-- Carried over from the Turntable page, which had it and this did not. -->
+          <button type="button" class="chip" data-w="1080" data-h="1080" aria-pressed="false">1:1 · 1080×1080</button>
         </div>
       </div>
 
@@ -180,6 +181,9 @@
 
       <div class="ctrl-group">
         <span class="ctrl-label">While setting up</span>
+        <!-- The Turntable's one real advantage was being able to stop the spin
+             and set an exact angle by hand. Same thing, one checkbox. -->
+        <label class="toggle-row"><input type="checkbox" id="holdStill"/> Hold the spin while I pose it</label>
         <label class="toggle-row"><input type="checkbox" id="showSafe"/> Show what Instagram covers</label>
         <span class="hint">Marks the header, caption row and button strip Instagram draws over your video. Preview only — never recorded.</span>
       </div>
@@ -830,6 +834,15 @@ SCENES.forEach(s => {
   });
 });
 document.getElementById('nameOverride').addEventListener('input', paintMeta);
+
+/* Stops the piece turning so an exact angle can be set by hand — the one
+   thing the Turntable page did that this did not. The capture already reads
+   auto-rotate to decide whether to put it back, so holding it here holds
+   through a capture too. */
+document.getElementById('holdStill').addEventListener('change', (e) => {
+  if (e.target.checked) mv.removeAttribute('auto-rotate');
+  else { mv.setAttribute('auto-rotate', ''); mv.setAttribute('auto-rotate-delay', '0'); }
+});
 
 /* Toggling the guide shows it straight away on a held frame, rather than
    making you play a preview to find out where the lines fall. */

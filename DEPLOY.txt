@@ -150,7 +150,7 @@ It prints a port, usually 3000. Then open:
 
     http://localhost:3000/admin/login.html
 
-Sign in as normal. Collection, Categories, Slideshow, Turntable
+Sign in as normal. Collection, Categories, Reel Maker, Caption
 and The Nest all behave exactly as they will once deployed,
 because the data lives in Supabase, not in the site.
 
