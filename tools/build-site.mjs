@@ -28,7 +28,15 @@ const RULES = [
   { dir: '.',      exts: ['.html', '.splinecode', '.png', '.js', '.toml'], deep: false },
   { dir: 'admin',  exts: ['.html', '.js'],                                 deep: false },
   { dir: 'images', exts: ['.webp', '.png', '.jpg', '.svg'],                deep: false },
-  { dir: 'models', exts: ['.glb'],                                         deep: false },
+  /* models/ is deliberately NOT here. Every one of the 21 listings with a 3D
+     view stores an absolute Supabase Storage URL — the admin's upload button
+     cannot produce anything else — so nothing on the site ever asks Netlify
+     for a .glb. Shipping them anyway put 69 MB on the CDN for files with no
+     referrer, which is bandwidth spent on nothing.
+     The files stay in the repo as a backup of what is in Supabase.
+     If a listing is ever given a RELATIVE path by hand, like
+     "models/vase.glb", add { dir: 'models', exts: ['.glb'], deep: false }
+     back to this list or that piece will 404. */
 ];
 
 await rm(DIST, { recursive: true, force: true });
