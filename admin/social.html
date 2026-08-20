@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Reel Maker — Urban Nest Admin</title>
+<title>Media Engagement Tool — Urban Nest Admin</title>
 <link rel="icon" type="image/png" href="../favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -112,7 +112,7 @@
     <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
     <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
     <div class="nav-group-label">Content Creation</div>
-    <a href="social.html" class="nav-item active"><span class="icon">▣</span> Reel Maker</a>
+    <a href="social.html" class="nav-item active"><span class="icon">▣</span> Media Engagement</a>
     <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
     <div class="nav-group-label">Community</div>
     <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
@@ -126,7 +126,7 @@
 
 <main class="main">
   <div class="page-header">
-    <h1>Reel Maker</h1>
+    <h1>Media Engagement Tool</h1>
     <p>Builds a finished MP4 at Instagram's own resolution — no screen recording, nothing to crop</p>
   </div>
 
@@ -177,6 +177,15 @@
           <input type="range" class="dial" id="dialClose" min="1" max="10" step="0.5" value="3"/>
         </div>
         <span class="hint" id="lenHint"></span>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">File</span>
+        <div class="chips" id="formats">
+          <button type="button" class="chip" data-mime="video/mp4;codecs=avc1" aria-pressed="true">MP4</button>
+          <button type="button" class="chip" data-mime="video/webm;codecs=vp9" aria-pressed="false">WebM</button>
+        </div>
+        <span class="hint">MP4 is what Instagram wants. WebM is the fallback if an MP4 comes out broken — Chrome's WebM writer is much older and steadier, and a clean WebM against a broken MP4 tells you the fault is the writer, not the render.</span>
       </div>
 
       <div class="ctrl-group">
@@ -488,14 +497,11 @@ function drawTurn(t, dur) {
     const i = Math.floor(pos) % turnFrames.length;
     const j = (i + 1) % turnFrames.length;
     const f = pos - Math.floor(pos);
-    ctx.drawImage(turnFrames[i], 0, 0, W, H);
-    // Two full-size draws per frame is the expensive part of the whole
-    // slideshow; near the ends of a step the second one changes nothing.
-    if (f > 0.03) {
-      ctx.globalAlpha = f;
-      ctx.drawImage(turnFrames[j], 0, 0, W, H);
-      ctx.globalAlpha = 1;
-    }
+    /* One draw, not two. The cross-fade existed to paper over 7.5-degree
+       steps; at three degrees it buys nothing visible and costs a second
+       full-size 1080×1920 composite on every frame — the most expensive thing
+       in the whole render, and the scene where the drawing fell behind. */
+    ctx.drawImage(turnFrames[f < 0.5 ? i : j], 0, 0, W, H);
   }
   // Both at the top: the wordmark was under the Reels header, and the hint
   // was under the caption row.
@@ -660,6 +666,39 @@ function sizeCanvas() {
   canvas.width = W; canvas.height = H;
 }
 
+/* Reads the finished file back the way a player would, because "it exported"
+   and "it plays" turned out to be different questions. A duration of Infinity
+   is the signature of a fragmented MP4 whose header never got its length, and
+   a duration far off the timeline means the frame timestamps went wrong. */
+async function inspect(blob, expected) {
+  return new Promise(resolve => {
+    const v = document.createElement('video');
+    const url = URL.createObjectURL(blob);
+    let settled = false;
+    const finish = (out) => {
+      if (settled) return;
+      settled = true;
+      URL.revokeObjectURL(url);
+      resolve(out);
+    };
+    v.preload = 'metadata';
+    v.muted = true;
+    v.onloadedmetadata = () => {
+      const d = v.duration, w = v.videoWidth, h = v.videoHeight;
+      let fault = null;
+      if (!isFinite(d) || d <= 0) fault = 'the file carries no playable duration';
+      else if (Math.abs(d - expected) / expected > 0.12)
+        fault = `it runs ${d.toFixed(1)}s where the timeline is ${expected.toFixed(1)}s`;
+      else if (!w || !h) fault = 'no picture size was recorded';
+      else if (w !== W || h !== H) fault = `it came out ${w}×${h} rather than ${W}×${H}`;
+      finish({ fault, duration: d, w, h });
+    };
+    v.onerror = () => finish({ fault: 'the browser could not open it', duration: 0, w: 0, h: 0 });
+    setTimeout(() => finish({ fault: 'it could not be read back within eight seconds', duration: 0, w: 0, h: 0 }), 8000);
+    v.src = url;
+  });
+}
+
 async function play(record) {
   if (running) return;
   const tl = timeline();
@@ -704,18 +743,44 @@ async function play(record) {
     document.getElementById('stage').classList.add('showing-canvas');
     busy(false);
 
-    let recorder = null, chunks = [], track = null;
+    const total = totalSecs();
+    let recorder = null, chunks = [];
+
     if (record) {
-      const mime = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9']
+      const want = document.querySelector('#formats .chip[aria-pressed="true"]').dataset.mime;
+      const mime = [want, 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm']
         .find(m => MediaRecorder.isTypeSupported(m));
       if (!mime) { showToast('This browser cannot record video', 'error'); return; }
-      // captureStream(0) hands frame timing to us: every frame in the video is
-      // one we drew, rather than whatever the browser happened to sample.
-      const stream = canvas.captureStream(0);
-      track = stream.getVideoTracks()[0];
-      recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 9000000 });
+
+      /* ── WHY captureStream(FPS) AND NOT captureStream(0) ──
+         Manual capture — captureStream(0) plus requestFrame() — timestamps
+         every frame at the moment it is requested, which makes the video's
+         pacing exactly as even as the animation loop managed to be. One
+         garbage collection, one slow frame in the turn scene, and that frame
+         is held in the file for as long as the hitch lasted. That is where
+         the freezing came from, and where a five-second first slide followed
+         by everything else rushing came from: a single frame given a
+         multi-second duration, with the rest crammed in after it.
+
+         Passing a frame rate hands the clock to the browser instead. It
+         samples the canvas on its own steady schedule and emits constant-rate
+         frames whatever the drawing is doing. If a draw is late the previous
+         frame is repeated — the picture holds for a moment, but the timing
+         stays true, which is the failure you want of the two. */
+      const stream = canvas.captureStream(FPS);
+      recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8000000 });
       recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-      recorder.start();
+
+      // Draw the opening frame and let the compositor settle before recording
+      // starts, so the first thing captured is a finished picture rather than
+      // whatever the canvas held while the model viewer was letting go of it.
+      drawAt(0, tl, guide);
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
+
+      // A timeslice makes the muxer flush every second instead of holding the
+      // whole file until stop, which is one less way to end up with a truncated
+      // one.
+      recorder.start(1000);
       document.getElementById('exportHint').textContent = 'Recording — keep this tab in front until it finishes.';
     }
 
@@ -726,9 +791,8 @@ async function play(record) {
        tab that goes away mid-run, and the watchdog catches every other reason
        the loop might stop being called — including a tab that was already in
        the background when the run started, which fires no event at all. */
-    const total = totalSecs();
     const t0 = performance.now();
-    let lastPush = -1;
+    let lastDraw = -1, drawn = 0;
     let watchdog = null, onHide = null;
 
     try {
@@ -741,22 +805,18 @@ async function play(record) {
           if (performance.now() - t0 > (total + 4) * 1000) give_up();
         }, 1000);
 
-        /* Capped at FPS rather than drawing on every animation frame. A 120Hz
-           screen was asking for four times the work the video can carry, and
-           two full-size draws per frame is what the turn scene costs — that
-           budget going over is the other half of the stutter. */
+        /* Capped at FPS rather than drawing on every animation frame: a 120Hz
+           screen would otherwise ask for four times the work the video can
+           carry. The browser is sampling on its own clock now, so this only
+           has to keep the canvas current, not hit a deadline. */
         (function frame() {
           const time = (performance.now() - t0) / 1000;
-          if (time - lastPush >= 1 / FPS || lastPush < 0) {
+          if (time - lastDraw >= 1 / FPS || lastDraw < 0) {
             drawAt(Math.min(time, total - 0.001), tl, guide);
-            lastPush = time;
-            if (track) track.requestFrame();
+            lastDraw = time;
+            drawn++;
           }
-          if (time >= total) {
-            drawAt(total - 0.001, tl, guide);
-            if (track) track.requestFrame();
-            return done();
-          }
+          if (time >= total) { drawAt(total - 0.001, tl, guide); return done(); }
           requestAnimationFrame(frame);
         })();
       });
@@ -766,19 +826,40 @@ async function play(record) {
     }
 
     if (recorder) {
+      // Let the last timeslice land before asking for the file.
+      await new Promise(r => setTimeout(r, 400));
       await new Promise(r => { recorder.onstop = r; recorder.stop(); });
+
       const ext = recorder.mimeType.includes('mp4') ? 'mp4' : 'webm';
       const blob = new Blob(chunks, { type: recorder.mimeType });
       const slug = (displayName() || 'piece').toLowerCase()
         .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
+      const name = `${slug}-${W}x${H}.${ext}`;
+
+      const check = await inspect(blob, total);
+      const fps = (drawn / total).toFixed(1);
+
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `${slug}-${W}x${H}.${ext}`;
+      a.download = name;
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      document.getElementById('exportHint').textContent =
-        `Saved ${a.download} — ${(blob.size / 1048576).toFixed(1)} MB. It is in your Downloads.`;
-      showToast('Video exported');
+
+      const size = (blob.size / 1048576).toFixed(1);
+      if (check.fault) {
+        // Handed over anyway — it might still be watchable, and deciding that
+        // is not this page's call. But it is said out loud rather than left
+        // for Instagram to discover.
+        document.getElementById('exportHint').innerHTML =
+          `<span class="warn">Saved ${name}, but it looks wrong: ${check.fault}. ` +
+          `Play it before posting. If it is broken, try the WebM format above — ` +
+          `Chrome's WebM writer is far older and steadier than its MP4 one.</span>`;
+        showToast('Exported, but the file failed its check', 'error');
+      } else {
+        document.getElementById('exportHint').textContent =
+          `Saved ${name} — ${size} MB, ${check.duration.toFixed(1)}s, ${check.w}×${check.h}, drawn at ${fps} fps. In your Downloads.`;
+        showToast('Video exported');
+      }
     }
   } catch (err) {
     // Both likely failures explain nothing from their own message.
