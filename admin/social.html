@@ -80,6 +80,15 @@
   #stage.showing-canvas #mv { visibility: hidden; }
   .stage-meta { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); }
 
+  /* ── DURING FRAME CAPTURE ──
+     The viewer is lifted out of #stage and laid on the viewport at the full
+     frame size, then scaled down to fit. model-viewer sizes its drawing
+     buffer from the layout box, so this captures at a true 1080×1920 while
+     staying wholly on screen — and an element clipped away by its container
+     is one model-viewer is entitled to stop rendering, which is a good way to
+     collect a folder of empty frames. */
+  body.capturing #mv { position: fixed; top: 0; left: 0; z-index: 9998; transform-origin: top left; }
+  body.capturing #busy { position: fixed; inset: 0; z-index: 9999; }
   #busy { position: absolute; inset: 0; z-index: 5; display: none; flex-direction: column;
           align-items: center; justify-content: center; gap: 16px; background: rgba(9,20,22,0.88); }
   #busy.on { display: flex; }
@@ -204,6 +213,7 @@
       </div>
 
       <div class="btn-row">
+        <button class="btn btn-secondary" id="testTurn">Test the 3D capture</button>
         <button class="btn btn-secondary" id="preview">Play a preview</button>
         <button class="btn btn-primary" id="export">Export MP4</button>
       </div>
@@ -256,6 +266,7 @@ let piece = null;
 let W = 1080, H = 1920;
 let ground = '#0F1F22', tone = 'dark';
 let turnFrames = [];          // ImageBitmaps of the model, one per angle
+let turnBlank = false;        // captured, but the model drew nothing
 let photo = null;             // the product photograph, or null
 let photoBlocked = false;     // loaded but unusable — see loadPhoto()
 let running = false;
@@ -365,36 +376,87 @@ function loadPhoto(url) {
 
 /* ── THE TURN, CAPTURED ───────────────────────────────────────── */
 
+/* Is there actually a model in this frame, or is it an empty rectangle?
+   Sampled small — enough to answer the question, cheap enough to ask on
+   every capture. A frame the model did not draw into is fully transparent;
+   one that only caught the ground is a single flat colour. */
+function frameHasContent(bitmap) {
+  const probe = document.createElement('canvas');
+  probe.width = 48; probe.height = 85;
+  const p = probe.getContext('2d', { willReadFrequently: true });
+  p.drawImage(bitmap, 0, 0, probe.width, probe.height);
+  const d = p.getImageData(0, 0, probe.width, probe.height).data;
+  let opaque = 0, min = 255, max = 0;
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] > 8) opaque++;
+    const lum = (d[i] + d[i + 1] + d[i + 2]) / 3;
+    if (lum < min) min = lum;
+    if (lum > max) max = lum;
+  }
+  const pixels = d.length / 4;
+  return { opaqueRatio: opaque / pixels, range: max - min,
+           ok: opaque / pixels > 0.01 && max - min > 6 };
+}
+
+async function settle() {
+  await mv.updateComplete;
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
+}
+
+async function grab() {
+  const blob = await mv.toBlob({ mimeType: 'image/webp', qualityArgument: 0.92 });
+  return createImageBitmap(blob);
+}
+
 async function captureTurn(onProgress) {
   turnFrames = [];
+  turnBlank = false;
   if (!piece.model_url || !mv.loaded) return;
 
   const orbit = mv.getCameraOrbit();          // keep the height and zoom set by hand
   const wasAuto = mv.hasAttribute('auto-rotate');
   mv.removeAttribute('auto-rotate');
 
-  // Rendered at full frame size so the stills are not upscaled later. It
-  // overflows its container for a moment, which #busy is covering.
-  const prev = { w: mv.style.width, h: mv.style.height };
+  const prev = { w: mv.style.width, h: mv.style.height, t: mv.style.transform };
+  document.body.classList.add('capturing');
   mv.style.width = W + 'px';
   mv.style.height = H + 'px';
+  mv.style.transform = `scale(${Math.min(window.innerWidth / W, window.innerHeight / H) * 0.96})`;
 
-  const count = turnFrameCount();
-  const start = orbit.theta * 180 / Math.PI;
-  for (let i = 0; i < count; i++) {
-    const theta = start + (360 * i / count);
-    mv.cameraOrbit = `${theta}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
-    await mv.updateComplete;
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-    const blob = await mv.toBlob({ mimeType: 'image/webp', qualityArgument: 0.92 });
-    turnFrames.push(await createImageBitmap(blob));
-    onProgress((i + 1) / count);
+  const restore = () => {
+    document.body.classList.remove('capturing');
+    mv.style.width = prev.w; mv.style.height = prev.h; mv.style.transform = prev.t;
+    mv.cameraOrbit = `${orbit.theta * 180 / Math.PI}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
+    if (wasAuto) mv.setAttribute('auto-rotate', '');
+  };
+
+  try {
+    const count = turnFrameCount();
+    const start = orbit.theta * 180 / Math.PI;
+
+    /* The first frame is proved before the other hundred-odd are spent on it.
+       Resizing the buffer to 1080×1920 takes a moment longer than a camera
+       move, so a blank first frame gets one more chance with real time to
+       settle before the scene is given up on. */
+    for (let attempt = 0; attempt < 2; attempt++) {
+      mv.cameraOrbit = `${start}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
+      await settle();
+      if (attempt) await new Promise(r => setTimeout(r, 700));
+      const first = await grab();
+      if (frameHasContent(first).ok) { turnFrames.push(first); break; }
+      if (attempt) { turnBlank = true; restore(); return; }
+    }
+
+    for (let i = 1; i < count; i++) {
+      const theta = start + (360 * i / count);
+      mv.cameraOrbit = `${theta}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
+      await settle();
+      turnFrames.push(await grab());
+      onProgress((i + 1) / count);
+    }
+  } finally {
+    restore();
   }
-
-  mv.style.width = prev.w;
-  mv.style.height = prev.h;
-  mv.cameraOrbit = `${start}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
-  if (wasAuto) mv.setAttribute('auto-rotate', '');
 }
 
 /* ── DRAWING ──────────────────────────────────────────────────── */
@@ -605,7 +667,7 @@ function timeline() {
   for (const s of SCENES) {
     if (!document.getElementById(s.id).checked) continue;
     if (s.key === 'photo' && (!piece.image_url || photoBlocked)) continue;
-    if (s.key === 'turn' && !piece.model_url) continue;
+    if (s.key === 'turn' && (!piece.model_url || turnBlank)) continue;
     if (s.key === 'specs' && !specRows().length) continue;
     on.push(s);
   }
@@ -701,7 +763,7 @@ async function inspect(blob, expected) {
 
 async function play(record) {
   if (running) return;
-  const tl = timeline();
+  let tl = timeline();
   if (!tl.length) { showToast('Nothing to show — every scene is empty', 'error'); return; }
 
   running = true;
@@ -725,9 +787,23 @@ async function play(record) {
       }
       if (!mv.loaded) {
         showToast('The model did not load — the turn will be left out', 'error');
+        turnBlank = true;
       } else {
         busy(true, 'Capturing the turn', 0);
         await captureTurn(p => busy(true, 'Capturing the turn', p));
+      }
+
+      /* Seconds of bare ground is the worst outcome: it looks like the video
+         is broken rather than like a scene was skipped. Drop the scene and
+         say why, so the rest of the video is still worth posting. */
+      if (turnBlank || !turnFrames.length) {
+        turnBlank = true;
+        showToast('The model captured blank — the turn is left out of this video', 'error');
+        document.getElementById('exportHint').innerHTML =
+          '<span class="warn">The 3D capture came back empty, so the turn was left out. ' +
+          'Use <strong>Test the 3D capture</strong> to see what the viewer is producing.</span>';
+        tl = timeline();
+        if (!tl.length) throw new Error('__nothingleft');
       }
     }
     // Canvas text silently falls back to a system serif if the webfont has
@@ -939,6 +1015,53 @@ document.getElementById('showSafe').addEventListener('change', (e) => {
   const last = tl[tl.length - 1];
   drawAt(last.start + Math.min(1.2, last.secs - 0.01), tl, true);
 });
+
+/* Grabs one frame and says what came back. A sixteen-second export is a slow
+   way to learn that the viewer handed over an empty rectangle. */
+document.getElementById('testTurn').onclick = async (e) => {
+  if (running) return;
+  const btn = e.target, label = btn.textContent;
+  const hint = document.getElementById('exportHint');
+  btn.disabled = true; btn.textContent = 'Testing…';
+  try {
+    if (!piece || !piece.model_url) { hint.textContent = 'This piece has no 3D model.'; return; }
+    if (!mv.loaded) {
+      hint.innerHTML = '<span class="warn">The model has not loaded yet. Wait for it to appear in the frame, then test again.</span>';
+      return;
+    }
+    running = true;
+    const before = { w: mv.style.width, h: mv.style.height, t: mv.style.transform };
+    document.body.classList.add('capturing');
+    mv.style.width = W + 'px'; mv.style.height = H + 'px';
+    mv.style.transform = `scale(${Math.min(window.innerWidth / W, window.innerHeight / H) * 0.96})`;
+    await settle();
+    const bmp = await grab();
+    document.body.classList.remove('capturing');
+    mv.style.width = before.w; mv.style.height = before.h; mv.style.transform = before.t;
+
+    const seen = frameHasContent(bmp);
+    // Put it on the canvas either way — seeing the empty frame is the point.
+    sizeCanvas();
+    fill(ground);
+    ctx.drawImage(bmp, 0, 0, W, H);
+    document.getElementById('stage').classList.add('showing-canvas');
+
+    hint.innerHTML = seen.ok
+      ? `The capture works: ${bmp.width}×${bmp.height}, ` +
+        `${(seen.opaqueRatio * 100).toFixed(0)}% of it drawn, tonal range ${seen.range | 0}. ` +
+        `Double-click the frame to go back to the live view.`
+      : `<span class="warn">The capture came back empty: ${bmp.width}×${bmp.height}, ` +
+        `${(seen.opaqueRatio * 100).toFixed(1)}% drawn, tonal range ${seen.range | 0}. ` +
+        `The viewer is rendering to the page but not into a captured frame. Tell Claude these numbers.</span>`;
+  } catch (err) {
+    document.body.classList.remove('capturing');
+    document.getElementById('exportHint').innerHTML =
+      `<span class="warn">The capture threw: ${err && err.message}</span>`;
+  } finally {
+    running = false;
+    btn.disabled = false; btn.textContent = label;
+  }
+};
 
 document.getElementById('preview').onclick = () => play(false);
 document.getElementById('export').onclick  = () => play(true);
