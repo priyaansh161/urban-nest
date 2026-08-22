@@ -1,0 +1,230 @@
+DEPLOY CHECKLIST — 22 August 2026
+==========================================================
+
+Last deploy was 7 August. Sixteen commits since then.
+Expected build output:  dist/ — 58 files, 6.6 MB
+
+Run these two, in order:
+
+    node tools/build-site.mjs
+    netlify deploy --prod --dir dist
+
+Then work down this list. Hard-refresh each page with
+Ctrl+Shift+R the first time — otherwise you are looking at
+the copy your browser saved a fortnight ago.
+
+
+==========================================================
+ A. THE ONE THAT COULD ACTUALLY BREAK SOMETHING
+==========================================================
+
+[ ] A1  Open any piece with a 3D view and check the model
+        still loads.
+
+        WHY: .glb files no longer ship to Netlify. Every
+        model is served from Supabase instead, which cut the
+        deploy from 72 MB to 6.6 MB. Checked before
+        deploying: all 21 listings use absolute Supabase
+        URLs, so none of them needs the local copies.
+
+        IF A MODEL IS MISSING: a listing has a relative path
+        like "models/vase.glb" typed by hand. Either repaste
+        the Supabase URL in Admin > Collection, or add
+        { dir: 'models', exts: ['.glb'], deep: false }
+        back to the RULES block in tools/build-site.mjs and
+        redeploy.
+
+
+==========================================================
+ B. HOMEPAGE   /
+==========================================================
+
+[ ] B1  The headline reads, in gold, three lines:
+            Your space.
+            Your imagination.
+            Your Urban Nest.
+
+[ ] B2  Above it, "CURATED LIVING · INDIA" is legible.
+        It used to disappear into the photograph.
+
+[ ] B3  Under the headline: "For the designer in you."
+
+[ ] B4  Scroll to the bottom. Above the Urban Nest logo
+        there is a line about the pieces being 3D models
+        built with AI assistance, ending in a gold link,
+        "How we model things".
+
+[ ] B5  Hover a tile in the collection strip. It should
+        shrink slightly and step back, like every other
+        tile on the site.
+
+
+==========================================================
+ C. COLLECTION   /collection.html
+==========================================================
+
+[ ] C1  The page opens on CATEGORY TILES, not a flat grid
+        of every piece. You should see four:
+        Amphorae, Lighting, Luminaires, Sculptures.
+
+[ ] C2  Each tile has a photograph and a piece count.
+
+[ ] C3  There is NO "Loading the collection…" text left
+        sitting underneath the tiles.
+
+[ ] C4  Hovering a category tile shrinks it.
+
+[ ] C5  Click a tile. You get that category's own page:
+        a wide photograph, its name, its paragraph, the
+        piece count, and "← All categories".
+
+[ ] C6  The browser Back button returns to the tiles.
+
+[ ] C7  The address bar reads ...collection.html?c=lighting
+        or similar. Paste that link in a new tab — it
+        should open straight to that category.
+
+
+==========================================================
+ D. A PIECE'S DETAIL SHEET
+==========================================================
+
+Click any piece to open it.
+
+[ ] D1  The product name is noticeably smaller than before
+        and no longer fills the panel.
+
+[ ] D2  Scroll inside the sheet. ONLY the text column moves.
+        The 3D object stays perfectly still.
+
+[ ] D3  Top-left of the object: two small circles. Clicking
+        them switches the background between the teal and a
+        pale bone colour. It remembers your choice when you
+        open the next piece.
+
+[ ] D4  The close mark is a bare ×, no filled black square,
+        sitting on the sheet's own corner.
+
+
+==========================================================
+ E. THE OTHER PAGES
+==========================================================
+
+[ ] E1  /about.html — scroll to "ON THE RENDERS", a section
+        between "What we are" and "Get in touch".
+
+[ ] E2  The footer link on the homepage jumps straight to
+        that section.
+
+[ ] E3  /community.html — the same footer line is there.
+
+[ ] E4  A room page (bathroom, bedroom or kitchen): click a
+        product dot. At the bottom of the panel, above SHOP
+        SIMILAR, there is a short note about the model being
+        a likeness rather than a photograph.
+
+
+==========================================================
+ F. ADMIN   /admin/login.html
+==========================================================
+
+[ ] F1  There is a "Show password" checkbox under the
+        password field. Ticking it reveals what you typed
+        and puts the cursor back at the end.
+
+[ ] F2  Sign in. The sidebar has a CONTENT CREATION group
+        with exactly two entries:
+            Media Engagement
+            Caption
+        There is NO "Turntable" and NO "Reel Studio".
+
+[ ] F3  /admin/reel.html should give a 404 — that page was
+        deleted.
+
+
+==========================================================
+ G. ADMIN > COLLECTION
+==========================================================
+
+[ ] G1  A "Categories" panel at the top, closed by default.
+        Open it: your four categories with photos, slugs,
+        piece counts and Edit / Publish / Delete.
+
+[ ] G2  The Category dropdown on an item lists YOUR
+        categories, not the old hard-coded seven.
+
+[ ] G3  Under the 3D Model URL field there is the compress
+        command with a COPY button.
+
+[ ] G4  Upload a .glb. It should succeed. This is the fix
+        for the "wrong file type" rejection — the file is
+        now labelled properly on the way up.
+
+
+==========================================================
+ H. ADMIN > MEDIA ENGAGEMENT
+==========================================================
+
+[ ] H1  The page is titled "Media Engagement Tool".
+
+[ ] H2  Three shapes: 9:16, 4:5 and 1:1.
+
+[ ] H3  Each scene has a slider for its length, and the
+        total updates as you drag.
+
+[ ] H4  Press "Test the 3D capture". Read what it says —
+        this is the outstanding problem and I want the
+        numbers it prints, whether it works or not.
+
+[ ] H5  Tick "Show what Instagram covers". Shaded bands
+        appear top and bottom. Nothing readable should sit
+        inside them.
+
+[ ] H6  Export one video. The line underneath should report
+        a duration matching the timeline. Play it before
+        posting.
+
+
+==========================================================
+ I. ADMIN > CAPTION
+==========================================================
+
+[ ] I1  Pick a piece, press "Write it". You get a caption
+        starting with the name, then two sentences from the
+        description, the 3D line, the specs, the price, an
+        Urban Nest sign-off, and "link in bio".
+
+[ ] I2  Three voices: Editorial, Plain, Punchy.
+
+[ ] I3  About 22 hashtags, mixed across tiers. "Shuffle the
+        mix" changes them.
+
+[ ] I4  The counters show characters and tag count against
+        Instagram's limits.
+
+
+==========================================================
+ J. WHAT SHOULD *NOT* BE THERE
+==========================================================
+
+These should all return 404. They were being published by
+accident until 7 August.
+
+[ ] J1  /models/source/crystal%20chandelier-raw.glb
+[ ] J2  /images/source/  (any file in it)
+[ ] J3  /tools/compress-model.mjs
+[ ] J4  /admin/lock-down-rls.sql
+
+
+==========================================================
+ IF SOMETHING IS WRONG
+==========================================================
+
+First: Ctrl+Shift+R. Most "it didn't deploy" is a cached
+page.
+
+Second: did you run BOTH commands? Deploying without
+rebuilding sends the previous dist.
+
+Third: tell Claude which checklist number failed. The
+numbers are there so you do not have to describe it.
