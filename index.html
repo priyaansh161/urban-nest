@@ -421,19 +421,19 @@
       color: rgba(244,242,233,0.95); margin-bottom: 20px;
       text-shadow: 0 1px 14px rgba(8,8,7,0.75), 0 0 4px rgba(8,8,7,0.5);
     }
-    /* Three lines rather than two, so the ceiling comes down from 104px. The
-       shadow is what lets gold sit on a photograph: it is a mid-tone, and
-       against a pale wall it has almost no contrast of its own to spend. */
+    /* Back to two tones: the statement in near-white, its turn in gold
+       italic. All-gold flattened it — the line lost the place where it
+       changes its mind, which was the only reason the second half landed.
+       The shadow stays. It was added for gold on a pale wall and it earns
+       its keep for white on one too. */
     .hero-type {
       font-family: 'Bodoni Moda', Didot, Georgia, serif;
-      font-weight: 600;
-      /* Sized so three lines occupy what two used to: at 82px the buttons
-         were pushed below the fold on a 900px-tall laptop. */
-      font-size: clamp(29px, 4.9cqw, 67px);
-      line-height: 1.0; letter-spacing: -0.02em;
-      max-width: 18ch;
-      color: var(--gold);
-      text-shadow: 0 2px 26px rgba(8,8,7,0.55), 0 1px 3px rgba(8,8,7,0.35);
+      font-weight: 400;
+      font-size: clamp(36px, 6.9cqw, 94px);
+      line-height: 1.0; letter-spacing: -0.022em;
+      max-width: 15ch;
+      color: var(--panel-ink);
+      text-shadow: 0 2px 26px rgba(8,8,7,0.45), 0 1px 3px rgba(8,8,7,0.3);
     }
     .hero-type em { font-style: italic; color: var(--gold); }
 
@@ -1022,9 +1022,8 @@
     <div class="hero-inner shell rv">
       <span class="hero-eyebrow">Curated living · India</span>
       <h1 class="hero-type">
-        <span class="mask"><span>Your space.</span></span>
-        <span class="mask"><span style="--d:110ms">Your imagination.</span></span>
-        <span class="mask"><span style="--d:220ms">Your Urban Nest.</span></span>
+        <span class="mask"><span>Luxury for the few.</span></span>
+        <span class="mask"><span style="--d:110ms"><em>We disagree.</em></span></span>
       </h1>
       <div class="hero-foot rv" style="--d:300ms">
         <p class="hero-sub">For the designer in you.</p>

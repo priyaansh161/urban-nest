@@ -39,10 +39,10 @@ the copy your browser saved a fortnight ago.
  B. HOMEPAGE   /
 ==========================================================
 
-[ ] B1  The headline reads, in gold, three lines:
-            Your space.
-            Your imagination.
-            Your Urban Nest.
+[ ] B1  The headline is two lines. The first is near-white,
+        the second is gold italic:
+            Luxury for the few.
+            We disagree.
 
 [ ] B2  Above it, "CURATED LIVING · INDIA" is legible.
         It used to disappear into the photograph.
