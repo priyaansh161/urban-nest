@@ -551,6 +551,11 @@
       position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 14px 11px;
       font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--panel-ink);
       background: linear-gradient(to top, rgba(8,8,7,0.72), transparent);
+      /* A hard ceiling of two lines. The text is shortened before it gets
+         here, but a caption is a label on a photograph and must never be
+         allowed to become the photograph. */
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden; line-height: 1.45;
     }
 
     /* ═══════════════════════════════════════════
@@ -797,6 +802,15 @@
       .hero-type { max-width: 100%; }
       .hero-foot { flex-direction: column; align-items: flex-start; gap: 22px; }
       .hero-foot .btn-row { width: 100%; }
+
+      /* Three across on a phone gave each piece about 110px to live in, which
+         is not a tile, it is a thumbnail with a paragraph on it. Two across,
+         with the caption tracked and padded to match the smaller tile. */
+      .wstrip { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .wstrip figcaption {
+        padding: 20px 11px 9px;
+        font-size: 9px; letter-spacing: 0.12em;
+      }
 
       /* the mosaic folds to two columns; wide tiles take the full width */
       .band { min-height: clamp(160px, 40cqw, 220px); padding: clamp(30px, 7cqw, 44px) var(--gutter); }
@@ -1258,12 +1272,29 @@
           var rows = (r && r.data) || [];
           if (!rows.length) return;
           var grid = document.getElementById('collectGrid');
+
+          var esc = function (s) {
+            return String(s == null ? '' : s)
+              .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+          };
+
+          /* Retailer titles run to seventy characters — "Candle Chandelier |
+             White Crystal Glass Metal Chandelier Lights For Ceiling" — and this
+             caption sits on a tile a third of a phone wide. Printed whole it
+             wrapped to seven lines and covered the photograph it was labelling.
+             The first clause is the piece; everything after the first comma,
+             bracket or bar is keyword stuffing for a search engine. */
+          var label = function (name) {
+            var s = String(name || '').split(/[,(|]/)[0].trim();
+            return s.length > 34 ? s.slice(0, 33).replace(/\s+\S*$/, '') + '…' : s;
+          };
+
           grid.innerHTML = rows.map(function (it) {
             // IMG: COLLECTION placeholder, when a piece has no photo of its own
             var img = it.image_url || 'images/det-vase.webp';
             return '<a class="ct-piece" href="collection.html">' +
-              '<figure><img src="' + img + '" alt="" loading="lazy" decoding="async"/>' +
-              '<figcaption>' + (it.name || '') + (it.model_url ? ' · 3D' : '') + '</figcaption></figure></a>';
+              '<figure><img src="' + esc(img) + '" alt="" loading="lazy" decoding="async"/>' +
+              '<figcaption>' + esc(label(it.name)) + (it.model_url ? ' · 3D' : '') + '</figcaption></figure></a>';
           }).join('');
           document.getElementById('collect').style.display = '';
         }, function () {});

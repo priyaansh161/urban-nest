@@ -58,6 +58,12 @@ the copy your browser saved a fortnight ago.
         shrink slightly and step back, like every other
         tile on the site.
 
+[ ] B6  ON A PHONE: the collection strip is TWO tiles across,
+        not three, and each caption is a short name over the
+        photograph rather than a paragraph covering it.
+        It should read "Whispering Homes Bezel 12-Light… · 3D"
+        and take about a third of the tile.
+
 
 ==========================================================
  C. COLLECTION   /collection.html
