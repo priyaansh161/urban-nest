@@ -62,6 +62,12 @@ the copy your browser saved a fortnight ago.
         and shuffled — reload the homepage a few times and
         they should not be the same three every time.
 
+[ ] B5c The section is titled "Explore the Collection", set
+        large in the serif typeface — not a small tracked
+        tag any more. "The spaces" heading below matches it
+        in size. On a phone, "See all" drops onto its own
+        line under the title rather than squeezing beside it.
+
 [ ] B6  ON A PHONE: the collection strip is TWO tiles across,
         not three, and each caption is a short name over the
         photograph rather than a paragraph covering it.
