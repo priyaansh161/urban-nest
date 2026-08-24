@@ -1262,14 +1262,32 @@
 
     /* ── the collection preview ──
        Three published pieces, linking through to the full page. If nothing is
-       published the section never appears, rather than showing filler. */
+       published the section never appears, rather than showing filler.
+
+       Pulled from a wider pool and shuffled down to three on every visit,
+       rather than the same first three by sort order forever — a strip that
+       never changes reads as a fixture, not as a live shop window. The order
+       column still decides who is IN the pool, so it stays a curation tool;
+       it just stops also fixing who is on screen right now. */
     (function loadCollection() {
       if (typeof db === 'undefined') return;
+      var POOL = 12;
+
+      function sample(arr, n) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a.slice(0, n);
+      }
+
       db.from('collection_items').select('id,name,category,image_url,model_url')
-        .eq('published', true).order('sort_order').order('created_at').limit(3)
+        .eq('published', true).order('sort_order').order('created_at').limit(POOL)
         .then(function (r) {
-          var rows = (r && r.data) || [];
-          if (!rows.length) return;
+          var pool = (r && r.data) || [];
+          if (!pool.length) return;
+          var rows = sample(pool, 3);
           var grid = document.getElementById('collectGrid');
 
           var esc = function (s) {

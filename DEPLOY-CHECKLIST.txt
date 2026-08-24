@@ -58,6 +58,10 @@ the copy your browser saved a fortnight ago.
         shrink slightly and step back, like every other
         tile on the site.
 
+[ ] B5b The three pieces shown are drawn from a wider pool
+        and shuffled — reload the homepage a few times and
+        they should not be the same three every time.
+
 [ ] B6  ON A PHONE: the collection strip is TWO tiles across,
         not three, and each caption is a short name over the
         photograph rather than a paragraph covering it.
