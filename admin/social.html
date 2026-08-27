@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Media Engagement Tool — Urban Nest Admin</title>
+<title>Reel Studio — Urban Nest Admin</title>
 <link rel="icon" type="image/png" href="../favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
 <script src="auth.js"></script>
 <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
@@ -35,13 +36,33 @@
   .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
   .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
 
-  .studio { display: grid; grid-template-columns: 320px 1fr; gap: 32px; align-items: start; }
+  /* The middle track is the old 32px gap, now spent on a draggable handle
+     instead of empty space — --ctrl-w is set from JS (and remembered),
+     defaulting to the panel's original width. */
+  .studio { display: grid; grid-template-columns: var(--ctrl-w, 320px) 28px 1fr; align-items: start; }
+  .resize-handle { align-self: stretch; cursor: col-resize; position: relative; touch-action: none; }
+  .resize-handle::before {
+    content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
+    background: var(--border); transform: translateX(-50%); transition: background 0.2s, width 0.2s;
+  }
+  .resize-handle:hover::before, .resize-handle.dragging::before { background: var(--gold); width: 2px; }
   .controls { background: var(--white); border: 0.5px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 22px; }
   .ctrl-group { display: flex; flex-direction: column; gap: 8px; }
   .ctrl-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
   select, input[type="text"] { padding: 10px 12px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--black); outline: none; width: 100%; }
   select:focus, input[type="text"]:focus { border-color: var(--gold); }
   .hint { font-size: 10.5px; color: var(--grey); line-height: 1.6; }
+
+  /* The template switch sits above everything else and looks a size heavier,
+     since choosing it decides which of the panels below are even visible. */
+  .tpl-select { padding: 12px 14px; border: 0.5px solid var(--black); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--black); outline: none; width: 100%; }
+  .tpl-hint { font-size: 10.5px; color: var(--grey); line-height: 1.6; margin-top: 6px; }
+
+  /* Each template owns a block of ctrl-groups. display:contents keeps its
+     children as direct flex items of .controls, so the 22px gap rhythm holds
+     whichever template is showing — only one .tpl-panel is ever "active". */
+  .tpl-panel { display: none; }
+  .tpl-panel.active { display: contents; }
 
   .chips { display: flex; gap: 6px; flex-wrap: wrap; }
   .chip { padding: 7px 13px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 10.5px; letter-spacing: 0.08em; color: var(--grey); cursor: pointer; transition: all 0.2s; }
@@ -60,6 +81,51 @@
   .dial { width: 100%; accent-color: var(--gold); height: 16px; cursor: pointer; }
   .scene-row:has(input[type="checkbox"]:not(:checked)) { opacity: 0.45; }
 
+  /* ── MULTI-PICK (Roundup / Montage) ── */
+  .pick-list { max-height: 210px; overflow-y: auto; border: 0.5px solid var(--border); display: flex; flex-direction: column; background: var(--white); }
+  .pick-row { display: flex; align-items: center; gap: 9px; padding: 8px 10px; font-size: 12px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
+  .pick-row:last-child { border-bottom: none; }
+  .pick-row:hover { background: #faf9f5; }
+  .pick-row input { accent-color: var(--gold); flex-shrink: 0; }
+  /* min-width:0 overrides a flex item's default of never shrinking below its
+     content's own width — without it, ellipsis never engages and a long
+     enough name pushes the row wider than the panel instead of clipping. */
+  .pick-row .pn { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pick-row .pp { color: var(--grey); font-size: 10.5px; flex-shrink: 0; }
+  .pick-empty { padding: 16px 10px; font-size: 11.5px; color: var(--grey); text-align: center; }
+  .pick-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pick-chip { display: flex; align-items: center; gap: 6px; padding: 5px 6px 5px 10px; background: var(--gold-light); border: 0.5px solid var(--gold); font-size: 10.5px; color: var(--black); }
+  .pick-chip button { border: none; background: none; color: var(--grey); cursor: pointer; font-size: 13px; line-height: 1; padding: 2px; }
+  .pick-chip button:hover { color: var(--black); }
+  .pick-count { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--black); }
+
+  /* ── MINI PREVIEW ──
+     A thumbnail beside the input it belongs to, so a caption can be judged
+     against the frame it will actually sit in without leaving the field or
+     touching the big stage, which is busy showing something else. */
+  /* Same shape as The Nest editor's formatting toolbar, scoped to what a
+     one-line card on a canvas can actually honour: weight, slant, size. */
+  .fmt-toolbar { display: flex; align-items: center; gap: 1px; flex-wrap: wrap;
+                 border: 0.5px solid var(--border); border-bottom: none; background: var(--bg); padding: 4px 6px; }
+  .fmt-sep { width: 1px; align-self: stretch; margin: 4px 7px; background: var(--border); }
+  .fmt-btn { min-width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+             padding: 0 7px; border: 0.5px solid transparent; border-radius: 3px; background: none;
+             cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--black);
+             transition: background 0.15s, border-color 0.15s; }
+  .fmt-btn:hover { border-color: var(--border); background: var(--white); }
+  .fmt-btn[aria-pressed="true"] { background: var(--black); color: var(--white); border-color: var(--black); }
+  .fmt-btn svg { width: 14px; height: 14px; display: block; }
+  .fmt-select { height: 28px; padding: 0 5px; border: 0.5px solid var(--border); border-radius: 3px;
+                background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 11.5px;
+                color: var(--black); cursor: pointer; outline: none; }
+  .fmt-select:focus { border-color: var(--gold); }
+  .fmt-toolbar + .mini-row input[type="text"] { border-top: none; }
+
+  .mini-row { display: flex; gap: 10px; align-items: stretch; }
+  .mini-row input[type="text"] { flex: 1; }
+  .mini-preview { width: 62px; aspect-ratio: 9 / 16; background: #0F1F22; flex-shrink: 0;
+                   box-shadow: 0 3px 10px rgba(17,17,16,0.16); }
+
   .btn { padding: 12px 22px; border: none; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
   .btn-primary { background: var(--black); color: var(--white); }
   .btn-primary:hover:not(:disabled) { background: var(--gold); }
@@ -69,26 +135,35 @@
   .btn-row { display: flex; flex-direction: column; gap: 8px; }
 
   /* ── STAGE ──
-     The model-viewer is what you see while setting up; the canvas takes over
-     for the preview and the export, because the canvas is what gets recorded. */
+     The model-viewer / spline-viewer is what you see while setting up; the
+     canvas takes over for the preview and the export, because the canvas is
+     what gets recorded. Templates with no live 3D piece (Roundup, Montage,
+     Quote, Testimonial) leave both viewers hidden and sit on the canvas the
+     whole time — there is nothing to pose. */
   .stage-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-  #stage { position: relative; overflow: hidden; aspect-ratio: 9 / 16; height: min(74vh, 800px);
+  #stage { position: relative; overflow: hidden; aspect-ratio: 9 / 16; height: min(82vh, 920px);
            background: #0F1F22; box-shadow: 0 14px 50px rgba(17,17,16,0.16); }
-  #mv { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
+  #mv, #sv { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
   #sheet { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
   #stage.showing-canvas #sheet { display: block; }
-  #stage.showing-canvas #mv { visibility: hidden; }
+  #stage.showing-canvas #mv, #stage.showing-canvas #sv { visibility: hidden; }
   .stage-meta { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); }
 
   /* ── DURING FRAME CAPTURE ──
-     The viewer is lifted out of #stage and laid on the viewport at the full
-     frame size, then scaled down to fit. model-viewer sizes its drawing
-     buffer from the layout box, so this captures at a true 1080×1920 while
-     staying wholly on screen — and an element clipped away by its container
-     is one model-viewer is entitled to stop rendering, which is a good way to
-     collect a folder of empty frames. */
-  body.capturing #mv { position: fixed; top: 0; left: 0; z-index: 9998; transform-origin: top left; }
-  body.capturing #busy { position: fixed; inset: 0; z-index: 9999; }
+     The viewer being captured is lifted out of #stage and laid on the
+     viewport at the full frame size, then scaled down to fit. Both
+     model-viewer and spline-viewer size their drawing buffer from the layout
+     box, so this captures at a true 1080×1920 while staying wholly on
+     screen — an element clipped away by its container is one either viewer
+     is entitled to stop rendering, which is a good way to collect a folder
+     of empty frames. */
+  body.capturing #mv, body.capturing #sv { position: fixed; top: 0; left: 0; z-index: 9998; transform-origin: top left; pointer-events: none; }
+  /* Stays put — #busy's normal position:absolute;inset:0 already covers
+     exactly #stage, which is now also where the lifted-out viewer above is
+     pinned (see stageCaptureFrame()). It used to jump to cover the whole
+     viewport, because the viewer it was masking used to jump there too;
+     neither needs to leave the preview window now. */
+  body.capturing #busy { z-index: 9999; }
   #busy { position: absolute; inset: 0; z-index: 5; display: none; flex-direction: column;
           align-items: center; justify-content: center; gap: 16px; background: rgba(9,20,22,0.88); }
   #busy.on { display: flex; }
@@ -102,7 +177,7 @@
   .guide li { font-size: 12.5px; line-height: 1.7; color: var(--grey); }
   .guide strong { color: var(--black); }
   .warn { color: #B4552F; }
-  @media (max-width: 1150px) { .studio { grid-template-columns: 1fr; } }
+  @media (max-width: 1150px) { .studio { grid-template-columns: 1fr; } .resize-handle { display: none; } }
 </style>
 </head>
 <body>
@@ -123,6 +198,7 @@
     <div class="nav-group-label">Content Creation</div>
     <a href="social.html" class="nav-item active"><span class="icon">▣</span> Media Engagement</a>
     <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
+    <a href="article-card.html" class="nav-item"><span class="icon">▤</span> Article Cards</a>
     <div class="nav-group-label">Community</div>
     <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
     <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
@@ -135,24 +211,246 @@
 
 <main class="main">
   <div class="page-header">
-    <h1>Media Engagement Tool</h1>
+    <h1>Reel Studio</h1>
     <p>Builds a finished MP4 at Instagram's own resolution — no screen recording, nothing to crop</p>
   </div>
 
   <div class="studio">
     <div class="controls">
       <div class="ctrl-group">
-        <label class="ctrl-label" for="pick">Piece</label>
-        <select id="pick"><option>Loading…</option></select>
-        <span class="hint" id="pickHint"></span>
+        <label class="ctrl-label" for="template">Template</label>
+        <select id="template" class="tpl-select">
+          <option value="story">Product Story — one piece, in depth</option>
+          <option value="roundup">Collection Roundup — several pieces</option>
+          <option value="montage">Rapid-Fire Montage — fast cuts</option>
+          <option value="quote">Nest Quote Card — an article, as text</option>
+          <option value="testimonial">Customer Testimonial — a review</option>
+          <option value="tour">Spline Scene Tour — a 3D room</option>
+        </select>
+        <span class="tpl-hint" id="tplHint"></span>
       </div>
 
+      <!-- ═══ PRODUCT STORY ═══ -->
+      <div class="tpl-panel active" data-tpl="story">
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="pick">Piece</label>
+          <select id="pick"><option>Loading…</option></select>
+          <span class="hint" id="pickHint"></span>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Scenes and their length</span>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="scPhoto" checked/> Photograph <span class="secs" id="outPhoto"></span></label>
+            <input type="range" class="dial" id="dialPhoto" min="0" max="12" step="0.5" value="3.5"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="scTurn" checked/> The piece turning <span class="secs" id="outTurn"></span></label>
+            <input type="range" class="dial" id="dialTurn" min="0" max="14" step="0.5" value="5"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="scSpecs" checked/> Specification <span class="secs" id="outSpecs"></span></label>
+            <input type="range" class="dial" id="dialSpecs" min="0" max="14" step="0.5" value="4.5"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="scClose" checked/> Name and price <span class="secs" id="outClose"></span></label>
+            <input type="range" class="dial" id="dialClose" min="0" max="10" step="0.5" value="3"/>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">While setting up</span>
+          <!-- The Turntable's one real advantage was being able to stop the spin
+               and set an exact angle by hand. Same thing, one checkbox. -->
+          <label class="toggle-row"><input type="checkbox" id="holdStill"/> Hold the spin while I pose it</label>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="nameOverride">Name in the video</label>
+          <input type="text" id="nameOverride" placeholder="Leave empty to shorten it automatically"/>
+          <span class="hint">Cut at the first comma or bracket by default, where the keyword stuffing starts.</span>
+        </div>
+      </div>
+
+      <!-- ═══ COLLECTION ROUNDUP ═══ -->
+      <div class="tpl-panel" data-tpl="roundup">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Pieces, in the order they'll appear <span class="pick-count" id="roundupCount"></span></span>
+          <input type="text" id="roundupFilter" placeholder="Filter by name…"/>
+          <div class="pick-list" id="roundupList"></div>
+          <div class="pick-chips" id="roundupChips"></div>
+          <span class="hint">Up to 8 pieces. Each gets its photograph, name and price — no specification, no turn.</span>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Scenes and their length</span>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="ruScOpen" checked/> "Our picks" opening <span class="secs" id="ruOutOpen"></span></label>
+            <input type="range" class="dial" id="ruDialOpen" min="0" max="4" step="0.2" value="1.8"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" checked disabled/> Each piece <span class="secs" id="ruOutItem"></span></label>
+            <input type="range" class="dial" id="ruDialItem" min="0" max="6" step="0.2" value="2.5"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="ruScClose" checked/> Closing card <span class="secs" id="ruOutClose"></span></label>
+            <input type="range" class="dial" id="ruDialClose" min="0" max="5" step="0.2" value="2.6"/>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="ruCloseText">Closing line</label>
+          <div class="fmt-toolbar" data-tpl-style="roundup">
+            <button type="button" class="fmt-btn" data-style="bold" aria-pressed="true" title="Bold" aria-label="Bold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7z"/><path d="M7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg>
+            </button>
+            <button type="button" class="fmt-btn" data-style="italic" aria-pressed="false" title="Italic" aria-label="Italic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5h-5"/><path d="M14 19H9"/><path d="M14.5 5l-4 14"/></svg>
+            </button>
+            <span class="fmt-sep"></span>
+            <select class="fmt-select" data-style="size" title="Text size">
+              <option value="0.8">Small</option>
+              <option value="1" selected>Medium</option>
+              <option value="1.25">Large</option>
+              <option value="1.5">Extra large</option>
+            </select>
+          </div>
+          <div class="mini-row">
+            <input type="text" id="ruCloseText" placeholder="Shop the Edit"/>
+            <canvas class="mini-preview" id="ruCloseMini" aria-label="Closing card preview"></canvas>
+          </div>
+          <span class="hint">What the last card says, over "Link in bio" — so a roundup of lamps from every category can close on "Illuminate your house with Lamps from Urban Nest" instead of the same line every time.</span>
+        </div>
+      </div>
+
+      <!-- ═══ RAPID-FIRE MONTAGE ═══ -->
+      <div class="tpl-panel" data-tpl="montage">
+        <div class="ctrl-group">
+          <span class="ctrl-label">Pieces, in the order they'll flash by <span class="pick-count" id="montageCount"></span></span>
+          <input type="text" id="montageFilter" placeholder="Filter by name…"/>
+          <div class="pick-list" id="montageList"></div>
+          <div class="pick-chips" id="montageChips"></div>
+          <span class="hint">Up to 30 photographs. This is the "dum dum dum dum dum" one — hard cuts, no cross-fade, no time to read a name.</span>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Beat</span>
+          <label class="toggle-row">Each piece on screen for <span class="secs" id="mtOutBeat"></span></label>
+          <input type="range" class="dial" id="mtDialBeat" min="0" max="500" step="20" value="160"/>
+          <span class="hint">Faster than about 150ms starts to feel like a strobe rather than a slideshow — that's usually the point here.</span>
+        </div>
+        <div class="ctrl-group">
+          <label class="toggle-row"><input type="checkbox" id="mtFlash" checked/> Flash cut — a white pop on every hard cut</label>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Bookends</span>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="mtScOpen" checked/> Brand flash to open <span class="secs" id="mtOutOpen"></span></label>
+            <input type="range" class="dial" id="mtDialOpen" min="0" max="1.5" step="0.1" value="0.6"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="mtScClose" checked/> Closing card <span class="secs" id="mtOutClose"></span></label>
+            <input type="range" class="dial" id="mtDialClose" min="0" max="5" step="0.2" value="2.6"/>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="mtCloseText">Closing line</label>
+          <div class="fmt-toolbar" data-tpl-style="montage">
+            <button type="button" class="fmt-btn" data-style="bold" aria-pressed="true" title="Bold" aria-label="Bold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7z"/><path d="M7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg>
+            </button>
+            <button type="button" class="fmt-btn" data-style="italic" aria-pressed="false" title="Italic" aria-label="Italic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5h-5"/><path d="M14 19H9"/><path d="M14.5 5l-4 14"/></svg>
+            </button>
+            <span class="fmt-sep"></span>
+            <select class="fmt-select" data-style="size" title="Text size">
+              <option value="0.8">Small</option>
+              <option value="1" selected>Medium</option>
+              <option value="1.25">Large</option>
+              <option value="1.5">Extra large</option>
+            </select>
+          </div>
+          <div class="mini-row">
+            <input type="text" id="mtCloseText" placeholder="Shop the Edit"/>
+            <canvas class="mini-preview" id="mtCloseMini" aria-label="Closing card preview"></canvas>
+          </div>
+          <span class="hint">Sits over the last piece's photo, on "Link in bio" — the mini preview uses whichever piece is last in the order above.</span>
+        </div>
+      </div>
+
+      <!-- ═══ NEST QUOTE CARD ═══ -->
+      <div class="tpl-panel" data-tpl="quote">
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="quotePost">Article</label>
+          <select id="quotePost"><option>Loading…</option></select>
+          <span class="hint" id="quoteHint"></span>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Scenes and their length</span>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="qtScOpen" checked/> Title card <span class="secs" id="qtOutOpen"></span></label>
+            <input type="range" class="dial" id="qtDialOpen" min="0" max="5" step="0.2" value="2.2"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="qtScQuote" checked/> The excerpt, as a pull-quote <span class="secs" id="qtOutQuote"></span></label>
+            <input type="range" class="dial" id="qtDialQuote" min="0" max="10" step="0.2" value="4.4"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="qtScClose" checked/> Byline and call to read <span class="secs" id="qtOutClose"></span></label>
+            <input type="range" class="dial" id="qtDialClose" min="0" max="5" step="0.2" value="2.6"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CUSTOMER TESTIMONIAL ═══ -->
+      <div class="tpl-panel" data-tpl="testimonial">
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="testiPick">Review</label>
+          <select id="testiPick"><option>Loading…</option></select>
+          <span class="hint" id="testiHint">Sorted best-rated first — no rating shows last.</span>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Scenes and their length</span>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="tsScOpen" checked/> Star rating <span class="secs" id="tsOutOpen"></span></label>
+            <input type="range" class="dial" id="tsDialOpen" min="0" max="4" step="0.2" value="1.6"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="tsScQuote" checked/> The review <span class="secs" id="tsOutQuote"></span></label>
+            <input type="range" class="dial" id="tsDialQuote" min="0" max="10" step="0.2" value="4.4"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="tsScClose" checked/> Name and closing line <span class="secs" id="tsOutClose"></span></label>
+            <input type="range" class="dial" id="tsDialClose" min="0" max="5" step="0.2" value="2.4"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SPLINE SCENE TOUR ═══ -->
+      <div class="tpl-panel" data-tpl="tour">
+        <div class="ctrl-group">
+          <label class="ctrl-label" for="tourScene">Scene</label>
+          <select id="tourScene"><option>Loading…</option></select>
+          <span class="hint" id="tourHint"></span>
+        </div>
+        <div class="ctrl-group">
+          <span class="ctrl-label">Scenes and their length</span>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="trScOpen" checked/> Room name to open <span class="secs" id="trOutOpen"></span></label>
+            <input type="range" class="dial" id="trDialOpen" min="0" max="4" step="0.2" value="1.4"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" checked disabled/> The room, captured live <span class="secs" id="trOutScene"></span></label>
+            <input type="range" class="dial" id="trDialScene" min="0" max="14" step="0.5" value="6"/>
+          </div>
+          <div class="scene-row">
+            <label class="toggle-row"><input type="checkbox" id="trScClose" checked/> "Explore in 3D" to close <span class="secs" id="trOutClose"></span></label>
+            <input type="range" class="dial" id="trDialClose" min="0" max="5" step="0.2" value="2.4"/>
+          </div>
+        </div>
+        <span class="hint">Tries to capture the room live; if that scene's viewer isn't readable, it falls back to the scene's cover photo (set in Spline Scenes) with a slow push-in instead. Add a cover photo there so this template always has something to show.</span>
+      </div>
+
+      <!-- ═══ SHARED ═══ -->
       <div class="ctrl-group">
         <span class="ctrl-label">Shape</span>
         <div class="chips" id="ratios">
           <button type="button" class="chip" data-w="1080" data-h="1920" aria-pressed="true">9:16 · 1080×1920</button>
           <button type="button" class="chip" data-w="1080" data-h="1350" aria-pressed="false">4:5 · 1080×1350</button>
-          <!-- Carried over from the Turntable page, which had it and this did not. -->
           <button type="button" class="chip" data-w="1080" data-h="1080" aria-pressed="false">1:1 · 1080×1080</button>
         </div>
       </div>
@@ -168,27 +466,6 @@
       </div>
 
       <div class="ctrl-group">
-        <span class="ctrl-label">Scenes and their length</span>
-        <div class="scene-row">
-          <label class="toggle-row"><input type="checkbox" id="scPhoto" checked/> Photograph <span class="secs" id="outPhoto"></span></label>
-          <input type="range" class="dial" id="dialPhoto" min="1" max="12" step="0.5" value="3.5"/>
-        </div>
-        <div class="scene-row">
-          <label class="toggle-row"><input type="checkbox" id="scTurn" checked/> The piece turning <span class="secs" id="outTurn"></span></label>
-          <input type="range" class="dial" id="dialTurn" min="2" max="14" step="0.5" value="5"/>
-        </div>
-        <div class="scene-row">
-          <label class="toggle-row"><input type="checkbox" id="scSpecs" checked/> Specification <span class="secs" id="outSpecs"></span></label>
-          <input type="range" class="dial" id="dialSpecs" min="2" max="14" step="0.5" value="4.5"/>
-        </div>
-        <div class="scene-row">
-          <label class="toggle-row"><input type="checkbox" id="scClose" checked/> Name and price <span class="secs" id="outClose"></span></label>
-          <input type="range" class="dial" id="dialClose" min="1" max="10" step="0.5" value="3"/>
-        </div>
-        <span class="hint" id="lenHint"></span>
-      </div>
-
-      <div class="ctrl-group">
         <span class="ctrl-label">File</span>
         <div class="chips" id="formats">
           <button type="button" class="chip" data-mime="video/mp4;codecs=avc1" aria-pressed="true">MP4</button>
@@ -198,32 +475,26 @@
       </div>
 
       <div class="ctrl-group">
-        <span class="ctrl-label">While setting up</span>
-        <!-- The Turntable's one real advantage was being able to stop the spin
-             and set an exact angle by hand. Same thing, one checkbox. -->
-        <label class="toggle-row"><input type="checkbox" id="holdStill"/> Hold the spin while I pose it</label>
         <label class="toggle-row"><input type="checkbox" id="showSafe"/> Show what Instagram covers</label>
         <span class="hint">Marks the header, caption row and button strip Instagram draws over your video. Preview only — never recorded.</span>
       </div>
 
-      <div class="ctrl-group">
-        <label class="ctrl-label" for="nameOverride">Name in the video</label>
-        <input type="text" id="nameOverride" placeholder="Leave empty to shorten it automatically"/>
-        <span class="hint">Cut at the first comma or bracket by default, where the keyword stuffing starts.</span>
-      </div>
-
       <div class="btn-row">
         <button class="btn btn-secondary" id="testTurn">Test the 3D capture</button>
+        <button class="btn btn-secondary" id="testTour" style="display:none">Test the scene capture</button>
         <button class="btn btn-secondary" id="preview">Play a preview</button>
         <button class="btn btn-primary" id="export">Export MP4</button>
       </div>
       <span class="hint" id="exportHint"></span>
     </div>
 
+    <div class="resize-handle" id="resizeHandle" title="Drag to resize — double-click to reset"></div>
+
     <div class="stage-wrap">
       <div id="stage">
         <model-viewer id="mv" camera-controls shadow-intensity="0.9" auto-rotate auto-rotate-delay="0"
                       rotation-per-second="30deg" interaction-prompt="none"></model-viewer>
+        <spline-viewer id="sv" style="display:none"></spline-viewer>
         <canvas id="sheet"></canvas>
         <div id="busy">
           <span class="busy-text" id="busyText">Working</span>
@@ -237,9 +508,10 @@
   <div class="guide">
     <h2>How this one works</h2>
     <ol>
-      <li>Pick the piece. Drag the model to set the height and zoom the turn will use — the video starts from whatever angle you leave it at.</li>
+      <li>Pick a <strong>template</strong> first — it decides what's below it and what the piece picker feeds into. Everything else works the same way for all six.</li>
+      <li>Where there's a 3D piece or scene on stage, drag it to set the height and zoom the capture will use. Where there isn't (Roundup, Montage, Quote, Testimonial), the canvas shows a live still of the current scene instead.</li>
       <li><strong>Play a preview</strong> renders the whole thing in the frame at speed, so you can see it before committing.</li>
-      <li><strong>Export MP4</strong> captures the turn frame by frame, then records the slideshow to a real MP4 at full resolution. It runs in real time, so a 16-second video takes about 16 seconds plus the capture.</li>
+      <li><strong>Export MP4</strong> captures whatever needs capturing (a turn, a room) frame by frame, then records the finished video to a real MP4 at full resolution. It runs roughly in real time, so a 16-second video takes about 16 seconds plus the capture.</li>
       <li>The file lands in <strong>Downloads</strong>. Upload it to Instagram as a Reel and add music there — the video is silent by design, since Instagram's audio library is where reels get their sound.</li>
     </ol>
   </div>
@@ -247,79 +519,71 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   A slideshow drawn onto a canvas at Instagram's exact pixel size,
-   then recorded off that canvas with MediaRecorder.
+   REEL STUDIO — one canvas-recording engine, six templates.
+
+   Every template resolves to the same shape: a list of scenes, each with
+   a `secs` duration and a `draw(t, dur)` function that paints itself onto
+   the shared 2D canvas. The engine (timeline / drawAt / play) only ever
+   talks to that shape — it does not know or care whether a scene's `draw`
+   is reading a photograph, a captured 3D turn, or a paragraph of text.
 
    WHY NOT SCREEN RECORDING: a browser window is never 1080×1920, so
    recording one always leaves a crop to guess at, and re-encodes an
    already-compressed capture. Recording the canvas instead gives the
    exact resolution, no crop, and one generation of encoding.
 
-   The one thing a canvas cannot do is read a WebGL canvas reliably
-   frame by frame, so the turning piece is captured to still frames
-   first — 48 of them, cross-faded on playback so the motion reads as
-   continuous rather than as a flick-book.
+   The one thing a canvas cannot do is read a live WebGL canvas reliably
+   frame by frame, so anything that moves on its own (a turning product, a
+   Spline room) is captured to still frames first, then played back —
+   cross-faded for the turn, sequential for the room, since the room's
+   motion is its own animation rather than a steady rotation.
    ═══════════════════════════════════════════════════════════════ */
 
-let pieces = [];
-let piece = null;
 let W = 1080, H = 1920;
 let ground = '#0F1F22', tone = 'dark';
-let turnFrames = [];          // ImageBitmaps of the model, one per angle
-let turnBlank = false;        // captured, but the model drew nothing
-let photo = null;             // the product photograph, or null
-let photoBlocked = false;     // loaded but unusable — see loadPhoto()
+let current = 'story';
 let running = false;
 
 const FPS = 30;
-const SCENES = [
-  { id: 'scPhoto', key: 'photo', dial: 'dialPhoto', out: 'outPhoto' },
-  { id: 'scTurn',  key: 'turn',  dial: 'dialTurn',  out: 'outTurn'  },
-  { id: 'scSpecs', key: 'specs', dial: 'dialSpecs', out: 'outSpecs' },
-  { id: 'scClose', key: 'close', dial: 'dialClose', out: 'outClose' },
-];
-const sceneSecs = s => Number(document.getElementById(s.dial).value);
-
-/* At 48 frames the cross-fade was dissolving between images 7.5 degrees
-   apart, which reads as a double image rather than as movement — the stutter.
-   One still per 3–4 degrees fixes it, but only if the piece keeps turning at
-   the same rate: a longer scene turns MORE TIMES rather than turning slower,
-   because stretching one revolution over nine seconds puts the stutter
-   straight back. Roughly five seconds per revolution either way. */
-const turnRevolutions = secs => Math.max(1, Math.round(secs / 5));
-const turnFrameCount = () => {
-  const secs = sceneSecs(SCENES.find(s => s.key === 'turn'));
-  const perRev = secs / turnRevolutions(secs);
-  return Math.min(120, Math.max(48, Math.round(perRev * 24)));
-};
-const FADE = 0.5;             // seconds of cross-fade between scenes
+const FADE = 0.5;             // default seconds of cross-fade between scenes
 
 const mv = document.getElementById('mv');
-const canvas = document.getElementById('sheet');
-const ctx = canvas.getContext('2d');
+const sv = document.getElementById('sv');
+// let, not const: withCanvas() below retargets these at a thumbnail for the
+// length of one draw call, then puts them straight back.
+let canvas = document.getElementById('sheet');
+let ctx = canvas.getContext('2d');
 
-(async () => { await requireAuth(); await load(); })();
+/* Every draw function closes over the module-level canvas/ctx rather than
+   taking them as arguments, which is fine until something needs to be drawn
+   somewhere else — a mini preview, in this case. Swapping the binding for
+   the length of one synchronous draw call is cheaper than threading a ctx
+   parameter through every drawing primitive and every scene. */
+function withCanvas(targetCanvas, fn) {
+  const savedCanvas = canvas, savedCtx = ctx;
+  canvas = targetCanvas;
+  ctx = targetCanvas.getContext('2d');
+  try { fn(); } finally { canvas = savedCanvas; ctx = savedCtx; }
+}
 
-/* ── DATA ─────────────────────────────────────────────────────── */
+/* ── LIBRARY DATA — loaded once, shared by every template ───────── */
+let pieces = [], posts = [], feedbacks = [], splineScenes = [];
 
-async function load() {
-  const { data, error } = await db.from('collection_items')
-    .select('id,name,price,category,description,image_url,model_url,specs')
-    .order('created_at', { ascending: false });
-  if (error) { showToast('Could not load the pieces', 'error'); return; }
+(async () => { await requireAuth(); await loadAll(); boot(); })();
 
-  pieces = data || [];
-  const sel = document.getElementById('pick');
-  if (!pieces.length) {
-    sel.innerHTML = '<option value="">Nothing in the collection yet</option>';
-    document.getElementById('export').disabled = true;
-    document.getElementById('preview').disabled = true;
-    return;
-  }
-  sel.innerHTML = pieces.map((p, i) =>
-    `<option value="${i}">${shorten(p.name, 56)}</option>`).join('');
-  sel.onchange = () => choose(pieces[sel.value]);
-  await choose(pieces[0]);
+async function loadAll() {
+  const [p, n, f, s] = await Promise.all([
+    db.from('collection_items').select('id,name,price,category,description,image_url,model_url,specs').order('created_at', { ascending: false }),
+    db.from('nest_posts').select('id,title,category,excerpt,content,author,read_time,image_url,slug').order('created_at', { ascending: false }),
+    db.from('feedback').select('id,name,message,rating,page,created_at').order('created_at', { ascending: false }),
+    db.from('spline_scenes').select('id,name,display_name,url,page_placement,cover_url').order('created_at', { ascending: false }),
+  ]);
+  if (p.error || n.error || f.error || s.error) { showToast('Some content failed to load', 'error'); }
+  pieces = p.data || [];
+  posts = n.data || [];
+  feedbacks = (f.data || []).filter(x => x.message && x.message.trim())
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  splineScenes = s.data || [];
 }
 
 function shorten(s, n) {
@@ -329,147 +593,15 @@ function shorten(s, n) {
 function reelName(name) {
   return String(name || '').split(/[,(|]/)[0].trim();
 }
-function displayName() {
-  return document.getElementById('nameOverride').value.trim() || reelName(piece && piece.name);
-}
-function specRows() {
-  return (Array.isArray(piece && piece.specs) ? piece.specs : [])
-    .filter(s => s && (s[0] || s[1])).slice(0, 6);
-}
 
-async function choose(p) {
-  piece = p;
-  turnFrames = [];
-  photo = null;
-  photoBlocked = false;
-  document.getElementById('stage').classList.remove('showing-canvas');
-
-  document.getElementById('mv').removeAttribute('src');
-  if (p.model_url) mv.setAttribute('src', p.model_url);
-
-  const bits = [];
-  if (!p.model_url) bits.push('no 3D model — the turn scene will be skipped');
-  if (!p.image_url) bits.push('no photograph — that scene will be skipped');
-  if (!specRows().length) bits.push('no specifications — that scene will be skipped');
-  document.getElementById('pickHint').innerHTML =
-    bits.length ? '<span class="warn">' + bits.join(' · ') + '</span>' : 'Photograph, model and specifications all present.';
-
-  loadPhoto(p.image_url);
-  paintMeta();
-}
-
-/* Anonymous CORS on purpose: an image drawn without it taints the canvas,
-   and a tainted canvas cannot be recorded at all — the export would fail
-   with a SecurityError rather than merely look wrong. */
-function loadPhoto(url) {
-  if (!url) return;
-  const img = new Image();
-  img.crossOrigin = 'anonymous';
-  img.onload = () => { photo = img; };
-  img.onerror = () => {
-    photoBlocked = true;
-    document.getElementById('pickHint').innerHTML =
-      '<span class="warn">The photograph would not load for export — its host does not allow it. That scene will be skipped.</span>';
-  };
-  img.src = url;
-}
-
-/* ── THE TURN, CAPTURED ───────────────────────────────────────── */
-
-/* Is there actually a model in this frame, or is it an empty rectangle?
-   Sampled small — enough to answer the question, cheap enough to ask on
-   every capture. A frame the model did not draw into is fully transparent;
-   one that only caught the ground is a single flat colour. */
-function frameHasContent(bitmap) {
-  const probe = document.createElement('canvas');
-  probe.width = 48; probe.height = 85;
-  const p = probe.getContext('2d', { willReadFrequently: true });
-  p.drawImage(bitmap, 0, 0, probe.width, probe.height);
-  const d = p.getImageData(0, 0, probe.width, probe.height).data;
-  let opaque = 0, min = 255, max = 0;
-  for (let i = 0; i < d.length; i += 4) {
-    if (d[i + 3] > 8) opaque++;
-    const lum = (d[i] + d[i + 1] + d[i + 2]) / 3;
-    if (lum < min) min = lum;
-    if (lum > max) max = lum;
-  }
-  const pixels = d.length / 4;
-  return { opaqueRatio: opaque / pixels, range: max - min,
-           ok: opaque / pixels > 0.01 && max - min > 6 };
-}
-
-async function settle() {
-  await mv.updateComplete;
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
-}
-
-async function grab() {
-  const blob = await mv.toBlob({ mimeType: 'image/webp', qualityArgument: 0.92 });
-  return createImageBitmap(blob);
-}
-
-async function captureTurn(onProgress) {
-  turnFrames = [];
-  turnBlank = false;
-  if (!piece.model_url || !mv.loaded) return;
-
-  const orbit = mv.getCameraOrbit();          // keep the height and zoom set by hand
-  const wasAuto = mv.hasAttribute('auto-rotate');
-  mv.removeAttribute('auto-rotate');
-
-  const prev = { w: mv.style.width, h: mv.style.height, t: mv.style.transform };
-  document.body.classList.add('capturing');
-  mv.style.width = W + 'px';
-  mv.style.height = H + 'px';
-  mv.style.transform = `scale(${Math.min(window.innerWidth / W, window.innerHeight / H) * 0.96})`;
-
-  const restore = () => {
-    document.body.classList.remove('capturing');
-    mv.style.width = prev.w; mv.style.height = prev.h; mv.style.transform = prev.t;
-    mv.cameraOrbit = `${orbit.theta * 180 / Math.PI}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
-    if (wasAuto) mv.setAttribute('auto-rotate', '');
-  };
-
-  try {
-    const count = turnFrameCount();
-    const start = orbit.theta * 180 / Math.PI;
-
-    /* The first frame is proved before the other hundred-odd are spent on it.
-       Resizing the buffer to 1080×1920 takes a moment longer than a camera
-       move, so a blank first frame gets one more chance with real time to
-       settle before the scene is given up on. */
-    for (let attempt = 0; attempt < 2; attempt++) {
-      mv.cameraOrbit = `${start}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
-      await settle();
-      if (attempt) await new Promise(r => setTimeout(r, 700));
-      const first = await grab();
-      if (frameHasContent(first).ok) { turnFrames.push(first); break; }
-      if (attempt) { turnBlank = true; restore(); return; }
-    }
-
-    for (let i = 1; i < count; i++) {
-      const theta = start + (360 * i / count);
-      mv.cameraOrbit = `${theta}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
-      await settle();
-      turnFrames.push(await grab());
-      onProgress((i + 1) / count);
-    }
-  } finally {
-    restore();
-  }
-}
-
-/* ── DRAWING ──────────────────────────────────────────────────── */
+/* ── DRAWING PRIMITIVES — shared by every template ───────────────── */
 
 /* ── INSTAGRAM'S SAFE AREA ──
    Instagram draws its own interface over the video and does not move it out
    of the way: the Reels header across the top, the account name, caption and
    audio row across the bottom, and the like / comment / share buttons up the
-   right edge. The first version put the product name at the bottom, where
-   "store.urbannest" and the caption landed straight on top of it.
-
-   Everything readable now lives between these lines. The proportions are the
-   ones Meta publishes for Reels, rounded outward. */
+   right edge. Everything readable lives between these lines. The proportions
+   are the ones Meta publishes for Reels, rounded outward. */
 const SAFE_TOP    = 0.135;   // under the Reels header
 const SAFE_BOTTOM = 0.775;   // above the caption row
 const TOP    = () => H * SAFE_TOP;
@@ -513,8 +645,11 @@ function tracked(text, font, y, colour, spacing) {
   for (const c of chars) { ctx.fillText(c, x, y); x += ctx.measureText(c).width + spacing; }
 }
 
+// One definition, used by every template's opening and closing cards — so
+// the mark is the same size wherever it lands. Raised from 28px: at that
+// size it read as a footnote on a phone rather than as the brand.
 function wordmark(y, colour) {
-  tracked('URBAN NEST', `${28 * S()}px "Bodoni Moda", serif`, y, colour || DIM(), 7 * S());
+  tracked('URBAN NEST', `${36 * S()}px "Bodoni Moda", serif`, y, colour || DIM(), 8.5 * S());
 }
 
 // object-fit: cover, by hand
@@ -526,117 +661,53 @@ function cover(img, dx, dy, dw, dh, zoom) {
 
 const easeOut = t => 1 - Math.pow(1 - t, 3);
 
-/* The words sit at the top now, under a scrim that darkens the top rather
-   than the bottom. It also suits the photographs better: the object is
-   usually in the lower two thirds, so the space above it was already empty. */
-function drawPhoto(t, dur) {
-  fill(ground);
-  if (photo) {
-    // A slow push-in: a still photograph for three seconds reads as a stall.
-    cover(photo, 0, 0, W, H, 1 + 0.09 * (t / dur));
-    const g = ctx.createLinearGradient(0, 0, 0, H * 0.52);
-    g.addColorStop(0, 'rgba(8,12,13,0.88)');
-    g.addColorStop(1, 'rgba(8,12,13,0)');
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H * 0.52);
-  }
-  ctx.globalAlpha = Math.min(1, easeOut(t / 0.9));
-  let y = TOP() + 44 * S();
-  if (piece.category) {
-    tracked(String(piece.category).toUpperCase(),
-      `500 ${20 * S()}px "DM Sans", sans-serif`, y, '#C2934D', 6 * S());
-    y += 62 * S();
-  }
-  const font = `600 ${62 * S()}px "Bodoni Moda", serif`;
-  centred(wrap(displayName(), font, TEXTW()).slice(0, 3), font, y + 40 * S(), 74 * S(), '#F5F7F6');
-  ctx.globalAlpha = 1;
+function stripMarkdown(s) {
+  return String(s || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#*_`>]/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-function drawTurn(t, dur) {
-  fill(ground);
-  if (turnFrames.length) {
-    // Cross-fade neighbouring stills so the angular steps read as motion.
-    const pos = (t / dur) * turnFrames.length * turnRevolutions(dur);
-    const i = Math.floor(pos) % turnFrames.length;
-    const j = (i + 1) % turnFrames.length;
-    const f = pos - Math.floor(pos);
-    /* One draw, not two. The cross-fade existed to paper over 7.5-degree
-       steps; at three degrees it buys nothing visible and costs a second
-       full-size 1080×1920 composite on every frame — the most expensive thing
-       in the whole render, and the scene where the drawing fell behind. */
-    ctx.drawImage(turnFrames[f < 0.5 ? i : j], 0, 0, W, H);
+/* Is there actually something in this frame, or is it an empty rectangle?
+   Sampled small — enough to answer the question, cheap enough to ask on
+   every capture. A frame that drew nothing is fully transparent; one that
+   only caught a flat background is a single flat colour. */
+function frameHasContent(bitmap) {
+  const probe = document.createElement('canvas');
+  probe.width = 48; probe.height = 85;
+  const p = probe.getContext('2d', { willReadFrequently: true });
+  p.drawImage(bitmap, 0, 0, probe.width, probe.height);
+  const d = p.getImageData(0, 0, probe.width, probe.height).data;
+  let opaque = 0, min = 255, max = 0;
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] > 8) opaque++;
+    const lum = (d[i] + d[i + 1] + d[i + 2]) / 3;
+    if (lum < min) min = lum;
+    if (lum > max) max = lum;
   }
-  // Both at the top: the wordmark was under the Reels header, and the hint
-  // was under the caption row.
-  wordmark(TOP() + 30 * S());
-  tracked('TURN IT OVER', `500 ${19 * S()}px "DM Sans", sans-serif`, TOP() + 82 * S(), DIM(), 6 * S());
+  const pixels = d.length / 4;
+  return { opaqueRatio: opaque / pixels, range: max - min,
+           ok: opaque / pixels > 0.01 && max - min > 6 };
 }
 
-function drawSpecs(t) {
-  fill(ground);
-  wordmark(TOP() + 30 * S());
-
-  let y = TOP() + 110 * S();
-  ctx.globalAlpha = Math.min(1, easeOut(t / 0.5));
-  tracked('SPECIFICATION', `500 ${20 * S()}px "DM Sans", sans-serif`, y, ACCENT(), 6 * S());
-  ctx.globalAlpha = 1;
-  y += 84 * S();
-
-  const valFont = `${34 * S()}px "Bodoni Moda", serif`;
-  for (let i = 0; i < specRows().length; i++) {
-    const row = specRows()[i];
-    const vals = wrap(row[1], valFont, TEXTW()).slice(0, 2);
-    const rowH = 62 * S() + vals.length * 42 * S();
-    // Stop at the caption row rather than sliding a line underneath it.
-    if (y + rowH > FLOOR()) break;
-
-    // Each line arrives on its own beat, 0.32s apart.
-    const a = Math.min(1, Math.max(0, easeOut((t - 0.45 - i * 0.32) / 0.5)));
-    if (a > 0) {
-      ctx.globalAlpha = a;
-      const slide = (1 - a) * 24 * S();
-      ctx.textAlign = 'center';
-      ctx.font = `500 ${17 * S()}px "DM Sans", sans-serif`;
-      ctx.fillStyle = ACCENT();
-      ctx.fillText(String(row[0] || '').toUpperCase(), W / 2, y + slide);
-      centred(vals, valFont, y + 48 * S() + slide, 42 * S(), INK());
-      ctx.globalAlpha = 1;
-    }
-    y += rowH;
-  }
+async function settleFrame() {
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
 }
 
-/* The closing card on a flat ground was three lines of type in an empty
-   frame — the weakest three seconds of the video, and the ones people see
-   last. It sits on the photograph now, pushed the opposite way to the opening
-   scene so the two do not look like the same shot twice, under a scrim heavy
-   enough for centred type to hold against whatever the photo is doing. */
-function drawClose(t, dur) {
-  fill(ground);
-  const onPhoto = !!photo;
-  if (onPhoto) {
-    cover(photo, 0, 0, W, H, 1.10 - 0.07 * (t / (dur || 3)));
-    ctx.fillStyle = 'rgba(8,12,13,0.74)';
-    ctx.fillRect(0, 0, W, H);
-  }
-  const ink    = onPhoto ? '#F5F7F6' : INK();
-  const accent = onPhoto ? '#C2934D' : ACCENT();
-  const dim    = onPhoto ? 'rgba(245,247,246,0.60)' : DIM();
-
-  const a = Math.min(1, easeOut(t / 0.7));
-  ctx.globalAlpha = a;
-  // Sits in the middle of the safe band, clear of both Instagram's rows.
-  wordmark(H * 0.30, dim);
-  const font = `600 ${62 * S()}px "Bodoni Moda", serif`;
-  let y = centred(wrap(displayName(), font, TEXTW()).slice(0, 3), font, H * 0.40, 74 * S(), ink);
-  if (piece.price) {
-    tracked(String(piece.price).toUpperCase(), `500 ${26 * S()}px "DM Sans", sans-serif`, y + 46 * S(), accent, 5 * S());
-    y += 46 * S();
-  }
-  tracked('LINK IN BIO', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 96 * S(), dim, 6 * S());
-  ctx.globalAlpha = 1;
+/* ── WHERE THE CAPTURED VIEWER SITS ──
+   The viewer being captured still needs its real, unclipped 1080×1920 (or
+   whatever W×H is) layout box — that part of the "lifted out of #stage"
+   trick is load-bearing, see the .capturing rules above. But there is no
+   reason that box has to land in the corner of the browser window: pinning
+   it to #stage's own screen position instead means it visually — and,
+   since a scaled element's hit box scales with it, functionally — never
+   leaves the preview window. Nothing outside it is blocked. */
+function stageCaptureFrame() {
+  const r = document.getElementById('stage').getBoundingClientRect();
+  return { top: r.top, left: r.left, scale: Math.min(r.width / W, r.height / H) };
 }
-
-const DRAW = { photo: drawPhoto, turn: drawTurn, specs: drawSpecs, close: drawClose };
 
 /* Drawn over the composition during a preview and never during an export, so
    the guide cannot end up in the file. */
@@ -660,23 +731,806 @@ function drawSafeGuide() {
   ctx.restore();
 }
 
-/* ── TIMELINE ─────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   TEMPLATE: PRODUCT STORY
+   photo → the piece turning → specification → name & price
+   ═══════════════════════════════════════════════════════════════ */
+
+let storyPiece = null;
+let turnFrames = [];
+let turnBlank = false;
+let photo = null;
+let photoBlocked = false;
+
+async function chooseStoryPiece(p) {
+  storyPiece = p;
+  turnFrames = [];
+  photo = null;
+  photoBlocked = false;
+  document.getElementById('stage').classList.remove('showing-canvas');
+  mv.removeAttribute('src');
+  if (p.model_url) mv.setAttribute('src', p.model_url);
+
+  const bits = [];
+  if (!p.model_url) bits.push('no 3D model — the turn scene will be skipped');
+  if (!p.image_url) bits.push('no photograph — that scene will be skipped');
+  if (!storySpecRows(p).length) bits.push('no specifications — that scene will be skipped');
+  document.getElementById('pickHint').innerHTML =
+    bits.length ? '<span class="warn">' + bits.join(' · ') + '</span>' : 'Photograph, model and specifications all present.';
+
+  loadPhoto(p.image_url);
+  paintMeta();
+}
+
+function storySpecRows(p) {
+  return (Array.isArray((p || storyPiece || {}).specs) ? (p || storyPiece).specs : [])
+    .filter(s => s && (s[0] || s[1])).slice(0, 6);
+}
+function storyDisplayName() {
+  return document.getElementById('nameOverride').value.trim() || reelName(storyPiece && storyPiece.name);
+}
+
+/* Anonymous CORS on purpose: an image drawn without it taints the canvas,
+   and a tainted canvas cannot be recorded at all — the export would fail
+   with a SecurityError rather than merely look wrong. */
+function loadPhoto(url) {
+  if (!url) return;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => { photo = img; };
+  img.onerror = () => {
+    photoBlocked = true;
+    document.getElementById('pickHint').innerHTML =
+      '<span class="warn">The photograph would not load for export — its host does not allow it. That scene will be skipped.</span>';
+  };
+  img.src = url;
+}
+
+async function grabMv() {
+  const blob = await mv.toBlob({ mimeType: 'image/webp', qualityArgument: 0.92 });
+  return createImageBitmap(blob);
+}
+
+/* At 48 frames the cross-fade was dissolving between images 7.5 degrees
+   apart, which reads as a double image rather than as movement — the stutter.
+   One still per 3–4 degrees fixes it, but only if the piece keeps turning at
+   the same rate: a longer scene turns MORE TIMES rather than turning slower,
+   because stretching one revolution over nine seconds puts the stutter
+   straight back. Roughly five seconds per revolution either way. */
+const turnRevolutions = secs => Math.max(1, Math.round(secs / 5));
+const turnFrameCount = () => {
+  const secs = Number(document.getElementById('dialTurn').value);
+  const perRev = secs / turnRevolutions(secs);
+  return Math.min(120, Math.max(48, Math.round(perRev * 24)));
+};
+
+async function captureTurn(onProgress) {
+  turnFrames = [];
+  turnBlank = false;
+  if (!storyPiece.model_url || !mv.loaded) return;
+
+  const orbit = mv.getCameraOrbit();          // keep the height and zoom set by hand
+  const wasAuto = mv.hasAttribute('auto-rotate');
+  mv.removeAttribute('auto-rotate');
+
+  const prev = { w: mv.style.width, h: mv.style.height, t: mv.style.transform, top: mv.style.top, left: mv.style.left };
+  document.body.classList.add('capturing');
+  const cf = stageCaptureFrame();
+  mv.style.width = W + 'px';
+  mv.style.height = H + 'px';
+  mv.style.top = cf.top + 'px';
+  mv.style.left = cf.left + 'px';
+  mv.style.transform = `scale(${cf.scale})`;
+
+  const restore = () => {
+    document.body.classList.remove('capturing');
+    mv.style.width = prev.w; mv.style.height = prev.h; mv.style.transform = prev.t;
+    mv.style.top = prev.top; mv.style.left = prev.left;
+    mv.cameraOrbit = `${orbit.theta * 180 / Math.PI}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
+    if (wasAuto) mv.setAttribute('auto-rotate', '');
+  };
+
+  try {
+    const count = turnFrameCount();
+    const start = orbit.theta * 180 / Math.PI;
+
+    /* The first frame is proved before the other hundred-odd are spent on it.
+       Resizing the buffer to 1080×1920 takes a moment longer than a camera
+       move, so a blank first frame gets one more chance with real time to
+       settle before the scene is given up on. */
+    for (let attempt = 0; attempt < 2; attempt++) {
+      mv.cameraOrbit = `${start}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
+      await mv.updateComplete; await settleFrame();
+      if (attempt) await new Promise(r => setTimeout(r, 700));
+      const first = await grabMv();
+      if (frameHasContent(first).ok) { turnFrames.push(first); break; }
+      if (attempt) { turnBlank = true; restore(); return; }
+    }
+
+    for (let i = 1; i < count; i++) {
+      const theta = start + (360 * i / count);
+      mv.cameraOrbit = `${theta}deg ${orbit.phi * 180 / Math.PI}deg ${orbit.radius}m`;
+      await mv.updateComplete; await settleFrame();
+      turnFrames.push(await grabMv());
+      onProgress((i + 1) / count);
+    }
+  } finally {
+    restore();
+  }
+}
+
+/* The words sit at the top now, under a scrim that darkens the top rather
+   than the bottom. It also suits the photographs better: the object is
+   usually in the lower two thirds, so the space above it was already empty. */
+function drawStoryPhoto(t, dur) {
+  fill(ground);
+  if (photo) {
+    cover(photo, 0, 0, W, H, 1 + 0.09 * (t / dur));
+    const g = ctx.createLinearGradient(0, 0, 0, H * 0.52);
+    g.addColorStop(0, 'rgba(8,12,13,0.88)');
+    g.addColorStop(1, 'rgba(8,12,13,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H * 0.52);
+  }
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.9));
+  let y = TOP() + 44 * S();
+  if (storyPiece.category) {
+    tracked(String(storyPiece.category).toUpperCase(),
+      `500 ${20 * S()}px "DM Sans", sans-serif`, y, '#C2934D', 6 * S());
+    y += 62 * S();
+  }
+  const font = `600 ${62 * S()}px "Bodoni Moda", serif`;
+  centred(wrap(storyDisplayName(), font, TEXTW()).slice(0, 3), font, y + 40 * S(), 74 * S(), '#F5F7F6');
+  ctx.globalAlpha = 1;
+}
+
+function drawStoryTurn(t, dur) {
+  fill(ground);
+  if (turnFrames.length) {
+    const pos = (t / dur) * turnFrames.length * turnRevolutions(dur);
+    const i = Math.floor(pos) % turnFrames.length;
+    const j = (i + 1) % turnFrames.length;
+    const f = pos - Math.floor(pos);
+    ctx.drawImage(turnFrames[f < 0.5 ? i : j], 0, 0, W, H);
+  }
+  wordmark(TOP() + 30 * S());
+  tracked('TURN IT OVER', `500 ${19 * S()}px "DM Sans", sans-serif`, TOP() + 82 * S(), DIM(), 6 * S());
+}
+
+function drawStorySpecs(t) {
+  fill(ground);
+  wordmark(TOP() + 30 * S());
+
+  let y = TOP() + 110 * S();
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.5));
+  tracked('SPECIFICATION', `500 ${20 * S()}px "DM Sans", sans-serif`, y, ACCENT(), 6 * S());
+  ctx.globalAlpha = 1;
+  y += 84 * S();
+
+  const rows = storySpecRows();
+  const valFont = `${34 * S()}px "Bodoni Moda", serif`;
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const vals = wrap(row[1], valFont, TEXTW()).slice(0, 2);
+    const rowH = 62 * S() + vals.length * 42 * S();
+    if (y + rowH > FLOOR()) break;
+
+    const a = Math.min(1, Math.max(0, easeOut((t - 0.45 - i * 0.32) / 0.5)));
+    if (a > 0) {
+      ctx.globalAlpha = a;
+      const slide = (1 - a) * 24 * S();
+      ctx.textAlign = 'center';
+      ctx.font = `500 ${17 * S()}px "DM Sans", sans-serif`;
+      ctx.fillStyle = ACCENT();
+      ctx.fillText(String(row[0] || '').toUpperCase(), W / 2, y + slide);
+      centred(vals, valFont, y + 48 * S() + slide, 42 * S(), INK());
+      ctx.globalAlpha = 1;
+    }
+    y += rowH;
+  }
+}
+
+function drawStoryClose(t, dur) {
+  fill(ground);
+  const onPhoto = !!photo;
+  if (onPhoto) {
+    cover(photo, 0, 0, W, H, 1.10 - 0.07 * (t / (dur || 3)));
+    ctx.fillStyle = 'rgba(8,12,13,0.74)';
+    ctx.fillRect(0, 0, W, H);
+  }
+  const ink    = onPhoto ? '#F5F7F6' : INK();
+  const accent = onPhoto ? '#C2934D' : ACCENT();
+  const dim    = onPhoto ? 'rgba(245,247,246,0.60)' : DIM();
+
+  const a = Math.min(1, easeOut(t / 0.7));
+  ctx.globalAlpha = a;
+  wordmark(H * 0.30, dim);
+  const font = `600 ${62 * S()}px "Bodoni Moda", serif`;
+  let y = centred(wrap(storyDisplayName(), font, TEXTW()).slice(0, 3), font, H * 0.40, 74 * S(), ink);
+  if (storyPiece.price) {
+    tracked(String(storyPiece.price).toUpperCase(), `500 ${26 * S()}px "DM Sans", sans-serif`, y + 46 * S(), accent, 5 * S());
+    y += 46 * S();
+  }
+  tracked('LINK IN BIO', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 96 * S(), dim, 6 * S());
+  ctx.globalAlpha = 1;
+}
+
+function storyScenes() {
+  if (!storyPiece) return [];
+  const defs = [
+    { id: 'scPhoto', key: 'photo', dial: 'dialPhoto', draw: drawStoryPhoto, avail: () => storyPiece.image_url && !photoBlocked },
+    { id: 'scTurn',  key: 'turn',  dial: 'dialTurn',  draw: drawStoryTurn,  avail: () => storyPiece.model_url && !turnBlank },
+    { id: 'scSpecs', key: 'specs', dial: 'dialSpecs', draw: drawStorySpecs, avail: () => storySpecRows().length },
+    { id: 'scClose', key: 'close', dial: 'dialClose', draw: drawStoryClose, avail: () => true },
+  ];
+  return defs.filter(d => document.getElementById(d.id).checked && d.avail())
+    .map(d => ({ key: d.key, secs: Number(document.getElementById(d.dial).value), draw: d.draw }));
+}
+
+async function storyPreRoll(onProgress) {
+  if (!document.getElementById('scTurn').checked || !storyPiece || !storyPiece.model_url) return;
+  if (Number(document.getElementById('dialTurn').value) <= 0) return;   // 0s — timeline() drops it anyway, nothing to capture for
+  if (!mv.loaded) {
+    busy(true, 'Waiting for the model', 0);
+    await new Promise(r => {
+      const t = setTimeout(r, 25000);
+      if (mv.loaded) { clearTimeout(t); return r(); }
+      mv.addEventListener('load', () => { clearTimeout(t); r(); }, { once: true });
+    });
+  }
+  if (!mv.loaded) {
+    showToast('The model did not load — the turn will be left out', 'error');
+    turnBlank = true;
+    return;
+  }
+  busy(true, 'Capturing the turn', 0);
+  await captureTurn(p => busy(true, 'Capturing the turn', p));
+  if (turnBlank || !turnFrames.length) {
+    turnBlank = true;
+    showToast('The model captured blank — the turn is left out of this video', 'error');
+    document.getElementById('exportHint').innerHTML =
+      '<span class="warn">The 3D capture came back empty, so the turn was left out. ' +
+      'Use <strong>Test the 3D capture</strong> to see what the viewer is producing.</span>';
+  }
+}
+
+function storyPaintDials() {
+  [['scPhoto','dialPhoto','outPhoto'],['scTurn','dialTurn','outTurn'],
+   ['scSpecs','dialSpecs','outSpecs'],['scClose','dialClose','outClose']].forEach(([, dial, out]) => {
+    document.getElementById(out).textContent = Number(document.getElementById(dial).value).toFixed(1) + 's';
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMPLATE: COLLECTION ROUNDUP
+   "Our picks" → each piece's photo, name & price → "Shop the edit"
+   ═══════════════════════════════════════════════════════════════ */
+
+let roundupPicks = [];
+
+function drawRoundupOpen(t) {
+  fill(ground);
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.6));
+  wordmark(H * 0.42, DIM());
+  const font = `600 ${58 * S()}px "Bodoni Moda", serif`;
+  centred(['OUR PICKS'], font, H * 0.42 + 74 * S(), 74 * S(), INK());
+  tracked(`${roundupPicks.length} PIECES`, `500 ${18 * S()}px "DM Sans", sans-serif`, H * 0.42 + 128 * S(), ACCENT(), 5 * S());
+  ctx.globalAlpha = 1;
+}
+
+function drawRoundupItem(p, index, t, dur) {
+  fill(ground);
+  const img = roundupPhotos[p.id];
+  if (img) {
+    cover(img, 0, 0, W, H, 1 + 0.06 * (t / dur));
+    const g = ctx.createLinearGradient(0, 0, 0, H * 0.52);
+    g.addColorStop(0, 'rgba(8,12,13,0.85)');
+    g.addColorStop(1, 'rgba(8,12,13,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H * 0.52);
+  } else {
+    tracked('NO PHOTOGRAPH', `500 ${18*S()}px "DM Sans", sans-serif`, H/2, DIM(), 5*S());
+  }
+  const a = Math.min(1, easeOut(t / 0.5));
+  ctx.globalAlpha = a;
+  let y = TOP() + 40 * S();
+  tracked(`${index + 1} / ${roundupPicks.length}`, `500 ${16 * S()}px "DM Sans", sans-serif`, y, '#C2934D', 5 * S());
+  y += 56 * S();
+  const font = `600 ${52 * S()}px "Bodoni Moda", serif`;
+  y = centred(wrap(reelName(p.name), font, TEXTW()).slice(0, 3), font, y + 34 * S(), 62 * S(), '#F5F7F6');
+  if (p.price) tracked(String(p.price).toUpperCase(), `500 ${20 * S()}px "DM Sans", sans-serif`, y + 30 * S(), 'rgba(245,247,246,0.75)', 4.5 * S());
+  ctx.globalAlpha = 1;
+}
+
+/* Shared by every closing card that takes free text (Roundup, Montage).
+   "Shop the Edit" is two words at full size; a typed sentence like
+   "Illuminate your house with Lamps from Urban Nest" is not — shrink
+   rather than truncate, so a longer line loses size before it ever loses
+   words. Returns the size that fit and the wrapped lines at that size. */
+/* `style` carries the closing-card toolbar's choices: { bold, italic, size }.
+   size is a multiplier, not an absolute — the shrink-to-fit loop still has
+   the final say, so picking "Large" on a long sentence makes it as large as
+   will actually fit rather than overflowing the frame. */
+function headlineFont(size, style) {
+  const st = style || {};
+  return `${st.italic ? 'italic ' : ''}${st.bold === false ? 400 : 600} ${size * S()}px "Bodoni Moda", serif`;
+}
+function fitHeadline(text, baseSize, maxLines, style) {
+  const scale = (style && style.size) || 1;
+  let size = baseSize * scale, lines;
+  do {
+    lines = wrap(text, headlineFont(size, style), TEXTW());
+    if (lines.length <= maxLines || size <= 28) break;
+    size -= 4;
+  } while (true);
+  return { size, lines: lines.slice(0, maxLines) };
+}
+
+/* The closing-card toolbars. These style the whole line rather than a word
+   inside it: the card is drawn onto a canvas, where mixing weights within
+   one line means measuring and drawing each run separately — a lot of
+   machinery for a card that is one short sentence. Bold, italic and size,
+   applied to the line, is what actually earns its place here. */
+const closeStyle = {
+  roundup: { bold: true, italic: false, size: 1 },
+  montage: { bold: true, italic: false, size: 1 },
+};
+
+function roundupCloseText() {
+  return (document.getElementById('ruCloseText').value.trim() || 'Shop the Edit').toUpperCase();
+}
+
+function drawRoundupClose(t) {
+  fill(ground);
+  const a = Math.min(1, easeOut(t / 0.7));
+  ctx.globalAlpha = a;
+  wordmark(H * 0.34, DIM());
+
+  const { size, lines } = fitHeadline(roundupCloseText(), 54, 5, closeStyle.roundup);
+  const font = headlineFont(size, closeStyle.roundup);
+  const lh = size * 1.19 * S();
+  const y = centred(lines, font, H * 0.34 + (size + 16) * S(), lh, INK());
+  tracked('LINK IN BIO', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 40 * S(), DIM(), 6 * S());
+  ctx.globalAlpha = 1;
+}
+
+/* The little window beside the Closing line field — same drawRoundupClose
+   the real export uses, aimed at a thumbnail instead of the main canvas via
+   withCanvas(), and held on its settled frame (t=1) rather than mid-fade. */
+function renderRoundupCloseMini() {
+  const mini = document.getElementById('ruCloseMini');
+  if (mini.width !== W || mini.height !== H) { mini.width = W; mini.height = H; }
+  withCanvas(mini, () => drawRoundupClose(1));
+}
+
+let roundupPhotos = {};
+function loadRoundupPhotos() {
+  roundupPicks.forEach(p => {
+    if (!p.image_url || roundupPhotos[p.id]) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { roundupPhotos[p.id] = img; refreshStaticIfCurrent('roundup'); };
+    img.src = p.image_url;
+  });
+}
+
+function roundupScenes() {
+  if (!roundupPicks.length) return [];
+  const openSecs = Number(document.getElementById('ruDialOpen').value);
+  const itemSecs = Number(document.getElementById('ruDialItem').value);
+  const closeSecs = Number(document.getElementById('ruDialClose').value);
+  const list = [];
+  if (document.getElementById('ruScOpen').checked) list.push({ key: 'ru_open', secs: openSecs, draw: drawRoundupOpen });
+  roundupPicks.forEach((p, i) => list.push({ key: 'ru_item_' + p.id, secs: itemSecs, draw: (t, dur) => drawRoundupItem(p, i, t, dur) }));
+  if (document.getElementById('ruScClose').checked) list.push({ key: 'ru_close', secs: closeSecs, draw: drawRoundupClose });
+  return list;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMPLATE: RAPID-FIRE MONTAGE
+   brand flash → hard-cut photos, as fast as the beat dial says → close
+   ═══════════════════════════════════════════════════════════════ */
+
+let montagePicks = [];
+let montagePhotos = {};
+function loadMontagePhotos() {
+  montagePicks.forEach(p => {
+    if (!p.image_url || montagePhotos[p.id]) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { montagePhotos[p.id] = img; refreshStaticIfCurrent('montage'); renderMontageCloseMini(); };
+    img.src = p.image_url;
+  });
+}
+
+function drawMontageOpen(t, dur) {
+  fill(ground);
+  const a = Math.min(1, t / (dur * 0.5));
+  ctx.globalAlpha = a;
+  wordmark(H / 2, INK());
+  ctx.globalAlpha = 1;
+}
+
+function drawMontageItem(p, t, dur, flashOn) {
+  fill(ground);
+  const img = montagePhotos[p.id];
+  if (img) cover(img, 0, 0, W, H, 1.04 - 0.04 * easeOut(t / dur));
+  if (flashOn) {
+    const decay = Math.max(0, 1 - t / 0.06);
+    if (decay > 0) { ctx.globalAlpha = decay * 0.55; fill('#FFFFFF'); ctx.globalAlpha = 1; }
+  }
+}
+
+function montageCloseText() {
+  return (document.getElementById('mtCloseText').value.trim() || 'Shop the Edit').toUpperCase();
+}
+
+function drawMontageClose(t) {
+  fill(ground);
+  const hero = montagePicks[montagePicks.length - 1];
+  const img = hero && montagePhotos[hero.id];
+  if (img) {
+    cover(img, 0, 0, W, H, 1.10 - 0.07 * t);
+    ctx.fillStyle = 'rgba(8,12,13,0.74)';
+    ctx.fillRect(0, 0, W, H);
+  }
+  const ink = img ? '#F5F7F6' : INK();
+  const dim = img ? 'rgba(245,247,246,0.60)' : DIM();
+  const a = Math.min(1, easeOut(t / 0.6));
+  ctx.globalAlpha = a;
+  wordmark(H * 0.38, dim);
+  const { size, lines } = fitHeadline(montageCloseText(), 56, 5, closeStyle.montage);
+  const font = headlineFont(size, closeStyle.montage);
+  const lh = size * 1.18 * S();
+  const y = centred(lines, font, H * 0.38 + (size + 16) * S(), lh, ink);
+  tracked('LINK IN BIO', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 40 * S(), dim, 6 * S());
+  ctx.globalAlpha = 1;
+}
+
+/* The little window beside Montage's Closing line field — same
+   drawMontageClose the real export uses (hero photo included, if one's
+   picked), via withCanvas(), held on its settled frame (t=1). */
+function renderMontageCloseMini() {
+  const mini = document.getElementById('mtCloseMini');
+  if (mini.width !== W || mini.height !== H) { mini.width = W; mini.height = H; }
+  withCanvas(mini, () => drawMontageClose(1));
+}
+
+function montageScenes() {
+  if (!montagePicks.length) return [];
+  const openSecs = Number(document.getElementById('mtDialOpen').value);
+  const beatSecs = Number(document.getElementById('mtDialBeat').value) / 1000;
+  const closeSecs = Number(document.getElementById('mtDialClose').value);
+  const flashOn = document.getElementById('mtFlash').checked;
+  const list = [];
+  if (document.getElementById('mtScOpen').checked) list.push({ key: 'mt_open', secs: openSecs, draw: drawMontageOpen, fadeIn: 0.2 });
+  montagePicks.forEach((p, i) => list.push({
+    key: 'mt_item_' + p.id, secs: beatSecs, fadeIn: 0,
+    draw: (t, dur) => drawMontageItem(p, t, dur, flashOn),
+  }));
+  if (document.getElementById('mtScClose').checked) list.push({ key: 'mt_close', secs: closeSecs, draw: drawMontageClose, fadeIn: 0.35 });
+  return list;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMPLATE: NEST QUOTE CARD
+   title card → excerpt as a pull-quote → byline & call to read
+   ═══════════════════════════════════════════════════════════════ */
+
+let quotePost = null;
+let quotePhoto = null;
+function loadQuotePhoto(url) {
+  quotePhoto = null;
+  if (!url) return;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => { quotePhoto = img; refreshStaticIfCurrent('quote'); };
+  img.src = url;
+}
+function quoteExcerpt() {
+  if (!quotePost) return '';
+  return stripMarkdown(quotePost.excerpt) || stripMarkdown(quotePost.content).slice(0, 220);
+}
+
+function drawQuoteOpen(t) {
+  fill(ground);
+  if (quotePhoto) {
+    cover(quotePhoto, 0, 0, W, H, 1.06);
+    ctx.fillStyle = 'rgba(8,12,13,0.68)';
+    ctx.fillRect(0, 0, W, H);
+  }
+  const ink = quotePhoto ? '#F5F7F6' : INK();
+  const dim = quotePhoto ? 'rgba(245,247,246,0.65)' : DIM();
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.7));
+  let y = TOP() + 60 * S();
+  if (quotePost.category) {
+    tracked(String(quotePost.category).toUpperCase(), `500 ${19 * S()}px "DM Sans", sans-serif`, y, '#C2934D', 5 * S());
+    y += 60 * S();
+  }
+  const font = `600 ${54 * S()}px "Bodoni Moda", serif`;
+  centred(wrap(quotePost.title, font, TEXTW()).slice(0, 4), font, y + 40 * S(), 64 * S(), ink);
+  ctx.globalAlpha = 1;
+}
+
+function drawQuotePull(t) {
+  fill(ground);
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.6));
+  const font = `italic 400 ${36 * S()}px "Bodoni Moda", serif`;
+  const lines = wrap('"' + quoteExcerpt() + '"', font, TEXTW()).slice(0, 8);
+  const lh = 50 * S();
+  const y0 = (H / 2) - (lines.length * lh) / 2;
+  centred(lines, font, y0, lh, INK());
+  ctx.globalAlpha = 1;
+}
+
+function drawQuoteClose(t) {
+  fill(ground);
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.6));
+  wordmark(H * 0.38, DIM());
+  let y = H * 0.38 + 60 * S();
+  const by = [quotePost.author, quotePost.read_time].filter(Boolean).join(' · ');
+  if (by) { tracked(by.toUpperCase(), `500 ${18 * S()}px "DM Sans", sans-serif`, y, ACCENT(), 4.5 * S()); y += 56 * S(); }
+  tracked('READ THE FULL STORY', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 26 * S(), INK(), 5 * S());
+  tracked('LINK IN BIO', `500 ${17 * S()}px "DM Sans", sans-serif`, y + 66 * S(), DIM(), 5 * S());
+  ctx.globalAlpha = 1;
+}
+
+function quoteScenes() {
+  if (!quotePost) return [];
+  const list = [];
+  if (document.getElementById('qtScOpen').checked)
+    list.push({ key: 'qt_open', secs: Number(document.getElementById('qtDialOpen').value), draw: drawQuoteOpen });
+  if (document.getElementById('qtScQuote').checked && quoteExcerpt())
+    list.push({ key: 'qt_quote', secs: Number(document.getElementById('qtDialQuote').value), draw: drawQuotePull });
+  if (document.getElementById('qtScClose').checked)
+    list.push({ key: 'qt_close', secs: Number(document.getElementById('qtDialClose').value), draw: drawQuoteClose });
+  return list;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMPLATE: CUSTOMER TESTIMONIAL
+   star rating → the review → name & closing line
+   ═══════════════════════════════════════════════════════════════ */
+
+let testiItem = null;
+
+function drawTestiOpen(t) {
+  fill(ground);
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.6));
+  const stars = testiItem.rating ? '★'.repeat(testiItem.rating) + '☆'.repeat(5 - testiItem.rating) : '★★★★★';
+  ctx.font = `${64 * S()}px "DM Sans", sans-serif`; ctx.fillStyle = ACCENT(); ctx.textAlign = 'center';
+  ctx.fillText(stars, W / 2, H * 0.44);
+  tracked('A REVIEW FROM A CUSTOMER', `500 ${17 * S()}px "DM Sans", sans-serif`, H * 0.44 + 56 * S(), DIM(), 5 * S());
+  ctx.globalAlpha = 1;
+}
+
+function drawTestiQuote(t) {
+  fill(ground);
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.6));
+  const font = `italic 400 ${36 * S()}px "Bodoni Moda", serif`;
+  const lines = wrap('"' + testiItem.message.trim() + '"', font, TEXTW()).slice(0, 9);
+  const lh = 50 * S();
+  const y0 = (H / 2) - (lines.length * lh) / 2;
+  centred(lines, font, y0, lh, INK());
+  ctx.globalAlpha = 1;
+}
+
+function drawTestiClose(t) {
+  fill(ground);
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.6));
+  wordmark(H * 0.40, DIM());
+  let y = H * 0.40 + 60 * S();
+  tracked((testiItem.name || 'A HAPPY CUSTOMER').toUpperCase(), `500 ${19 * S()}px "DM Sans", sans-serif`, y, ACCENT(), 5 * S());
+  tracked('JOIN THEM — LINK IN BIO', `500 ${18 * S()}px "DM Sans", sans-serif`, y + 50 * S(), INK(), 5 * S());
+  ctx.globalAlpha = 1;
+}
+
+function testiScenes() {
+  if (!testiItem) return [];
+  const list = [];
+  if (document.getElementById('tsScOpen').checked)
+    list.push({ key: 'ts_open', secs: Number(document.getElementById('tsDialOpen').value), draw: drawTestiOpen });
+  if (document.getElementById('tsScQuote').checked)
+    list.push({ key: 'ts_quote', secs: Number(document.getElementById('tsDialQuote').value), draw: drawTestiQuote });
+  if (document.getElementById('tsScClose').checked)
+    list.push({ key: 'ts_close', secs: Number(document.getElementById('tsDialClose').value), draw: drawTestiClose });
+  return list;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMPLATE: SPLINE SCENE TOUR
+   room name → the room, captured live and played back → "explore in 3D"
+
+   Spline scenes carry their own baked-in animation and camera move, so
+   there is no orbit to drive by hand the way the turn scene does — this
+   just samples the live scene at a steady rate while it plays, the same
+   way the turn scene samples a rotation, and plays the stills back in the
+   order they were taken. */
+let tourScene = null;
+let tourFrames = [];
+let tourBlank = false;
+let tourPhoto = null;
+
+function splineCanvas() {
+  return sv && sv.shadowRoot ? sv.shadowRoot.querySelector('canvas') : null;
+}
+
+/* Spline's canvas renders with preserveDrawingBuffer:false and, on the scenes
+   tested, gave back a fully blank read every time — same result from a
+   synchronous drawImage as from createImageBitmap, at the right size and the
+   wrong size, mid-render and settled. That rules out a timing fix; either
+   Spline draws through a path a 2D context can't read at all (plausibly an
+   OffscreenCanvas handed to a worker) or these scenes just don't support it.
+   The cover photo saved against the scene is the reliable fallback — same
+   slow-pan treatment as every other photo-led scene in this tool — and
+   captureTour is left in place in case a future viewer version, or some
+   other scene, behaves differently. */
+function loadTourPhoto(url) {
+  tourPhoto = null;
+  if (!url) return;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => { tourPhoto = img; };
+  img.src = url;
+}
+
+function chooseTourScene(s) {
+  tourScene = s;
+  tourFrames = [];
+  tourBlank = false;
+  document.getElementById('stage').classList.remove('showing-canvas');
+  sv.setAttribute('url', s.url);
+  loadTourPhoto(s.cover_url);
+  document.getElementById('tourHint').textContent =
+    s.page_placement ? `Placed on the ${s.page_placement} page.` : '';
+  paintMeta();
+}
+
+async function settleSpline() { await settleFrame(); }
+
+function tourFrameCount(secs) {
+  return Math.min(90, Math.max(24, Math.round(secs * 10)));
+}
+
+async function captureTour(secs, onProgress) {
+  tourFrames = [];
+  tourBlank = false;
+  if (!tourScene || !tourScene.url) return;
+
+  document.body.classList.add('capturing');
+  const prevStyle = { w: sv.style.width, h: sv.style.height, t: sv.style.transform, top: sv.style.top, left: sv.style.left };
+  const cf = stageCaptureFrame();
+  sv.style.width = W + 'px';
+  sv.style.height = H + 'px';
+  sv.style.top = cf.top + 'px';
+  sv.style.left = cf.left + 'px';
+  sv.style.transform = `scale(${cf.scale})`;
+
+  const restore = () => {
+    document.body.classList.remove('capturing');
+    sv.style.width = prevStyle.w; sv.style.height = prevStyle.h; sv.style.transform = prevStyle.t;
+    sv.style.top = prevStyle.top; sv.style.left = prevStyle.left;
+  };
+
+  try {
+    const count = tourFrameCount(secs);
+    const interval = (secs * 1000) / count;
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await settleSpline();
+      if (attempt) await new Promise(r => setTimeout(r, 700));
+      const canvasEl = splineCanvas();
+      if (!canvasEl) { if (attempt) { tourBlank = true; restore(); return; } continue; }
+      const first = await createImageBitmap(canvasEl);
+      if (frameHasContent(first).ok) { tourFrames.push(first); break; }
+      if (attempt) { tourBlank = true; restore(); return; }
+    }
+
+    for (let i = 1; i < count; i++) {
+      await new Promise(r => setTimeout(r, interval));
+      await settleSpline();
+      const canvasEl = splineCanvas();
+      if (!canvasEl) break;
+      tourFrames.push(await createImageBitmap(canvasEl));
+      onProgress((i + 1) / count);
+    }
+    if (!tourFrames.length) tourBlank = true;
+  } finally {
+    restore();
+  }
+}
+
+function drawTourOpen(t) {
+  fill(ground);
+  ctx.globalAlpha = Math.min(1, easeOut(t / 0.6));
+  wordmark(H * 0.44, DIM());
+  const font = `600 ${52 * S()}px "Bodoni Moda", serif`;
+  centred(wrap((tourScene.display_name || tourScene.name || '').toUpperCase(), font, TEXTW()).slice(0, 3), font, H * 0.44 + 66 * S(), 62 * S(), INK());
+  ctx.globalAlpha = 1;
+}
+
+function drawTourScene(t, dur) {
+  fill(ground);
+  if (tourFrames.length) {
+    const idx = Math.min(tourFrames.length - 1, Math.floor((t / dur) * tourFrames.length));
+    ctx.drawImage(tourFrames[idx], 0, 0, W, H);
+  } else if (tourPhoto) {
+    // The live capture's fallback: a slow push-in on the scene's cover photo,
+    // same treatment the product photo scene gives a still image.
+    cover(tourPhoto, 0, 0, W, H, 1 + 0.07 * (t / dur));
+  }
+  wordmark(TOP() + 30 * S());
+  tracked((tourScene.display_name || tourScene.name || '').toUpperCase(), `500 ${19 * S()}px "DM Sans", sans-serif`, TOP() + 82 * S(), DIM(), 5 * S());
+}
+
+function drawTourClose(t) {
+  fill(ground);
+  const a = Math.min(1, easeOut(t / 0.7));
+  ctx.globalAlpha = a;
+  wordmark(H * 0.38, DIM());
+  const font = `600 ${54 * S()}px "Bodoni Moda", serif`;
+  const y = centred(['EXPLORE', 'IN 3D'], font, H * 0.38 + 68 * S(), 64 * S(), INK());
+  tracked('LINK IN BIO', `500 ${19 * S()}px "DM Sans", sans-serif`, y + 40 * S(), DIM(), 6 * S());
+  ctx.globalAlpha = 1;
+}
+
+function tourScenes() {
+  if (!tourScene) return [];
+  const list = [];
+  if (document.getElementById('trScOpen').checked)
+    list.push({ key: 'tr_open', secs: Number(document.getElementById('trDialOpen').value), draw: drawTourOpen });
+  // Included even when the live capture came back blank — drawTourScene
+  // falls back to the cover photo, so there's still something to show.
+  list.push({ key: 'tr_scene', secs: Number(document.getElementById('trDialScene').value), draw: drawTourScene });
+  if (document.getElementById('trScClose').checked)
+    list.push({ key: 'tr_close', secs: Number(document.getElementById('trDialClose').value), draw: drawTourClose });
+  return list;
+}
+
+async function tourPreRoll(onProgress) {
+  if (!tourScene) return;
+  if (Number(document.getElementById('trDialScene').value) <= 0) return;   // 0s — timeline() drops it anyway, nothing to capture for
+  busy(true, 'Waiting for the room to load', 0);
+  await new Promise(r => {
+    const t = setTimeout(r, 20000);
+    sv.addEventListener('load', () => { clearTimeout(t); r(); }, { once: true });
+    setTimeout(() => { if (splineCanvas()) { clearTimeout(t); r(); } }, 3000);
+  });
+  const secs = Number(document.getElementById('trDialScene').value);
+  busy(true, 'Capturing the room', 0);
+  await captureTour(secs, p => busy(true, 'Capturing the room', p));
+  if (tourBlank || !tourFrames.length) {
+    tourBlank = true;
+    if (tourPhoto) {
+      document.getElementById('exportHint').textContent =
+        `The live capture wasn't readable for this scene, so the room scene uses its cover photo instead.`;
+    } else {
+      showToast('The scene captured blank and has no cover photo to fall back to', 'error');
+      document.getElementById('exportHint').innerHTML =
+        '<span class="warn">Add a cover photo to this scene in <strong>Spline Scenes</strong>, or use a different template — this scene has nothing to show.</span>';
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TEMPLATE REGISTRY + ENGINE
+   ═══════════════════════════════════════════════════════════════ */
+
+const TEMPLATES = {
+  story:       { scenes: storyScenes,       preRoll: storyPreRoll, liveViewer: 'mv' },
+  roundup:     { scenes: roundupScenes,     liveViewer: null },
+  montage:     { scenes: montageScenes,     liveViewer: null },
+  quote:       { scenes: quoteScenes,       liveViewer: null },
+  testimonial: { scenes: testiScenes,       liveViewer: null },
+  tour:        { scenes: tourScenes,        preRoll: tourPreRoll,  liveViewer: 'sv' },
+};
 
 function timeline() {
-  const on = [];
-  for (const s of SCENES) {
-    if (!document.getElementById(s.id).checked) continue;
-    if (s.key === 'photo' && (!piece.image_url || photoBlocked)) continue;
-    if (s.key === 'turn' && (!piece.model_url || turnBlank)) continue;
-    if (s.key === 'specs' && !specRows().length) continue;
-    on.push(s);
-  }
+  // Every dial can be dragged to 0 now — a 0s scene is dropped rather than
+  // kept as a zero-width slot, so it behaves exactly like switching it off.
+  const list = (TEMPLATES[current].scenes() || [])
+    .filter(s => s.secs > 0)
+    .map(s => ({ fadeIn: FADE, ...s }));
   let at = 0;
-  return on.map(s => {
-    const o = { ...s, secs: sceneSecs(s), start: at };
-    at += o.secs;
-    return o;
-  });
+  return list.map(s => { const o = { ...s, start: at }; at += s.secs; return o; });
 }
 
 function totalSecs() {
@@ -692,31 +1546,40 @@ function drawAt(time, tl, guide) {
   const local = Math.min(time - cur.start, cur.secs);
 
   const prev = tl[tl.indexOf(cur) - 1];
-  const into = local;
-  if (prev && into < FADE) {
-    DRAW[prev.key](prev.secs, prev.secs);       // outgoing, held on its last frame
-    ctx.globalAlpha = into / FADE;
-    DRAW[cur.key](local, cur.secs);
+  const fadeIn = cur.fadeIn != null ? cur.fadeIn : FADE;
+  if (prev && fadeIn > 0 && local < fadeIn) {
+    prev.draw(prev.secs, prev.secs);       // outgoing, held on its last frame
+    ctx.globalAlpha = local / fadeIn;
+    cur.draw(local, cur.secs);
     ctx.globalAlpha = 1;
   } else {
-    DRAW[cur.key](local, cur.secs);
+    cur.draw(local, cur.secs);
   }
   if (guide) drawSafeGuide();
 }
 
 function paintMeta() {
-  SCENES.forEach(s => {
-    document.getElementById(s.out).textContent = sceneSecs(s).toFixed(1) + 's';
-  });
+  if (current === 'story') storyPaintDials();
   const secs = totalSecs();
   document.getElementById('meta').textContent = `${W}×${H} · ${secs.toFixed(1)}s · silent`;
-  document.getElementById('lenHint').textContent = secs
-    ? `${secs.toFixed(1)}s in total. The turn is ${turnFrameCount()} captured frames, ` +
-      `played ${turnRevolutions(sceneSecs(SCENES.find(s => s.key === 'turn')))}× round.`
-    : 'Every scene is either switched off or has nothing to show.';
-}
+  // per-template dial readouts
+  const readouts = {
+    ru: [['ruDialOpen','ruOutOpen'],['ruDialItem','ruOutItem'],['ruDialClose','ruOutClose']],
+    mt: [['mtDialOpen','mtOutOpen'],['mtDialClose','mtOutClose']],
+    qt: [['qtDialOpen','qtOutOpen'],['qtDialQuote','qtOutQuote'],['qtDialClose','qtOutClose']],
+    ts: [['tsDialOpen','tsOutOpen'],['tsDialQuote','tsOutQuote'],['tsDialClose','tsOutClose']],
+    tr: [['trDialOpen','trOutOpen'],['trDialScene','trOutScene'],['trDialClose','trOutClose']],
+  };
+  Object.values(readouts).flat().forEach(([dial, out]) => {
+    const dEl = document.getElementById(dial), oEl = document.getElementById(out);
+    if (dEl && oEl) oEl.textContent = Number(dEl.value).toFixed(1) + 's';
+  });
+  const beatMs = document.getElementById('mtDialBeat');
+  if (beatMs) document.getElementById('mtOutBeat').textContent = beatMs.value + 'ms';
 
-/* ── RUNNING IT ───────────────────────────────────────────────── */
+  if (current === 'roundup') document.getElementById('roundupCount').textContent = `(${roundupPicks.length}/8)`;
+  if (current === 'montage') document.getElementById('montageCount').textContent = `(${montagePicks.length}/30)`;
+}
 
 function busy(on, text, pct) {
   document.getElementById('busy').classList.toggle('on', on);
@@ -724,8 +1587,18 @@ function busy(on, text, pct) {
   document.getElementById('busyFill').style.width = ((pct || 0) * 100).toFixed(1) + '%';
 }
 
-function sizeCanvas() {
-  canvas.width = W; canvas.height = H;
+function sizeCanvas() { canvas.width = W; canvas.height = H; }
+
+function renderStaticPreview() {
+  sizeCanvas();
+  const tl = timeline();
+  document.getElementById('stage').classList.add('showing-canvas');
+  if (!tl.length) { fill(ground); return; }
+  drawAt(0.001, tl, document.getElementById('showSafe').checked);
+}
+
+function refreshStaticIfCurrent(tpl) {
+  if (current === tpl) renderStaticPreview();
 }
 
 /* Reads the finished file back the way a player would, because "it exported"
@@ -763,54 +1636,23 @@ async function inspect(blob, expected) {
 
 async function play(record) {
   if (running) return;
-  let tl = timeline();
-  if (!tl.length) { showToast('Nothing to show — every scene is empty', 'error'); return; }
-
   running = true;
-  // Never on an export, whatever the checkbox says.
   const guide = !record && document.getElementById('showSafe').checked;
   document.getElementById('preview').disabled = true;
   document.getElementById('export').disabled = true;
   sizeCanvas();
 
   try {
-    if (tl.some(s => s.key === 'turn')) {
-      // The model loads on its own schedule. Exporting before it arrives used
-      // to give a turn scene of empty ground with no hint as to why.
-      if (!mv.loaded) {
-        busy(true, 'Waiting for the model', 0);
-        await new Promise(r => {
-          const t = setTimeout(r, 25000);
-          if (mv.loaded) { clearTimeout(t); return r(); }
-          mv.addEventListener('load', () => { clearTimeout(t); r(); }, { once: true });
-        });
-      }
-      if (!mv.loaded) {
-        showToast('The model did not load — the turn will be left out', 'error');
-        turnBlank = true;
-      } else {
-        busy(true, 'Capturing the turn', 0);
-        await captureTurn(p => busy(true, 'Capturing the turn', p));
-      }
+    const tpl = TEMPLATES[current];
+    if (tpl.preRoll) await tpl.preRoll(() => {});
 
-      /* Seconds of bare ground is the worst outcome: it looks like the video
-         is broken rather than like a scene was skipped. Drop the scene and
-         say why, so the rest of the video is still worth posting. */
-      if (turnBlank || !turnFrames.length) {
-        turnBlank = true;
-        showToast('The model captured blank — the turn is left out of this video', 'error');
-        document.getElementById('exportHint').innerHTML =
-          '<span class="warn">The 3D capture came back empty, so the turn was left out. ' +
-          'Use <strong>Test the 3D capture</strong> to see what the viewer is producing.</span>';
-        tl = timeline();
-        if (!tl.length) throw new Error('__nothingleft');
-      }
-    }
-    // Canvas text silently falls back to a system serif if the webfont has
-    // not arrived, and it looks nothing like the site.
+    const tl = timeline();
+    if (!tl.length) { showToast('Nothing to show — pick content and switch a scene on', 'error'); return; }
+
     if (document.fonts) {
       await Promise.all([
         document.fonts.load(`600 68px "Bodoni Moda"`),
+        document.fonts.load(`italic 400 36px "Bodoni Moda"`),
         document.fonts.load(`400 34px "Bodoni Moda"`),
         document.fonts.load(`500 20px "DM Sans"`),
       ]).catch(() => {});
@@ -829,40 +1671,24 @@ async function play(record) {
       if (!mime) { showToast('This browser cannot record video', 'error'); return; }
 
       /* ── WHY captureStream(FPS) AND NOT captureStream(0) ──
-         Manual capture — captureStream(0) plus requestFrame() — timestamps
-         every frame at the moment it is requested, which makes the video's
-         pacing exactly as even as the animation loop managed to be. One
-         garbage collection, one slow frame in the turn scene, and that frame
-         is held in the file for as long as the hitch lasted. That is where
-         the freezing came from, and where a five-second first slide followed
-         by everything else rushing came from: a single frame given a
-         multi-second duration, with the rest crammed in after it.
-
-         Passing a frame rate hands the clock to the browser instead. It
-         samples the canvas on its own steady schedule and emits constant-rate
-         frames whatever the drawing is doing. If a draw is late the previous
-         frame is repeated — the picture holds for a moment, but the timing
-         stays true, which is the failure you want of the two. */
+         Passing a frame rate hands the clock to the browser. It samples the
+         canvas on its own steady schedule and emits constant-rate frames
+         whatever the drawing is doing — a late draw repeats the previous
+         frame rather than skewing the timeline, which is the failure you
+         want of the two. */
       const stream = canvas.captureStream(FPS);
       recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8000000 });
       recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
 
-      // Draw the opening frame and let the compositor settle before recording
-      // starts, so the first thing captured is a finished picture rather than
-      // whatever the canvas held while the model viewer was letting go of it.
       drawAt(0, tl, guide);
-      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
+      await settleFrame();
 
-      // A timeslice makes the muxer flush every second instead of holding the
-      // whole file until stop, which is one less way to end up with a truncated
-      // one.
       recorder.start(1000);
       document.getElementById('exportHint').textContent = 'Recording — keep this tab in front until it finishes.';
     }
 
-    /* A hidden tab stops calling requestAnimationFrame, which used to leave
+    /* A hidden tab stops calling requestAnimationFrame, which would leave
        the whole thing wedged: no frames, no end, buttons disabled forever.
-       There is no way to render a canvas animation in a background tab.
        Two guards, because they catch different cases: the listener catches a
        tab that goes away mid-run, and the watchdog catches every other reason
        the loop might stop being called — including a tab that was already in
@@ -876,15 +1702,10 @@ async function play(record) {
         const give_up = () => fail(new Error('__hidden'));
         onHide = () => { if (document.hidden) give_up(); };
         document.addEventListener('visibilitychange', onHide);
-        // Timers keep firing in a background tab even when frames do not.
         watchdog = setInterval(() => {
           if (performance.now() - t0 > (total + 4) * 1000) give_up();
         }, 1000);
 
-        /* Capped at FPS rather than drawing on every animation frame: a 120Hz
-           screen would otherwise ask for four times the work the video can
-           carry. The browser is sampling on its own clock now, so this only
-           has to keep the canvas current, not hit a deadline. */
         (function frame() {
           const time = (performance.now() - t0) / 1000;
           if (time - lastDraw >= 1 / FPS || lastDraw < 0) {
@@ -902,13 +1723,12 @@ async function play(record) {
     }
 
     if (recorder) {
-      // Let the last timeslice land before asking for the file.
       await new Promise(r => setTimeout(r, 400));
       await new Promise(r => { recorder.onstop = r; recorder.stop(); });
 
       const ext = recorder.mimeType.includes('mp4') ? 'mp4' : 'webm';
       const blob = new Blob(chunks, { type: recorder.mimeType });
-      const slug = (displayName() || 'piece').toLowerCase()
+      const slug = (templateFileSlug() || 'reel').toLowerCase()
         .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
       const name = `${slug}-${W}x${H}.${ext}`;
 
@@ -923,9 +1743,6 @@ async function play(record) {
 
       const size = (blob.size / 1048576).toFixed(1);
       if (check.fault) {
-        // Handed over anyway — it might still be watchable, and deciding that
-        // is not this page's call. But it is said out loud rather than left
-        // for Instagram to discover.
         document.getElementById('exportHint').innerHTML =
           `<span class="warn">Saved ${name}, but it looks wrong: ${check.fault}. ` +
           `Play it before posting. If it is broken, try the WebM format above — ` +
@@ -938,12 +1755,11 @@ async function play(record) {
       }
     }
   } catch (err) {
-    // Both likely failures explain nothing from their own message.
     const msg = String(err && err.message);
     const why = msg === '__hidden'
       ? 'Stopped because the tab went to the background — a canvas cannot render there. Nothing was saved; run it again and leave this tab in front.'
       : /secur|taint/i.test(msg)
-      ? 'The photograph blocked the export — its host does not allow reuse. Switch that scene off and try again.'
+      ? 'A photograph blocked the export — its host does not allow reuse. Switch that scene off, or pick a different photo, and try again.'
       : 'Export failed: ' + msg;
     showToast(why, 'error');
     document.getElementById('exportHint').textContent = why;
@@ -955,7 +1771,218 @@ async function play(record) {
   }
 }
 
-/* ── CONTROLS ─────────────────────────────────────────────────── */
+function templateFileSlug() {
+  switch (current) {
+    case 'story': return storyDisplayName();
+    case 'roundup': return 'collection-roundup';
+    case 'montage': return 'rapid-fire-edit';
+    case 'quote': return quotePost && quotePost.title;
+    case 'testimonial': return testiItem && ('review-' + (testiItem.name || ''));
+    case 'tour': return tourScene && (tourScene.display_name || tourScene.name);
+  }
+}
+
+/* ── MULTI-PICK (Roundup / Montage) ──────────────────────────────── */
+
+function renderMultiPick(listId, chipsId, filterId, picks, max, onChange) {
+  const filterVal = (document.getElementById(filterId).value || '').toLowerCase();
+  const list = document.getElementById(listId);
+  const pool = pieces.filter(p => !filterVal || String(p.name).toLowerCase().includes(filterVal));
+  if (!pool.length) {
+    list.innerHTML = '<div class="pick-empty">Nothing in the collection matches.</div>';
+  } else {
+    list.innerHTML = pool.map(p => {
+      const checked = picks.some(x => x.id === p.id);
+      const disabled = !checked && picks.length >= max;
+      return `<label class="pick-row">
+        <input type="checkbox" data-id="${p.id}" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''}/>
+        <span class="pn">${reelName(p.name)}</span>
+        <span class="pp">${p.price ? shorten(String(p.price), 14) : ''}</span>
+      </label>`;
+    }).join('');
+    list.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const id = cb.dataset.id;
+        if (cb.checked) { const piece = pieces.find(x => x.id === id); if (piece && !picks.some(x => x.id === id)) picks.push(piece); }
+        else { const i = picks.findIndex(x => x.id === id); if (i >= 0) picks.splice(i, 1); }
+        onChange();
+      });
+    });
+  }
+  document.getElementById(chipsId).innerHTML = picks.map((p, i) =>
+    `<span class="pick-chip">${i + 1}. ${shorten(reelName(p.name), 22)}<button type="button" data-id="${p.id}">×</button></span>`
+  ).join('');
+  document.getElementById(chipsId).querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = picks.findIndex(x => x.id === btn.dataset.id);
+      if (i >= 0) picks.splice(i, 1);
+      onChange();
+    });
+  });
+}
+
+function refreshRoundupUI() {
+  renderMultiPick('roundupList', 'roundupChips', 'roundupFilter', roundupPicks, 8, () => {
+    loadRoundupPhotos();
+    refreshRoundupUI();
+    paintMeta();
+    refreshStaticIfCurrent('roundup');
+  });
+}
+function refreshMontageUI() {
+  renderMultiPick('montageList', 'montageChips', 'montageFilter', montagePicks, 30, () => {
+    loadMontagePhotos();
+    refreshMontageUI();
+    paintMeta();
+    refreshStaticIfCurrent('montage');
+    renderMontageCloseMini();
+  });
+}
+
+/* ── TEMPLATE SWITCHING ───────────────────────────────────────────── */
+
+const TPL_HINTS = {
+  story: 'A deep dive on one piece — its photograph, a 3D turn, specification, name and price.',
+  roundup: 'Several pieces in one reel, each with its photograph, name and price. No 3D.',
+  montage: 'Fast hard cuts through many photographs — a teaser, not a catalogue. No 3D.',
+  quote: 'A Nest article turned into a text-only reel: title, pull-quote, byline. No photo required.',
+  testimonial: 'A customer review as a reel: star rating, the quote, their name.',
+  tour: 'A Spline room scene, captured live and played back, framed with a title and a call to explore.',
+};
+
+function switchTemplate(id) {
+  current = id;
+  document.querySelectorAll('.tpl-panel').forEach(el => el.classList.toggle('active', el.dataset.tpl === id));
+  document.getElementById('tplHint').textContent = TPL_HINTS[id] || '';
+  document.getElementById('testTurn').style.display = id === 'story' ? '' : 'none';
+  document.getElementById('testTour').style.display = id === 'tour' ? '' : 'none';
+
+  const stage = document.getElementById('stage');
+  if (id === 'story') {
+    mv.style.display = ''; sv.style.display = 'none';
+    stage.classList.remove('showing-canvas');
+    if (storyPiece) chooseStoryPiece(storyPiece);
+  } else if (id === 'tour') {
+    mv.style.display = 'none'; sv.style.display = '';
+    stage.classList.remove('showing-canvas');
+    if (tourScene) chooseTourScene(tourScene);
+  } else {
+    mv.style.display = 'none'; sv.style.display = 'none';
+    renderStaticPreview();
+  }
+  renderRoundupCloseMini();
+  renderMontageCloseMini();
+  paintMeta();
+}
+
+/* ── BOOT ─────────────────────────────────────────────────────────── */
+
+function boot() {
+  // Product Story
+  const pickSel = document.getElementById('pick');
+  if (!pieces.length) {
+    pickSel.innerHTML = '<option value="">Nothing in the collection yet</option>';
+  } else {
+    pickSel.innerHTML = pieces.map((p, i) => `<option value="${i}">${shorten(p.name, 56)}</option>`).join('');
+    pickSel.onchange = () => chooseStoryPiece(pieces[pickSel.value]);
+    chooseStoryPiece(pieces[0]);
+  }
+
+  // Roundup / Montage
+  document.getElementById('roundupFilter').addEventListener('input', refreshRoundupUI);
+  document.getElementById('montageFilter').addEventListener('input', refreshMontageUI);
+  refreshRoundupUI();
+  refreshMontageUI();
+
+  // Nest Quote Card
+  const qSel = document.getElementById('quotePost');
+  if (!posts.length) {
+    qSel.innerHTML = '<option value="">No articles yet</option>';
+  } else {
+    qSel.innerHTML = posts.map((p, i) => `<option value="${i}">${shorten(p.title, 56)}</option>`).join('');
+    qSel.onchange = () => {
+      quotePost = posts[qSel.value];
+      loadQuotePhoto(quotePost.image_url);
+      document.getElementById('quoteHint').innerHTML = quoteExcerpt() ? '' :
+        '<span class="warn">No excerpt or content to quote — write one in The Nest first.</span>';
+      paintMeta(); refreshStaticIfCurrent('quote');
+    };
+    quotePost = posts[0];
+    loadQuotePhoto(quotePost.image_url);
+  }
+
+  // Testimonial
+  const tSel = document.getElementById('testiPick');
+  if (!feedbacks.length) {
+    tSel.innerHTML = '<option value="">No reviews with a message yet</option>';
+  } else {
+    tSel.innerHTML = feedbacks.map((f, i) =>
+      `<option value="${i}">${f.rating ? '★'.repeat(f.rating) : '—'} ${shorten(f.name || 'Anonymous', 24)} — ${shorten(f.message, 30)}</option>`).join('');
+    tSel.onchange = () => { testiItem = feedbacks[tSel.value]; paintMeta(); refreshStaticIfCurrent('testimonial'); };
+    testiItem = feedbacks[0];
+  }
+
+  // Spline Scene Tour
+  const svSel = document.getElementById('tourScene');
+  if (!splineScenes.length) {
+    svSel.innerHTML = '<option value="">No Spline scenes saved yet</option>';
+  } else {
+    svSel.innerHTML = splineScenes.map((s, i) => `<option value="${i}">${shorten(s.display_name || s.name, 56)}</option>`).join('');
+    svSel.onchange = () => chooseTourScene(splineScenes[svSel.value]);
+    chooseTourScene(splineScenes[0]);
+  }
+
+  switchTemplate('story');
+}
+
+/* ── SHARED CONTROLS ──────────────────────────────────────────────── */
+
+document.getElementById('template').addEventListener('change', (e) => switchTemplate(e.target.value));
+
+/* ── RESIZING THE CONTROLS PANEL ──
+   Retailer product names run long, and every list that shows one — the
+   Piece picker, the Roundup/Montage checklists — was stuck reading them
+   through a fixed 320px column. Dragging this wider now actually reveals
+   more of the name rather than fighting a separate character cap; see the
+   pick-list rendering, which dropped its own truncation for the same
+   reason. Remembered in localStorage so it's a one-time adjustment. */
+(function () {
+  const studio = document.querySelector('.studio');
+  const handle = document.getElementById('resizeHandle');
+  const MIN = 280, MAX = 640, DEFAULT = 320;
+
+  let w = DEFAULT;
+  try {
+    const saved = parseInt(localStorage.getItem('un-reel-ctrl-w'), 10);
+    if (saved >= MIN && saved <= MAX) w = saved;
+  } catch (e) {}
+  studio.style.setProperty('--ctrl-w', w + 'px');
+
+  let dragging = false, startX = 0, startW = w;
+  handle.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    startX = e.clientX;
+    startW = w;
+    handle.classList.add('dragging');
+    try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  handle.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    w = Math.min(MAX, Math.max(MIN, startW + (e.clientX - startX)));
+    studio.style.setProperty('--ctrl-w', w + 'px');
+  });
+  handle.addEventListener('pointerup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    try { localStorage.setItem('un-reel-ctrl-w', w); } catch (e) {}
+  });
+  handle.addEventListener('dblclick', () => {
+    w = DEFAULT;
+    studio.style.setProperty('--ctrl-w', w + 'px');
+    try { localStorage.setItem('un-reel-ctrl-w', w); } catch (e) {}
+  });
+})();
 
 function wireChips(groupId, after) {
   document.getElementById(groupId).addEventListener('click', (e) => {
@@ -970,77 +1997,141 @@ function wireChips(groupId, after) {
 wireChips('ratios', (btn) => {
   W = Number(btn.dataset.w); H = Number(btn.dataset.h);
   document.getElementById('stage').style.aspectRatio = W + '/' + H;
-  turnFrames = [];              // captured at the old size, useless now
+  turnFrames = []; tourFrames = [];   // captured at the old size, useless now
   sizeCanvas();
   paintMeta();
+  if (!TEMPLATES[current].liveViewer) renderStaticPreview();
+  renderRoundupCloseMini();
+  renderMontageCloseMini();
 });
 
 wireChips('grounds', (btn) => {
   ground = btn.dataset.bg; tone = btn.dataset.tone;
   document.getElementById('stage').style.background = ground;
-  turnFrames = [];              // the stills carry the old ground behind them
+  turnFrames = []; tourFrames = [];   // the stills carry the old ground behind them
+  if (!TEMPLATES[current].liveViewer) renderStaticPreview();
+  renderRoundupCloseMini();
+  renderMontageCloseMini();
 });
 
-SCENES.forEach(s => {
-  document.getElementById(s.id).addEventListener('change', paintMeta);
-  document.getElementById(s.dial).addEventListener('input', () => {
-    // A different turn length wants a different number of stills, so what is
-    // already captured no longer matches.
-    if (s.key === 'turn') turnFrames = [];
-    paintMeta();
-  });
-});
+wireChips('formats', () => {});
+
+// Story dials/checkboxes
+['scPhoto','scTurn','scSpecs','scClose'].forEach(id => document.getElementById(id).addEventListener('change', paintMeta));
+['dialPhoto','dialSpecs','dialClose'].forEach(id => document.getElementById(id).addEventListener('input', paintMeta));
+document.getElementById('dialTurn').addEventListener('input', () => { turnFrames = []; paintMeta(); });
 document.getElementById('nameOverride').addEventListener('input', paintMeta);
-
-/* Stops the piece turning so an exact angle can be set by hand — the one
-   thing the Turntable page did that this did not. The capture already reads
-   auto-rotate to decide whether to put it back, so holding it here holds
-   through a capture too. */
 document.getElementById('holdStill').addEventListener('change', (e) => {
   if (e.target.checked) mv.removeAttribute('auto-rotate');
   else { mv.setAttribute('auto-rotate', ''); mv.setAttribute('auto-rotate-delay', '0'); }
 });
+
+// Roundup dials/checkboxes
+['ruScOpen','ruScClose'].forEach(id => document.getElementById(id).addEventListener('change', () => { paintMeta(); refreshStaticIfCurrent('roundup'); }));
+['ruDialOpen','ruDialItem','ruDialClose'].forEach(id => document.getElementById(id).addEventListener('input', () => { paintMeta(); refreshStaticIfCurrent('roundup'); }));
+document.getElementById('ruCloseText').addEventListener('input', renderRoundupCloseMini);
+
+/* One handler for both closing-card toolbars — the panel's data-tpl-style
+   says which template's style object it edits, so adding a third template
+   with a closing card needs markup only, no new wiring. */
+function repaintCloseCard(tpl) {
+  if (tpl === 'roundup') renderRoundupCloseMini(); else renderMontageCloseMini();
+  refreshStaticIfCurrent(tpl);
+}
+document.querySelectorAll('.fmt-toolbar[data-tpl-style]').forEach(bar => {
+  const tpl = bar.dataset.tplStyle;
+  bar.querySelectorAll('.fmt-btn[data-style]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.style;
+      closeStyle[tpl][key] = !closeStyle[tpl][key];
+      btn.setAttribute('aria-pressed', String(closeStyle[tpl][key]));
+      repaintCloseCard(tpl);
+    });
+  });
+  const sizeSel = bar.querySelector('.fmt-select[data-style="size"]');
+  if (sizeSel) sizeSel.addEventListener('change', () => {
+    closeStyle[tpl].size = Number(sizeSel.value);
+    repaintCloseCard(tpl);
+  });
+});
+
+// Montage dials/checkboxes
+['mtScOpen','mtScClose','mtFlash'].forEach(id => document.getElementById(id).addEventListener('change', () => { paintMeta(); refreshStaticIfCurrent('montage'); }));
+['mtDialBeat','mtDialOpen','mtDialClose'].forEach(id => document.getElementById(id).addEventListener('input', () => { paintMeta(); refreshStaticIfCurrent('montage'); }));
+document.getElementById('mtCloseText').addEventListener('input', renderMontageCloseMini);
+
+// Quote dials/checkboxes
+['qtScOpen','qtScQuote','qtScClose'].forEach(id => document.getElementById(id).addEventListener('change', () => { paintMeta(); refreshStaticIfCurrent('quote'); }));
+['qtDialOpen','qtDialQuote','qtDialClose'].forEach(id => document.getElementById(id).addEventListener('input', () => { paintMeta(); refreshStaticIfCurrent('quote'); }));
+
+// Testimonial dials/checkboxes
+['tsScOpen','tsScQuote','tsScClose'].forEach(id => document.getElementById(id).addEventListener('change', () => { paintMeta(); refreshStaticIfCurrent('testimonial'); }));
+['tsDialOpen','tsDialQuote','tsDialClose'].forEach(id => document.getElementById(id).addEventListener('input', () => { paintMeta(); refreshStaticIfCurrent('testimonial'); }));
+
+// Tour dials/checkboxes
+['trScOpen','trScClose'].forEach(id => document.getElementById(id).addEventListener('change', () => { paintMeta(); }));
+document.getElementById('trDialScene').addEventListener('input', () => { tourFrames = []; paintMeta(); });
+document.getElementById('trDialOpen').addEventListener('input', paintMeta);
+document.getElementById('trDialClose').addEventListener('input', paintMeta);
 
 /* Toggling the guide shows it straight away on a held frame, rather than
    making you play a preview to find out where the lines fall. */
 document.getElementById('showSafe').addEventListener('change', (e) => {
   const stage = document.getElementById('stage');
   if (running) return;
-  if (!e.target.checked) { stage.classList.remove('showing-canvas'); return; }
+  if (!e.target.checked) {
+    if (TEMPLATES[current].liveViewer) stage.classList.remove('showing-canvas');
+    return;
+  }
   const tl = timeline();
   if (!tl.length) return;
   sizeCanvas();
   stage.classList.add('showing-canvas');
-  // The last scene at rest: whichever it is, the guide is what matters here.
   const last = tl[tl.length - 1];
   drawAt(last.start + Math.min(1.2, last.secs - 0.01), tl, true);
 });
 
 /* Grabs one frame and says what came back. A sixteen-second export is a slow
    way to learn that the viewer handed over an empty rectangle. */
-document.getElementById('testTurn').onclick = async (e) => {
+async function testCapture(kind) {
   if (running) return;
-  const btn = e.target, label = btn.textContent;
+  const btnId = kind === 'story' ? 'testTurn' : 'testTour';
+  const btn = document.getElementById(btnId), label = btn.textContent;
   const hint = document.getElementById('exportHint');
+  const viewer = kind === 'story' ? mv : sv;
   btn.disabled = true; btn.textContent = 'Testing…';
+  let before = null;   // set once capturing starts; restored on error too, so a thrown mid-capture doesn't leave the viewer stuck at full size
   try {
-    if (!piece || !piece.model_url) { hint.textContent = 'This piece has no 3D model.'; return; }
-    if (!mv.loaded) {
-      hint.innerHTML = '<span class="warn">The model has not loaded yet. Wait for it to appear in the frame, then test again.</span>';
-      return;
+    if (kind === 'story') {
+      if (!storyPiece || !storyPiece.model_url) { hint.textContent = 'This piece has no 3D model.'; return; }
+      if (!mv.loaded) { hint.innerHTML = '<span class="warn">The model has not loaded yet. Wait for it to appear in the frame, then test again.</span>'; return; }
+    } else {
+      if (!tourScene) { hint.textContent = 'Pick a scene first.'; return; }
     }
     running = true;
-    const before = { w: mv.style.width, h: mv.style.height, t: mv.style.transform };
+    before = { w: viewer.style.width, h: viewer.style.height, t: viewer.style.transform, top: viewer.style.top, left: viewer.style.left };
     document.body.classList.add('capturing');
-    mv.style.width = W + 'px'; mv.style.height = H + 'px';
-    mv.style.transform = `scale(${Math.min(window.innerWidth / W, window.innerHeight / H) * 0.96})`;
-    await settle();
-    const bmp = await grab();
+    const cf = stageCaptureFrame();
+    viewer.style.width = W + 'px'; viewer.style.height = H + 'px';
+    viewer.style.top = cf.top + 'px'; viewer.style.left = cf.left + 'px';
+    viewer.style.transform = `scale(${cf.scale})`;
+    await settleFrame();
+
+    let bmp = kind === 'story' ? await grabMv() : await createImageBitmap(splineCanvas());
+    /* A Spline scene's internal canvas resizes to the new capture buffer on
+       its own ResizeObserver, which can lag a plain settle — the first grab
+       can catch it still at its untouched default size. One retry after a
+       real wait, same timing captureTour gives its own first frame. */
+    if (kind === 'tour' && !frameHasContent(bmp).ok) {
+      await new Promise(r => setTimeout(r, 700));
+      await settleFrame();
+      bmp = await createImageBitmap(splineCanvas());
+    }
     document.body.classList.remove('capturing');
-    mv.style.width = before.w; mv.style.height = before.h; mv.style.transform = before.t;
+    viewer.style.width = before.w; viewer.style.height = before.h; viewer.style.transform = before.t;
+    viewer.style.top = before.top; viewer.style.left = before.left;
 
     const seen = frameHasContent(bmp);
-    // Put it on the canvas either way — seeing the empty frame is the point.
     sizeCanvas();
     fill(ground);
     ctx.drawImage(bmp, 0, 0, W, H);
@@ -1055,20 +2146,26 @@ document.getElementById('testTurn').onclick = async (e) => {
         `The viewer is rendering to the page but not into a captured frame. Tell Claude these numbers.</span>`;
   } catch (err) {
     document.body.classList.remove('capturing');
-    document.getElementById('exportHint').innerHTML =
-      `<span class="warn">The capture threw: ${err && err.message}</span>`;
+    if (before) {
+      viewer.style.width = before.w; viewer.style.height = before.h; viewer.style.transform = before.t;
+      viewer.style.top = before.top; viewer.style.left = before.left;
+    }
+    document.getElementById('exportHint').innerHTML = `<span class="warn">The capture threw: ${err && err.message}</span>`;
   } finally {
     running = false;
     btn.disabled = false; btn.textContent = label;
   }
-};
+}
+document.getElementById('testTurn').onclick = () => testCapture('story');
+document.getElementById('testTour').onclick = () => testCapture('tour');
 
 document.getElementById('preview').onclick = () => play(false);
 document.getElementById('export').onclick  = () => play(true);
 
-// Leaving the canvas up after a run hides the model you were posing.
+// Leaving the canvas up after a run hides the viewer you were posing.
 document.getElementById('stage').addEventListener('dblclick', () => {
-  if (!running) document.getElementById('stage').classList.remove('showing-canvas');
+  if (running) return;
+  if (TEMPLATES[current].liveViewer) document.getElementById('stage').classList.remove('showing-canvas');
 });
 </script>
 </body>
