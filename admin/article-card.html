@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Article Cards — Urban Nest Admin</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  .studio { display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: start; }
+  .controls { background: var(--white); border: 0.5px solid var(--border); padding: 24px; display: flex; flex-direction: column; gap: 22px; }
+  .ctrl-group { display: flex; flex-direction: column; gap: 8px; }
+  .ctrl-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .ctrl-label .link-btn { text-transform: none; letter-spacing: 0; font-size: 11px; color: var(--gold); background: none; border: none; cursor: pointer; padding: 0; }
+  .ctrl-label .link-btn:hover { text-decoration: underline; }
+  select, input[type="text"], textarea { padding: 10px 12px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 12.5px; color: var(--black); outline: none; width: 100%; }
+  textarea { resize: vertical; line-height: 1.6; }
+  select:focus, input:focus, textarea:focus { border-color: var(--gold); }
+  .hint { font-size: 10.5px; color: var(--grey); line-height: 1.6; }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { padding: 7px 13px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 10.5px; letter-spacing: 0.08em; color: var(--grey); cursor: pointer; transition: all 0.2s; }
+  .chip:hover { color: var(--black); border-color: var(--black); }
+  .chip[aria-pressed="true"] { background: var(--black); color: var(--white); border-color: var(--black); }
+
+  .btn { padding: 12px 22px; border: none; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover:not(:disabled) { background: var(--gold); }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover:not(:disabled) { border-color: var(--black); color: var(--black); }
+  .btn:disabled { opacity: 0.45; cursor: default; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn-row .btn { flex: 1; }
+
+  .stage-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  #stage { position: relative; overflow: hidden; background: #0F1F22; height: min(78vh, 880px); box-shadow: 0 14px 50px rgba(17,17,16,0.16); }
+  #sheet { display: block; width: 100%; height: 100%; }
+  .stage-meta { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); }
+
+  .guide { background: var(--white); border: 0.5px solid var(--border); padding: 20px 24px; margin-top: 28px; }
+  .guide h2 { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 12px; font-weight: 500; }
+  .guide ol { margin-left: 18px; display: flex; flex-direction: column; gap: 7px; }
+  .guide li { font-size: 12.5px; line-height: 1.7; color: var(--grey); }
+  .guide strong { color: var(--black); }
+  @media (max-width: 1150px) { .studio { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Content Creation</div>
+    <a href="social.html" class="nav-item"><span class="icon">▣</span> Media Engagement</a>
+    <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
+    <a href="article-card.html" class="nav-item active"><span class="icon">▤</span> Article Cards</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Article Cards</h1>
+    <p>Turns a Nest post into one Instagram-ready image, plus a caption to go with it — for the feed, not a Reel</p>
+  </div>
+
+  <div class="studio">
+    <div class="controls">
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="postPick">Article</label>
+        <select id="postPick"><option>Loading…</option></select>
+        <span class="hint" id="postHint"></span>
+      </div>
+
+      <div class="ctrl-group">
+        <span class="ctrl-label">Shape</span>
+        <div class="chips" id="ratios">
+          <button type="button" class="chip" data-w="1080" data-h="1350" aria-pressed="true">4:5 · Feed post</button>
+          <button type="button" class="chip" data-w="1080" data-h="1080" aria-pressed="false">1:1 · Square</button>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="tagText">Tag</label>
+        <input type="text" id="tagText" placeholder="Uses the article's category"/>
+        <span class="hint">The small marker top-left — "NEW ON THE NEST", "VIRAL", whatever fits. Leave empty for the category.</span>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="headlineText">Headline</label>
+        <input type="text" id="headlineText" placeholder="Uses the article's title"/>
+        <span class="hint">Shrinks to fit rather than cutting off — a shorter, punchier line reads better than the full SEO title.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="exportBtn">Export PNG</button>
+      </div>
+      <span class="hint" id="exportHint"></span>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label" for="captionText">Caption <button type="button" class="link-btn" id="regenBtn">↻ Regenerate</button></label>
+        <textarea id="captionText" rows="10" placeholder="Pick an article to draft one"></textarea>
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="copyBtn">Copy Caption</button>
+        </div>
+        <span class="hint">Instagram has no way to read text off an image — this is what goes in the caption box when you post it. Edit freely before copying.</span>
+      </div>
+    </div>
+
+    <div class="stage-wrap">
+      <div id="stage"><canvas id="sheet"></canvas></div>
+      <span class="stage-meta" id="meta"></span>
+    </div>
+  </div>
+
+  <div class="guide">
+    <h2>How this one works</h2>
+    <ol>
+      <li>Pick the article. The photograph, title, category, author and read time all come straight from what's saved in <strong>The Nest</strong> — nothing to re-type.</li>
+      <li><strong>Tag</strong> and <strong>Headline</strong> are optional overrides — leave them empty and the card uses the article's own category and title.</li>
+      <li><strong>Export PNG</strong> saves the card to Downloads at the shape you picked. Upload it to Instagram as a normal feed post.</li>
+      <li>The <strong>Caption</strong> box drafts the post text — the excerpt, a line pointing to the link in bio, and the article's own tags turned into hashtags. It only redrafts when you press <strong>Regenerate</strong>, so edits you make stick even if you tweak the Tag or Headline afterward.</li>
+    </ol>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ARTICLE CARDS — one Nest post → one static image (a feed post has
+   no timeline to record, so this is a single render, not the
+   capture/MediaRecorder machinery Reel Studio needs for video). The
+   drawing primitives below are deliberately the same shapes as Reel
+   Studio's (fill/wrap/centred/tracked/cover) — proven there, copied
+   here rather than shared, since the two pages load independently.
+   ═══════════════════════════════════════════════════════════════ */
+
+let posts = [];
+let post = null;
+let photo = null;
+let photoBlocked = false;
+let W = 1080, H = 1350;
+
+const canvas = document.getElementById('sheet');
+const ctx = canvas.getContext('2d');
+
+(async () => { await requireAuth(); await load(); })();
+
+async function load() {
+  const { data, error } = await db.from('nest_posts')
+    .select('id,title,category,excerpt,content,author,read_time,image_url,tags')
+    .order('created_at', { ascending: false });
+  if (error) { showToast('Could not load The Nest', 'error'); return; }
+  posts = data || [];
+  const sel = document.getElementById('postPick');
+  if (!posts.length) {
+    sel.innerHTML = '<option value="">Nothing published in The Nest yet</option>';
+    document.getElementById('exportBtn').disabled = true;
+    return;
+  }
+  sel.innerHTML = posts.map((p, i) => `<option value="${i}">${shorten(p.title, 60)}</option>`).join('');
+  sel.onchange = () => choose(posts[sel.value]);
+  choose(posts[0]);
+}
+
+function shorten(s, n) {
+  s = String(s || '');
+  return s.length > n ? s.slice(0, n - 1) + '…' : s;
+}
+function stripMarkdown(s) {
+  return String(s || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#*_`>]/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function choose(p) {
+  post = p;
+  photo = null;
+  photoBlocked = false;
+  document.getElementById('headlineText').value = '';
+  document.getElementById('tagText').value = '';
+  document.getElementById('postHint').innerHTML = p.image_url ? '' :
+    '<span style="color:#B4552F">No photograph on this post — the card will use a flat ground instead.</span>';
+  loadPhoto(p.image_url);
+  regenerateCaption();
+  draw();
+}
+
+/* Anonymous CORS on purpose: an image drawn without it taints the canvas,
+   and a tainted canvas cannot be exported at all. */
+function loadPhoto(url) {
+  if (!url) { draw(); return; }
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => { photo = img; draw(); };
+  img.onerror = () => {
+    photoBlocked = true;
+    document.getElementById('postHint').innerHTML =
+      '<span style="color:#B4552F">The photograph would not load for export — its host does not allow it. The card will use a flat ground instead.</span>';
+    draw();
+  };
+  img.src = url;
+}
+
+/* ── DRAWING ──────────────────────────────────────────────────── */
+
+const S = () => W / 1080;
+function fill(colour) { ctx.fillStyle = colour; ctx.fillRect(0, 0, W, H); }
+
+function wrap(text, font, maxWidth) {
+  ctx.font = font;
+  const words = String(text || '').split(/\s+/);
+  const lines = [];
+  let line = '';
+  for (const word of words) {
+    const next = line ? line + ' ' + word : word;
+    if (ctx.measureText(next).width > maxWidth && line) { lines.push(line); line = word; }
+    else line = next;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+function centred(lines, font, y, lh, colour) {
+  ctx.font = font; ctx.fillStyle = colour; ctx.textAlign = 'center';
+  lines.forEach((l, i) => ctx.fillText(l, W / 2, y + i * lh));
+}
+function tracked(text, font, y, colour, spacing) {
+  ctx.font = font; ctx.fillStyle = colour; ctx.textAlign = 'left';
+  const chars = String(text).split('');
+  const total = chars.reduce((w, c) => w + ctx.measureText(c).width + spacing, 0) - spacing;
+  let x = (W - total) / 2;
+  for (const c of chars) { ctx.fillText(c, x, y); x += ctx.measureText(c).width + spacing; }
+}
+function trackedRight(text, font, xRight, y, colour, spacing) {
+  ctx.font = font; ctx.fillStyle = colour; ctx.textAlign = 'left';
+  const chars = String(text).split('');
+  const total = chars.reduce((w, c) => w + ctx.measureText(c).width + spacing, 0) - spacing;
+  let x = xRight - total;
+  for (const c of chars) { ctx.fillText(c, x, y); x += ctx.measureText(c).width + spacing; }
+}
+function cover(img, dx, dy, dw, dh) {
+  const scale = Math.max(dw / img.width, dh / img.height);
+  const w = img.width * scale, h = img.height * scale;
+  ctx.drawImage(img, dx + (dw - w) / 2, dy + (dh - h) / 2, w, h);
+}
+
+// Shrinks a headline to fit within maxLines rather than cutting it off.
+function fitHeadline(text, baseSize, maxLines) {
+  let size = baseSize, lines;
+  do {
+    lines = wrap(text, `600 ${size * S()}px "Bodoni Moda", serif`, W - 140 * S());
+    if (lines.length <= maxLines || size <= 30) break;
+    size -= 4;
+  } while (true);
+  return { size, lines: lines.slice(0, maxLines) };
+}
+
+function tagText() {
+  return (document.getElementById('tagText').value.trim() || post.category || 'The Nest').toUpperCase();
+}
+function headlineText() {
+  return (document.getElementById('headlineText').value.trim() || post.title || '').toUpperCase();
+}
+
+function sizeCanvas() { canvas.width = W; canvas.height = H; }
+
+function draw() {
+  if (!post) return;
+  sizeCanvas();
+  fill('#0F1F22');
+
+  const hasPhoto = photo && !photoBlocked;
+  if (hasPhoto) {
+    cover(photo, 0, 0, W, H);
+    const g = ctx.createLinearGradient(0, H * 0.42, 0, H);
+    g.addColorStop(0, 'rgba(8,12,13,0)');
+    g.addColorStop(0.55, 'rgba(8,12,13,0.58)');
+    g.addColorStop(1, 'rgba(8,12,13,0.93)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, H * 0.42, W, H * 0.58);
+  }
+
+  // The tag — a small marked box, top-left, the way a section kicker sits on
+  // an editorial page. Solid gold rather than white/black: the one thing on
+  // the card that says "Urban Nest" rather than "any news account".
+  const tag = tagText();
+  const tagFont = `700 ${23 * S()}px "DM Sans", sans-serif`;
+  ctx.font = tagFont;
+  const padX = 20 * S(), padY = 12 * S();
+  const tagW = ctx.measureText(tag).width + padX * 2;
+  const tagH = 23 * S() + padY * 2;
+  const tagX = 44 * S(), tagY = 44 * S();
+  ctx.fillStyle = '#C2934D';
+  if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(tagX, tagY, tagW, tagH, 4 * S()); ctx.fill(); }
+  else ctx.fillRect(tagX, tagY, tagW, tagH);
+  ctx.fillStyle = '#111110';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+  ctx.fillText(tag, tagX + padX, tagY + tagH / 2 + 1);
+  ctx.textBaseline = 'alphabetic';
+
+  // The mark, opposite the tag, the way every other export in this admin
+  // carries it.
+  trackedRight('URBAN NEST', `500 ${18 * S()}px "Bodoni Moda", serif`, W - 44 * S(), 68 * S(),
+    hasPhoto ? 'rgba(245,247,246,0.85)' : 'rgba(245,247,246,0.55)', 4 * S());
+
+  // Headline, divider, byline — stacked upward from a fixed bottom anchor so
+  // the block's position holds steady whether it's two lines or five.
+  const ink = hasPhoto ? '#F5F7F6' : '#F5F7F6';
+  const dim = hasPhoto ? 'rgba(245,247,246,0.65)' : 'rgba(245,247,246,0.5)';
+  const byline = [post.author || 'Urban Nest Editorial', post.read_time].filter(Boolean).join(' · ').toUpperCase();
+
+  const { size, lines } = fitHeadline(headlineText(), 62, 5);
+  const font = `600 ${size * S()}px "Bodoni Moda", serif`;
+  const lh = size * 1.16 * S();
+
+  const bylineY = H - 58 * S();
+  const dividerY = H - 92 * S();
+  const headlineBottom = H - 122 * S();
+  const startY = headlineBottom - (lines.length - 1) * lh;
+
+  centred(lines, font, startY, lh, ink);
+
+  ctx.strokeStyle = 'rgba(194,147,77,0.9)';
+  ctx.lineWidth = 2 * S();
+  ctx.beginPath();
+  ctx.moveTo(W / 2 - 42 * S(), dividerY);
+  ctx.lineTo(W / 2 + 42 * S(), dividerY);
+  ctx.stroke();
+
+  tracked(byline, `500 ${17 * S()}px "DM Sans", sans-serif`, bylineY, dim, 4 * S());
+
+  document.getElementById('meta').textContent = `${W}×${H} · PNG`;
+}
+
+/* ── CAPTION ──────────────────────────────────────────────────── */
+
+// A blind character slice cuts mid-word ("instantly fe|els warmer" → "instantly fe")
+// and only ever shows the intro, whichever sentence that happens to land on. Used now
+// only as a hard ceiling under extractiveSummary(), not as the summary method itself.
+function trimToWord(s, maxLen) {
+  if (s.length <= maxLen) return s;
+  const cut = s.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+}
+
+const STOPWORDS = new Set(('the a an and or but of to in on at for with is are was were be been being it its '
+  + 'this that these those as by from into your you their they he she we our us has have had not no so if '
+  + 'than then more most can will just also about out up down over under between while when which who what how')
+  .split(' '));
+function wordsOf(s) { return (s.toLowerCase().match(/[a-z0-9']+/g) || []); }
+
+/* No AI, no API key, no per-call cost — a classic extractive summary instead: score every
+   sentence in the article by how often its words recur across the piece and how much it
+   overlaps the title, keep the highest-scoring few, then put them back in the order they
+   actually appear. The point isn't eloquence, it's that the result is pulled from wherever
+   in the article is actually representative, not just wherever the opening paragraph
+   happened to run out of characters. */
+function extractiveSummary(text, title, maxSentences, maxChars) {
+  const sentences = (text.match(/[^.!?]+[.!?]+(\s+|$)/g) || [text])
+    .map(s => s.trim()).filter(s => wordsOf(s).length >= 5);
+  if (!sentences.length) return trimToWord(text, maxChars);
+
+  const freq = {};
+  sentences.forEach(s => wordsOf(s).forEach(w => {
+    if (!STOPWORDS.has(w) && w.length > 2) freq[w] = (freq[w] || 0) + 1;
+  }));
+  const titleWords = new Set(wordsOf(title).filter(w => !STOPWORDS.has(w)));
+
+  const scored = sentences.map((s, i) => {
+    const ws = wordsOf(s).filter(w => !STOPWORDS.has(w) && w.length > 2);
+    if (!ws.length) return { s, i, score: 0 };
+    const freqScore = ws.reduce((sum, w) => sum + (freq[w] || 0), 0) / ws.length;
+    const titleOverlap = ws.filter(w => titleWords.has(w)).length;
+    return { s, i, score: freqScore + titleOverlap * 2 };
+  });
+  scored.sort((a, b) => b.score - a.score);
+
+  const picked = [];
+  let total = 0;
+  for (const item of scored) {
+    if (picked.length >= maxSentences) break;
+    if (picked.length > 0 && total + item.s.length > maxChars) continue;
+    picked.push(item);
+    total += item.s.length;
+  }
+  picked.sort((a, b) => a.i - b.i);   // back to reading order, not score order
+  return trimToWord(picked.map(p => p.s).join(' ').trim(), maxChars + 60);
+}
+
+function regenerateCaption() {
+  if (!post) return;
+  const body = (post.excerpt && post.excerpt.trim()) || extractiveSummary(stripMarkdown(post.content), post.title, 3, 420);
+  const tags = String(post.tags || '').split(',').map(t => t.trim()).filter(Boolean)
+    .map(t => '#' + t.replace(/\s+/g, ''));
+  const hashtags = ['#UrbanNest', ...tags].join(' ');
+  document.getElementById('captionText').value =
+    [post.title, '', body, '', 'Read the full story — link in bio.', '', hashtags].join('\n');
+}
+
+/* ── EXPORT ───────────────────────────────────────────────────── */
+
+async function exportPNG() {
+  if (!post) return;
+  const btn = document.getElementById('exportBtn'), label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    if (document.fonts) {
+      await Promise.all([
+        document.fonts.load(`600 68px "Bodoni Moda"`),
+        document.fonts.load(`700 24px "DM Sans"`),
+        document.fonts.load(`500 20px "DM Sans"`),
+      ]).catch(() => {});
+      draw();
+    }
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('the browser would not produce a PNG');
+    const slug = (headlineText() || post.title || 'article').toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
+    const name = `${slug}-${W}x${H}.png`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    const size = (blob.size / 1048576).toFixed(1);
+    document.getElementById('exportHint').textContent = `Saved ${name} — ${size} MB. In your Downloads.`;
+    showToast('Card exported');
+  } catch (err) {
+    const why = /secur|taint/i.test(String(err && err.message))
+      ? 'The photograph blocked the export — its host does not allow reuse. Pick a different article or add a photo it will let go of.'
+      : 'Export failed: ' + (err && err.message);
+    showToast(why, 'error');
+    document.getElementById('exportHint').textContent = why;
+  } finally {
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+
+/* ── CONTROLS ─────────────────────────────────────────────────── */
+
+document.getElementById('ratios').addEventListener('click', (e) => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  document.querySelectorAll('#ratios [aria-pressed]').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+  W = Number(btn.dataset.w); H = Number(btn.dataset.h);
+  document.getElementById('stage').style.aspectRatio = W + '/' + H;
+  draw();
+});
+document.getElementById('tagText').addEventListener('input', draw);
+document.getElementById('headlineText').addEventListener('input', draw);
+document.getElementById('regenBtn').addEventListener('click', regenerateCaption);
+document.getElementById('exportBtn').addEventListener('click', exportPNG);
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const ta = document.getElementById('captionText');
+  try {
+    await navigator.clipboard.writeText(ta.value);
+    showToast('Caption copied');
+  } catch (e) {
+    ta.select();
+    showToast('Select-and-copy — clipboard access was blocked', 'error');
+  }
+});
+
+document.getElementById('stage').style.aspectRatio = W + '/' + H;
+</script>
+</body>
+</html>
