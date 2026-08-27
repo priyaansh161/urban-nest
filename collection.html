@@ -371,7 +371,7 @@
     <div class="hero-inner">
       <div class="page-tag">SINGLE PIECES</div>
       <h1 class="page-title">The <em>Collection.</em></h1>
-      <p class="page-sub">Individual pieces, modelled in 3D. Turn each one over before you decide. No room to walk through, just the object itself.</p>
+      <p class="page-sub">Handpicked décor that stands out. Every piece modelled in 3D — turn it over before you decide.</p>
     </div>
   </div>
 
@@ -478,7 +478,30 @@
   // handler — no quoting of ids into markup, nothing to escape wrong.
   document.addEventListener('click', function (e) {
     var card = e.target.closest && e.target.closest('.item[data-id]');
-    if (card) openDetail(card.getAttribute('data-id'));
+    if (card) openPiece(card.getAttribute('data-id'));
+  });
+
+  /* ── THE PIECE, AS ITS OWN HISTORY ENTRY ──
+     Opening a piece pushes ?p=<id> onto the URL rather than just toggling the
+     sheet, so the address bar names what's open and — the actual point —
+     the browser's own back button has something correct to go back to.
+     Closing (the cross, the backdrop, Escape) all go through history.back()
+     instead of closing directly; popstate is the one place that ever hides
+     the sheet, so all four ways of leaving a piece behave identically. */
+  function withParam(key, val) {
+    var u = new URL(location.href);
+    if (val == null) u.searchParams.delete(key);
+    else u.searchParams.set(key, val);
+    return u.pathname + u.search;
+  }
+  function openPiece(id) {
+    if (!ITEMS[id]) return;
+    history.pushState({ p: id }, '', withParam('p', id));
+    openDetail(id);
+  }
+  window.addEventListener('popstate', function () {
+    var id = new URLSearchParams(location.search).get('p');
+    if (id && ITEMS[id]) openDetail(id); else reallyCloseDetail();
   });
 
   // Opening a piece is what starts the download. The words are on screen
@@ -578,19 +601,29 @@
     if (saved === 'light') setStageBg('light');
   })();
 
-  function closeDetail() {
+  // Called directly only from popstate, once the URL has already lost its
+  // ?p=. Everything else that looks like "close" asks history for that
+  // instead of closing outright — see closeDetail().
+  function reallyCloseDetail() {
     document.getElementById('detail').classList.remove('open');
     document.body.style.overflow = '';
     // drop the viewer so its memory and any in-flight download are released
     setTimeout(function () { if (dViewer) { dViewer.remove(); dViewer = null; } }, 350);
   }
+  function closeDetail() {
+    if (new URLSearchParams(location.search).get('p')) history.back();
+    else reallyCloseDetail();
+  }
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDetail(); });
 
-  /* ── THE TWO VIEWS ──
+  /* ── THE VIEWS ──
      No query string: a tile per category. ?c=slug: that category's own page,
-     its photograph and paragraph above its pieces. Tiles are ordinary links,
-     so the back button, a middle click and a shared URL all behave the way
-     they look like they should, with no history handling of our own. */
+     its photograph and paragraph above its pieces. Category tiles are
+     ordinary links, so the back button, a middle click and a shared URL all
+     behave the way they look like they should, with no history handling of
+     our own. A piece (&p=id, opened from within a category or linked to
+     directly) is the one exception — see "THE PIECE, AS ITS OWN HISTORY
+     ENTRY" below, since a modal has no URL of its own by default. */
   /* A category with no photograph of its own still needs one. A tile showing
      the logo on a flat panel reads as broken rather than as new, and the
      category header is worse — a whole empty half of the screen. These are
@@ -669,15 +702,31 @@
       var current = null;
       for (var i = 0; i < cs.length; i++) if (cs[i].slug === slug) current = cs[i];
 
-      if (slug && current) return paintCategory(current, rows.filter(function (it) {
-        return (it.category || '') === slug;
-      }));
+      if (slug && current) {
+        paintCategory(current, rows.filter(function (it) { return (it.category || '') === slug; }));
+      } else if (!cs.length) {
+        // An unknown or unpublished slug is not an error worth a message —
+        // the category was probably taken down. Show the doors instead.
+        paintAll(rows);
+      } else {
+        paintTiles(cs, counts, rows);
+      }
 
-      // An unknown or unpublished slug is not an error worth a message — the
-      // category was probably taken down. Show the doors instead.
-      if (!cs.length) return paintAll(rows);
-      paintTiles(cs, counts, rows);
+      openFromUrl();
     }, fail);
+
+    // A tile that links straight to a piece (?c=slug&p=id, e.g. the
+    // homepage strip) opens it on load. The bare category/listing URL is
+    // put in place as the entry underneath it first — otherwise closing the
+    // piece would go back past this page entirely, to wherever the tile was
+    // clicked from, instead of landing here.
+    function openFromUrl() {
+      var id = new URLSearchParams(location.search).get('p');
+      if (!id || !ITEMS[id]) return;
+      history.replaceState(null, '', withParam('p', null));
+      history.pushState({ p: id }, '', withParam('p', id));
+      openDetail(id);
+    }
 
     function fail() {
       grid.innerHTML = '<div class="empty">The collection could not be loaded just now.<br/>Please try again shortly.</div>';

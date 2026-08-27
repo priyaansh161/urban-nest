@@ -4,7 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Urban Nest · Curated Living Spaces</title>
+  <meta name="description" content="Home décor in India has long been a luxury for the few. We disagree. Walk through rooms in 3D, turn each piece over, and find the small things that make a home."/>
   <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <!-- ── THE LINK PREVIEW ──
+       What WhatsApp, Instagram DMs, iMessage, Slack and LinkedIn show when
+       this address is pasted into a chat. Without these a shared link is a
+       bare line of text with no picture, which is what it was until now.
+       og:image MUST be an absolute URL — a relative path resolves against
+       the app doing the fetching, not against this site, so it silently
+       comes back blank. JPEG rather than the site's usual webp because
+       several preview fetchers still will not read webp. -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Urban Nest"/>
+  <meta property="og:url" content="https://storeurbannest.netlify.app/"/>
+  <meta property="og:title" content="Urban Nest · Curated Living Spaces"/>
+  <meta property="og:description" content="Just the right feel. Walk through rooms in 3D and turn each piece over before you decide."/>
+  <!-- Square, and declared as square. WhatsApp renders the preview image as a
+       small square thumbnail, so a wide image gets squashed — the mark went
+       oval and the type illegible. A square logo has no aspect to lose.
+       twitter:card is "summary" rather than "summary_large_image" for the
+       same reason: the large card expects 1.91:1 and would crop a square. -->
+  <meta property="og:image" content="https://storeurbannest.netlify.app/images/share-card.jpg"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="1200"/>
+  <meta property="og:image:alt" content="Urban Nest"/>
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:title" content="Urban Nest · Curated Living Spaces"/>
+  <meta name="twitter:description" content="Just the right feel. Walk through rooms in 3D and turn each piece over before you decide."/>
+  <meta name="twitter:image" content="https://storeurbannest.netlify.app/images/share-card.jpg"/>
   <!-- 600 is here for the hero line only: gold on a photograph needs the
        extra weight to hold its edges, and 500 was not enough of a step. -->
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -437,15 +465,13 @@
     }
     .hero-type em { font-style: italic; color: var(--gold); }
 
+    /* flex-end, not space-between: the strapline that used to sit opposite
+       the buttons is gone, and space-between with one child left would park
+       them against the left edge instead of where they have always been. */
     .hero-foot {
-      display: flex; justify-content: space-between; align-items: flex-end;
+      display: flex; justify-content: flex-end; align-items: flex-end;
       gap: 30px; flex-wrap: wrap;
       margin-top: clamp(26px, 3.4cqw, 44px);
-    }
-    .hero-sub {
-      font-size: 13.5px; line-height: 1.8;
-      color: rgba(244,242,233,0.72);
-      max-width: 34ch;
     }
     /* buttons on a photograph invert: light outline, light fill */
     .hero-foot .btn { border-color: var(--gold); color: var(--panel-ink); }
@@ -537,7 +563,6 @@
        baseline. Matches .spaces-head, which already drops its note the same
        way for the same reason. */
     .collect-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; margin-bottom: var(--sec-lead); }
-    .collect-label { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); }
     .collect-all {
       font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
       text-decoration: none; color: var(--gold);
@@ -731,12 +756,41 @@
        CONTACT
        ═══════════════════════════════════════════ */
     .contact { padding: var(--sec) 0; }
+    /* ── HEADING AND MARK, SIDE BY SIDE ──
+       The heading is capped at 18ch so it breaks into two handsome lines,
+       which left the right half of this band empty on a wide screen. The
+       lockup fills it with the same three things in the same order the
+       share card and /card.html lead with — logo, wordmark, tagline — so
+       the brand signs off the page rather than trailing away. The row owns
+       the gap to the contact grid now; the heading no longer sets it. */
+    .contact-head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 28px; flex-wrap: wrap;
+      margin-bottom: clamp(30px, 4cqw, 52px);
+    }
     .contact-type {
       font-family: 'Bodoni Moda', Didot, Georgia, serif;
       font-weight: 400;
       font-size: clamp(26px, 3.6cqw, 44px);
-      line-height: 1.15; margin-bottom: clamp(30px, 4cqw, 52px);
+      line-height: 1.15;
       max-width: 18ch;
+    }
+    .contact-lockup {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 11px; text-align: center;
+    }
+    /* Same treatment as the nav mark: the source file is a black circle on a
+       white square, so it is clipped to a circle rather than shown square. */
+    .cl-logo { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .cl-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cl-name {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-size: 19px; letter-spacing: 0.2em; text-indent: 0.2em;
+    }
+    .cl-tagline {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-size: 14px; letter-spacing: 0.085em; text-indent: 0.085em;
+      color: var(--gold);
     }
     .contact-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
@@ -848,6 +902,9 @@
 
       .philosophy-inner { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; }
+      /* Stacked, the lockup drops under the heading — left-aligned with
+         everything else on the page rather than stranded in the middle. */
+      .contact-lockup { align-items: flex-start; text-align: left; }
       .footer-inner { flex-direction: column; text-align: center; }
     }
 
@@ -1035,7 +1092,6 @@
         <span class="mask"><span style="--d:110ms"><em>We disagree.</em></span></span>
       </h1>
       <div class="hero-foot rv" style="--d:300ms">
-        <p class="hero-sub">For the designer in you.</p>
         <div class="btn-row">
           <a href="#rooms" class="btn btn-solid">
             Explore spaces
@@ -1131,7 +1187,14 @@
 
   <!-- ── CONTACT ── -->
   <section class="contact shell rv">
-    <h2 class="contact-type">We'd love to hear from you.</h2>
+    <div class="contact-head">
+      <h2 class="contact-type">We'd love to hear from you.</h2>
+      <div class="contact-lockup">
+        <span class="cl-logo"><img src="logo-icon.png" alt="" aria-hidden="true"/></span>
+        <span class="cl-name">URBAN NEST</span>
+        <span class="cl-tagline">Just The Right Feel</span>
+      </div>
+    </div>
     <div class="contact-grid">
       <div class="contact-item">
         <span class="contact-type-label">Email</span>
@@ -1318,7 +1381,14 @@
           grid.innerHTML = rows.map(function (it) {
             // IMG: COLLECTION placeholder, when a piece has no photo of its own
             var img = it.image_url || 'images/det-vase.webp';
-            return '<a class="ct-piece" href="collection.html">' +
+            // Straight to the piece, not the collection's front door — the
+            // category first (?c=), then the piece open on top of it (&p=),
+            // so leaving the piece lands back on its category, not here.
+            var params = new URLSearchParams();
+            if (it.category) params.set('c', it.category);
+            params.set('p', it.id);
+            var href = 'collection.html?' + params.toString();
+            return '<a class="ct-piece" href="' + href + '">' +
               '<figure><img src="' + esc(img) + '" alt="" loading="lazy" decoding="async"/>' +
               '<figcaption>' + esc(label(it.name)) + (it.model_url ? ' · 3D' : '') + '</figcaption></figure></a>';
           }).join('');

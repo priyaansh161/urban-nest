@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Urban Nest · Just The Right Feel</title>
+  <meta name="description" content="Urban Nest — just the right feel. Walk through rooms in 3D, turn each piece over, and find the small things that make a home."/>
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <!-- Same preview as the homepage: whichever of the two links gets shared,
+       the card in the chat looks the same. og:image MUST be absolute — a
+       relative path resolves against the app doing the fetching, not against
+       this site, and comes back blank. -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Urban Nest"/>
+  <meta property="og:url" content="https://storeurbannest.netlify.app/card.html"/>
+  <meta property="og:title" content="Urban Nest · Just The Right Feel"/>
+  <meta property="og:description" content="Walk through rooms in 3D and turn each piece over before you decide."/>
+  <meta property="og:image" content="https://storeurbannest.netlify.app/images/share-card.jpg"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="1200"/>
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:image" content="https://storeurbannest.netlify.app/images/share-card.jpg"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --ink: #0D0D0D; --paper: #FFFFFF; --muted: #6B6B68; --line: #E4E3DE;
+      --ease: cubic-bezier(.16,.7,.2,1);
+    }
+    /* Committed to white-and-black rather than following the device: this is
+       the page behind a share card that is white and black, and the two
+       should not look like different companies. */
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #F4F3EF;
+      color: var(--ink);
+      min-height: 100svh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 26px 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .card {
+      width: min(420px, 100%);
+      background: var(--paper);
+      border: 0.5px solid var(--line);
+      box-shadow: 0 24px 60px rgba(13,13,13,0.10);
+      padding: 34px 24px 24px;
+    }
+
+    /* ── THE LOCKUP ──
+       Logo, wordmark, rule, tagline — the same order and proportions as the
+       share card, so tapping through feels like the card opening rather than
+       arriving somewhere new. */
+    .lockup { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .logo { width: 66px; height: 66px; }
+    .logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .wordmark {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-size: 30px; letter-spacing: 0.2em; text-indent: 0.2em;
+      margin-top: 20px;
+    }
+    .rule { width: 52px; height: 1.5px; background: var(--ink); margin: 15px 0; }
+    .tagline {
+      font-family: 'Bodoni Moda', Didot, Georgia, serif;
+      font-size: 19px; letter-spacing: 0.085em; text-indent: 0.085em;
+    }
+    .eyebrow {
+      font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--muted); margin-top: 14px;
+    }
+    .blurb {
+      font-size: 13px; line-height: 1.8; color: var(--muted);
+      margin-top: 18px; max-width: 30ch;
+    }
+
+    /* ── THE DOORS ──
+       Full-width rows rather than buttons in a grid: on a phone this page is
+       read with one thumb, and a row is a target you cannot miss. */
+    .doors { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+    .door {
+      display: flex; align-items: center; gap: 13px;
+      /* 56px: comfortably past the ~44px a fingertip needs, and four of them
+         plus the lockup still clear a small phone without scrolling. */
+      min-height: 56px; padding: 0 16px;
+      text-decoration: none; color: var(--ink);
+      border: 0.5px solid var(--line);
+      transition: border-color .3s var(--ease), background .3s var(--ease), transform .3s var(--ease);
+    }
+    .door:hover, .door:focus-visible { border-color: var(--ink); background: #FAFAF8; transform: scale(0.985); }
+    .door:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .door-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; color: var(--ink); }
+    .door-text { flex: 1; min-width: 0; }
+    .door-title { display: block; font-size: 13.5px; font-weight: 500; }
+    .door-note { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .door-arrow { flex-shrink: 0; opacity: 0.35; transition: opacity .3s, transform .3s var(--ease); }
+    .door:hover .door-arrow { opacity: 1; transform: translateX(3px); }
+    .door-arrow svg { width: 14px; height: 14px; display: block; }
+
+    .door.primary { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+    .door.primary .door-icon { color: var(--paper); }
+    .door.primary .door-note { color: rgba(255,255,255,0.55); }
+    .door.primary:hover { background: #000; border-color: #000; }
+
+    .foot {
+      margin-top: 22px; text-align: center;
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    }
+    .foot a { color: var(--muted); text-decoration: none; }
+    .foot a:hover { color: var(--ink); }
+
+    /* One gentle arrival, and nothing after it — a card that keeps moving
+       reads as a landing page. */
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .card { animation: rise .7s var(--ease) both; }
+    @media (prefers-reduced-motion: reduce) {
+      .card { animation: none; }
+      .door, .door-arrow { transition: none; }
+      .door:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <main class="card">
+    <div class="lockup">
+      <span class="logo"><img src="logo-icon.png" alt="Urban Nest"/></span>
+      <span class="wordmark">URBAN NEST</span>
+      <span class="rule"></span>
+      <span class="tagline">Just The Right Feel</span>
+      <span class="eyebrow">Curated living · India</span>
+      <p class="blurb">Walk through a room in 3D. Turn a piece over before you decide.</p>
+    </div>
+
+    <nav class="doors">
+      <a class="door primary" href="index.html">
+        <span class="door-icon">◈</span>
+        <span class="door-text">
+          <span class="door-title">Visit Urban Nest</span>
+          <span class="door-note">The full site</span>
+        </span>
+        <span class="door-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="door" href="index.html#rooms">
+        <span class="door-icon">◉</span>
+        <span class="door-text">
+          <span class="door-title">Walk through the spaces</span>
+          <span class="door-note">Kitchen, bath and bedroom, in 3D</span>
+        </span>
+        <span class="door-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="door" href="collection.html">
+        <span class="door-icon">◻</span>
+        <span class="door-text">
+          <span class="door-title">The Collection</span>
+          <span class="door-note">Pieces you can turn over</span>
+        </span>
+        <span class="door-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+
+      <a class="door" href="community.html">
+        <span class="door-icon">✦</span>
+        <span class="door-text">
+          <span class="door-title">The Nest Edit</span>
+          <span class="door-note">Ideas and trends in Indian décor</span>
+        </span>
+        <span class="door-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </nav>
+
+    <div class="foot">
+      <a href="https://storeurbannest.netlify.app/">storeurbannest.netlify.app</a>
+    </div>
+  </main>
+
+</body>
+</html>
