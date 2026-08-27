@@ -49,6 +49,34 @@
   }
   input:focus, textarea:focus, select:focus { border-color: var(--gold); }
   textarea { min-height: 120px; }
+  /* Sits flush on top of the content box, sharing its border rather than
+     floating a separate box above it — it's an extension of the field, not
+     a control panel next to it. Grouped with dividers the way a word
+     processor's ribbon is: text style, then headings, then lists. */
+  .fmt-toolbar { display: flex; align-items: center; gap: 1px; flex-wrap: wrap;
+                 border: 0.5px solid var(--border); border-bottom: none; background: var(--bg); padding: 4px 6px; }
+  .fmt-sep { width: 1px; align-self: stretch; margin: 4px 7px; background: var(--border); }
+  .fmt-btn { min-width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+             gap: 5px; padding: 0 8px; border: 0.5px solid transparent; border-radius: 3px; background: none;
+             cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black);
+             transition: background 0.15s, border-color 0.15s; }
+  .fmt-btn:hover { border-color: var(--border); background: var(--white); }
+  .fmt-btn:active { background: var(--gold-light); border-color: var(--gold); }
+  .fmt-btn svg { width: 15px; height: 15px; display: block; }
+  /* The style dropdown, where a word processor puts its font size — the
+     equivalent control here, since size on this blog is a consequence of
+     what a line IS (heading, sub-heading, body) rather than a number set
+     per article. Each option is drawn at roughly its real relative size. */
+  .fmt-select { height: 30px; padding: 0 6px; border: 0.5px solid var(--border); border-radius: 3px;
+                background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 12px;
+                color: var(--black); cursor: pointer; outline: none; min-width: 124px; }
+  .fmt-select:hover { border-color: var(--grey); }
+  .fmt-select:focus { border-color: var(--gold); }
+  .fmt-select option { font-family: 'Bodoni Moda', serif; }
+  .fmt-select option[value="paragraph"] { font-family: 'DM Sans', sans-serif; font-size: 13px; }
+  .fmt-select option[value="h2"] { font-size: 19px; }
+  .fmt-select option[value="h3"] { font-size: 16px; }
+  .fmt-select option[value="h4"] { font-size: 13.5px; }
   .form-actions { display: flex; gap: 12px; margin-top: 24px; }
   .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
   .btn-primary { background: var(--black); color: var(--white); }
@@ -103,6 +131,7 @@
     <div class="nav-group-label">Content Creation</div>
     <a href="social.html" class="nav-item"><span class="icon">▣</span> Media Engagement</a>
     <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
+    <a href="article-card.html" class="nav-item"><span class="icon">▤</span> Article Cards</a>
     <div class="nav-group-label">Community</div>
     <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
     <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
@@ -160,8 +189,30 @@
       </div>
       <div class="form-group full">
         <label for="postContent">Content</label>
+        <div class="fmt-toolbar">
+          <button type="button" class="fmt-btn" data-fmt="bold" title="Bold  (Ctrl+B)" aria-label="Bold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7z"/><path d="M7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg>
+          </button>
+          <button type="button" class="fmt-btn" data-fmt="italic" title="Italic  (Ctrl+I)" aria-label="Italic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5h-5"/><path d="M14 19H9"/><path d="M14.5 5l-4 14"/></svg>
+          </button>
+          <span class="fmt-sep"></span>
+          <select class="fmt-select" id="fmtStyle" title="Text style — sets the size of the line the cursor is on">
+            <option value="paragraph">Normal text</option>
+            <option value="h2">Heading 1</option>
+            <option value="h3">Heading 2</option>
+            <option value="h4">Heading 3</option>
+          </select>
+          <span class="fmt-sep"></span>
+          <button type="button" class="fmt-btn" data-fmt="bullets" title="Bullet list" aria-label="Bullet list">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="4.5" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="4.5" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><path d="M9.5 6.5H20M9.5 12H20M9.5 17.5H20"/></svg>
+          </button>
+          <button type="button" class="fmt-btn" data-fmt="numbers" title="Numbered list" aria-label="Numbered list">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6.5H20M10 12H20M10 17.5H20"/><path d="M3.2 5.2l1.3-.7V8"/><path d="M3.2 11h2.2l-2.2 2.6h2.2"/><path d="M3.4 16.2h2v1.4h-2v1.4h2"/></svg>
+          </button>
+        </div>
         <textarea id="postContent" placeholder="Write your article…"></textarea>
-        <span style="font-size:11px;color:var(--grey);line-height:1.6;margin-top:4px;">Tip: start a line with <strong>##</strong> for a section heading, leave a blank line between paragraphs, and use <strong>-</strong> for bullet points. Links (https://…) become clickable automatically.</span>
+        <span style="font-size:11px;color:var(--grey);line-height:1.6;margin-top:4px;">Select text and click a button, or just click one to format the line the cursor's on. <strong>Ctrl+B</strong> and <strong>Ctrl+I</strong> work too. Leave a blank line between paragraphs. Links (https://…) become clickable automatically.</span>
       </div>
       <div class="form-group full">
         <label for="postImage">Cover Image URL (optional)</label>
@@ -207,6 +258,134 @@ let posts = [];
   await requireAuth();
   loadPosts();
 })();
+
+/* ── FORMATTING TOOLBAR ──
+   Operates on the textarea's own selection rather than opening any kind of
+   editor — the syntax typed in is exactly what community.html's formatBody()
+   reads, so what you see here is genuinely what controls the output, just
+   without having to remember "how many #'s was it again". */
+function fmtCurrentLines(ta) {
+  const { selectionStart: s, selectionEnd: e, value } = ta;
+  const lineStart = value.lastIndexOf('\n', s - 1) + 1;
+  let lineEnd = value.indexOf('\n', Math.max(e - 1, s));
+  if (lineEnd === -1) lineEnd = value.length;
+  return { lineStart, lineEnd, block: value.slice(lineStart, lineEnd) };
+}
+function fmtStripMarkers(line) {
+  return line.replace(/^#{1,4}\s*/, '').replace(/^[-*]\s+/, '').replace(/^\d+[.)]\s+/, '');
+}
+function fmtFireInput(ta) {
+  ta.focus();
+  ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+function fmtHeading(ta, hashes) {
+  const { lineStart, lineEnd, block } = fmtCurrentLines(ta);
+  const lines = block.split('\n').map(l => l.trim() === '' ? l : hashes + ' ' + fmtStripMarkers(l));
+  ta.setRangeText(lines.join('\n'), lineStart, lineEnd, 'end');
+  fmtFireInput(ta);
+}
+// Clicking the same list button again turns it back off, the way a word
+// processor's list toggle does — so `test` decides the direction.
+function fmtList(ta, test, marker) {
+  const { lineStart, lineEnd, block } = fmtCurrentLines(ta);
+  const lines = block.split('\n');
+  const already = lines.filter(l => l.trim()).every(l => test.test(l.trim()));
+  let n = 0;
+  const next = lines.map(l => {
+    if (l.trim() === '') return l;
+    const bare = fmtStripMarkers(l);
+    return already ? bare : marker(++n) + bare;
+  });
+  ta.setRangeText(next.join('\n'), lineStart, lineEnd, 'end');
+  fmtFireInput(ta);
+}
+function fmtParagraph(ta) {
+  const { lineStart, lineEnd, block } = fmtCurrentLines(ta);
+  const next = block.split('\n').map(l => l.trim() === '' ? l : fmtStripMarkers(l));
+  ta.setRangeText(next.join('\n'), lineStart, lineEnd, 'end');
+  fmtFireInput(ta);
+}
+// Wraps the selection in `mark`, or unwraps it if it's already wrapped —
+// the Ctrl+B-twice behaviour. With nothing selected it drops in placeholder
+// text and selects it, so the next keystroke replaces it.
+function fmtWrap(ta, mark, placeholder) {
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const hasSelection = start !== end;
+  const sel = ta.value.slice(start, end);
+  const m = mark.length;
+
+  if (hasSelection && sel.startsWith(mark) && sel.endsWith(mark) && sel.length > m * 2) {
+    const inner = sel.slice(m, -m);
+    ta.setRangeText(inner, start, end, 'select');
+    fmtFireInput(ta);
+    return;
+  }
+  const outer = ta.value.slice(start - m, end + m);
+  if (hasSelection && outer === mark + sel + mark) {
+    ta.setRangeText(sel, start - m, end + m, 'select');
+    fmtFireInput(ta);
+    return;
+  }
+  const text = hasSelection ? sel : placeholder;
+  ta.setRangeText(mark + text + mark, start, end, 'end');
+  ta.selectionStart = start + m;
+  ta.selectionEnd = start + m + text.length;
+  fmtFireInput(ta);
+}
+
+const FMT_ACTIONS = {
+  bold:      ta => fmtWrap(ta, '**', 'bold text'),
+  italic:    ta => fmtWrap(ta, '*', 'italic text'),
+  h2:        ta => fmtHeading(ta, '#'),
+  h3:        ta => fmtHeading(ta, '##'),
+  h4:        ta => fmtHeading(ta, '###'),
+  paragraph: ta => fmtParagraph(ta),
+  bullets:   ta => fmtList(ta, /^[-*]\s+/, () => '- '),
+  numbers:   ta => fmtList(ta, /^\d+[.)]\s+/, n => n + '. '),
+};
+
+document.querySelectorAll('.fmt-toolbar .fmt-btn').forEach(btn => {
+  // mousedown, not click: the textarea would lose its selection to the
+  // button before a click handler ever ran.
+  btn.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    const run = FMT_ACTIONS[btn.dataset.fmt];
+    if (run) run(document.getElementById('postContent'));
+    fmtSyncStyle();
+  });
+});
+
+/* The style dropdown reads as well as writes: it shows what the line the
+   cursor sits on already is, so it answers "what am I typing in?" and not
+   only "what do I want next?" — the half of a word processor's style box
+   people actually rely on. */
+function fmtStyleOfLine(line) {
+  const m = line.match(/^(#{1,3})#*\s*/);
+  if (!m) return 'paragraph';
+  return m[1].length === 1 ? 'h2' : m[1].length === 2 ? 'h3' : 'h4';
+}
+function fmtSyncStyle() {
+  const ta = document.getElementById('postContent');
+  const sel = document.getElementById('fmtStyle');
+  if (!ta || !sel) return;
+  const { block } = fmtCurrentLines(ta);
+  sel.value = fmtStyleOfLine(block.split('\n')[0] || '');
+}
+
+document.getElementById('fmtStyle').addEventListener('change', (e) => {
+  const run = FMT_ACTIONS[e.target.value];
+  if (run) run(document.getElementById('postContent'));
+});
+['click', 'keyup', 'focus'].forEach(evt =>
+  document.getElementById('postContent').addEventListener(evt, fmtSyncStyle));
+
+document.getElementById('postContent').addEventListener('keydown', (e) => {
+  if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
+  const key = e.key.toLowerCase();
+  if (key !== 'b' && key !== 'i') return;
+  e.preventDefault();
+  FMT_ACTIONS[key === 'b' ? 'bold' : 'italic'](e.target);
+});
 
 async function loadPosts() {
   const { data, error } = await db.from('nest_posts')
@@ -280,6 +459,7 @@ function resetForm() {
   document.getElementById('formTitle').textContent = 'New Post';
   document.getElementById('resetFormBtn').style.display = 'none';
   document.getElementById('publishBtn').textContent = 'Publish Post';
+  fmtSyncStyle();
 }
 
 async function savePost(publish) {
