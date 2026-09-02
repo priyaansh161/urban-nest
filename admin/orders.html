@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Orders — Urban Nest Admin</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; --green: #4E7A6B; --red: #c0392b; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  /* Money owed is the number that gets asked about, so it leads. */
+  .stat-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--border); border: 0.5px solid var(--border); margin-bottom: 28px; }
+  .stat { background: var(--white); padding: 20px 22px; }
+  .stat-n { font-family: 'Bodoni Moda', serif; font-size: 26px; font-variant-numeric: tabular-nums; }
+  .stat-n.owed { color: var(--gold); }
+  .stat-l { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--grey); margin-top: 8px; }
+
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .filter-btn { padding: 8px 18px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover { color: var(--black); border-color: var(--black); }
+  .filter-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+  .filter-sep { width: 1px; height: 22px; background: var(--border); margin: 0 4px; }
+  select.seller-filter { padding: 8px 14px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.08em; color: var(--black); outline: none; }
+
+  .orders { display: flex; flex-direction: column; gap: 2px; }
+  .order { background: var(--white); border: 0.5px solid var(--border); transition: border-color 0.2s; }
+  .order:hover { border-color: #ccc; }
+  .order-head { display: grid; grid-template-columns: 130px 1fr 150px 130px 110px auto; gap: 18px; align-items: center; padding: 18px 24px; cursor: pointer; }
+  .order-no { font-family: 'Bodoni Moda', serif; font-size: 15px; }
+  .order-cust { font-size: 13px; }
+  .order-cust small { display: block; color: var(--grey); font-size: 11px; margin-top: 2px; }
+  .order-date { font-size: 11px; color: var(--grey); }
+  .order-amt { font-size: 15px; font-variant-numeric: tabular-nums; text-align: right; }
+  .chev { font-size: 18px; color: #bbb; transition: transform 0.3s; line-height: 1; }
+  .order.open .chev { transform: rotate(45deg); color: var(--black); }
+
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 9px; border-radius: 2px; display: inline-block; white-space: nowrap; }
+  .b-paid { background: rgba(78,122,107,.13); color: var(--green); }
+  .b-pending { background: #eee; color: var(--grey); }
+  .b-failed, .b-refunded { background: rgba(192,57,43,.1); color: var(--red); }
+
+  .order-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1); }
+  .order.open .order-body { grid-template-rows: 1fr; }
+  .order-body-inner { overflow: hidden; }
+  .order-detail { padding: 0 24px 22px; border-top: 0.5px solid var(--border); }
+  .detail-cols { display: grid; grid-template-columns: 1fr 260px; gap: 32px; padding-top: 18px; }
+  .detail-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 10px; }
+
+  .line { display: grid; grid-template-columns: 1fr 120px 110px auto; gap: 14px; align-items: center; padding: 12px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .line:last-child { border-bottom: none; }
+  .line-name small { display: block; color: var(--grey); font-size: 11px; margin-top: 3px; }
+  .line-money { text-align: right; font-variant-numeric: tabular-nums; }
+  .line-money small { display: block; color: var(--grey); font-size: 10px; margin-top: 2px; }
+  .line-actions { display: flex; gap: 6px; }
+  .row-btn { padding: 5px 12px; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); transition: all 0.2s; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .row-btn:hover { border-color: var(--black); color: var(--black); }
+  .row-btn.done { border-color: var(--green); color: var(--green); }
+
+  .addr { font-size: 12.5px; line-height: 1.7; color: #333; }
+  .addr .muted { color: var(--grey); }
+  .rzp { font-size: 10.5px; color: var(--grey); margin-top: 14px; word-break: break-all; line-height: 1.6; }
+
+  .empty-state { padding: 64px 24px; text-align: center; color: var(--grey); font-size: 13px; background: var(--white); border: 0.5px solid var(--border); }
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+
+  @media (max-width: 1100px) {
+    .order-head { grid-template-columns: 1fr auto; gap: 10px; }
+    .order-date, .order-cust { display: none; }
+    .detail-cols { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Commerce</div>
+    <a href="sellers.html" class="nav-item"><span class="icon">⬢</span> Sellers</a>
+    <a href="orders.html" class="nav-item active"><span class="icon">▦</span> Orders</a>
+    <div class="nav-group-label">Content Creation</div>
+    <a href="social.html" class="nav-item"><span class="icon">▣</span> Media Engagement</a>
+    <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
+    <a href="article-card.html" class="nav-item"><span class="icon">▤</span> Article Cards</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Orders</h1>
+    <p>What sold, whether it is paid, and who still needs to pack it</p>
+  </div>
+
+  <div class="stat-strip" id="stats"></div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setStatus('all', this)">All</button>
+    <button class="filter-btn" onclick="setStatus('paid', this)">Paid</button>
+    <button class="filter-btn" onclick="setStatus('pending', this)">Unpaid</button>
+    <button class="filter-btn" onclick="setStatus('topack', this)">To pack</button>
+    <div class="filter-sep"></div>
+    <select class="seller-filter" id="sellerFilter" onchange="renderList()">
+      <option value="">All sellers</option>
+    </select>
+  </div>
+
+  <div class="orders" id="orderList">
+    <div class="empty-state">Loading orders…</div>
+  </div>
+</main>
+
+<script>
+let orders = [];      // each with .items[]
+let sellers = {};
+let status = 'all';
+
+(async () => { await requireAuth(); await load(); })();
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function rupees(p) {
+  const r = (p || 0) / 100;
+  return '₹' + r.toLocaleString('en-IN', {
+    minimumFractionDigits: p % 100 ? 2 : 0, maximumFractionDigits: p % 100 ? 2 : 0
+  });
+}
+function when(d) {
+  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+async function load() {
+  const sr = await db.from('sellers').select('id,name,kind,payout_mode');
+  if (!sr.error) {
+    (sr.data || []).forEach(s => { sellers[s.id] = s; });
+    document.getElementById('sellerFilter').innerHTML =
+      '<option value="">All sellers</option>' +
+      (sr.data || []).filter(s => s.kind !== 'affiliate')
+        .map(s => '<option value="' + s.id + '">' + esc(s.name) + '</option>').join('');
+  }
+
+  const or = await db.from('orders').select('*').order('created_at', { ascending: false });
+  if (or.error) {
+    document.getElementById('orderList').innerHTML =
+      '<div class="empty-state">Could not load orders. Has <strong>setup-commerce.sql</strong> been run?</div>';
+    return;
+  }
+  orders = or.data || [];
+
+  if (orders.length) {
+    const ir = await db.from('order_items').select('*').in('order_id', orders.map(o => o.id));
+    const byOrder = {};
+    (ir.data || []).forEach(i => { (byOrder[i.order_id] = byOrder[i.order_id] || []).push(i); });
+    orders.forEach(o => { o.items = byOrder[o.id] || []; });
+  }
+
+  renderStats();
+  renderList();
+}
+
+function renderStats() {
+  const paid = orders.filter(o => o.payment_status === 'paid');
+  const revenue = paid.reduce((n, o) => n + (o.total_paise || 0), 0);
+  // What we have collected but not yet handed over. Only ever manual-payout
+  // sellers — a Route split settles itself at checkout.
+  const owed = paid.reduce((n, o) => n + (o.items || []).reduce((m, i) => {
+    const s = sellers[i.seller_id];
+    const manual = s && s.payout_mode === 'manual' && s.kind !== 'direct';
+    return m + (manual && i.payout_status !== 'paid' ? (i.seller_payout_paise || 0) : 0);
+  }, 0), 0);
+  const toPack = paid.reduce((n, o) => n + (o.items || [])
+    .filter(i => ['new', 'confirmed'].includes(i.fulfilment_status)).length, 0);
+
+  document.getElementById('stats').innerHTML =
+    '<div class="stat"><div class="stat-n">' + paid.length + '</div><div class="stat-l">Paid orders</div></div>' +
+    '<div class="stat"><div class="stat-n">' + esc(rupees(revenue)) + '</div><div class="stat-l">Taken</div></div>' +
+    '<div class="stat"><div class="stat-n owed">' + esc(rupees(owed)) + '</div><div class="stat-l">Owed to sellers</div></div>' +
+    '<div class="stat"><div class="stat-n">' + toPack + '</div><div class="stat-l">Pieces to pack</div></div>';
+}
+
+function visible() {
+  const sf = document.getElementById('sellerFilter').value;
+  return orders.filter(o => {
+    if (status === 'paid' && o.payment_status !== 'paid') return false;
+    if (status === 'pending' && o.payment_status !== 'pending') return false;
+    if (status === 'topack' && !(o.payment_status === 'paid' &&
+        (o.items || []).some(i => ['new', 'confirmed'].includes(i.fulfilment_status)))) return false;
+    if (sf && !(o.items || []).some(i => i.seller_id === sf)) return false;
+    return true;
+  });
+}
+
+function setStatus(s, btn) {
+  status = s;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+function renderList() {
+  const list = visible();
+  const el = document.getElementById('orderList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state">No orders yet. They appear here the moment a payment clears.</div>';
+    return;
+  }
+  const sf = document.getElementById('sellerFilter').value;
+  el.innerHTML = list.map(o => order(o, sf)).join('');
+}
+
+function order(o, sf) {
+  const badge = { paid: 'b-paid', pending: 'b-pending', failed: 'b-failed', refunded: 'b-refunded' }[o.payment_status] || 'b-pending';
+  // With a seller filter on, show only their lines — this is the view you
+  // turn round to face a showroom owner.
+  const items = (o.items || []).filter(i => !sf || i.seller_id === sf);
+
+  return '<div class="order" id="o-' + esc(o.id) + '">' +
+    '<div class="order-head" onclick="toggle(\'' + esc(o.id) + '\')">' +
+      '<span class="order-no">' + esc(o.order_no || '—') + '</span>' +
+      '<span class="order-cust">' + esc(o.customer_name) +
+        '<small>' + esc(o.customer_phone || '') + (o.city ? ' · ' + esc(o.city) : '') + '</small></span>' +
+      '<span class="order-date">' + esc(when(o.created_at)) + '</span>' +
+      '<span><span class="badge ' + badge + '">' + esc(o.payment_status) + '</span></span>' +
+      '<span class="order-amt">' + esc(rupees(o.total_paise)) + '</span>' +
+      '<span class="chev">+</span>' +
+    '</div>' +
+    '<div class="order-body"><div class="order-body-inner"><div class="order-detail"><div class="detail-cols">' +
+      '<div>' +
+        '<div class="detail-label">Pieces</div>' +
+        items.map(i => line(o, i)).join('') +
+      '</div>' +
+      '<div>' +
+        '<div class="detail-label">Deliver to</div>' +
+        '<div class="addr">' + address(o) + '</div>' +
+        rzpRef(o) +
+      '</div>' +
+    '</div></div></div></div>' +
+  '</div>';
+}
+
+function line(o, i) {
+  const s = sellers[i.seller_id];
+  const manual = s && s.payout_mode === 'manual' && s.kind !== 'direct';
+  const packed = ['shipped', 'delivered'].includes(i.fulfilment_status);
+
+  return '<div class="line">' +
+    '<span class="line-name">' + esc(i.name_snapshot) + (i.qty > 1 ? ' × ' + i.qty : '') +
+      '<small>' + esc(s ? s.name : 'Unknown seller') +
+      ' · ' + (i.fulfilled_by === 'seller' ? 'they ship' : 'we ship') +
+      ' · ' + esc(i.fulfilment_status) + '</small></span>' +
+    '<span class="line-money">' + esc(rupees(i.line_total_paise)) +
+      '<small>' + esc(rupees(i.commission_paise)) + ' commission</small></span>' +
+    '<span class="line-money">' + esc(rupees(i.seller_payout_paise)) +
+      '<small>' + (manual ? (i.payout_status === 'paid' ? 'paid out' : 'owed') : 'settles itself') + '</small></span>' +
+    '<span class="line-actions">' +
+      (o.payment_status !== 'paid' ? '' :
+        (!packed
+          ? '<button class="row-btn" onclick="mark(\'' + esc(i.id) + '\',\'shipped\')">Mark shipped</button>'
+          : i.fulfilment_status === 'shipped'
+            ? '<button class="row-btn" onclick="mark(\'' + esc(i.id) + '\',\'delivered\')">Mark delivered</button>'
+            : '<button class="row-btn done" disabled>Delivered</button>')) +
+      (o.payment_status === 'paid' && manual && i.payout_status !== 'paid'
+        ? '<button class="row-btn" onclick="payout(\'' + esc(i.id) + '\')">Mark paid out</button>' : '') +
+    '</span>' +
+  '</div>';
+}
+
+function address(o) {
+  const bits = [o.address_line1, o.address_line2, o.city, o.state, o.pincode].filter(Boolean);
+  if (!bits.length) return '<span class="muted">No address given</span>';
+  return esc(o.customer_name) + '<br>' + bits.map(esc).join('<br>') +
+    (o.customer_email ? '<br><span class="muted">' + esc(o.customer_email) + '</span>' : '');
+}
+
+function rzpRef(o) {
+  if (!o.razorpay_payment_id && !o.razorpay_order_id) return '';
+  return '<div class="rzp">' +
+    (o.razorpay_payment_id ? 'Payment ' + esc(o.razorpay_payment_id) + '<br>' : '') +
+    (o.razorpay_order_id ? 'Razorpay order ' + esc(o.razorpay_order_id) : '') +
+    (o.paid_at ? '<br>Paid ' + esc(when(o.paid_at)) : '') +
+  '</div>';
+}
+
+function toggle(id) {
+  document.getElementById('o-' + id).classList.toggle('open');
+}
+
+async function mark(itemId, to) {
+  const { error } = await db.from('order_items').update({ fulfilment_status: to }).eq('id', itemId);
+  if (error) { showToast('Could not update — ' + error.message, 'error'); return; }
+  showToast('Marked ' + to);
+  const open = [...document.querySelectorAll('.order.open')].map(e => e.id);
+  await load();
+  open.forEach(id => document.getElementById(id)?.classList.add('open'));
+}
+
+async function payout(itemId) {
+  const { error } = await db.from('order_items')
+    .update({ payout_status: 'paid', paid_out_at: new Date().toISOString() }).eq('id', itemId);
+  if (error) { showToast('Could not update — ' + error.message, 'error'); return; }
+  showToast('Recorded as paid out');
+  const open = [...document.querySelectorAll('.order.open')].map(e => e.id);
+  await load();
+  open.forEach(id => document.getElementById(id)?.classList.add('open'));
+}
+</script>
+</body>
+</html>

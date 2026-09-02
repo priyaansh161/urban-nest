@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Checkout · Urban Nest</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<meta name="robots" content="noindex"/>
+<script>
+  /* Before first paint, or the page flashes the wrong theme. Same key the
+     rest of the site uses. */
+  try {
+    var t = localStorage.getItem('un-theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #A37B3F; --white: #F5F7F6; --black: #0F1F22;
+    --grey: #586366; --grey-light: #EAEFED; --border: #D9E0DE;
+    --panel: #0E3238; --rust: #A3563F;
+    --ease: cubic-bezier(.16,.7,.2,1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --white: #061E23; --black: #EAF2F1; --grey: #7F9295;
+      --border: #123037; --grey-light: #0C272C; --gold: #C2934D;
+      --panel: #0B343C; --rust: #C97B60;
+    }
+  }
+  :root[data-theme="dark"] {
+    --white: #061E23; --black: #EAF2F1; --grey: #7F9295;
+    --border: #123037; --grey-light: #0C272C; --gold: #C2934D;
+    --panel: #0B343C; --rust: #C97B60;
+  }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--white);
+    color: var(--black);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 32px; border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--black); }
+  .nav-logo img { width: 26px; height: 26px; }
+  .nav-logo-text { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: .22em; }
+  .nav-back { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); text-decoration: none; }
+  .nav-back:hover { color: var(--black); }
+
+  main { max-width: 1040px; margin: 0 auto; padding: 48px 32px 96px; }
+  h1 { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: 40px; margin-bottom: 6px; }
+  .lede { color: var(--grey); font-weight: 300; margin-bottom: 40px; font-size: 15px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 400px; gap: 48px; align-items: start; }
+
+  /* ── SUMMARY ── */
+  .summary { background: var(--grey-light); border: 1px solid var(--border); padding: 26px; }
+  .summary h2, .form h2 {
+    font-size: 10px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--grey); font-weight: 500; margin-bottom: 18px;
+  }
+  .seller-group { margin-bottom: 18px; }
+  .seller-group-name {
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--gold); padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 10px;
+  }
+  .line { display: flex; justify-content: space-between; gap: 14px; padding: 7px 0; font-size: 14px; }
+  .line-name { font-weight: 300; }
+  .line-qty { color: var(--grey); font-size: 12px; }
+  .line-amt { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .totals { border-top: 1px solid var(--black); margin-top: 14px; padding-top: 14px; }
+  .total-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+  .total-row.grand { font-size: 19px; font-family: 'Bodoni Moda', serif; padding-top: 10px; }
+  .total-row .amt { font-variant-numeric: tabular-nums; }
+  .ship-note { font-size: 12px; color: var(--grey); margin-top: 10px; font-weight: 300; }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fg { display: flex; flex-direction: column; gap: 6px; }
+  .fg.full { grid-column: 1 / -1; }
+  label { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); }
+  label .req { color: var(--gold); }
+  input {
+    padding: 12px 14px; border: 1px solid var(--border); background: var(--white);
+    font-family: inherit; font-size: 14px; color: var(--black); outline: none;
+    transition: border-color .2s;
+  }
+  input:focus-visible { border-color: var(--gold); }
+  input[aria-invalid="true"] { border-color: var(--rust); }
+  .field-err { font-size: 12px; color: var(--rust); }
+
+  .pay {
+    width: 100%; margin-top: 24px; padding: 16px; background: var(--black); color: var(--white);
+    border: none; font-family: inherit; font-size: 12px; letter-spacing: .18em;
+    text-transform: uppercase; cursor: pointer; transition: opacity .2s, transform .25s var(--ease);
+  }
+  .pay:hover:not(:disabled) { background: var(--gold); }
+  .pay:disabled { opacity: .5; cursor: default; }
+
+  .pay-terms { font-size: 11.5px; color: var(--grey); line-height: 1.6; margin-top: 14px; font-weight: 300; }
+  .pay-terms a { color: var(--gold); }
+
+  .notice { padding: 14px 18px; border: 1px solid var(--border); border-left: 2px solid var(--gold); font-size: 13.5px; margin-bottom: 24px; font-weight: 300; }
+  .notice.bad { border-left-color: var(--rust); color: var(--rust); }
+
+  .state { text-align: center; padding: 80px 20px; }
+  .state h2 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; margin-bottom: 10px; letter-spacing: 0; text-transform: none; color: var(--black); }
+  .state p { color: var(--grey); font-weight: 300; max-width: 46ch; margin: 0 auto 24px; }
+  .state a.btn, .state button.btn {
+    display: inline-block; padding: 13px 30px; background: var(--black); color: var(--white);
+    text-decoration: none; font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+    border: none; cursor: pointer; font-family: inherit;
+  }
+  .order-no { font-family: 'Bodoni Moda', serif; font-size: 30px; color: var(--gold); margin: 18px 0; }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 880px) {
+    .grid { grid-template-columns: 1fr; gap: 32px; }
+    /* Summary first on a phone: you check what you are paying for before
+       committing to typing an address. */
+    .summary { order: -1; }
+    main { padding: 32px 20px 64px; }
+    h1 { font-size: 30px; }
+    nav { padding: 16px 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="logo-icon.png" alt=""/>
+    <span class="nav-logo-text">URBAN NEST</span>
+  </a>
+  <a href="collection.html" class="nav-back">← Back to the collection</a>
+</nav>
+
+<main>
+  <!-- Loading -->
+  <div class="state" id="stLoading">
+    <h2>One moment</h2>
+    <p>Checking that everything in your selection is still available.</p>
+  </div>
+
+  <!-- Empty -->
+  <div class="state hidden" id="stEmpty">
+    <h2>Nothing selected yet</h2>
+    <p>Your selection is empty. Pieces you add from the collection will appear here.</p>
+    <a class="btn" href="collection.html">Browse the collection</a>
+  </div>
+
+  <!-- Success -->
+  <div class="state hidden" id="stDone">
+    <h2>Thank you — your order is placed</h2>
+    <div class="order-no" id="doneOrderNo"></div>
+    <p id="doneMsg">We have your payment and the seller has been notified. You will hear from us about delivery.</p>
+    <a class="btn" href="collection.html">Back to the collection</a>
+  </div>
+
+  <!-- The checkout itself -->
+  <div id="stForm" class="hidden">
+    <h1>Checkout</h1>
+    <p class="lede">A few details, then payment. Nothing is charged until you confirm.</p>
+
+    <div class="notice hidden" id="notice"></div>
+
+    <div class="grid">
+      <div class="form">
+        <h2>Delivery details</h2>
+        <div class="form-grid">
+          <div class="fg">
+            <label for="fName">Name <span class="req">*</span></label>
+            <input type="text" id="fName" autocomplete="name"/>
+          </div>
+          <div class="fg">
+            <label for="fPhone">Phone <span class="req">*</span></label>
+            <input type="tel" id="fPhone" autocomplete="tel" placeholder="+91"/>
+          </div>
+          <div class="fg full">
+            <label for="fEmail">Email</label>
+            <input type="email" id="fEmail" autocomplete="email"/>
+          </div>
+          <div class="fg full">
+            <label for="fAddr1">Address</label>
+            <input type="text" id="fAddr1" autocomplete="address-line1"/>
+          </div>
+          <div class="fg full">
+            <label for="fAddr2">Address line 2</label>
+            <input type="text" id="fAddr2" autocomplete="address-line2"/>
+          </div>
+          <div class="fg">
+            <label for="fCity">City</label>
+            <input type="text" id="fCity" autocomplete="address-level2"/>
+          </div>
+          <div class="fg">
+            <label for="fState">State</label>
+            <input type="text" id="fState" autocomplete="address-level1"/>
+          </div>
+          <div class="fg">
+            <label for="fPin">Pincode</label>
+            <input type="text" id="fPin" inputmode="numeric" autocomplete="postal-code"/>
+          </div>
+        </div>
+        <div class="field-err hidden" id="formErr"></div>
+      </div>
+
+      <aside class="summary">
+        <h2>Your selection</h2>
+        <div id="sumLines"></div>
+        <div class="totals">
+          <div class="total-row"><span>Subtotal</span><span class="amt" id="sumSub"></span></div>
+          <div class="total-row"><span>Delivery</span><span class="amt">Free</span></div>
+          <div class="total-row grand"><span>Total</span><span class="amt" id="sumTotal"></span></div>
+        </div>
+        <p class="ship-note" id="shipNote"></p>
+        <button class="pay" id="payBtn" type="button">Pay securely</button>
+        <!-- The return terms have to be visible BEFORE paying, or the ₹250
+             change-of-mind deduction is not something a buyer agreed to. -->
+        <p class="pay-terms">
+          By paying you accept our <a href="policies.html#terms" target="_blank">terms</a>,
+          <a href="policies.html#shipping" target="_blank">delivery</a> and
+          <a href="policies.html#returns" target="_blank">returns</a> policies.
+          Delivery is free. Fragile pieces are opened in front of you at the door where the
+          courier offers it. Anything broken is replaced; a change-of-mind return has ₹250 deducted.
+        </p>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  var CART_KEY = 'un-cart';
+  var FN = '/.netlify/functions/';
+
+  var lines = [];          // [{ id, qty, item, seller }]
+  var totalPaise = 0;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function rupees(p) {
+    var r = p / 100;
+    return '₹' + r.toLocaleString('en-IN', {
+      minimumFractionDigits: p % 100 ? 2 : 0,
+      maximumFractionDigits: p % 100 ? 2 : 0
+    });
+  }
+  function show(id) {
+    ['stLoading', 'stEmpty', 'stDone', 'stForm'].forEach(function (s) {
+      document.getElementById(s).classList.toggle('hidden', s !== id);
+    });
+  }
+  function notice(msg, bad) {
+    var n = document.getElementById('notice');
+    n.textContent = msg;
+    n.classList.toggle('bad', !!bad);
+    n.classList.toggle('hidden', !msg);
+  }
+  function readCart() {
+    try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function soldBy(seller) {
+    if (!seller) return '';
+    if (seller.kind === 'consignment') return 'Urban Nest · sourced from ' + seller.name;
+    if (seller.kind === 'direct') return 'Urban Nest';
+    return seller.name;
+  }
+
+  /* Prices are re-read here rather than trusted from the cart, and read
+     again inside create-order before a rupee is charged. This copy is only
+     so the visitor sees the same number the server will use. */
+  async function load() {
+    var cart = readCart();
+    if (!cart.length) { show('stEmpty'); return; }
+
+    var ids = cart.map(function (l) { return l.id; });
+    var got = await db.from('collection_items')
+      .select('id,name,price_paise,seller_id,in_stock,published')
+      .in('id', ids);
+
+    if (got.error) {
+      show('stForm');
+      notice('We could not load your selection just now. Please refresh and try again.', true);
+      document.getElementById('payBtn').disabled = true;
+      return;
+    }
+
+    var sellerIds = [...new Set((got.data || []).map(function (i) { return i.seller_id; }).filter(Boolean))];
+    var sellers = {};
+    if (sellerIds.length) {
+      var sr = await db.from('sellers').select('id,name,kind').in('id', sellerIds);
+      (sr.data || []).forEach(function (s) { sellers[s.id] = s; });
+    }
+
+    var dropped = 0;
+    lines = [];
+    cart.forEach(function (l) {
+      var it = (got.data || []).filter(function (i) { return i.id === l.id; })[0];
+      var ok = it && it.published && it.in_stock !== false && it.price_paise && it.seller_id && sellers[it.seller_id];
+      if (!ok) { dropped++; return; }
+      lines.push({ id: l.id, qty: l.qty, item: it, seller: sellers[it.seller_id] });
+    });
+
+    if (!lines.length) { show('stEmpty'); return; }
+    if (dropped) {
+      notice(dropped === 1
+        ? 'One piece is no longer available and has been removed from your selection.'
+        : dropped + ' pieces are no longer available and have been removed from your selection.');
+      // Keep the stored cart honest with what is actually being bought.
+      try { localStorage.setItem(CART_KEY, JSON.stringify(lines.map(function (l) { return { id: l.id, qty: l.qty }; }))); } catch (e) {}
+    }
+
+    render();
+    show('stForm');
+  }
+
+  /* Grouped by seller, because on a marketplace order more than one
+     showroom may be packing part of it, and the buyer should see that
+     before they pay rather than when two parcels arrive. */
+  function render() {
+    var groups = {};
+    lines.forEach(function (l) {
+      var k = l.seller.id;
+      (groups[k] = groups[k] || { seller: l.seller, lines: [] }).lines.push(l);
+    });
+
+    var html = '';
+    Object.keys(groups).forEach(function (k) {
+      var g = groups[k];
+      html += '<div class="seller-group">' +
+        '<div class="seller-group-name">Sold by ' + esc(soldBy(g.seller)) + '</div>' +
+        g.lines.map(function (l) {
+          return '<div class="line">' +
+            '<span class="line-name">' + esc(l.item.name) +
+            (l.qty > 1 ? ' <span class="line-qty">× ' + l.qty + '</span>' : '') + '</span>' +
+            '<span class="line-amt">' + esc(rupees(l.item.price_paise * l.qty)) + '</span>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+    });
+    document.getElementById('sumLines').innerHTML = html;
+
+    totalPaise = lines.reduce(function (n, l) { return n + l.item.price_paise * l.qty; }, 0);
+    document.getElementById('sumSub').textContent = rupees(totalPaise);
+    document.getElementById('sumTotal').textContent = rupees(totalPaise);
+
+    var n = Object.keys(groups).length;
+    document.getElementById('shipNote').textContent = n > 1
+      ? 'These pieces come from ' + n + ' sellers and may arrive separately.'
+      : '';
+  }
+
+  function collectCustomer() {
+    var v = function (id) { return document.getElementById(id).value.trim(); };
+    return {
+      name: v('fName'), phone: v('fPhone'), email: v('fEmail'),
+      address_line1: v('fAddr1'), address_line2: v('fAddr2'),
+      city: v('fCity'), state: v('fState'), pincode: v('fPin')
+    };
+  }
+
+  function validate(c) {
+    ['fName', 'fPhone'].forEach(function (id) { document.getElementById(id).removeAttribute('aria-invalid'); });
+    var err = document.getElementById('formErr');
+    var bad = null;
+    if (!c.name) bad = ['fName', 'Please enter your name.'];
+    else if (!c.phone) bad = ['fPhone', 'Please enter a phone number so we can reach you about delivery.'];
+    else if (!/^[0-9+\-\s]{8,16}$/.test(c.phone)) bad = ['fPhone', 'That phone number does not look right.'];
+    if (bad) {
+      document.getElementById(bad[0]).setAttribute('aria-invalid', 'true');
+      document.getElementById(bad[0]).focus();
+      err.textContent = bad[1];
+      err.classList.remove('hidden');
+      return false;
+    }
+    err.classList.add('hidden');
+    return true;
+  }
+
+  async function post(path, body) {
+    var res = await fetch(FN + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.status === 404) {
+      throw new Error('The payment service is not running. If you are testing locally, start it with "netlify dev".');
+    }
+    var data = await res.json().catch(function () { return {}; });
+    if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+    return data;
+  }
+
+  async function pay() {
+    var btn = document.getElementById('payBtn');
+    var c = collectCustomer();
+    if (!validate(c)) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Preparing…';
+    notice('');
+
+    var order;
+    try {
+      order = await post('create-order', {
+        lines: lines.map(function (l) { return { id: l.id, qty: l.qty }; }),
+        customer: c
+      });
+    } catch (e) {
+      notice(e.message, true);
+      btn.disabled = false;
+      btn.textContent = 'Pay securely';
+      return;
+    }
+
+    btn.textContent = 'Waiting for payment…';
+
+    var rzp = new Razorpay({
+      key: order.key_id,
+      order_id: order.razorpay_order_id,
+      amount: order.amount,
+      currency: order.currency,
+      name: 'Urban Nest',
+      description: order.order_no,
+      prefill: { name: c.name, email: c.email, contact: c.phone },
+      theme: { color: '#A37B3F' },
+      modal: {
+        // Closing the window is not a failure — the order simply stays
+        // pending, and they can try again without losing their selection.
+        ondismiss: function () {
+          btn.disabled = false;
+          btn.textContent = 'Pay securely';
+          notice('Payment was not completed. Your selection is still here whenever you are ready.');
+        }
+      },
+      handler: async function (resp) {
+        btn.textContent = 'Confirming…';
+        try {
+          var done = await post('verify-payment', {
+            razorpay_order_id: resp.razorpay_order_id,
+            razorpay_payment_id: resp.razorpay_payment_id,
+            razorpay_signature: resp.razorpay_signature
+          });
+          try { localStorage.removeItem(CART_KEY); } catch (e) {}
+          document.getElementById('doneOrderNo').textContent = done.order_no;
+          show('stDone');
+        } catch (e) {
+          // Money may well have moved. Never tell them it failed — give
+          // them the payment id and a way to reach a human.
+          document.getElementById('doneOrderNo').textContent = order.order_no;
+          document.getElementById('doneMsg').textContent =
+            'Your payment went through, but we could not confirm it automatically. ' +
+            'Please send us this payment reference and we will sort it out: ' + resp.razorpay_payment_id;
+          show('stDone');
+        }
+      }
+    });
+
+    rzp.on('payment.failed', function (r) {
+      btn.disabled = false;
+      btn.textContent = 'Pay securely';
+      notice((r && r.error && r.error.description) || 'That payment did not go through. Nothing has been charged.', true);
+    });
+
+    rzp.open();
+  }
+
+  document.getElementById('payBtn').addEventListener('click', pay);
+  load();
+})();
+</script>
+</body>
+</html>

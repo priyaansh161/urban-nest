@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sellers — Urban Nest Admin</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 32px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  .form-panel { background: var(--white); border: 0.5px solid var(--border); padding: 32px; margin-bottom: 32px; }
+  .form-panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey); }
+  input, textarea, select { padding: 11px 14px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black); outline: none; transition: border-color 0.2s; resize: vertical; }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+  .hint { font-size: 11px; color: var(--grey); line-height: 1.5; }
+  .checkbox-row { display: flex; align-items: center; gap: 10px; }
+  .checkbox-row input { width: auto; }
+  .checkbox-row label { text-transform: none; letter-spacing: 0.04em; font-size: 12px; color: var(--black); }
+
+  /* A seller's arrangement is the one field with real consequences, so
+     it gets a plain-English explanation and a preview of the line a
+     buyer will actually read. */
+  .arrangement-note { grid-column: 1 / -1; background: var(--bg); border: 0.5px solid var(--border); border-left: 2px solid var(--gold); padding: 16px 20px; font-size: 12px; line-height: 1.7; color: #444; }
+  .arrangement-note strong { color: var(--black); }
+  .preview-line { margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--border); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey); }
+  .preview-line span { display: block; margin-top: 6px; font-size: 13px; letter-spacing: 0.02em; text-transform: none; color: var(--black); }
+
+  .form-actions { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
+  .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover { background: #222; }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover { color: var(--black); border-color: var(--black); }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+
+  .items-panel { background: var(--white); border: 0.5px solid var(--border); }
+  .items-header { padding: 20px 24px; border-bottom: 0.5px solid var(--border); }
+  .items-header-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+
+  .seller-row { padding: 22px 26px; border-bottom: 0.5px solid var(--border); display: grid; grid-template-columns: 1fr 200px 150px auto; gap: 24px; align-items: center; }
+  .seller-row:last-child { border-bottom: none; }
+  .seller-row.inactive { opacity: 0.5; }
+  .seller-name { font-size: 15px; font-weight: 500; }
+  .seller-sub { font-size: 11px; color: var(--grey); margin-top: 4px; }
+  .seller-terms { font-size: 12px; color: #333; }
+  .seller-terms small { display: block; color: var(--grey); font-size: 11px; margin-top: 3px; }
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; display: inline-block; }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+  .badge-grey { background: #eee; color: var(--grey); }
+  .row-actions { display: flex; gap: 8px; }
+  .row-btn { padding: 5px 14px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .row-btn:hover { border-color: var(--black); color: var(--black); }
+  .row-btn.danger { color: #c0392b; border-color: rgba(192,57,43,0.3); }
+  .row-btn.danger:hover { background: rgba(192,57,43,0.05); }
+  .empty-state { padding: 64px 24px; text-align: center; color: var(--grey); font-size: 13px; }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Commerce</div>
+    <a href="sellers.html" class="nav-item active"><span class="icon">⬢</span> Sellers</a>
+    <a href="orders.html" class="nav-item"><span class="icon">▦</span> Orders</a>
+    <div class="nav-group-label">Content Creation</div>
+    <a href="social.html" class="nav-item"><span class="icon">▣</span> Media Engagement</a>
+    <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
+    <a href="article-card.html" class="nav-item"><span class="icon">▤</span> Article Cards</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Sellers</h1>
+    <p>Showrooms and suppliers whose pieces appear on the site</p>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-panel-title">
+      <span id="formTitle">Add Seller</span>
+      <button class="btn btn-secondary" id="resetBtn" onclick="resetForm()" style="display:none">Cancel Edit</button>
+    </div>
+
+    <input type="hidden" id="editingId"/>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="sName">Name</label>
+        <input type="text" id="sName" placeholder="e.g. Sharma Handicrafts" oninput="syncSlug(); renderPreview();"/>
+        <span class="hint">Shown to visitors on the piece. Use the name the showroom trades under.</span>
+      </div>
+      <div class="form-group">
+        <label for="sSlug">Slug</label>
+        <input type="text" id="sSlug" placeholder="sharma-handicrafts"/>
+        <span class="hint">Internal reference. Leave it alone once pieces are filed under it.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="sKind">Arrangement</label>
+        <select id="sKind" onchange="kindChanged()">
+          <option value="marketplace">Marketplace — they sell and ship</option>
+          <option value="consignment">Consignment — their stock, we hold and ship</option>
+          <option value="direct">Direct — our own stock</option>
+          <option value="affiliate">Affiliate — outbound link only</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="sPayout">Payout</label>
+        <select id="sPayout">
+          <option value="route">Route — splits to them at checkout</option>
+          <option value="manual">Manual — we collect, then pay them</option>
+        </select>
+        <span class="hint">Set automatically from the arrangement. Change it only if you have a reason.</span>
+      </div>
+
+      <div class="arrangement-note" id="arrangementNote"></div>
+
+      <div class="form-group">
+        <label for="sCommission">Commission %</label>
+        <input type="number" id="sCommission" step="0.5" min="0" max="100" placeholder="15"/>
+        <span class="hint">What Urban Nest keeps on each sale. Leave 0 for our own stock.</span>
+      </div>
+      <div class="form-group" id="rzpGroup">
+        <label for="sRzp">Razorpay Linked Account</label>
+        <input type="text" id="sRzp" placeholder="acc_XXXXXXXXXXXX"/>
+        <span class="hint">Needed before a Route split can pay them. Add it once they have completed Razorpay's onboarding.</span>
+      </div>
+
+      <div class="form-group full">
+        <label for="sLogo">Logo URL</label>
+        <input type="url" id="sLogo" placeholder="https://…"/>
+        <span class="hint">Optional. A small mark shown beside their name on the piece.</span>
+      </div>
+
+      <div class="form-group">
+        <label for="sContact">Contact Person</label>
+        <input type="text" id="sContact" placeholder="Full name"/>
+      </div>
+      <div class="form-group">
+        <label for="sPhone">Phone</label>
+        <input type="tel" id="sPhone" placeholder="+91 …"/>
+      </div>
+      <div class="form-group">
+        <label for="sEmail">Email</label>
+        <input type="email" id="sEmail" placeholder="name@example.com"/>
+        <span class="hint">Where their orders get sent.</span>
+      </div>
+      <div class="form-group">
+        <label for="sGstin">GSTIN</label>
+        <input type="text" id="sGstin" placeholder="Optional"/>
+      </div>
+
+      <div class="form-group full">
+        <label for="sAddress">Address</label>
+        <input type="text" id="sAddress" placeholder="Street / shop address"/>
+      </div>
+      <div class="form-group">
+        <label for="sCity">City</label>
+        <input type="text" id="sCity"/>
+      </div>
+      <div class="form-group">
+        <label for="sState">State</label>
+        <input type="text" id="sState"/>
+      </div>
+      <div class="form-group">
+        <label for="sPincode">Pincode</label>
+        <input type="text" id="sPincode"/>
+      </div>
+      <div class="form-group">
+        <label for="sSort">Sort Order</label>
+        <input type="number" id="sSort" value="0"/>
+      </div>
+
+      <div class="form-group full checkbox-row">
+        <input type="checkbox" id="sActive" checked/>
+        <label for="sActive">Active — their pieces may appear on the site</label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" id="saveBtn" onclick="saveSeller()">Save Seller</button>
+    </div>
+  </div>
+
+  <div class="items-panel">
+    <div class="items-header">
+      <span class="items-header-title">All Sellers</span>
+    </div>
+    <div id="sellerList">
+      <div class="empty-state">Loading sellers…</div>
+    </div>
+  </div>
+</main>
+
+<script>
+let sellers = [];
+let itemCounts = {};   // seller_id → how many pieces are filed under them
+
+/* Each arrangement decides three separate things, and the note in the form
+   spells all three out. Getting this wrong is the one mistake here with
+   real-world consequences, so it is never left implicit. */
+const ARRANGEMENTS = {
+  marketplace: {
+    payout: 'route',
+    needsRzp: true,
+    note: '<strong>They are the seller.</strong> Their name goes on the piece, they pack and ship it, and they carry the refund. Money splits to their Razorpay account at checkout and Urban Nest keeps the commission.',
+    preview: n => 'Sold by ' + (n || 'their name')
+  },
+  consignment: {
+    payout: 'manual',
+    needsRzp: false,
+    note: '<strong>Urban Nest is the seller.</strong> They hand us stock, we store it, pack it and carry the refund. All money arrives with us and we pay their share on a cycle. Needs no capital — we never buy the stock, so agree in writing who bears breakage while it sits with us.',
+    preview: n => 'Sold by Urban Nest · Sourced from ' + (n || 'their name')
+  },
+  direct: {
+    payout: 'manual',
+    needsRzp: false,
+    note: '<strong>Our own stock.</strong> Bought, held and shipped by Urban Nest. Nothing is owed to anyone else, so commission stays at zero.',
+    preview: () => 'Sold & shipped by Urban Nest'
+  },
+  affiliate: {
+    payout: 'manual',
+    needsRzp: false,
+    note: '<strong>Not sold here.</strong> Pieces filed under this seller send the visitor to their site instead of into the cart. No checkout, no order, no payout — this is how the Amazon catalogue already works.',
+    preview: n => 'Button reads: Shop at ' + (n || 'their name') + ' →'
+  }
+};
+
+(async () => { await requireAuth(); await loadSellers(); kindChanged(); })();
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function syncSlug() {
+  const slugField = document.getElementById('sSlug');
+  // Only autofill while adding. Editing a live seller must not silently
+  // move its slug out from under the pieces filed against it.
+  if (document.getElementById('editingId').value) return;
+  slugField.value = document.getElementById('sName').value
+    .toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function kindChanged() {
+  const kind = document.getElementById('sKind').value;
+  const cfg  = ARRANGEMENTS[kind];
+  document.getElementById('sPayout').value = cfg.payout;
+  document.getElementById('rzpGroup').style.display = cfg.needsRzp ? '' : 'none';
+  if (kind === 'direct') document.getElementById('sCommission').value = 0;
+  renderPreview();
+}
+
+function renderPreview() {
+  const kind = document.getElementById('sKind').value;
+  const cfg  = ARRANGEMENTS[kind];
+  const name = document.getElementById('sName').value.trim();
+  document.getElementById('arrangementNote').innerHTML =
+    cfg.note +
+    '<div class="preview-line">What a visitor sees<span>' + esc(cfg.preview(name)) + '</span></div>';
+}
+
+async function loadSellers() {
+  const { data, error } = await db.from('sellers')
+    .select('*').order('sort_order').order('name');
+  if (error) {
+    showToast('Failed to load sellers — has setup-commerce.sql been run?', 'error');
+    document.getElementById('sellerList').innerHTML =
+      '<div class="empty-state">Could not load sellers. Run <strong>admin/setup-commerce.sql</strong> in Supabase first.</div>';
+    return;
+  }
+  sellers = data || [];
+  await loadItemCounts();
+  renderList();
+}
+
+/* Used to stop a seller being deleted while pieces still point at them —
+   the delete would fail on the foreign key anyway, but with a database
+   error rather than something anyone can act on. */
+async function loadItemCounts() {
+  itemCounts = {};
+  const { data, error } = await db.from('collection_items')
+    .select('seller_id, affiliate_seller_id');
+  if (error || !data) return;
+  data.forEach(row => {
+    [row.seller_id, row.affiliate_seller_id].forEach(id => {
+      if (id) itemCounts[id] = (itemCounts[id] || 0) + 1;
+    });
+  });
+}
+
+function renderList() {
+  const el = document.getElementById('sellerList');
+  if (!sellers.length) {
+    el.innerHTML = '<div class="empty-state">No sellers yet. Add the first one above.</div>';
+    return;
+  }
+  el.innerHTML = sellers.map(s => {
+    const count = itemCounts[s.id] || 0;
+    const terms = s.kind === 'direct'
+      ? 'Our own stock'
+      : (Number(s.commission_pct) || 0) + '% commission';
+    return '<div class="seller-row ' + (s.active ? '' : 'inactive') + '">' +
+      '<div>' +
+        '<div class="seller-name">' + esc(s.name) + '</div>' +
+        '<div class="seller-sub">' +
+          esc(s.contact_name || 'No contact set') +
+          (s.city ? ' · ' + esc(s.city) : '') +
+          ' · ' + count + ' piece' + (count === 1 ? '' : 's') +
+        '</div>' +
+      '</div>' +
+      '<div class="seller-terms">' +
+        '<span class="badge ' + (s.kind === 'affiliate' ? 'badge-grey' : 'badge-gold') + '">' + esc(s.kind) + '</span>' +
+        '<small>' + esc(terms) + '</small>' +
+      '</div>' +
+      '<div class="seller-terms">' +
+        esc(s.payout_mode === 'route' ? 'Route split' : 'Manual payout') +
+        (s.kind === 'marketplace' && !s.razorpay_account_id
+          ? '<small style="color:#c0392b">No linked account yet</small>' : '') +
+      '</div>' +
+      '<div class="row-actions">' +
+        '<button class="row-btn" onclick="editSeller(\'' + s.id + '\')">Edit</button>' +
+        '<button class="row-btn danger" onclick="deleteSeller(\'' + s.id + '\')">Delete</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function editSeller(id) {
+  const s = sellers.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('editingId').value = s.id;
+  document.getElementById('sName').value = s.name || '';
+  document.getElementById('sSlug').value = s.slug || '';
+  document.getElementById('sKind').value = s.kind || 'marketplace';
+  document.getElementById('sCommission').value = s.commission_pct == null ? '' : s.commission_pct;
+  document.getElementById('sRzp').value = s.razorpay_account_id || '';
+  document.getElementById('sLogo').value = s.logo_url || '';
+  document.getElementById('sContact').value = s.contact_name || '';
+  document.getElementById('sPhone').value = s.phone || '';
+  document.getElementById('sEmail').value = s.email || '';
+  document.getElementById('sGstin').value = s.gstin || '';
+  document.getElementById('sAddress').value = s.address || '';
+  document.getElementById('sCity').value = s.city || '';
+  document.getElementById('sState').value = s.state || '';
+  document.getElementById('sPincode').value = s.pincode || '';
+  document.getElementById('sSort').value = s.sort_order || 0;
+  document.getElementById('sActive').checked = s.active !== false;
+
+  kindChanged();
+  // kindChanged() resets payout to the arrangement's default; the stored
+  // value wins, in case it was deliberately overridden.
+  document.getElementById('sPayout').value = s.payout_mode || 'route';
+
+  document.getElementById('formTitle').textContent = 'Edit Seller';
+  document.getElementById('resetBtn').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  ['editingId','sName','sSlug','sCommission','sRzp','sLogo','sContact',
+   'sPhone','sEmail','sGstin','sAddress','sCity','sState','sPincode']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('sKind').value = 'marketplace';
+  document.getElementById('sSort').value = 0;
+  document.getElementById('sActive').checked = true;
+  document.getElementById('formTitle').textContent = 'Add Seller';
+  document.getElementById('resetBtn').style.display = 'none';
+  kindChanged();
+}
+
+async function saveSeller() {
+  const name = document.getElementById('sName').value.trim();
+  if (!name) { showToast('A seller needs a name', 'error'); return; }
+
+  const slug = document.getElementById('sSlug').value.trim()
+    || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  const commission = parseFloat(document.getElementById('sCommission').value);
+
+  const payload = {
+    name,
+    slug,
+    kind: document.getElementById('sKind').value,
+    payout_mode: document.getElementById('sPayout').value,
+    commission_pct: isNaN(commission) ? 0 : commission,
+    razorpay_account_id: document.getElementById('sRzp').value.trim() || null,
+    logo_url: document.getElementById('sLogo').value.trim() || null,
+    contact_name: document.getElementById('sContact').value.trim() || null,
+    phone: document.getElementById('sPhone').value.trim() || null,
+    email: document.getElementById('sEmail').value.trim() || null,
+    gstin: document.getElementById('sGstin').value.trim() || null,
+    address: document.getElementById('sAddress').value.trim() || null,
+    city: document.getElementById('sCity').value.trim() || null,
+    state: document.getElementById('sState').value.trim() || null,
+    pincode: document.getElementById('sPincode').value.trim() || null,
+    sort_order: parseInt(document.getElementById('sSort').value, 10) || 0,
+    active: document.getElementById('sActive').checked
+  };
+
+  const id = document.getElementById('editingId').value;
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+
+  const { error } = id
+    ? await db.from('sellers').update(payload).eq('id', id)
+    : await db.from('sellers').insert([payload]);
+
+  btn.disabled = false;
+
+  if (error) {
+    showToast(/duplicate|unique/i.test(error.message || '')
+      ? 'That slug is already taken'
+      : 'Save failed — ' + (error.message || 'unknown error'), 'error');
+    return;
+  }
+
+  showToast(id ? 'Seller updated' : 'Seller added');
+  resetForm();
+  await loadSellers();
+}
+
+async function deleteSeller(id) {
+  const s = sellers.find(x => x.id === id);
+  if (!s) return;
+
+  if (s.slug === 'urban-nest') {
+    showToast('Urban Nest is the house seller and cannot be removed', 'error');
+    return;
+  }
+
+  const count = itemCounts[id] || 0;
+  if (count) {
+    showToast('Reassign the ' + count + ' piece' + (count === 1 ? '' : 's') +
+              ' filed under ' + s.name + ' first', 'error');
+    return;
+  }
+
+  if (!confirm('Delete ' + s.name + '? Past orders keep their own record of the sale.')) return;
+
+  const { error } = await db.from('sellers').delete().eq('id', id);
+  if (error) { showToast('Delete failed — ' + (error.message || ''), 'error'); return; }
+
+  showToast('Seller deleted');
+  await loadSellers();
+}
+</script>
+</body>
+</html>

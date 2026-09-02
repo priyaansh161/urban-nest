@@ -91,6 +91,24 @@
   .spec-remove { border: 0.5px solid var(--border); background: transparent; color: var(--grey); cursor: pointer; font-size: 13px; transition: all 0.2s; }
   .spec-remove:hover { color: #c0392b; border-color: rgba(192,57,43,0.4); }
   .add-spec { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; background: none; border: none; color: var(--gold); cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 4px 0; }
+  /* ── HOW A PIECE SELLS ──
+     Grouped and boxed rather than loose in the grid: these five fields
+     only make sense read together, and getting them wrong is what puts
+     an unbuyable piece on the storefront. */
+  .sell-block { background: var(--bg); border: 0.5px solid var(--border); border-left: 2px solid var(--gold); padding: 20px 24px; }
+  .sell-block > label { display: block; margin-bottom: 16px; }
+  .sell-grid { display: grid; grid-template-columns: 1.4fr 1fr 1.2fr auto; gap: 16px; align-items: start; }
+  .sell-grid .form-group { gap: 6px; }
+  .checkbox-row { flex-direction: row !important; align-items: center; gap: 8px !important; padding-top: 26px; }
+  .checkbox-row input { width: auto; }
+  .checkbox-row label { text-transform: none; letter-spacing: 0.04em; font-size: 12px; color: var(--black); white-space: nowrap; }
+  .sell-preview { margin-top: 18px; padding-top: 14px; border-top: 0.5px solid var(--border); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); }
+  .sell-preview .pv-btn { display: inline-block; margin-top: 8px; background: var(--black); color: var(--white); padding: 8px 18px; font-size: 12px; letter-spacing: 0.08em; text-transform: none; }
+  .sell-preview .pv-second { display: block; margin-top: 8px; font-size: 12px; letter-spacing: 0.02em; text-transform: none; color: var(--grey); }
+  .sell-preview .pv-soldby { display: block; margin-top: 8px; font-size: 12px; letter-spacing: 0.02em; text-transform: none; color: var(--black); }
+  .sell-preview .pv-warn { display: block; margin-top: 8px; font-size: 12px; letter-spacing: 0.02em; text-transform: none; color: #c0392b; }
+  @media (max-width: 1100px) { .sell-grid { grid-template-columns: 1fr 1fr; } .checkbox-row { padding-top: 0; } }
+
   .form-actions { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
   .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
   .btn-primary { background: var(--black); color: var(--white); }
@@ -144,6 +162,9 @@
     <a href="collection.html" class="nav-item active"><span class="icon">◻</span> Collection</a>
     <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
     <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Commerce</div>
+    <a href="sellers.html" class="nav-item"><span class="icon">⬢</span> Sellers</a>
+    <a href="orders.html" class="nav-item"><span class="icon">▦</span> Orders</a>
     <div class="nav-group-label">Content Creation</div>
     <a href="social.html" class="nav-item"><span class="icon">▣</span> Media Engagement</a>
     <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
@@ -264,6 +285,38 @@
       <div class="form-group">
         <label for="itemBuy">Buy Link (optional)</label>
         <input type="url" id="itemBuy" placeholder="https://amzn.to/…"/>
+        <span class="hint">Sends the visitor off-site instead of into the cart.</span>
+      </div>
+      <div class="form-group">
+        <label for="itemAffiliateSeller">Buy Link Goes To</label>
+        <select id="itemAffiliateSeller" onchange="renderSellPreview()"></select>
+        <span class="hint">Names the button — "Shop at Amazon →". Ignored without a buy link.</span>
+      </div>
+
+      <div class="form-group full sell-block">
+        <label>How This Piece Sells</label>
+        <div class="sell-grid">
+          <div class="form-group">
+            <label for="itemSeller">Sold By</label>
+            <select id="itemSeller" onchange="renderSellPreview()"></select>
+          </div>
+          <div class="form-group">
+            <label for="itemRupees">Price ₹</label>
+            <input type="number" id="itemRupees" min="0" step="1" placeholder="12999" oninput="renderSellPreview()"/>
+          </div>
+          <div class="form-group">
+            <label for="itemPrimaryCta">Primary Button</label>
+            <select id="itemPrimaryCta" onchange="renderSellPreview()">
+              <option value="cart">Add to Cart</option>
+              <option value="affiliate">Send to the buy link</option>
+            </select>
+          </div>
+          <div class="form-group checkbox-row">
+            <input type="checkbox" id="itemInStock" checked onchange="renderSellPreview()"/>
+            <label for="itemInStock">In stock</label>
+          </div>
+        </div>
+        <div class="sell-preview" id="sellPreview"></div>
       </div>
       <div class="form-group">
         <label for="itemDescription">Description</label>
@@ -296,10 +349,11 @@
 <script>
 let items = [];
 let categories = [];
+let sellersList = [];
 // Categories first: the item form's Category select is built from them, and
 // an item saved against a category that does not exist would vanish from the
 // site without any error to show for it.
-(async () => { await requireAuth(); await loadCategories(); loadItems(); })();
+(async () => { await requireAuth(); await loadCategories(); await loadSellersList(); loadItems(); })();
 
 async function loadItems() {
   const { data, error } = await db.from('collection_items')
@@ -350,12 +404,101 @@ function editItem(id) {
   document.getElementById('itemDescription').value = item.description || '';
   document.getElementById('itemModel').value = item.model_url || '';
   document.getElementById('itemBuy').value = item.buy_link || '';
+  document.getElementById('itemRupees').value =
+    item.price_paise == null ? '' : (item.price_paise / 100);
+  document.getElementById('itemPrimaryCta').value = item.primary_cta || 'cart';
+  document.getElementById('itemInStock').checked = item.in_stock !== false;
+  fillSellerSelects(item.seller_id || '', item.affiliate_seller_id || '');
   document.getElementById('itemComingSoon').checked = !!item.coming_soon;
   document.getElementById('specRows').innerHTML = '';
   (Array.isArray(item.specs) ? item.specs : []).forEach(([k, v]) => addSpecRow(k, v));
   document.getElementById('formTitle').textContent = 'Edit Item';
   document.getElementById('resetBtn').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ── WHO SELLS THIS PIECE ────────────────────────────────────────────
+   Two separate selects, because one piece can be both stocked by a
+   seller and listed on Amazon. "Sold By" drives the cart; "Buy Link
+   Goes To" only labels the outbound button.                          */
+async function loadSellersList() {
+  const { data, error } = await db.from('sellers')
+    .select('id,name,kind').eq('active', true).order('sort_order').order('name');
+  // Missing table just means setup-commerce.sql has not been run. The rest
+  // of the page still works, so this fails quietly rather than blocking it.
+  sellersList = error ? [] : (data || []);
+  fillSellerSelects('', '');
+}
+
+function fillSellerSelects(sellerId, affiliateId) {
+  const sellSel = document.getElementById('itemSeller');
+  const affSel  = document.getElementById('itemAffiliateSeller');
+  if (!sellSel || !affSel) return;
+
+  const sellable  = sellersList.filter(s => s.kind !== 'affiliate');
+  const affiliate = sellersList.filter(s => s.kind === 'affiliate');
+
+  sellSel.innerHTML = '<option value="">— Not sold here —</option>' +
+    sellable.map(s => '<option value="' + s.id + '">' + escAttr(s.name) + '</option>').join('');
+  affSel.innerHTML = '<option value="">— None —</option>' +
+    affiliate.map(s => '<option value="' + s.id + '">' + escAttr(s.name) + '</option>').join('');
+
+  sellSel.value = sellerId || '';
+  affSel.value  = affiliateId || '';
+  renderSellPreview();
+}
+
+function escAttr(t) {
+  return String(t == null ? '' : t).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+/* The line a visitor actually reads, shown live. The four arrangements
+   are the same ones the Sellers screen explains — repeated here because
+   this is where the choice gets made piece by piece. */
+function renderSellPreview() {
+  const box = document.getElementById('sellPreview');
+  if (!box) return;
+
+  const seller  = sellersList.find(s => s.id === document.getElementById('itemSeller').value);
+  const affId   = document.getElementById('itemAffiliateSeller').value;
+  const aff     = sellersList.find(s => s.id === affId);
+  const hasLink = !!document.getElementById('itemBuy').value.trim();
+  const rupees  = parseFloat(document.getElementById('itemRupees').value);
+  const inStock = document.getElementById('itemInStock').checked;
+  const primary = document.getElementById('itemPrimaryCta').value;
+
+  const money = isNaN(rupees) ? null : '₹' + rupees.toLocaleString('en-IN');
+  const soldBy = !seller ? '' :
+    seller.kind === 'consignment' ? 'Sold by Urban Nest · Sourced from ' + seller.name :
+    seller.kind === 'direct'      ? 'Sold & shipped by Urban Nest' :
+                                    'Sold by ' + seller.name;
+
+  let html = 'What a visitor sees';
+  const warn = [];
+
+  if (!seller && !hasLink) {
+    html += '<span class="pv-second">Display only — no button.</span>';
+  } else if (seller && !hasLink) {
+    html += '<span class="pv-btn">' + (inStock ? 'Add to Cart' + (money ? ' — ' + money : '') : 'Out of stock') + '</span>';
+  } else if (!seller && hasLink) {
+    html += '<span class="pv-btn">Shop at ' + escAttr(aff ? aff.name : 'the supplier') + ' →</span>';
+  } else if (primary === 'cart') {
+    html += '<span class="pv-btn">' + (inStock ? 'Add to Cart' + (money ? ' — ' + money : '') : 'Out of stock') + '</span>' +
+            '<span class="pv-second">Also available on ' + escAttr(aff ? aff.name : 'the supplier') + '</span>';
+  } else {
+    html += '<span class="pv-btn">Shop at ' + escAttr(aff ? aff.name : 'the supplier') + ' →</span>' +
+            '<span class="pv-second">Also available here' + (money ? ' — ' + money : '') + '</span>';
+  }
+
+  if (soldBy) html += '<span class="pv-soldby">' + escAttr(soldBy) + '</span>';
+
+  // The one combination that silently breaks a checkout.
+  if (seller && (isNaN(rupees) || rupees <= 0)) warn.push('Needs a price before it can go in a cart.');
+  if (hasLink && !aff) warn.push('Buy link has no destination name — the button will read "the supplier".');
+  warn.forEach(w => { html += '<span class="pv-warn">' + w + '</span>'; });
+
+  box.innerHTML = html;
 }
 
 /* ── SPECIFICATIONS ──────────────────────────────────────────────────
@@ -378,8 +521,11 @@ function collectSpecs() {
 }
 
 function resetForm() {
-  ['editingId','itemName','itemPrice','itemImage','itemDescription','itemModel','itemBuy']
+  ['editingId','itemName','itemPrice','itemImage','itemDescription','itemModel','itemBuy','itemRupees']
     .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('itemPrimaryCta').value = 'cart';
+  document.getElementById('itemInStock').checked = true;
+  fillSellerSelects('', '');
   fillCategorySelect(categories.length ? categories[0].slug : '');
   document.getElementById('itemComingSoon').checked = true;
   document.getElementById('formTitle').textContent = 'Add Item';
@@ -679,9 +825,19 @@ function storageError(error) {
   return 'Upload failed: ' + (m || 'unknown error');
 }
 
+function rupeesToPaise(v) {
+  const n = parseFloat(v);
+  return isNaN(n) || n <= 0 ? null : Math.round(n * 100);
+}
+
 async function saveItem(publish) {
   const name = document.getElementById('itemName').value.trim();
   if (!name) { showToast('Please enter a product name', 'error'); return; }
+  const sellerChosen = document.getElementById('itemSeller').value;
+  const paise = rupeesToPaise(document.getElementById('itemRupees').value);
+  if (sellerChosen && !paise) {
+    showToast('A piece sold through the cart needs a price', 'error'); return;
+  }
   const id = document.getElementById('editingId').value;
   const payload = {
     name,
@@ -691,6 +847,13 @@ async function saveItem(publish) {
     description: document.getElementById('itemDescription').value.trim() || null,
     model_url: document.getElementById('itemModel').value.trim() || null,
     buy_link: document.getElementById('itemBuy').value.trim() || null,
+    seller_id: document.getElementById('itemSeller').value || null,
+    affiliate_seller_id: document.getElementById('itemAffiliateSeller').value || null,
+    // Stored in paise so totals are integer arithmetic. The display-only
+    // "Price / Range" field above is left exactly as it was.
+    price_paise: rupeesToPaise(document.getElementById('itemRupees').value),
+    primary_cta: document.getElementById('itemPrimaryCta').value,
+    in_stock: document.getElementById('itemInStock').checked,
     specs: collectSpecs(),
     coming_soon: document.getElementById('itemComingSoon').checked,
     published: publish,
@@ -701,10 +864,11 @@ async function saveItem(publish) {
   let { error } = await write(payload);
   // These columns arrive in separate migrations. If one has not been run,
   // save what the table does have rather than losing the whole edit.
-  if (error && /model_url|buy_link|specs/.test(error.message || '')) {
-    const { model_url, buy_link, specs, ...rest } = payload;
+  if (error && /model_url|buy_link|specs|seller_id|price_paise|primary_cta|in_stock/.test(error.message || '')) {
+    const { model_url, buy_link, specs, seller_id, affiliate_seller_id,
+            price_paise, primary_cta, in_stock, ...rest } = payload;
     ({ error } = await write(rest));
-    if (!error) showToast('Saved, but some fields were dropped — run add-collection-3d.sql and add-collection-specs.sql');
+    if (!error) showToast('Saved, but some fields were dropped — run add-collection-3d.sql, add-collection-specs.sql and setup-commerce.sql');
   }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
   showToast(publish ? 'Item published!' : 'Draft saved');

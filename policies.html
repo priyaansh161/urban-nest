@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Policies · Urban Nest</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<meta name="description" content="Urban Nest terms of use, shipping and delivery, returns and refunds, privacy, and how to reach us."/>
+<script>
+  try {
+    var t = localStorage.getItem('un-theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --gold: #A37B3F; --white: #F5F7F6; --black: #0F1F22;
+    --grey: #586366; --grey-light: #EAEFED; --border: #D9E0DE; --panel: #0E3238;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --white: #061E23; --black: #EAF2F1; --grey: #7F9295;
+      --border: #123037; --grey-light: #0C272C; --gold: #C2934D; --panel: #0B343C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --white: #061E23; --black: #EAF2F1; --grey: #7F9295;
+    --border: #123037; --grey-light: #0C272C; --gold: #C2934D; --panel: #0B343C;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--white); color: var(--black);
+    line-height: 1.75; -webkit-font-smoothing: antialiased;
+  }
+
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 32px; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--white); z-index: 10;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--black); }
+  .nav-logo img { width: 26px; height: 26px; }
+  .nav-logo-text { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: .22em; }
+  .nav-back { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); text-decoration: none; }
+  .nav-back:hover { color: var(--black); }
+
+  main { max-width: 1040px; margin: 0 auto; padding: 56px 32px 110px; }
+  h1 { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: 42px; margin-bottom: 8px; }
+  .lede { color: var(--grey); font-weight: 300; margin-bottom: 14px; max-width: 62ch; }
+  .updated { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); margin-bottom: 44px; }
+
+  .layout { display: grid; grid-template-columns: 210px 1fr; gap: 56px; align-items: start; }
+  .toc { position: sticky; top: 96px; }
+  .toc-label { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--grey); margin-bottom: 14px; }
+  .toc a {
+    display: block; padding: 7px 0; font-size: 13px; color: var(--grey);
+    text-decoration: none; border-left: 1px solid var(--border); padding-left: 14px;
+    transition: color .2s, border-color .2s;
+  }
+  .toc a:hover { color: var(--black); border-left-color: var(--gold); }
+
+  section { scroll-margin-top: 90px; margin-bottom: 56px; }
+  h2 {
+    font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: 25px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+  }
+  h3 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin: 26px 0 10px; font-weight: 500; }
+  p { margin-bottom: 14px; font-weight: 300; max-width: 68ch; }
+  ul { margin: 0 0 16px 20px; }
+  li { margin-bottom: 8px; font-weight: 300; max-width: 66ch; }
+  strong { font-weight: 500; }
+  a { color: var(--gold); }
+
+  /* The two clauses a buyer is most likely to argue about later, so they
+     are the two that are hardest to miss. */
+  .callout {
+    background: var(--grey-light); border-left: 2px solid var(--gold);
+    padding: 18px 22px; margin: 20px 0; font-size: 14.5px;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-top: 8px; }
+  .contact-item { border-top: 1px solid var(--border); padding-top: 14px; }
+  .contact-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--grey); margin-bottom: 6px; }
+  .contact-value { font-size: 15px; }
+  .contact-value a { text-decoration: none; }
+  .contact-value a:hover { text-decoration: underline; }
+
+  /* Anything the owner still has to fill in before this page is truthful. */
+  .todo {
+    background: rgba(163,123,63,.10); border: 1px dashed var(--gold);
+    padding: 3px 8px; border-radius: 2px; font-size: 13px; color: var(--gold);
+  }
+
+  footer {
+    border-top: 1px solid var(--border); padding: 32px;
+    text-align: center; font-size: 12px; color: var(--grey);
+  }
+  footer a { color: var(--grey); text-decoration: none; margin: 0 10px; }
+  footer a:hover { color: var(--black); }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; gap: 32px; }
+    .toc { position: static; }
+    .toc a { display: inline-block; border-left: none; padding: 6px 14px 6px 0; }
+    main { padding: 36px 20px 72px; }
+    h1 { font-size: 32px; }
+    nav { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="logo-icon.png" alt=""/>
+    <span class="nav-logo-text">URBAN NEST</span>
+  </a>
+  <a href="index.html" class="nav-back">← Back to the site</a>
+</nav>
+
+<main>
+  <h1>Policies</h1>
+  <p class="lede">
+    How Urban Nest works, what happens when something arrives broken, what we do with your
+    details, and how to reach a person. Written to be read, not to be survived.
+  </p>
+  <p class="updated">Last updated 2 September 2026</p>
+
+  <div class="layout">
+    <aside class="toc">
+      <div class="toc-label">On this page</div>
+      <a href="#contact">Contact</a>
+      <a href="#terms">Terms of Use</a>
+      <a href="#shipping">Shipping &amp; Delivery</a>
+      <a href="#returns">Returns &amp; Refunds</a>
+      <a href="#privacy">Privacy</a>
+    </aside>
+
+    <div>
+      <!-- ── CONTACT ── -->
+      <section id="contact">
+        <h2>Contact</h2>
+        <p>
+          A real person reads these. We aim to reply within two working days, and sooner
+          if something has gone wrong with an order.
+        </p>
+        <div class="contact-grid">
+          <div class="contact-item">
+            <div class="contact-label">Email</div>
+            <div class="contact-value"><a href="mailto:reachus.urbannest@gmail.com">reachus.urbannest@gmail.com</a></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-label">Phone &amp; WhatsApp</div>
+            <div class="contact-value"><a href="tel:+918588944583">+91 85889 44583</a></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-label">Hours</div>
+            <div class="contact-value">Monday to Saturday, 10am – 7pm IST</div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-label">Registered address</div>
+            <div class="contact-value"><span class="todo">add your registered business address</span></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-label">Legal entity</div>
+            <div class="contact-value"><span class="todo">add the registered name, e.g. sole proprietorship</span></div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-label">GSTIN</div>
+            <div class="contact-value"><span class="todo">add if registered, or remove this box</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TERMS ── -->
+      <section id="terms">
+        <h2>Terms of Use</h2>
+        <p>
+          By browsing or buying from Urban Nest you agree to what follows. If you do not, please
+          do not use the site.
+        </p>
+
+        <h3>Who you are buying from</h3>
+        <p>
+          Urban Nest is a marketplace as well as a shop. Some pieces are sold and shipped by
+          us; others are sold by independent showrooms and makers who list with us. <strong>Every
+          piece names its seller on the product page</strong>, and your order confirmation
+          repeats it. Where a piece is sold by a partner, your contract of sale is with that
+          seller, and Urban Nest acts as the platform through which it is made.
+        </p>
+        <p>
+          Some pieces are not sold here at all — they link out to another retailer, and are
+          marked as such. Where we earn a commission on those links, we say so. We are not
+          party to anything you buy on another company's site.
+        </p>
+
+        <h3>Prices and availability</h3>
+        <ul>
+          <li>Prices are in Indian Rupees and include applicable taxes unless stated otherwise.</li>
+          <li>Listing a piece is not a guarantee it is in stock. If something sells out between
+              your order and our packing it, we cancel and refund in full.</li>
+          <li>We may correct a price that is obviously wrong. If it affects an order you have
+              already placed, we will contact you first and you may cancel.</li>
+        </ul>
+
+        <h3>The photographs and 3D models</h3>
+        <p>
+          Many pieces are shown as 3D models built with AI assistance from the maker's own
+          photographs. They are a close likeness, not a photograph of the exact object.
+          Colour, finish, grain and scale can differ from what arrives, and handmade pieces
+          vary from one to the next. The written specification is the reliable description.
+        </p>
+
+        <h3>Using the site</h3>
+        <ul>
+          <li>Text, photographs, 3D models and page designs on this site belong to Urban Nest or
+              to the makers who supplied them. Please do not reuse them commercially without asking.</li>
+          <li>Do not attempt to disrupt the site, scrape it at volume, or interfere with anyone
+              else's use of it.</li>
+          <li>We may change these terms. The date at the top tells you when they last moved.</li>
+        </ul>
+
+        <h3>Where we stand if something goes wrong</h3>
+        <p>
+          Nothing here limits rights you have under Indian consumer law. Beyond those, our
+          liability for any order is limited to what you paid for it. These terms are governed
+          by the laws of India, and disputes fall to the courts of
+          <span class="todo">your city</span>.
+        </p>
+      </section>
+
+      <!-- ── SHIPPING ── -->
+      <section id="shipping">
+        <h2>Shipping &amp; Delivery</h2>
+
+        <h3>What it costs</h3>
+        <p>
+          <strong>Delivery is free anywhere in India.</strong> It is already accounted for in the
+          price, so there is no separate charge at checkout and no surprise at the end.
+        </p>
+        <p>We do not ship outside India at present.</p>
+
+        <h3>How long it takes</h3>
+        <ul>
+          <li>Orders are packed within <strong>2 to 4 working days</strong>. Larger or fragile
+              pieces take longer to crate properly, and we would rather they arrived intact.</li>
+          <li>Delivery is typically <strong>4 to 10 working days</strong> after that, depending
+              on where you are.</li>
+          <li>You will get tracking details by email or WhatsApp once a piece is despatched.</li>
+        </ul>
+
+        <h3>Open box delivery on fragile pieces</h3>
+        <p>
+          Where our courier offers it, fragile pieces — glass, ceramic, sculpture, lighting —
+          are sent as <strong>open box delivery</strong>. The parcel is opened in front of you
+          and you check the piece before accepting it. It costs you nothing and settles any
+          question of transit damage on the spot.
+        </p>
+        <p>
+          Open box delivery is not available to every pincode. Where it is not, the piece is
+          sent normally and the terms under
+          <a href="#returns">Returns &amp; Refunds</a> apply.
+        </p>
+
+        <h3>Orders from more than one seller</h3>
+        <p>
+          If your order includes pieces from different showrooms, each seller despatches their
+          own. <strong>They will arrive separately and on different days</strong>, and your
+          confirmation tells you which is which. You are not charged any extra for this.
+        </p>
+
+        <h3>When it arrives</h3>
+        <ul>
+          <li>Please check the parcel before you sign for it. If the outer packaging is visibly
+              damaged, note it with the courier or refuse the delivery — it makes a claim far easier.</li>
+          <li>If nobody is there, the courier will normally try twice more before returning it to us.</li>
+          <li>An incorrect or incomplete address is the most common cause of a failed delivery.
+              If a parcel comes back for that reason we will contact you to arrange another attempt.</li>
+        </ul>
+      </section>
+
+      <!-- ── RETURNS ──
+           Kept short on purpose. Two things do the work that a page of
+           conditions used to: fragile pieces are opened in front of the
+           courier, and a replacement only goes out once the original comes
+           back. Nobody ends up ahead by breaking something, so there is
+           little left to write rules against. -->
+      <section id="returns">
+        <h2>Returns, Cancellations &amp; Refunds</h2>
+
+        <p>All orders are prepaid. We do not offer cash on delivery.</p>
+
+        <h3>Fragile pieces are opened in front of you</h3>
+        <div class="callout">
+          <p>
+            Where our courier offers <strong>open box delivery</strong>, fragile pieces are sent
+            that way. The parcel is opened in front of you at the door and you check the piece
+            before accepting it. <strong>If anything is broken, refuse the delivery there and
+            then</strong> — that is the whole process, and we send a replacement.
+          </p>
+        </div>
+        <p>
+          Please do take the minute to look. It is much easier for everyone than sorting it out
+          afterwards, and it is why fragile pieces are sent this way.
+        </p>
+
+        <h3>If something is wrong after you have accepted it</h3>
+        <div class="callout">
+          <p>
+            Send us a <strong>photograph within 24 hours of delivery</strong> and return the
+            piece. <strong>We replace it, however badly it is broken</strong> — we will not
+            argue about how it happened. If the piece is one of a kind and cannot be replaced,
+            we refund you in full instead.
+          </p>
+        </div>
+        <p>
+          Return postage on a damaged piece is on us. Nothing is deducted.
+        </p>
+
+        <h3>If you simply change your mind</h3>
+        <div class="callout">
+          <p>
+            You may return most pieces within <strong>7 days</strong> of delivery, unused and in
+            their original packaging. <strong>A flat ₹250 is deducted from your refund</strong>
+            to cover the cost of getting the piece to you and back.
+          </p>
+          <p>
+            Delivery looked free because it was built into the price — but it was really paid, and
+            on a change-of-mind return that cost does not disappear.
+          </p>
+        </div>
+
+        <h3>What cannot be returned on a change of mind</h3>
+        <ul>
+          <li>Made-to-order, customised or personalised pieces</li>
+          <li>Anything used, installed, wired in, or returned without its original packaging</li>
+          <li>Pieces marked as final sale on the product page</li>
+        </ul>
+        <p>
+          Any of these are still replaced if they arrive broken. That is not affected.
+        </p>
+
+        <h3>Cancelling</h3>
+        <p>
+          Cancel any time before despatch and you get a <strong>full refund with nothing
+          deducted</strong> — email or WhatsApp us with your order number. Once a piece has been
+          despatched it becomes a return rather than a cancellation.
+        </p>
+
+        <h3>How refunds are paid</h3>
+        <ul>
+          <li>Refunds go back to the original payment method. We cannot send them anywhere else.</li>
+          <li>We start the refund within <strong>3 working days</strong> of the piece reaching us.</li>
+          <li>Your bank or card issuer then takes a further <strong>5 to 7 working days</strong>
+              to show it. That part is out of our hands.</li>
+        </ul>
+
+        <h3>Pieces sold by a partner showroom</h3>
+        <p>
+          The same terms apply — you do not get a worse deal because a piece came from a partner.
+          Raise it with us and we will sort it out with the seller on your behalf.
+        </p>
+      </section>
+
+      <!-- ── PRIVACY ── -->
+      <section id="privacy">
+        <h2>Privacy</h2>
+
+        <h3>What we collect</h3>
+        <ul>
+          <li><strong>When you order:</strong> your name, phone number, email and delivery address.</li>
+          <li><strong>When you subscribe or send feedback:</strong> whatever you choose to give us.</li>
+          <li><strong>Automatically:</strong> ordinary technical information such as your browser
+              type and the pages you visited.</li>
+        </ul>
+
+        <h3>What we never see</h3>
+        <div class="callout">
+          <p>
+            <strong>Your card details never reach us.</strong> Payments are handled entirely by
+            Razorpay, a licensed payment aggregator. Card numbers, UPI PINs and net-banking
+            passwords go straight to them and are never stored on our systems.
+          </p>
+        </div>
+
+        <h3>What we do with it</h3>
+        <ul>
+          <li>Fulfil your order and keep you informed about it.</li>
+          <li>Answer you when you get in touch.</li>
+          <li>Send occasional updates, but only if you asked for them. Every one has an
+              unsubscribe link and we do not sell or rent your details to anyone.</li>
+        </ul>
+
+        <h3>Who else sees it</h3>
+        <p>
+          Only those who have to: the seller and courier handling your delivery, our payment
+          processor, and our hosting and database providers. Where a piece is sold by a partner
+          showroom, they receive the details needed to pack and send it, and nothing more.
+        </p>
+
+        <h3>How long we keep it</h3>
+        <p>
+          Order records are kept as long as tax and accounting rules require. Mailing list details
+          are kept until you unsubscribe. Feedback is kept until it stops being useful.
+        </p>
+
+        <h3>Your say</h3>
+        <p>
+          Email <a href="mailto:reachus.urbannest@gmail.com">reachus.urbannest@gmail.com</a> and you can
+          ask for a copy of what we hold on you, ask us to correct it, or ask us to delete it —
+          apart from records we are legally required to keep. We will action it within 30 days.
+        </p>
+
+        <h3>Cookies</h3>
+        <p>
+          We use browser storage for practical things only: remembering your light or dark theme
+          preference and what is in your basket. Your basket stays on your own device and is not
+          sent to us until you check out.
+        </p>
+      </section>
+
+      <p style="font-size:13px;color:var(--grey);border-top:1px solid var(--border);padding-top:20px;">
+        These policies are written in plain language and are not legal advice. If Urban Nest grows
+        beyond a small operation, have them reviewed by a professional.
+      </p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <a href="index.html">Home</a>
+  <a href="collection.html">Collection</a>
+  <a href="about.html">About</a>
+  <a href="#contact">Contact</a>
+  <div style="margin-top:14px;">© 2026 Urban Nest · Just The Right Feel</div>
+</footer>
+
+</body>
+</html>

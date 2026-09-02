@@ -139,6 +139,41 @@
     .price { font-size: 13px; color: var(--black); }
     .buy { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; text-decoration: none; border: 1px solid var(--black); border-radius: 100px; padding: 9px 17px; transition: background .25s, color .25s; white-space: nowrap; }
     .buy:hover { background: var(--black); color: var(--white); }
+    /* The cart button is a <button>, the affiliate one an <a>. They are
+       deliberately identical to look at — a visitor should be choosing a
+       piece, not noticing which of our arrangements it falls under. */
+    button.buy { background: none; color: var(--black); font-family: inherit; cursor: pointer; }
+    button.buy[disabled] { opacity: .45; cursor: default; border-style: dashed; }
+    button.buy[disabled]:hover { background: none; color: var(--black); }
+    .sold-by { display: block; font-size: 10px; letter-spacing: .1em; color: var(--grey); margin-top: 8px; }
+    .d-second { display: block; font-size: 12px; color: var(--grey); margin-top: 10px; }
+    .d-second a { color: var(--gold); }
+    .d-soldby { display: block; font-size: 11px; letter-spacing: .09em; color: var(--grey); margin-top: 10px; }
+
+    /* ── CART ──
+       Only ever appears once something is in it, so a catalogue of
+       affiliate pieces looks exactly as it always has. */
+    .cart-pill { position: fixed; right: 22px; bottom: 22px; z-index: 60; display: none; align-items: center; gap: 10px;
+      background: var(--black); color: var(--white); border: none; border-radius: 100px; padding: 13px 22px;
+      font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer;
+      box-shadow: 0 8px 30px rgba(0,0,0,.22); }
+    .cart-pill.show { display: inline-flex; }
+    .cart-panel { position: fixed; right: 22px; bottom: 80px; z-index: 61; width: min(360px, calc(100vw - 44px));
+      background: var(--white); border: 1px solid var(--border); border-radius: 4px; padding: 20px; display: none;
+      box-shadow: 0 18px 50px rgba(0,0,0,.2); }
+    .cart-panel.show { display: block; }
+    .cart-title { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--grey); margin-bottom: 14px; }
+    .cart-line { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 13px; }
+    .cart-line-name { flex: 1; line-height: 1.4; }
+    .cart-line-sub { display: block; font-size: 10px; letter-spacing: .08em; color: var(--grey); margin-top: 3px; }
+    .cart-remove { background: none; border: none; color: var(--grey); cursor: pointer; font-size: 15px; line-height: 1; padding: 0 2px; font-family: inherit; }
+    .cart-remove:hover { color: var(--black); }
+    .cart-total { display: flex; justify-content: space-between; padding: 14px 0 4px; border-top: 1px solid var(--black); font-size: 14px; margin-top: 6px; }
+    .cart-go { width: 100%; margin-top: 14px; padding: 13px; background: var(--black); color: var(--white); border: none;
+      font-family: inherit; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; cursor: pointer; }
+    .cart-go { display: block; text-align: center; text-decoration: none; }
+  .cart-go:hover { background: var(--gold); }
+    .cart-note { display: block; font-size: 11px; color: var(--grey); margin-top: 10px; line-height: 1.5; }
 
     .empty { padding: 70px 24px; text-align: center; color: var(--grey); font-size: 14px; line-height: 1.9; }
 
@@ -415,23 +450,31 @@
         <div class="d-specs" id="dSpecs"></div>
         <span class="d-price" id="dPrice"></span>
         <a class="d-buy" id="dBuy" href="#" target="_blank" rel="noopener sponsored">Shop this piece →</a>
+        <button class="d-buy" id="dCart" type="button" style="display:none">Add to Cart</button>
+        <span class="d-second" id="dSecond" style="display:none"></span>
+        <span class="d-soldby" id="dSoldBy" style="display:none"></span>
       </div>
     </div>
   </div>
+
+  <button class="cart-pill" id="cartPill" type="button" aria-label="Open cart"></button>
+  <div class="cart-panel" id="cartPanel" role="dialog" aria-label="Your selection"></div>
 
   <footer>
     <div class="footer-disclosure">
       Every piece here is shown as a 3D model, built with AI assistance from the
       maker&rsquo;s own photographs. It is a close likeness, not a photograph of the
       object itself &mdash; colour, finish and scale can differ from what arrives.
-      Treat the specification and the retailer&rsquo;s own page as the final word.
+      Treat the specification, and the seller&rsquo;s own page where there is one, as
+      the final word. Where a piece links out to a retailer we may earn a
+      commission on the sale; where it is sold here, the seller is named on the piece.
       <a href="about.html#renders">How we model things &rarr;</a>
     </div>
     <div class="footer-left">
       <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
       <span class="footer-logo">URBAN NEST</span>
     </div>
-    <div class="footer-note">© 2026 Urban Nest · All rights reserved</div>
+    <a href="policies.html" class="footer-note" style="text-decoration:none;margin-right:16px">Policies</a><div class="footer-note">© 2026 Urban Nest · All rights reserved</div>
   </footer>
 
 <script>
@@ -456,6 +499,22 @@
       '<span class="stage-ph"><img src="favicon.png" alt="" aria-hidden="true"/></span></div>';
   }
 
+  /* rel="sponsored" belongs on an affiliate link and nowhere else — it is a
+     declaration that we are paid for the click, which is untrue of our own
+     checkout. */
+  function cardButton(item) {
+    if (cartLeads(item)) {
+      return item.in_stock === false
+        ? '<button class="buy" type="button" disabled>Out of stock</button>'
+        : '<button class="buy" type="button" data-add="' + esc(item.id) + '">Add to Cart</button>';
+    }
+    if (item.buy_link) {
+      return '<a class="buy" href="' + esc(item.buy_link) +
+             '" target="_blank" rel="noopener sponsored">Shop →</a>';
+    }
+    return '';
+  }
+
   function card(item) {
     return '<article class="item" data-id="' + esc(item.id) + '">' + stage(item) +
       '<div class="body">' +
@@ -463,10 +522,56 @@
         '<h2 class="name">' + esc(item.name) + '</h2>' +
         (item.description ? '<p class="desc">' + esc(item.description) + '</p>' : '<p class="desc"></p>') +
         '<div class="foot">' +
-          '<span class="price">' + (item.price ? esc(item.price) : '') + '</span>' +
-          (item.buy_link ? '<a class="buy" href="' + esc(item.buy_link) + '" target="_blank" rel="noopener sponsored">Shop →</a>' : '') +
+          '<span class="price">' + esc(priceText(item)) + '</span>' +
+          cardButton(item) +
         '</div>' +
+        (soldByLine(item) ? '<span class="sold-by">' + esc(soldByLine(item)) + '</span>' : '') +
       '</div></article>';
+  }
+
+  var SELLERS = {};
+
+  /* ── HOW A PIECE SELLS ──
+     Four arrangements, decided by the seller a piece is filed under. The
+     admin shows a live preview of exactly these lines while you edit, so
+     what follows has to stay in step with it.
+       marketplace  the showroom sells and ships
+       consignment  their stock, held and shipped by us
+       direct       our own stock
+       affiliate    not sold here — an outbound link                     */
+  // Whole rupees where the amount is whole, paise only when there are
+  // any — so the cart never shows a rounded figure beside an exact charge.
+  function rupees(paise) {
+    var r = paise / 100;
+    return '₹' + r.toLocaleString('en-IN', {
+      minimumFractionDigits: paise % 100 ? 2 : 0,
+      maximumFractionDigits: paise % 100 ? 2 : 0
+    });
+  }
+  function priceText(it) {
+    return it.price_paise ? rupees(it.price_paise) : (it.price || '');
+  }
+  // Sellable means a real seller AND a real number. A piece with one but
+  // not the other must never reach a cart, so it is treated as display only.
+  function sellable(it) {
+    return !!(it && it.seller_id && SELLERS[it.seller_id] && it.price_paise);
+  }
+  function soldByLine(it) {
+    var s = SELLERS[it.seller_id];
+    if (!s) return '';
+    if (s.kind === 'consignment') return 'Sold by Urban Nest · Sourced from ' + s.name;
+    if (s.kind === 'direct') return 'Sold & shipped by Urban Nest';
+    return 'Sold by ' + s.name;
+  }
+  function affName(it) {
+    var a = SELLERS[it.affiliate_seller_id];
+    return a ? a.name : 'the supplier';
+  }
+  // Which of the two buttons leads. Only meaningful when a piece has both.
+  function cartLeads(it) {
+    if (!sellable(it)) return false;
+    if (!it.buy_link) return true;
+    return it.primary_cta !== 'affiliate';
   }
 
   var ITEMS = {};
@@ -477,9 +582,82 @@
   // One listener for the whole grid, so cards carry an id rather than a
   // handler — no quoting of ids into markup, nothing to escape wrong.
   document.addEventListener('click', function (e) {
-    var card = e.target.closest && e.target.closest('.item[data-id]');
+    if (!e.target.closest) return;
+    // Checked before the card, and stops there: adding a piece must not also
+    // open it, and the button sits inside the card.
+    var add = e.target.closest('[data-add]');
+    if (add) { e.stopPropagation(); addToCart(add.getAttribute('data-add')); return; }
+    var rm = e.target.closest('[data-remove]');
+    if (rm) { e.stopPropagation(); removeFromCart(rm.getAttribute('data-remove')); return; }
+    if (e.target.closest('#cartPill')) { toggleCart(); return; }
+    if (e.target.closest('#cartPanel')) return;
+    closeCart();
+    var card = e.target.closest('.item[data-id]');
     if (card) openPiece(card.getAttribute('data-id'));
   });
+
+  /* ── THE CART ──
+     Lives in localStorage on the visitor's own machine. It holds ids and
+     quantities only — never a price. Prices are read from the catalogue
+     when the panel is drawn, and will be read again on the server when a
+     payment is created, so an edited cart cannot change what anything costs. */
+  var CART_KEY = 'un-cart';
+  function readCart() {
+    try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function writeCart(c) {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(c)); } catch (e) {}
+    renderCart();
+  }
+  function addToCart(id) {
+    var it = ITEMS[id];
+    if (!sellable(it) || it.in_stock === false) return;
+    var c = readCart();
+    var line = c.filter(function (l) { return l.id === id; })[0];
+    if (line) line.qty += 1; else c.push({ id: id, qty: 1 });
+    writeCart(c);
+    openCart();
+  }
+  function removeFromCart(id) {
+    writeCart(readCart().filter(function (l) { return l.id !== id; }));
+  }
+  function cartLines() {
+    // A piece unpublished or deleted since it was added is dropped rather
+    // than shown at a price we can no longer honour.
+    return readCart().map(function (l) {
+      var it = ITEMS[l.id];
+      return sellable(it) ? { id: l.id, qty: l.qty, item: it } : null;
+    }).filter(Boolean);
+  }
+  function renderCart() {
+    var lines = cartLines();
+    var pill = document.getElementById('cartPill');
+    var panel = document.getElementById('cartPanel');
+    if (!pill || !panel) return;
+
+    var count = lines.reduce(function (n, l) { return n + l.qty; }, 0);
+    var total = lines.reduce(function (n, l) { return n + l.item.price_paise * l.qty; }, 0);
+
+    if (!count) { pill.classList.remove('show'); closeCart(); return; }
+    pill.classList.add('show');
+    pill.textContent = count + (count === 1 ? ' piece · ' : ' pieces · ') + rupees(total);
+
+    panel.innerHTML =
+      '<div class="cart-title">Your selection</div>' +
+      lines.map(function (l) {
+        return '<div class="cart-line"><span class="cart-line-name">' + esc(l.item.name) +
+          (l.qty > 1 ? ' × ' + l.qty : '') +
+          '<span class="cart-line-sub">' + esc(soldByLine(l.item)) + '</span></span>' +
+          '<span>' + esc(rupees(l.item.price_paise * l.qty)) + '</span>' +
+          '<button class="cart-remove" type="button" data-remove="' + esc(l.id) + '" aria-label="Remove">×</button></div>';
+      }).join('') +
+      '<div class="cart-total"><span>Total</span><span>' + esc(rupees(total)) + '</span></div>' +
+      '<a class="cart-go" href="checkout.html">Checkout</a>' +
+      '<span class="cart-note">Your selection is saved on this device.</span>';
+  }
+  function openCart()  { var p = document.getElementById('cartPanel'); if (p) p.classList.add('show'); }
+  function closeCart() { var p = document.getElementById('cartPanel'); if (p) p.classList.remove('show'); }
+  function toggleCart() { var p = document.getElementById('cartPanel'); if (p) p.classList.toggle('show'); }
 
   /* ── THE PIECE, AS ITS OWN HISTORY ENTRY ──
      Opening a piece pushes ?p=<id> onto the URL rather than just toggling the
@@ -526,10 +704,38 @@
     }).join('');
     sp.style.display = specs.length ? '' : 'none';
 
-    document.getElementById('dPrice').textContent = it.price || '';
-    var buy = document.getElementById('dBuy');
-    buy.style.display = it.buy_link ? '' : 'none';
+    document.getElementById('dPrice').textContent = priceText(it);
+
+    var buy    = document.getElementById('dBuy');
+    var cartBt = document.getElementById('dCart');
+    var second = document.getElementById('dSecond');
+    var soldBy = document.getElementById('dSoldBy');
+    var leads  = cartLeads(it);
+
+    buy.style.display = (!leads && it.buy_link) ? '' : 'none';
     buy.href = it.buy_link || '#';
+    buy.textContent = 'Shop at ' + affName(it) + ' →';
+
+    cartBt.style.display = leads ? '' : 'none';
+    cartBt.disabled = it.in_stock === false;
+    cartBt.textContent = it.in_stock === false ? 'Out of stock' : 'Add to Cart — ' + priceText(it);
+    cartBt.setAttribute('data-add', it.id);
+
+    // The other route, kept quiet but present. A visitor who would rather buy
+    // on Amazon should not have to leave empty-handed.
+    var secondHtml = '';
+    if (leads && it.buy_link) {
+      secondHtml = 'Also available on <a href="' + esc(it.buy_link) +
+                   '" target="_blank" rel="noopener sponsored">' + esc(affName(it)) + '</a>';
+    } else if (!leads && it.buy_link && sellable(it)) {
+      secondHtml = 'Also available here — ' + esc(priceText(it));
+    }
+    second.innerHTML = secondHtml;
+    second.style.display = secondHtml ? '' : 'none';
+
+    var line = soldByLine(it);
+    soldBy.textContent = line;
+    soldBy.style.display = line ? '' : 'none';
 
     var stageEl = document.getElementById('dStage');
     var poster = document.getElementById('dPoster');
@@ -686,15 +892,23 @@
     var cats = db.from('collection_categories').select('*')
       .eq('published', true).order('sort_order').order('name')
       .then(function (r) { return r.error ? { data: [] } : r; }, function () { return { data: [] }; });
+    // Optional in the same way. Without setup-commerce.sql there are no
+    // sellers, every piece falls back to its buy link, and the page is
+    // exactly what it was before any of this existed.
+    var sels = db.from('sellers').select('id,name,kind').eq('active', true)
+      .then(function (r) { return r.error ? { data: [] } : r; }, function () { return { data: [] }; });
 
-    Promise.all([items, cats]).then(function (res) {
+    Promise.all([items, cats, sels]).then(function (res) {
       var rows = (res[0] && res[0].data) || [];
       var cs   = (res[1] && res[1].data) || [];
+      var sl   = (res[2] && res[2].data) || [];
       if (res[0] && res[0].error) return fail();
 
       ITEMS = {};
       rows.forEach(function (it) { ITEMS[it.id] = it; });
       cs.forEach(function (c) { CAT_NAMES[c.slug] = c.name; });
+      sl.forEach(function (x) { SELLERS[x.id] = x; });
+      renderCart();
 
       var counts = {};
       rows.forEach(function (it) { counts[it.category || ''] = (counts[it.category || ''] || 0) + 1; });

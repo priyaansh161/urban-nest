@@ -27,3 +27,7 @@ tools/node_modules/
 *.blend
 *.fbx
 *.obj
+
+# Secrets for local function testing. Real keys live here and never in the
+# repo — the deployed site reads the same names from Netlify's env vars.
+.env

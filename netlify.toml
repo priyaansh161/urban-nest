@@ -10,3 +10,12 @@
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Content-Type = "application/octet-stream"
+
+# ── CHECKOUT FUNCTIONS ──
+# The three endpoints in netlify/functions/. They live outside dist/ on
+# purpose: build-site.mjs assembles dist from an allow list of static files,
+# while functions are uploaded separately by the CLI, which reads this block.
+# Deploy from the project root or it will not find them.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
