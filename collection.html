@@ -59,10 +59,17 @@
     .nav-links a { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); text-decoration: none; transition: color .2s; }
     .nav-links a:hover, .nav-links a.active { color: var(--gold); }
 
-    .page-hero { padding: 140px 48px 56px; border-bottom: .5px solid var(--border); background: var(--panel); }
-    .hero-inner { max-width: 1280px; margin: 0 auto; }
-    .page-tag { font-size: 10px; letter-spacing: .3em; color: var(--gold); margin-bottom: 18px; }
-    .page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(38px, 5.5vw, 66px); font-weight: 400; line-height: 1.02; color: #F5F7F6; }
+    .page-hero { position: relative; overflow: hidden; padding: 140px 48px 56px; border-bottom: .5px solid var(--border); background: var(--panel); }
+    /* The faint 80px grid behind the hero. Same values on every page, so
+       the bracket at the top of each one reads as the same object. */
+    .page-hero-grid {
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(234,242,241,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(234,242,241,0.03) 1px, transparent 1px);
+      background-size: 80px 80px; pointer-events: none;
+    }
+    .hero-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
+    .page-tag { font-size: 10px; letter-spacing: .3em; color: var(--gold); margin-bottom: 20px; }
+    .page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 400; line-height: 1.0; color: #F5F7F6; }
     .page-title em { font-style: italic; color: var(--gold); }
     .page-sub { font-size: 14px; color: rgba(234,242,241,.45); line-height: 1.9; max-width: 46ch; margin-top: 18px; }
 
@@ -369,21 +376,184 @@
       .switch button { width: 34px; height: 34px; }
       .hamburger { min-width: 34px; min-height: 34px; align-items: center; justify-content: center; }
     }
-  </style>
+  
+  /* ── SHARED TOP BAR ──
+     The site's menu bar. It is the same object on every page: same logo,
+     same links, same Join button, same height — it does not respond to
+     which page you are on, beyond marking the current link.
+
+     Everything about the bar lives in this one block, geometry included,
+     so there is a single place to change it. It sits last in the
+     stylesheet and uses !important because each page is self-contained
+     and carries its own older nav rules underneath.
+
+     It also does NOT follow the light/dark switch. The bar is the one
+     element that should look identical everywhere, in both themes.
+
+     To add a page later: paste this block at the end of its stylesheet
+     and paste the <nav> markup from any existing page. Do not paste it
+     into a page whose <nav> is not a top bar. */
+  :root {
+    --topbar:        #0E3238;
+    --topbar-ink:    #F5F7F6;
+    --topbar-dim:    rgba(245,247,246,0.62);
+    --topbar-accent: #C2934D;   /* the dark-ground gold, since the bar is always dark */
+    --topbar-hair:   rgba(245,247,246,0.10);
+  }
+
+  /* Layout. `position` is deliberately not set here — some pages need a
+     fixed bar and pad their hero to clear it, others use sticky. Both sit
+     at the top of the window, so the bar looks the same either way. */
+  nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    width: 100% !important;
+    padding: 20px 48px !important;
+    background: var(--topbar) !important;
+    border-bottom: 1px solid var(--topbar-hair) !important;
+    backdrop-filter: none !important;
+    color: var(--topbar-ink) !important;
+    /* The bar sets its own leading. Inheriting the page's body line-height
+       made it three to five pixels taller on some pages than others. */
+    line-height: 1 !important;
+  }
+
+  /* Logo — the 30px mark and the Bodoni wordmark, on every page. */
+  nav .nav-logo, nav .logo {
+    display: flex !important; align-items: center !important;
+    gap: 11px !important; text-decoration: none !important;
+    color: var(--topbar-ink) !important;
+  }
+  nav .nav-logo-icon, nav .logo-icon {
+    width: 30px !important; height: 30px !important;
+    border-radius: 50% !important; overflow: hidden !important; flex-shrink: 0 !important;
+  }
+  nav .nav-logo-icon img, nav .logo-icon img, nav .nav-logo > img {
+    width: 100% !important; height: 100% !important;
+    object-fit: cover !important; display: block !important;
+  }
+  nav .nav-logo-text {
+    font-family: 'Bodoni Moda', Didot, Georgia, serif !important;
+    font-size: 15px !important; letter-spacing: 0.18em !important;
+    white-space: nowrap !important; font-weight: 400 !important;
+    text-transform: none !important; line-height: 1 !important;
+  }
+
+  /* Links */
+  nav .nav-links {
+    display: flex !important; gap: 28px !important; list-style: none !important;
+    margin: 0 !important; padding: 0 !important;
+  }
+  nav .nav-links li { margin: 0 !important; padding: 0 !important; border: 0 !important; }
+  nav .nav-links a {
+    font-family: inherit !important;
+    font-size: 11px !important; letter-spacing: 0.15em !important;
+    text-transform: uppercase !important; text-decoration: none !important;
+    font-weight: 400 !important;
+    color: var(--topbar-dim) !important; transition: color .2s !important;
+    line-height: 1 !important;
+  }
+  nav .nav-links a:hover,
+  nav .nav-links a.active { color: var(--topbar-accent) !important; }
+  /* The button already says this; only the mobile menu needs the text
+     link, because the button is hidden there. */
+  nav .nav-links .join-item { display: none !important; }
+
+  /* Right-hand group */
+  nav .nav-right { display: flex !important; align-items: center !important; gap: 18px !important; }
+
+  nav .nav-join {
+    padding: 9px 20px !important; border-radius: 100px !important;
+    background: var(--topbar-ink) !important; color: var(--topbar) !important;
+    border: 0 !important;
+    font-family: inherit !important;
+    font-size: 10px !important; letter-spacing: 0.18em !important;
+    text-transform: uppercase !important; text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: background .25s, color .25s !important;
+    transform: none !important; box-shadow: none !important;
+    line-height: 1 !important;
+  }
+  nav .nav-join:hover { background: var(--topbar-accent) !important; color: var(--topbar) !important; }
+
+  nav .switch {
+    display: flex !important; align-items: center !important;
+    border: 1px solid rgba(245,247,246,0.22) !important;
+    background: transparent !important;
+    border-radius: 100px !important; padding: 2px !important;
+  }
+  nav .switch button {
+    display: grid !important; place-items: center !important;
+    width: 28px !important; height: 24px !important;
+    border: none !important; background: none !important; cursor: pointer !important;
+    border-radius: 100px !important; font-family: inherit !important;
+    color: var(--topbar-dim) !important;
+    transition: background .25s, color .25s !important;
+  }
+  nav .switch button:hover { color: var(--topbar-ink) !important; }
+  nav .switch button[aria-pressed="true"] {
+    background: var(--topbar-ink) !important; color: var(--topbar) !important;
+  }
+  nav .switch svg { width: 13px !important; height: 13px !important; display: block !important; }
+  nav .switch button[aria-pressed="true"] svg { stroke: var(--topbar) !important; }
+
+  nav .hamburger {
+    display: none !important; flex-direction: column !important; gap: 5px !important;
+    cursor: pointer !important; background: none !important; border: none !important; padding: 4px !important;
+  }
+  nav .hamburger span {
+    display: block !important; width: 20px !important; height: 1.5px !important;
+    background: var(--topbar-ink) !important;
+    transition: transform .3s, opacity .3s !important;
+  }
+  nav .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg) !important; }
+  nav .hamburger.open span:nth-child(2) { opacity: 0 !important; }
+  nav .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg) !important; }
+
+  /* Phones and small tablets: the links collapse into a drop-down that is
+     part of the same bar, so it is teal too. */
+  @media (max-width: 900px) {
+    nav { padding: 16px 20px !important; }
+    nav .nav-links {
+      display: none !important; position: absolute !important;
+      top: 100% !important; left: 0 !important; right: 0 !important;
+      flex-direction: column !important; gap: 0 !important;
+      padding: 0 !important;
+      background: var(--topbar) !important;
+      border-bottom: 1px solid var(--topbar-hair) !important;
+    }
+    nav .nav-links.open { display: flex !important; }
+    nav .nav-links .join-item { display: block !important; }
+    nav .nav-links li { border-bottom: 1px solid rgba(245,247,246,0.08) !important; }
+    nav .nav-links li:last-child { border-bottom: none !important; }
+    nav .nav-links a {
+      display: flex !important; align-items: center !important;
+      padding: 15px 20px !important; font-size: 12px !important; min-height: 44px !important;
+    }
+    nav .hamburger { display: flex !important; }
+    nav .nav-join { display: none !important; }
+    nav .nav-right { gap: 12px !important; }
+  }
+</style>
 </head>
 <body>
 
   <nav>
     <a href="index.html" class="nav-logo">
-      <div class="nav-logo-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+      <span class="nav-logo-icon"><img src="logo-icon.png" alt=""/></span>
       <span class="nav-logo-text">URBAN NEST</span>
     </a>
+
     <ul class="nav-links" id="navLinks">
-      <li><a href="index.html#rooms">Spaces</a></li>
+      <li><a href="spaces.html">Spaces</a></li>
       <li><a href="collection.html" class="active">Collection</a></li>
       <li><a href="community.html">The Nest Edit</a></li>
       <li><a href="about.html">About</a></li>
+      <li class="join-item"><a href="join.html">Join the Nest</a></li>
     </ul>
+
     <div class="nav-right">
       <div class="switch" role="group" aria-label="Colour theme">
         <button type="button" id="themeLight" aria-pressed="false" title="Light" aria-label="Light theme">
@@ -398,11 +568,13 @@
           </svg>
         </button>
       </div>
-      <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleNav()"><span></span><span></span><span></span></button>
+      <a href="join.html" class="nav-join">Join the Nest</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
   <div class="page-hero" id="pageHero">
+    <div class="page-hero-grid"></div>
     <div class="hero-inner">
       <div class="page-tag">SINGLE PIECES</div>
       <h1 class="page-title">The <em>Collection.</em></h1>

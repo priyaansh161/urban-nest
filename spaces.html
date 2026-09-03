@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Spaces · Urban Nest</title>
+<link rel="icon" type="image/png" href="favicon.png"/>
+<meta name="description" content="Every room Urban Nest has built in 3D. Step into any of them and look around."/>
+<script>
+  try {
+    var t = localStorage.getItem('un-theme');
+    if (t) document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #A37B3F; --white: #F5F7F6; --black: #0F1F22;
+    --grey: #586366; --grey-light: #EAEFED; --border: #D9E0DE;
+    --panel: #0E3238;
+    --ease: cubic-bezier(.16,.7,.2,1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --white: #061E23; --black: #EAF2F1; --grey: #7F9295;
+      --border: #123037; --grey-light: #0C272C; --gold: #C2934D; --panel: #0B343C;
+    }
+  }
+  :root[data-theme="dark"] {
+    --white: #061E23; --black: #EAF2F1; --grey: #7F9295;
+    --border: #123037; --grey-light: #0C272C; --gold: #C2934D; --panel: #0B343C;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--white); color: var(--black);
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV (structure only; the shared top bar block at the end paints it) ── */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 18px 48px; border-bottom: .5px solid var(--border); }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo-icon { width: 34px; height: 34px; border-radius: 50%; overflow: hidden; }
+  .nav-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .nav-logo-text { font-family: 'Bodoni Moda', serif; font-size: 17px; letter-spacing: .16em; }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); text-decoration: none; transition: color .2s; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  .switch { display: flex; align-items: center; border: 1px solid var(--border); background: transparent; border-radius: 100px; padding: 2px; }
+  .switch button { display: grid; place-items: center; width: 28px; height: 24px; border: none; background: none; cursor: pointer; color: var(--grey); border-radius: 100px; transition: background .25s, color .25s; font-family: inherit; }
+  .switch svg { width: 14px; height: 14px; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+  .hamburger span { display: block; width: 22px; height: 1.5px; background: var(--black); transition: all .3s; }
+
+  /* ── PAGE HERO — the same teal bracket the other pages use ── */
+  .page-hero { position: relative; overflow: hidden; padding: 140px 48px 56px; border-bottom: .5px solid var(--border); background: var(--panel); }
+  /* The faint 80px grid behind the hero. Same values on every page, so
+     the bracket at the top of each one reads as the same object. */
+  .page-hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(234,242,241,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(234,242,241,0.03) 1px, transparent 1px);
+    background-size: 80px 80px; pointer-events: none;
+  }
+  .hero-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; }
+  .page-tag { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  .page-title { font-family: 'Bodoni Moda', serif; font-size: clamp(40px, 6vw, 72px); font-weight: 400; line-height: 1.0; color: #F5F7F6; }
+  .page-title em { font-style: italic; color: var(--gold); }
+  .page-sub { margin-top: 22px; max-width: 52ch; font-weight: 300; font-size: 15px; color: rgba(245,247,246,.66); line-height: 1.75; }
+
+  /* ── ROOMS ── */
+  .rooms { max-width: 1280px; margin: 0 auto; padding: 72px 48px 96px; }
+  .rooms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; }
+  .room {
+    display: block; text-decoration: none; color: inherit;
+    border: .5px solid var(--border); background: var(--white);
+    transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .3s;
+  }
+  /* Shrinks like every other tile on the site rather than lifting,
+     and the frame takes the gold at the same time. */
+  .room:hover { transform: scale(0.962); border-color: var(--gold); box-shadow: 0 6px 18px rgba(0,0,0,.10); }
+  .room-media { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); }
+  .room-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--ease); }
+  .room:hover .room-media img { transform: scale(1.04); }
+  .room-badge {
+    position: absolute; left: 14px; bottom: 14px; z-index: 1;
+    font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+    color: #F5F7F6; background: rgba(14,50,56,.82); padding: 5px 11px; border-radius: 20px;
+  }
+  .room-body { padding: 26px 26px 30px; }
+  .room-name { font-family: 'Bodoni Moda', serif; font-size: 26px; font-weight: 400; margin-bottom: 10px; }
+  .room-desc { font-size: 14px; font-weight: 300; color: var(--grey); line-height: 1.7; margin-bottom: 18px; }
+  .room-go { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+
+  /* ── FOOTER — the same one the Collection page uses ── */
+  footer { background: var(--panel); color: rgba(234,242,241,.4); padding: 30px 48px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .footer-left { display: flex; align-items: center; gap: 12px; }
+  .footer-icon { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; }
+  .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: .18em; }
+  .footer-disclosure {
+    flex-basis: 100%; order: -1; max-width: 86ch;
+    padding-bottom: 20px; margin-bottom: 4px;
+    border-bottom: .5px solid rgba(234,242,241,.08);
+    font-size: 11.5px; line-height: 1.85; color: rgba(234,242,241,.34);
+    text-align: left;
+  }
+  .footer-disclosure a { color: var(--gold); text-decoration: none; white-space: nowrap; }
+  .footer-disclosure a:hover { text-decoration: underline; }
+  .footer-note { font-size: 11px; }
+  footer a.footer-note { text-decoration: none; margin-right: 16px; }
+  footer a.footer-note:hover { color: var(--gold); }
+
+  @media (max-width: 900px) {
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; position: fixed; top: 61px; left: 0; right: 0; background: var(--white); flex-direction: column; gap: 0; border-bottom: .5px solid var(--border); }
+    .nav-links.open { display: flex; }
+    .nav-links li { border-bottom: .5px solid var(--border); }
+    .nav-links a { display: block; padding: 16px 20px; font-size: 13px; }
+    .hamburger { display: flex; }
+    .page-hero { padding: 100px 20px 44px; }
+    .rooms { padding: 48px 20px 64px; }
+    footer { padding: 24px 20px; flex-direction: column; text-align: center; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  /* ── SHARED TOP BAR ──
+     The site's menu bar. It is the same object on every page: same logo,
+     same links, same Join button, same height — it does not respond to
+     which page you are on, beyond marking the current link.
+
+     Everything about the bar lives in this one block, geometry included,
+     so there is a single place to change it. It sits last in the
+     stylesheet and uses !important because each page is self-contained
+     and carries its own older nav rules underneath.
+
+     It also does NOT follow the light/dark switch. The bar is the one
+     element that should look identical everywhere, in both themes.
+
+     To add a page later: paste this block at the end of its stylesheet
+     and paste the <nav> markup from any existing page. Do not paste it
+     into a page whose <nav> is not a top bar. */
+  :root {
+    --topbar:        #0E3238;
+    --topbar-ink:    #F5F7F6;
+    --topbar-dim:    rgba(245,247,246,0.62);
+    --topbar-accent: #C2934D;   /* the dark-ground gold, since the bar is always dark */
+    --topbar-hair:   rgba(245,247,246,0.10);
+  }
+
+  /* Layout. `position` is deliberately not set here — some pages need a
+     fixed bar and pad their hero to clear it, others use sticky. Both sit
+     at the top of the window, so the bar looks the same either way. */
+  nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    width: 100% !important;
+    padding: 20px 48px !important;
+    background: var(--topbar) !important;
+    border-bottom: 1px solid var(--topbar-hair) !important;
+    backdrop-filter: none !important;
+    color: var(--topbar-ink) !important;
+    /* The bar sets its own leading. Inheriting the page's body line-height
+       made it three to five pixels taller on some pages than others. */
+    line-height: 1 !important;
+  }
+
+  /* Logo — the 30px mark and the Bodoni wordmark, on every page. */
+  nav .nav-logo, nav .logo {
+    display: flex !important; align-items: center !important;
+    gap: 11px !important; text-decoration: none !important;
+    color: var(--topbar-ink) !important;
+  }
+  nav .nav-logo-icon, nav .logo-icon {
+    width: 30px !important; height: 30px !important;
+    border-radius: 50% !important; overflow: hidden !important; flex-shrink: 0 !important;
+  }
+  nav .nav-logo-icon img, nav .logo-icon img, nav .nav-logo > img {
+    width: 100% !important; height: 100% !important;
+    object-fit: cover !important; display: block !important;
+  }
+  nav .nav-logo-text {
+    font-family: 'Bodoni Moda', Didot, Georgia, serif !important;
+    font-size: 15px !important; letter-spacing: 0.18em !important;
+    white-space: nowrap !important; font-weight: 400 !important;
+    text-transform: none !important; line-height: 1 !important;
+  }
+
+  /* Links */
+  nav .nav-links {
+    display: flex !important; gap: 28px !important; list-style: none !important;
+    margin: 0 !important; padding: 0 !important;
+  }
+  nav .nav-links li { margin: 0 !important; padding: 0 !important; border: 0 !important; }
+  nav .nav-links a {
+    font-family: inherit !important;
+    font-size: 11px !important; letter-spacing: 0.15em !important;
+    text-transform: uppercase !important; text-decoration: none !important;
+    font-weight: 400 !important;
+    color: var(--topbar-dim) !important; transition: color .2s !important;
+    line-height: 1 !important;
+  }
+  nav .nav-links a:hover,
+  nav .nav-links a.active { color: var(--topbar-accent) !important; }
+  /* The button already says this; only the mobile menu needs the text
+     link, because the button is hidden there. */
+  nav .nav-links .join-item { display: none !important; }
+
+  /* Right-hand group */
+  nav .nav-right { display: flex !important; align-items: center !important; gap: 18px !important; }
+
+  nav .nav-join {
+    padding: 9px 20px !important; border-radius: 100px !important;
+    background: var(--topbar-ink) !important; color: var(--topbar) !important;
+    border: 0 !important;
+    font-family: inherit !important;
+    font-size: 10px !important; letter-spacing: 0.18em !important;
+    text-transform: uppercase !important; text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: background .25s, color .25s !important;
+    transform: none !important; box-shadow: none !important;
+    line-height: 1 !important;
+  }
+  nav .nav-join:hover { background: var(--topbar-accent) !important; color: var(--topbar) !important; }
+
+  nav .switch {
+    display: flex !important; align-items: center !important;
+    border: 1px solid rgba(245,247,246,0.22) !important;
+    background: transparent !important;
+    border-radius: 100px !important; padding: 2px !important;
+  }
+  nav .switch button {
+    display: grid !important; place-items: center !important;
+    width: 28px !important; height: 24px !important;
+    border: none !important; background: none !important; cursor: pointer !important;
+    border-radius: 100px !important; font-family: inherit !important;
+    color: var(--topbar-dim) !important;
+    transition: background .25s, color .25s !important;
+  }
+  nav .switch button:hover { color: var(--topbar-ink) !important; }
+  nav .switch button[aria-pressed="true"] {
+    background: var(--topbar-ink) !important; color: var(--topbar) !important;
+  }
+  nav .switch svg { width: 13px !important; height: 13px !important; display: block !important; }
+  nav .switch button[aria-pressed="true"] svg { stroke: var(--topbar) !important; }
+
+  nav .hamburger {
+    display: none !important; flex-direction: column !important; gap: 5px !important;
+    cursor: pointer !important; background: none !important; border: none !important; padding: 4px !important;
+  }
+  nav .hamburger span {
+    display: block !important; width: 20px !important; height: 1.5px !important;
+    background: var(--topbar-ink) !important;
+    transition: transform .3s, opacity .3s !important;
+  }
+  nav .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg) !important; }
+  nav .hamburger.open span:nth-child(2) { opacity: 0 !important; }
+  nav .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg) !important; }
+
+  /* Phones and small tablets: the links collapse into a drop-down that is
+     part of the same bar, so it is teal too. */
+  @media (max-width: 900px) {
+    nav { padding: 16px 20px !important; }
+    nav .nav-links {
+      display: none !important; position: absolute !important;
+      top: 100% !important; left: 0 !important; right: 0 !important;
+      flex-direction: column !important; gap: 0 !important;
+      padding: 0 !important;
+      background: var(--topbar) !important;
+      border-bottom: 1px solid var(--topbar-hair) !important;
+    }
+    nav .nav-links.open { display: flex !important; }
+    nav .nav-links .join-item { display: block !important; }
+    nav .nav-links li { border-bottom: 1px solid rgba(245,247,246,0.08) !important; }
+    nav .nav-links li:last-child { border-bottom: none !important; }
+    nav .nav-links a {
+      display: flex !important; align-items: center !important;
+      padding: 15px 20px !important; font-size: 12px !important; min-height: 44px !important;
+    }
+    nav .hamburger { display: flex !important; }
+    nav .nav-join { display: none !important; }
+    nav .nav-right { gap: 12px !important; }
+  }
+</style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-icon"><img src="logo-icon.png" alt=""/></span>
+      <span class="nav-logo-text">URBAN NEST</span>
+    </a>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="spaces.html" class="active">Spaces</a></li>
+      <li><a href="collection.html">Collection</a></li>
+      <li><a href="community.html">The Nest Edit</a></li>
+      <li><a href="about.html">About</a></li>
+      <li class="join-item"><a href="join.html">Join the Nest</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <div class="switch" role="group" aria-label="Colour theme">
+        <button type="button" id="themeLight" aria-pressed="false" title="Light" aria-label="Light theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4.2"/>
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>
+          </svg>
+        </button>
+        <button type="button" id="themeDark" aria-pressed="false" title="Dark" aria-label="Dark theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/>
+          </svg>
+        </button>
+      </div>
+      <a href="join.html" class="nav-join">Join the Nest</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <div class="page-hero">
+    <div class="page-hero-grid"></div>
+    <div class="hero-inner">
+      <div class="page-tag">Walk through</div>
+      <h1 class="page-title">The <em>Spaces.</em></h1>
+      <p class="page-sub">
+        Every room we have built in 3D. Step into one, look around, and tap anything
+        you like the look of.
+      </p>
+    </div>
+  </div>
+
+  <div class="rooms">
+    <div class="rooms-grid">
+
+      <a class="room" href="bathroom.html">
+        <div class="room-media">
+          <span class="room-badge">Bathroom</span>
+          <img src="images/cover-bath-1.webp" alt="The Urban Nest bathroom, rendered in 3D" loading="lazy" decoding="async"/>
+        </div>
+        <div class="room-body">
+          <div class="room-name">The Bathroom</div>
+          <p class="room-desc">
+            Stone, brass and soft light. Fittings and finishes you can turn over
+            before deciding they belong in yours.
+          </p>
+          <span class="room-go">Enter the room →</span>
+        </div>
+      </a>
+
+      <a class="room" href="kitchen.html">
+        <div class="room-media">
+          <span class="room-badge">Kitchen</span>
+          <img src="images/cover-kitchen-1.webp" alt="The Urban Nest kitchen, rendered in 3D" loading="lazy" decoding="async"/>
+        </div>
+        <div class="room-body">
+          <div class="room-name">The Kitchen</div>
+          <p class="room-desc">
+            The room that gets used hardest. Worktops, handles and hardware, shown
+            the way they actually sit together.
+          </p>
+          <span class="room-go">Enter the room →</span>
+        </div>
+      </a>
+
+      <a class="room" href="bedroom.html">
+        <div class="room-media">
+          <span class="room-badge">Bedroom</span>
+          <img src="images/cover-bed-1.webp" alt="The Urban Nest bedroom, rendered in 3D" loading="lazy" decoding="async"/>
+        </div>
+        <div class="room-body">
+          <div class="room-name">The Bedroom</div>
+          <p class="room-desc">
+            Quieter, warmer, and the room people get most wrong. Lighting and
+            textiles that decide how it feels at the end of a day.
+          </p>
+          <span class="room-go">Enter the room →</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-disclosure">
+      Every room here is shown as a 3D model, built with AI assistance from the
+      maker&rsquo;s own photographs. It is a close likeness, not a photograph of the
+      space itself &mdash; colour, finish and scale can differ from what arrives.
+      Treat the specification, and the seller&rsquo;s own page where there is one, as
+      the final word. Where a piece links out to a retailer we may earn a
+      commission on the sale; where it is sold here, the seller is named on the piece.
+      <a href="about.html#renders">How we model things &rarr;</a>
+    </div>
+    <div class="footer-left">
+      <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+      <span class="footer-logo">URBAN NEST</span>
+    </div>
+    <a href="policies.html" class="footer-note" style="text-decoration:none;margin-right:16px">Policies</a><div class="footer-note">© 2026 Urban Nest · All rights reserved</div>
+  </footer>
+
+<script>
+  function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+
+  (function () {
+    var root = document.documentElement;
+    var light = document.getElementById('themeLight');
+    var dark = document.getElementById('themeDark');
+    function paint() {
+      var t = root.getAttribute('data-theme');
+      light.setAttribute('aria-pressed', String(t === 'light'));
+      dark.setAttribute('aria-pressed', String(t === 'dark'));
+    }
+    function set(next) {
+      /* pressing the active one returns you to the device setting */
+      if (root.getAttribute('data-theme') === next) {
+        root.removeAttribute('data-theme');
+        try { localStorage.removeItem('un-theme'); } catch (e) {}
+      } else {
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('un-theme', next); } catch (e) {}
+      }
+      paint();
+    }
+    light.addEventListener('click', function () { set('light'); });
+    dark.addEventListener('click', function () { set('dark'); });
+    paint();
+  })();
+</script>
+</body>
+</html>

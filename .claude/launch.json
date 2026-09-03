@@ -4,7 +4,7 @@
     {
       "name": "urban-nest",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "."],
+      "runtimeArgs": ["serve", "C:/Users/priya/OneDrive/Projects/urban-nest"],
       "port": 3000,
       "autoPort": true
     },
