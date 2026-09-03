@@ -39,6 +39,10 @@
     background: var(--white); color: var(--black);
     line-height: 1.6; -webkit-font-smoothing: antialiased;
   }
+  /* Without this a link with no colour of its own falls back to the
+     browser's default blue — which is what the footer's Policies link
+     was doing. Every other page that has plain links sets this too. */
+  a { color: inherit; }
 
   /* ── NAV (structure only; the shared top bar block at the end paints it) ── */
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 18px 48px; border-bottom: .5px solid var(--border); }
@@ -401,7 +405,7 @@
       <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
       <span class="footer-logo">URBAN NEST</span>
     </div>
-    <a href="policies.html" class="footer-note" style="text-decoration:none;margin-right:16px">Policies</a><div class="footer-note">© 2026 Urban Nest · All rights reserved</div>
+    <a href="policies.html" class="footer-note">Policies</a><div class="footer-note">© 2026 Urban Nest · All rights reserved</div>
   </footer>
 
 <script>
