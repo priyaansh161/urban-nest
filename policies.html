@@ -92,6 +92,15 @@
   /* Sits inside the text column rather than full bleed, so it does not
      break the sticky contents list beside it. */
   .inline-band { min-height: clamp(150px, 20vw, 220px); margin: 8px 0 48px; }
+  /* The closing band lines up with the text above it rather than running
+     the full width of the window. Full bleed at 26vw it came out taller
+     than most of the sections it was closing, and wider than every other
+     thing on the page. 1184px is main's 1280 less its two 48px gutters. */
+  .closing-band {
+    margin: 44px 0 0;
+    min-height: clamp(130px, 13vw, 180px);
+    padding: clamp(28px, 3.4vw, 44px) 32px;
+  }
 
   main { max-width: 1280px; margin: 0 auto; padding: 56px 48px 96px; }
   .updated { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--grey); margin-bottom: 44px; }
@@ -163,6 +172,8 @@
     .hamburger { display: flex; }
     .page-hero { padding: 100px 20px 44px; }
     .wband { padding: clamp(22px, 6vw, 34px) 20px; min-height: clamp(140px, 34vw, 200px); }
+    /* Same 20px gutters main takes on a phone. */
+    .closing-band { margin-top: 32px; min-height: clamp(120px, 28vw, 165px); }
     footer { padding: 26px 20px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -703,18 +714,18 @@
         These policies are written in plain language and are not legal advice. If Urban Nest grows
         beyond a small operation, have them reviewed by a professional.
       </p>
+
+      <div class="wband closing-band">
+        <img src="images/band-warm.webp" alt="" loading="lazy" decoding="async"/>
+        <blockquote class="wband-quote">
+          <span class="wband-shloka">सह नाववतु सह नौ भुनक्तु</span>
+          <span class="wband-sense">May we be protected together; may we be nourished together.</span>
+          <cite class="wband-attr">Taittirīya Upaniṣad 2.1 · Yajur Veda</cite>
+        </blockquote>
+      </div>
     </div>
   </div>
 </main>
-
-<div class="wband">
-  <img src="images/band-warm.webp" alt="" loading="lazy" decoding="async"/>
-  <blockquote class="wband-quote">
-    <span class="wband-shloka">सह नाववतु सह नौ भुनक्तु</span>
-    <span class="wband-sense">May we be protected together; may we be nourished together.</span>
-    <cite class="wband-attr">Taittirīya Upaniṣad 2.1 · Yajur Veda</cite>
-  </blockquote>
-</div>
 
 <footer>
   <div class="footer-left">
