@@ -12,7 +12,7 @@
     if (t) document.documentElement.setAttribute('data-theme', t);
   } catch (e) {}
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&family=Noto+Serif+Devanagari:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
@@ -72,7 +72,22 @@
   .wband img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .wband::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,7,0.80), rgba(8,8,7,0.40)); }
   .wband-quote { position: relative; z-index: 1; width: min(1100px, 100%); text-align: center; }
-  .wband-line { display: block; text-wrap: balance; font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400; font-size: clamp(20px, 2.9vw, 40px); line-height: 1.24; color: #F5F7F6; text-shadow: 0 1px 20px rgba(0,0,0,0.5); }
+/* Devanagari carries matras above and below the line and needs far
+     more leading than the Latin face did; at 1.24 they collide. */
+  .wband-shloka {
+    display: block; text-wrap: balance;
+    font-family: 'Noto Serif Devanagari', 'Bodoni Moda', serif; font-weight: 400;
+    font-size: clamp(21px, 2.7vw, 38px); line-height: 1.62;
+    color: #F5F7F6; text-shadow: 0 1px 20px rgba(0,0,0,0.5);
+  }
+  /* Sanskrit is not Hindi — reading Devanagari does not mean reading
+     this — so the sense travels with the verse. */
+  .wband-sense {
+    display: block; text-wrap: balance; margin-top: clamp(8px, 0.9vw, 14px);
+    font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400;
+    font-size: clamp(15px, 1.5vw, 21px); line-height: 1.38;
+    color: rgba(245,247,246,0.88); text-shadow: 0 1px 20px rgba(0,0,0,0.5);
+  }
   .wband-attr { display: block; margin-top: clamp(9px, 1vw, 15px); font-style: normal; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: rgba(245,247,246,.66); }
   /* Sits inside the text column rather than full bleed, so it does not
      break the sticky contents list beside it. */
@@ -488,8 +503,9 @@
       <div class="wband inline-band">
         <img src="images/band-modern.webp" alt="" loading="lazy" decoding="async"/>
         <blockquote class="wband-quote">
-          <span class="wband-line">"The details are not the details. They make the design."</span>
-          <cite class="wband-attr">Charles Eames</cite>
+          <span class="wband-shloka">शं नो भव द्विपदे शं चतुष्पदे</span>
+          <span class="wband-sense">Be a blessing to our two-footed and our four-footed alike.</span>
+          <cite class="wband-attr">Ṛg Veda 7.54.1 · to Vāstoṣpati, who keeps the dwelling</cite>
         </blockquote>
       </div>
 
@@ -694,8 +710,9 @@
 <div class="wband">
   <img src="images/band-warm.webp" alt="" loading="lazy" decoding="async"/>
   <blockquote class="wband-quote">
-    <span class="wband-line">"Have nothing in your houses that you do not know to be useful, or believe to be beautiful."</span>
-    <cite class="wband-attr">William Morris</cite>
+    <span class="wband-shloka">सह नाववतु सह नौ भुनक्तु</span>
+    <span class="wband-sense">May we be protected together; may we be nourished together.</span>
+    <cite class="wband-attr">Taittirīya Upaniṣad 2.1 · Yajur Veda</cite>
   </blockquote>
 </div>
 

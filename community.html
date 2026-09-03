@@ -14,7 +14,7 @@
     } catch (e) {}
   })();
 </script>
-  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&family=Noto+Serif+Devanagari:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -490,11 +490,21 @@
     .nband img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
     .nband::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,8,7,0.80), rgba(8,8,7,0.40)); }
     .nband-quote { position: relative; z-index: 1; width: min(1100px, 100%); text-align: center; }
-    .nband-line {
+/* Devanagari carries matras above and below the line and needs far
+       more leading than the Latin face did; at 1.24 they collide. */
+    .nband-shloka {
       display: block; text-wrap: balance;
-      font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400;
-      font-size: clamp(20px, 2.9vw, 40px); line-height: 1.24; letter-spacing: -0.005em;
+      font-family: 'Noto Serif Devanagari', 'Bodoni Moda', serif; font-weight: 400;
+      font-size: clamp(21px, 2.7vw, 38px); line-height: 1.62;
       color: #F5F7F6; text-shadow: 0 1px 20px rgba(0,0,0,0.5);
+    }
+    /* Sanskrit is not Hindi — reading Devanagari does not mean reading
+       this — so the sense travels with the verse. */
+    .nband-sense {
+      display: block; text-wrap: balance; margin-top: clamp(8px, 0.9vw, 14px);
+      font-family: 'Bodoni Moda', serif; font-style: italic; font-weight: 400;
+      font-size: clamp(15px, 1.5vw, 21px); line-height: 1.38;
+      color: rgba(245,247,246,0.88); text-shadow: 0 1px 20px rgba(0,0,0,0.5);
     }
     .nband-attr {
       display: block; margin-top: clamp(9px, 1vw, 15px); font-style: normal;
@@ -835,8 +845,9 @@
     <!-- IMG: FULL-WIDTH BAND closing the article grid  ·  swap the file below -->
     <img src="images/band-calm.webp" alt="" loading="lazy" decoding="async"/>
     <blockquote class="nband-quote">
-      <span class="nband-line">"The details are not the details. They make the design."</span>
-      <cite class="nband-attr">Charles Eames</cite>
+      <span class="nband-shloka">शुभं करोति कल्याणम् आरोग्यं धनसम्पदा</span>
+      <span class="nband-sense">It brings auspiciousness and well-being, health and abundance.</span>
+      <cite class="nband-attr">The dīpa-jyoti śloka · said in the house as the lamp is lit</cite>
     </blockquote>
   </div>
 
