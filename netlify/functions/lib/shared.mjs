@@ -15,9 +15,19 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
    that creates payments — so these check the origin themselves. */
 const ALLOWED = [
   'https://storeurbannest.netlify.app',
-  'http://localhost:4322',   // npx serve
+  'http://localhost:3000',   // npx serve
+  'http://localhost:4322',   // npx serve, older port
   'http://localhost:8888'    // netlify dev
 ];
+
+/* The list above only shaped the response header, which stops another
+   website calling these from a browser but stops nothing else: curl sends
+   no Origin at all and was served happily, so anyone could sit there
+   creating orders. Browsers send Origin on every POST, so requiring one
+   costs a real visitor nothing and costs a script everything. */
+export function originAllowed(origin) {
+  return ALLOWED.includes(origin);
+}
 
 export function cors(origin) {
   const ok = ALLOWED.includes(origin) ? origin : ALLOWED[0];

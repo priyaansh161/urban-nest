@@ -7,8 +7,8 @@
 <link rel="icon" type="image/png" href="../favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
-<script src="auth.js"></script>
+<script src="/admin/config.js"></script>
+<script src="/admin/auth.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
@@ -212,6 +212,14 @@ function filtered() {
   });
 }
 
+/* Everything below is typed by strangers on a public form. It is text,
+     never markup — escape it before it goes anywhere near innerHTML. */
+  function escHtml(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
 function renderTable() {
   const rows = filtered();
   const body = document.getElementById('subsBody');
@@ -221,14 +229,14 @@ function renderTable() {
   }
   body.innerHTML = rows.map(s => `
     <tr>
-      <td><div class="td-name">${s.name || '—'}</div></td>
-      <td><div>${s.email}</div></td>
-      <td><div class="td-sub">${s.phone || '—'}</div></td>
-      <td>${s.city ? `<span class="city-badge">${s.city}</span>` : '—'}</td>
-      <td><div class="td-sub">${s.address || '—'}</div></td>
-      <td><span class="source-badge">${(s.source || 'website').replace('-', ' ')}</span></td>
+      <td><div class="td-name">${escHtml(s.name || '—')}</div></td>
+      <td><div>${escHtml(s.email)}</div></td>
+      <td><div class="td-sub">${escHtml(s.phone || '—')}</div></td>
+      <td>${s.city ? `<span class="city-badge">${escHtml(s.city)}</span>` : '—'}</td>
+      <td><div class="td-sub">${escHtml(s.address || '—')}</div></td>
+      <td><span class="source-badge">${escHtml((s.source || 'website').replace('-', ' '))}</span></td>
       <td><div class="td-sub">${new Date(s.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</div></td>
-      <td><button class="del-btn" onclick="deleteSub('${s.id}')">×</button></td>
+      <td><button class="del-btn" onclick="deleteSub('${escHtml(s.id)}')">×</button></td>
     </tr>`).join('');
 }
 
@@ -242,6 +250,17 @@ async function deleteSub(id) {
   showToast('Subscriber removed');
 }
 
+/* One cell of CSV, from a value a stranger typed.
+   Quotes are doubled, which is how CSV escapes them — without this a "
+   in a name ended the field early and shifted every column after it.
+   A leading = + - or @ is prefixed with an apostrophe: spreadsheets read
+   those as the start of a formula rather than as text. */
+function csvCell(v) {
+  let t = String(v == null ? '' : v);
+  if (/^[=+\-@\t\r]/.test(t)) t = "'" + t;
+  return '"' + t.replace(/"/g, '""') + '"';
+}
+
 function exportCSV() {
   const rows = filtered();
   if (!rows.length) { showToast('Nothing to export', 'error'); return; }
@@ -249,13 +268,13 @@ function exportCSV() {
   const lines = [
     headers.join(','),
     ...rows.map(s => [
-      `"${s.name || ''}"`,
-      `"${s.email || ''}"`,
-      `"${s.phone || ''}"`,
-      `"${s.city || ''}"`,
-      `"${(s.address || '').replace(/"/g, '""')}"`,
-      `"${s.source || ''}"`,
-      `"${new Date(s.created_at).toLocaleDateString('en-GB')}"`,
+      csvCell(s.name),
+      csvCell(s.email),
+      csvCell(s.phone),
+      csvCell(s.city),
+      csvCell(s.address),
+      csvCell(s.source),
+      csvCell(new Date(s.created_at).toLocaleDateString('en-GB')),
     ].join(','))
   ];
   const blob = new Blob([lines.join('\n')], { type: 'text/csv' });

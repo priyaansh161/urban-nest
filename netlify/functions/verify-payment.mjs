@@ -7,12 +7,13 @@
  *
  * A browser claiming "payment succeeded" is not evidence. This is.
  */
-import { json, fail, sb, hmacHex, signatureMatches, assertTestMode, env, cors } from './lib/shared.mjs';
+import { json, fail, sb, hmacHex, signatureMatches, assertTestMode, env, cors, originAllowed } from './lib/shared.mjs';
 
 export default async (req) => {
   const origin = req.headers.get('origin') || '';
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(origin) });
   if (req.method !== 'POST') return fail(405, 'Method not allowed', origin);
+  if (!originAllowed(origin)) return fail(403, 'Not allowed from here', origin);
 
   let body;
   try { body = await req.json(); }

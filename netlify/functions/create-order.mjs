@@ -4,7 +4,11 @@
  * It sends ids and quantities. Every rupee is read here, from the database,
  * so a cart edited in devtools buys nothing at a discount.
  */
-import { json, fail, sb, razorpay, assertTestMode, cors } from './lib/shared.mjs';
+import { json, fail, sb, razorpay, assertTestMode, cors, originAllowed } from './lib/shared.mjs';
+
+// Ids come from the browser and are interpolated into a PostgREST filter.
+// Anything that is not a plain uuid never gets near the query.
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const MAX_QTY   = 20;    // per line; a decor piece is not bought by the crate
 const MAX_LINES = 20;
@@ -13,6 +17,7 @@ export default async (req) => {
   const origin = req.headers.get('origin') || '';
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(origin) });
   if (req.method !== 'POST') return fail(405, 'Method not allowed', origin);
+  if (!originAllowed(origin)) return fail(403, 'Not allowed from here', origin);
 
   let body;
   try { body = await req.json(); }
@@ -29,7 +34,7 @@ export default async (req) => {
   // Collapse duplicates so the same id sent twice cannot dodge the qty cap.
   const wanted = new Map();
   for (const l of lines) {
-    if (typeof l?.id !== 'string') return fail(400, 'Malformed selection', origin);
+    if (typeof l?.id !== 'string' || !UUID.test(l.id)) return fail(400, 'Malformed selection', origin);
     const qty = Math.floor(Number(l.qty) || 0);
     if (qty < 1) return fail(400, 'Malformed selection', origin);
     wanted.set(l.id, Math.min((wanted.get(l.id) || 0) + qty, MAX_QTY));

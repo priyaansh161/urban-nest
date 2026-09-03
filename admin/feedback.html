@@ -7,8 +7,8 @@
 <link rel="icon" type="image/png" href="../favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="config.js"></script>
-<script src="auth.js"></script>
+<script src="/admin/config.js"></script>
+<script src="/admin/auth.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
@@ -139,6 +139,14 @@ function setFilter(f, btn) {
   renderList();
 }
 
+/* Everything below is typed by strangers on a public form. It is text,
+     never markup — escape it before it goes anywhere near innerHTML. */
+  function escHtml(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
 function renderList() {
   const filtered = currentFilter === 'all'
     ? feedback
@@ -148,28 +156,33 @@ function renderList() {
     el.innerHTML = `<div class="empty-state">No ${currentFilter === 'all' ? '' : currentFilter + ' '}feedback yet.</div>`;
     return;
   }
-  el.innerHTML = filtered.map(f => `
+  el.innerHTML = filtered.map(f => {
+    /* A rating is a number between nothing and five. Anything else and
+       String.repeat throws on a negative count, taking the page with it. */
+    const stars = Math.max(0, Math.min(5, Math.floor(Number(f.rating) || 0)));
+    return `
     <div class="feedback-card ${f.status === 'unread' ? 'unread' : ''}">
       <div class="feedback-meta">
         <div>
-          <div class="feedback-author">${f.name || 'Anonymous'}</div>
-          ${f.email ? `<div class="feedback-email">${f.email}</div>` : ''}
+          <div class="feedback-author">${escHtml(f.name || 'Anonymous')}</div>
+          ${f.email ? `<div class="feedback-email">${escHtml(f.email)}</div>` : ''}
         </div>
         <div class="feedback-right">
           <span class="feedback-date">${new Date(f.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}</span>
-          ${f.page ? `<span class="feedback-page">${f.page}</span>` : ''}
-          ${f.rating ? `<span class="stars">${'★'.repeat(f.rating)}${'☆'.repeat(5 - f.rating)}</span>` : ''}
-          <span class="badge ${f.status === 'unread' ? 'badge-gold' : 'badge-grey'}">${f.status}</span>
+          ${f.page ? `<span class="feedback-page">${escHtml(f.page)}</span>` : ''}
+          ${stars ? `<span class="stars">${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}</span>` : ''}
+          <span class="badge ${f.status === 'unread' ? 'badge-gold' : 'badge-grey'}">${escHtml(f.status)}</span>
         </div>
       </div>
-      <div class="feedback-message">"${f.message}"</div>
+      <div class="feedback-message">"${escHtml(f.message)}"</div>
       <div class="feedback-actions">
         ${f.status === 'unread'
-          ? `<button class="row-btn" onclick="markRead('${f.id}')">Mark Read</button>`
-          : `<button class="row-btn" onclick="markUnread('${f.id}')">Mark Unread</button>`}
-        <button class="row-btn danger" onclick="deleteFeedback('${f.id}')">Delete</button>
+          ? `<button class="row-btn" onclick="markRead('${escHtml(f.id)}')">Mark Read</button>`
+          : `<button class="row-btn" onclick="markUnread('${escHtml(f.id)}')">Mark Unread</button>`}
+        <button class="row-btn danger" onclick="deleteFeedback('${escHtml(f.id)}')">Delete</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function markRead(id) {

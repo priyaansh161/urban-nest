@@ -42,7 +42,7 @@ export default async (req) => {
 
   try {
     const rows = await sb('orders?razorpay_order_id=eq.' + encodeURIComponent(orderId) +
-                          '&select=id,payment_status');
+                          '&select=id,order_no,payment_status,total_paise');
     const order = rows[0];
     if (!order) return new Response('Unknown order', { status: 200 });
 
@@ -69,10 +69,18 @@ export default async (req) => {
     }
 
     if (kind === 'refund.processed') {
-      await sb('orders?id=eq.' + order.id, {
-        method: 'PATCH',
-        body: JSON.stringify({ payment_status: 'refunded' })
-      });
+      // amount_refunded is the running total across every refund on the
+      // payment, so this stays right when a second partial one arrives.
+      const refunded = Number(payment.amount_refunded || event?.payload?.refund?.entity?.amount || 0);
+      if (refunded >= Number(order.total_paise || 0)) {
+        await sb('orders?id=eq.' + order.id, {
+          method: 'PATCH',
+          body: JSON.stringify({ payment_status: 'refunded' })
+        });
+      } else {
+        console.warn('Partial refund on', order.order_no + ':', refunded, 'of', order.total_paise,
+                     '— order left as paid.');
+      }
     }
 
     // Always 200 once handled. A non-2xx makes Razorpay retry, and retrying
