@@ -935,34 +935,31 @@
       .hamburger { min-height: 34px; min-width: 34px; justify-content: center; align-items: center; }
     }
   
-  /* .ct-piece is the collection strip, which is its own anchor rather than a
-     .ct and so had been missing the gesture every other tile on the site has. */
-  .ct, .sp, .wstrip figure, .ct-piece {
+  /* The collection strip is <a class="ct-piece"><figure>…</figure></a>. The
+     gesture belongs on the figure alone: with the anchor in this list too,
+     hovering the photo fired both, the scale compounded to 0.880, and the
+     frame on the anchor stayed behind at 0.938 with a gap between them. */
+  .ct, .sp, .wstrip figure {
     box-shadow: var(--lift-2);
     transition: transform .55s var(--ease), box-shadow .55s var(--ease), filter .55s var(--ease);
     will-change: transform;
   }
   /* the one you are pointing at withdraws, so the rest of the grid
      appears to come forward without any of them actually moving */
-  .ct:hover, .sp:hover, .wstrip figure:hover, .ct-piece:hover {
+  .ct:hover, .sp:hover, .wstrip figure:hover {
     transform: scale(0.938);
     box-shadow: var(--lift-1);
     filter: saturate(1.06);
   }
-  /* Every tile that shrinks also carries a hairline frame, the way the
-     collection tiles do. It is drawn as an overlay rather than an inset
-     shadow because .sp fills itself edge to edge with a photograph, which
-     would paint straight over an inset. The frame picks up the gold on
-     hover, so the gesture is a shrink and a highlight together. */
-  .ct, .sp, .wstrip figure, .ct-piece { position: relative; }
-  .ct::after, .sp::after, .wstrip figure::after, .ct-piece::after {
+  /* Every tile that shrinks carries the same hairline frame, hugging the
+     photograph. It is drawn as an overlay rather than an inset shadow
+     because .sp fills itself edge to edge with a photograph, which would
+     paint straight over an inset. The frame is the same in both states —
+     the shrink alone is the hover. */
+  .ct, .sp, .wstrip figure { position: relative; }
+  .ct::after, .sp::after, .wstrip figure::after {
     content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
     box-shadow: inset 0 0 0 1px rgba(245,247,246,0.18);
-    transition: box-shadow .55s var(--ease);
-  }
-  .ct:hover::after, .sp:hover::after,
-  .wstrip figure:hover::after, .ct-piece:hover::after {
-    box-shadow: inset 0 0 0 1px var(--gold);
   }
 
   .sp-cap, .wstrip figcaption { transition: transform .55s var(--ease); }
@@ -1010,7 +1007,7 @@
   @keyframes staggerIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
-    .ct, .sp, .wstrip figure, .ct-piece, .btn, .nav-join, .parx, .js .rv-stagger > * {
+    .ct, .sp, .wstrip figure, .btn, .nav-join, .parx, .js .rv-stagger > * {
       transition: none !important; transform: none !important; animation: none !important;
     }
     .js .rv-stagger > * { opacity: 1 !important; }
@@ -1222,6 +1219,7 @@
     </a>
 
     <ul class="nav-links nav-in" id="navLinks" style="--d:90ms">
+      <li><a href="index.html" class="active">Home</a></li>
       <li><a href="spaces.html">Spaces</a></li>
       <li><a href="collection.html">Collection</a></li>
       <li><a href="community.html">The Nest Edit</a></li>

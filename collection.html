@@ -88,7 +88,9 @@
     .grid[hidden], .cats[hidden] { display: none; }
     .cat-tile { display: flex; flex-direction: column; text-decoration: none; color: inherit;
                 border: .5px solid var(--border); background: var(--white); transition: border-color .3s; }
-    .cat-tile:hover { border-color: var(--gold); }
+    /* The border stays as it is. The gold outline was the only one of
+       its kind left on a tile, and read as a stray line rather than as
+       part of the gesture. */
     .cat-tile-media { position: relative; aspect-ratio: 3 / 2; background: var(--panel); overflow: hidden; }
     .cat-tile-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .cat-tile-ph { position: absolute; inset: 0; display: grid; place-items: center; }
@@ -126,7 +128,6 @@
     }
 
     .item { display: flex; flex-direction: column; border: .5px solid var(--border); background: var(--white); transition: border-color .3s; }
-    .item:hover { border-color: var(--gold); }
     /* The stage is dark so pale ceramics and brass both read against it. */
     .stage { position: relative; aspect-ratio: 4 / 5; background: #0F1F22; overflow: hidden; }
     .stage model-viewer { width: 100%; height: 100%; --poster-color: transparent; background: transparent; }
@@ -547,6 +548,7 @@
     </a>
 
     <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
       <li><a href="spaces.html">Spaces</a></li>
       <li><a href="collection.html" class="active">Collection</a></li>
       <li><a href="community.html">The Nest Edit</a></li>
