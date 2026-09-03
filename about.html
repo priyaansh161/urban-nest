@@ -436,6 +436,29 @@
     nav .hamburger { display: flex !important; }
     nav .nav-join { display: none !important; }
     nav .nav-right { gap: 12px !important; }
+
+    /* Touch targets. A fingertip covers about 34px, and several of these
+       were half that. Each page used to set its own version of this, or
+       none at all, which is why the bar came out 63px on some pages and
+       71px on others. One set of sizes here, one height everywhere. */
+    nav .switch button { width: 34px !important; height: 34px !important; }
+    nav .hamburger {
+      min-width: 34px !important; min-height: 34px !important;
+      align-items: center !important; justify-content: center !important;
+    }
+    nav .nav-logo { padding-block: 0 !important; }
+    nav .nav-links a { min-height: 44px !important; }
+  }
+
+  /* Narrow phones — an SE and most older Androids. The logo, the wordmark,
+     the toggle and the hamburger together came to a few pixels more than
+     the screen, which put a horizontal scrollbar on the whole page. They
+     each give a little rather than any one of them being dropped. */
+  @media (max-width: 380px) {
+    nav { padding: 14px 16px !important; }
+    nav .nav-logo { gap: 8px !important; }
+    nav .nav-logo-text { font-size: 13px !important; letter-spacing: 0.13em !important; }
+    nav .nav-right { gap: 8px !important; }
   }
 </style>
 </head>

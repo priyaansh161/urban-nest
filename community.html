@@ -256,7 +256,9 @@
     .nest-rule { flex: 1; height: 1px; background: var(--border); }
 
     .nest-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 34px 32px; }
-    .nest-empty { grid-column: span 12; padding: 44px 0; color: var(--grey); font-size: 14px; }
+    /* 1 / -1, not span 12: stacked, this grid has a single column, and
+       asking for twelve made it generate eleven implicit ones. */
+    .nest-empty { grid-column: 1 / -1; padding: 44px 0; color: var(--grey); font-size: 14px; }
 
     .na { display: flex; flex-direction: column; gap: 11px; cursor: pointer; text-decoration: none; color: inherit; }
     .na-media { overflow: hidden; background: var(--grey-light); }
@@ -720,6 +722,29 @@
     nav .hamburger { display: flex !important; }
     nav .nav-join { display: none !important; }
     nav .nav-right { gap: 12px !important; }
+
+    /* Touch targets. A fingertip covers about 34px, and several of these
+       were half that. Each page used to set its own version of this, or
+       none at all, which is why the bar came out 63px on some pages and
+       71px on others. One set of sizes here, one height everywhere. */
+    nav .switch button { width: 34px !important; height: 34px !important; }
+    nav .hamburger {
+      min-width: 34px !important; min-height: 34px !important;
+      align-items: center !important; justify-content: center !important;
+    }
+    nav .nav-logo { padding-block: 0 !important; }
+    nav .nav-links a { min-height: 44px !important; }
+  }
+
+  /* Narrow phones — an SE and most older Androids. The logo, the wordmark,
+     the toggle and the hamburger together came to a few pixels more than
+     the screen, which put a horizontal scrollbar on the whole page. They
+     each give a little rather than any one of them being dropped. */
+  @media (max-width: 380px) {
+    nav { padding: 14px 16px !important; }
+    nav .nav-logo { gap: 8px !important; }
+    nav .nav-logo-text { font-size: 13px !important; letter-spacing: 0.13em !important; }
+    nav .nav-right { gap: 8px !important; }
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
