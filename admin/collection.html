@@ -33,6 +33,14 @@
   .page-header { margin-bottom: 32px; }
   .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
   .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+  .section-switch { display: inline-flex; margin-top: 16px; border: 1px solid var(--border); border-radius: 100px; padding: 3px; }
+  .section-switch button {
+    border: 0; background: none; cursor: pointer; font-family: inherit;
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--grey); padding: 8px 20px; border-radius: 100px;
+    transition: background .2s, color .2s;
+  }
+  .section-switch button.on { background: var(--black); color: var(--white); }
 
   .form-panel { background: var(--white); border: 0.5px solid var(--border); padding: 32px; margin-bottom: 32px; }
   .form-panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -181,8 +189,15 @@
 
 <main class="main">
   <div class="page-header">
-    <h1>Collection</h1>
-    <p>Manage upcoming products and collection previews</p>
+    <h1 id="sectionHeading">Collection</h1>
+    <p id="sectionBlurb">Handpicked decorative pieces &mdash; the things that prove the eye is worth trusting</p>
+    <!-- Both sections live in the same two tables, told apart by a
+         section column. This decides what is listed below and what a
+         new piece is filed under. -->
+    <div class="section-switch" role="group" aria-label="Which section">
+      <button type="button" id="secCollection" class="on"  onclick="setSection('collection')">Collection</button>
+      <button type="button" id="secEssentials"              onclick="setSection('essentials')">Essentials</button>
+    </div>
   </div>
 
   <!-- Collapsed by default. Categories are set up once and then left alone,
@@ -353,11 +368,35 @@ let sellersList = [];
 // Categories first: the item form's Category select is built from them, and
 // an item saved against a category that does not exist would vanish from the
 // site without any error to show for it.
+/* Which half of the two tables this page is showing. Everything loaded
+   and everything saved is filed under it. */
+let currentSection = 'collection';
+
+const SECTION_COPY = {
+  collection: ['Collection', 'Handpicked decorative pieces \u2014 the things that prove the eye is worth trusting'],
+  essentials: ['Essentials', 'Cheap, available and good \u2014 the things a home runs on that no shop puts in front of you']
+};
+
+async function setSection(next) {
+  if (next === currentSection) return;
+  currentSection = next;
+  const [heading, blurb] = SECTION_COPY[next];
+  document.getElementById('sectionHeading').textContent = heading;
+  document.getElementById('sectionBlurb').innerHTML = blurb;
+  document.getElementById('secCollection').classList.toggle('on', next === 'collection');
+  document.getElementById('secEssentials').classList.toggle('on', next === 'essentials');
+  // A form left open belongs to the section it was opened in.
+  if (typeof resetForm === 'function') { try { resetForm(); } catch (e) {} }
+  if (typeof resetCatForm === 'function') { try { resetCatForm(); } catch (e) {} }
+  await loadCategories();
+  await loadItems();
+}
+
 (async () => { await requireAuth(); await loadCategories(); await loadSellersList(); loadItems(); })();
 
 async function loadItems() {
   const { data, error } = await db.from('collection_items')
-    .select('*').order('created_at', { ascending: false });
+    .select('*').eq('section', currentSection).order('created_at', { ascending: false });
   if (error) { showToast('Failed to load items', 'error'); return; }
   items = data || [];
   renderGrid();
@@ -542,7 +581,7 @@ function resetForm() {
    first.                                                             */
 async function loadCategories() {
   const { data, error } = await db.from('collection_categories')
-    .select('*').order('sort_order').order('name');
+    .select('*').eq('section', currentSection).order('sort_order').order('name');
   if (error) {
     // The page is still usable for editing existing items without it.
     showToast('Categories could not be loaded — run setup-collection-categories.sql', 'error');
@@ -676,6 +715,7 @@ async function saveCategory(publish) {
     hero_image_url: document.getElementById('catHeroImage').value.trim() || null,
     sort_order: parseInt(document.getElementById('catSort').value, 10) || 0,
     published: publish,
+    section: currentSection,
   };
 
   const { error } = id
@@ -685,7 +725,8 @@ async function saveCategory(publish) {
 
   if (affected) {
     const { error: moveErr } = await db.from('collection_items')
-      .update({ category: slug }).eq('category', previous.slug);
+      .update({ category: slug })
+      .eq('category', previous.slug).eq('section', currentSection);
     if (moveErr) {
       showToast(`Category saved, but its ${affected} piece${affected === 1 ? '' : 's'} could not be moved`, 'error');
     }
@@ -857,6 +898,7 @@ async function saveItem(publish) {
     specs: collectSpecs(),
     coming_soon: document.getElementById('itemComingSoon').checked,
     published: publish,
+    section: currentSection,
   };
   const write = (body) => id
     ? db.from('collection_items').update(body).eq('id', id)
