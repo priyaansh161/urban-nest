@@ -459,11 +459,20 @@
       font-weight: 400;
       font-size: clamp(36px, 6.9cqw, 94px);
       line-height: 1.0; letter-spacing: -0.022em;
-      max-width: 15ch;
+      max-width: 19ch;
       color: var(--panel-ink);
       text-shadow: 0 2px 26px rgba(8,8,7,0.45), 0 1px 3px rgba(8,8,7,0.3);
     }
     .hero-type em { font-style: italic; color: var(--gold); }
+
+    .hero-sub {
+      margin-top: clamp(16px, 1.7cqw, 26px);
+      max-width: 44ch;
+      font-size: clamp(14px, 1.35cqw, 19px);
+      font-weight: 300; line-height: 1.65;
+      color: rgba(244,242,233,0.92);
+      text-shadow: 0 1px 14px rgba(8,8,7,0.75), 0 0 4px rgba(8,8,7,0.5);
+    }
 
     /* flex-end, not space-between: the strapline that used to sit opposite
        the buttons is gone, and space-between with one child left would park
@@ -1299,9 +1308,10 @@
     <div class="hero-inner shell rv">
       <span class="hero-eyebrow">Curated living · India</span>
       <h1 class="hero-type">
-        <span class="mask"><span>Luxury for the few.</span></span>
-        <span class="mask"><span style="--d:110ms"><em>We disagree.</em></span></span>
+        <span class="mask"><span>Where Your Space</span></span>
+        <span class="mask"><span style="--d:110ms">Finds Its <em>Character.</em></span></span>
       </h1>
+      <p class="hero-sub"><span class="mask"><span style="--d:220ms">Not the hundred things on offer. The few worth living with.</span></span></p>
       <div class="hero-foot rv" style="--d:300ms">
         <div class="btn-row">
           <a href="#rooms" class="btn btn-solid">
