@@ -304,6 +304,14 @@
         <span class="hint">Compress first — PowerShell, any folder. Swap in your filename. Writes the finished .glb to <strong>models\</strong>, typically 26 MB down to 1.6 MB, then check it renders with <strong>tools\verify.html</strong> before uploading here.</span>
       </div>
       <div class="form-group">
+        <label for="itemStageBg">3D Background</label>
+        <select id="itemStageBg">
+          <option value="">Dark (default)</option>
+          <option value="light">Light &mdash; for dark objects</option>
+        </select>
+        <span class="hint">A 3D close-up sits on a transparent background, so a dark object vanishes on the dark stage and a pale one vanishes on the light. Pick whichever this piece shows up against. Visitors can still switch it.</span>
+      </div>
+      <div class="form-group">
         <label for="itemBuy">Buy Link (optional)</label>
         <input type="url" id="itemBuy" placeholder="https://amzn.to/…"/>
         <span class="hint">Sends the visitor off-site instead of into the cart.</span>
@@ -459,6 +467,7 @@ function editItem(id) {
   document.getElementById('itemRupees').value =
     item.price_paise == null ? '' : (item.price_paise / 100);
   document.getElementById('itemPrimaryCta').value = item.primary_cta || 'cart';
+  document.getElementById('itemStageBg').value = item.popup_bg || '';
   document.getElementById('itemInStock').checked = item.in_stock !== false;
   fillSellerSelects(item.seller_id || '', item.affiliate_seller_id || '');
   document.getElementById('itemComingSoon').checked = !!item.coming_soon;
@@ -576,6 +585,7 @@ function resetForm() {
   ['editingId','itemName','itemPrice','itemImage','itemDescription','itemModel','itemBuy','itemRupees']
     .forEach(id => document.getElementById(id).value = '');
   document.getElementById('itemPrimaryCta').value = 'cart';
+  document.getElementById('itemStageBg').value = '';
   document.getElementById('itemInStock').checked = true;
   fillSellerSelects('', '');
   fillCategorySelect(categories.length ? categories[0].slug : '');
@@ -976,6 +986,7 @@ async function saveItem(publish) {
     // "Price / Range" field above is left exactly as it was.
     price_paise: rupeesToPaise(document.getElementById('itemRupees').value),
     primary_cta: document.getElementById('itemPrimaryCta').value,
+    popup_bg: document.getElementById('itemStageBg').value || null,
     in_stock: document.getElementById('itemInStock').checked,
     specs: collectSpecs(),
     coming_soon: document.getElementById('itemComingSoon').checked,
