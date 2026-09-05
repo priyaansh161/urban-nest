@@ -868,7 +868,7 @@ async function uploadModel(input) {
 
   if (error) {
     hint.innerHTML = MODEL_HINT;
-    showToast(storageError(error), 'error');
+    showToast(storageError(error, MODEL_BUCKET), 'error');
     return;
   }
 
@@ -941,7 +941,7 @@ async function uploadImage(input) {
 
   btn.disabled = false; btn.textContent = label;
 
-  if (error) { hint.textContent = 'Upload failed.'; showToast(storageError(error), 'error'); return; }
+  if (error) { hint.textContent = 'Upload failed.'; showToast(storageError(error, IMAGE_BUCKET), 'error'); return; }
 
   const { data } = db.storage.from(IMAGE_BUCKET).getPublicUrl(path);
   document.getElementById('itemImage').value = data.publicUrl;
@@ -949,12 +949,17 @@ async function uploadImage(input) {
   showToast('Photograph uploaded');
 }
 
-function storageError(error) {
+/* Two buckets use this now, so the message has to say which one is
+   refusing. It said "the models bucket" whatever had actually failed,
+   which sent me looking at the wrong bucket entirely. */
+function storageError(error, bucket) {
   const m = (error && error.message) || '';
-  if (/bucket not found/i.test(m))        return 'No "models" bucket yet — create a public bucket called models in Supabase → Storage';
-  if (/row-level security|policy/i.test(m)) return 'The models bucket is rejecting uploads — add an INSERT policy for authenticated users';
-  if (/payload too large|exceeded|size/i.test(m)) return 'Rejected as too large — shrink the export, or raise the size limit on the models bucket';
-  if (/mime|content type/i.test(m))       return 'Rejected as the wrong file type — the models bucket accepts model/gltf-binary (.glb) only';
+  const b = bucket || 'Models';
+  const setup = b === 'Models' ? 'admin/setup-model-storage.sql' : 'admin/setup-image-storage.sql';
+  if (/bucket not found/i.test(m))        return 'No "' + b + '" bucket yet — create it in Supabase → Storage, then run ' + setup;
+  if (/row-level security|policy/i.test(m)) return 'The ' + b + ' bucket is refusing uploads — run ' + setup + ' to give it an upload policy';
+  if (/payload too large|exceeded|size/i.test(m)) return 'Rejected as too large for the ' + b + ' bucket';
+  if (/mime|content type/i.test(m))       return 'The ' + b + ' bucket is refusing this file type — run ' + setup + ' to allow it';
   return 'Upload failed: ' + (m || 'unknown error');
 }
 
