@@ -1123,7 +1123,14 @@
       if (res[0] && res[0].error) return fail();
 
       ITEMS = {};
-      rows.forEach(function (it) { ITEMS[it.id] = it; });
+      rows.forEach(function (it) {
+        /* A buy link still reading TODO-<ASIN> has not been replaced with a
+           SiteStripe short link yet. It is a placeholder, not a URL, so it
+           is cleared here rather than rendered as a button that goes
+           nowhere — better no button than a broken one. */
+        if (it.buy_link && /^TODO-/i.test(it.buy_link)) it.buy_link = null;
+        ITEMS[it.id] = it;
+      });
       cs.forEach(function (c) { CAT_NAMES[c.slug] = c.name; });
       sl.forEach(function (x) { SELLERS[x.id] = x; });
       renderCart();

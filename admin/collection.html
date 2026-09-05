@@ -313,8 +313,8 @@
       </div>
       <div class="form-group">
         <label for="itemBuy">Buy Link (optional)</label>
-        <input type="url" id="itemBuy" placeholder="https://amzn.to/…"/>
-        <span class="hint">Sends the visitor off-site instead of into the cart.</span>
+        <input type="text" id="itemBuy" placeholder="https://amzn.to/…" oninput="paintBuyHint()"/>
+        <span class="hint" id="buyHint">Sends the visitor off-site instead of into the cart.</span>
       </div>
       <div class="form-group">
         <label for="itemAffiliateSeller">Buy Link Goes To</label>
@@ -468,6 +468,7 @@ function editItem(id) {
     item.price_paise == null ? '' : (item.price_paise / 100);
   document.getElementById('itemPrimaryCta').value = item.primary_cta || 'cart';
   document.getElementById('itemStageBg').value = item.popup_bg || '';
+  paintBuyHint();
   document.getElementById('itemInStock').checked = item.in_stock !== false;
   fillSellerSelects(item.seller_id || '', item.affiliate_seller_id || '');
   document.getElementById('itemComingSoon').checked = !!item.coming_soon;
@@ -961,6 +962,29 @@ function storageError(error, bucket) {
   if (/payload too large|exceeded|size/i.test(m)) return 'Rejected as too large for the ' + b + ' bucket';
   if (/mime|content type/i.test(m))       return 'The ' + b + ' bucket is refusing this file type — run ' + setup + ' to allow it';
   return 'Upload failed: ' + (m || 'unknown error');
+}
+
+/* A buy link imported as TODO-<ASIN> is a placeholder holding the Amazon
+   product id. Rather than leave you searching for the product again, the
+   hint turns it into a link straight to that page — open it, take the
+   SiteStripe short link, paste it back over the placeholder.
+
+   The public pages refuse to render a button for a TODO- link, so a piece
+   published before this is done shows no buy button rather than a broken
+   one. */
+function paintBuyHint() {
+  const el = document.getElementById('itemBuy');
+  const hint = document.getElementById('buyHint');
+  if (!el || !hint) return;
+  const m = (el.value || '').trim().match(/^TODO-([A-Z0-9]{10})$/i);
+  if (m) {
+    const asin = m[1].toUpperCase();
+    hint.innerHTML = '<strong>Placeholder — no commission yet.</strong> ' +
+      '<a href="https://www.amazon.in/dp/' + asin + '" target="_blank" rel="noopener">' +
+      'Open ' + asin + ' on Amazon →</a> then paste the SiteStripe short link over this.';
+    return;
+  }
+  hint.textContent = 'Sends the visitor off-site instead of into the cart.';
 }
 
 function rupeesToPaise(v) {
