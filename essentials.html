@@ -699,14 +699,17 @@
   // megabytes nobody asked for. Tiles carry a photo; the model is fetched only
   // once a piece is opened.
   function stage(item) {
+    // Either kind of model earns the badge — a visitor does not care
+    // which file format is behind it.
+    var has3d = item.model_url || item.spline_url;
     if (item.image_url) {
       return '<div class="stage">' +
-        (item.model_url ? '<span class="badge3d">3D</span>' : '') +
+        (has3d ? '<span class="badge3d">3D</span>' : '') +
         (item.coming_soon ? '<span class="badge-soon">Coming soon</span>' : '') +
         '<img src="' + esc(item.image_url) + '" alt="' + esc(item.name) + '" loading="lazy" decoding="async"/></div>';
     }
     return '<div class="stage">' +
-      (item.model_url ? '<span class="badge3d">3D</span>' : '') +
+      (has3d ? '<span class="badge3d">3D</span>' : '') +
       (item.coming_soon ? '<span class="badge-soon">Coming soon</span>' : '') +
       '<span class="stage-ph"><img src="favicon.png" alt="" aria-hidden="true"/></span></div>';
   }
@@ -945,6 +948,22 @@
     second.innerHTML = secondHtml;
     second.style.display = secondHtml ? '' : 'none';
 
+    /* The Spline runtime, fetched the first time a piece actually needs
+       it and never again. Same version the room pages use. */
+    var splineReady = null;
+    function loadSpline() {
+      if (splineReady) return splineReady;
+      splineReady = new Promise(function (resolve, reject) {
+        var t = document.createElement('script');
+        t.type = 'module';
+        t.src = 'https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js';
+        t.onload = resolve;
+        t.onerror = reject;
+        document.head.appendChild(t);
+      });
+      return splineReady;
+    }
+
     var line = soldByLine(it);
     soldBy.textContent = line;
     soldBy.style.display = line ? '' : 'none';
@@ -964,6 +983,28 @@
 
     document.getElementById('detail').classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    /* A Spline close-up, straight from the dot this piece came from. The
+       room shows the same scene; nothing is duplicated but the URL. */
+    if (!it.model_url && it.spline_url) {
+      status.textContent = 'Preparing the 3D view';
+      loadSpline().then(function () {
+        // The sheet may have been closed, or another piece opened, while
+        // the runtime was downloading.
+        if (!document.getElementById('detail').classList.contains('open')) return;
+        var sv = document.createElement('spline-viewer');
+        sv.setAttribute('url', it.spline_url);
+        sv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+        stageEl.insertBefore(sv, poster);
+        dViewer = sv;
+        poster.classList.add('gone');
+        hint.classList.add('show');
+        status.textContent = '';
+      }, function () {
+        status.textContent = 'The 3D view could not be loaded';
+      });
+      return;
+    }
 
     if (!it.model_url) {
       status.textContent = it.image_url ? 'Photograph only' : 'No 3D view yet';
@@ -1109,7 +1150,7 @@
         console.warn('The Essentials needs admin/add-essentials-section.sql to be run.');
         return { data: [] };
       }
-      return askItems('id,name,category,price,image_url,description,coming_soon');
+      return askItems('id,name,category,price,image_url,description,coming_soon,spline_url');
     });
     // Categories are optional in the same way: before
     // setup-collection-categories.sql is run there is no table, and the page
