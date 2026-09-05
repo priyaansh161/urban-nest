@@ -388,8 +388,15 @@ async function setSection(next) {
   // A form left open belongs to the section it was opened in.
   if (typeof resetForm === 'function') { try { resetForm(); } catch (e) {} }
   if (typeof resetCatForm === 'function') { try { resetCatForm(); } catch (e) {} }
+  // The category select keeps an unfamiliar slug as a phantom option so a
+  // piece on a legacy slug is never silently moved. Across a section switch
+  // that rule works against us: the selection left over from the other
+  // section survives as an option that does not belong here, and a piece
+  // could be filed under it. Clear it before and after the reload.
+  document.getElementById('itemCategory').value = '';
   await loadCategories();
   await loadItems();
+  fillCategorySelect('');
 }
 
 (async () => { await requireAuth(); await loadCategories(); await loadSellersList(); loadItems(); })();
