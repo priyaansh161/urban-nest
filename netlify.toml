@@ -11,6 +11,20 @@
     Access-Control-Allow-Origin = "*"
     Content-Type = "application/octet-stream"
 
+# ── THE PRINTED QR ──
+# The QR on the visiting card encodes /hello, not the homepage. A printed
+# QR is set in ink; where /hello *goes* is the line below, and that can be
+# changed whenever without reprinting a box of cards.
+#
+# 302, deliberately, not 301. A 301 says "moved permanently" and phones
+# cache it hard — a device that followed /hello once would keep going to
+# the old destination long after this line changed, which is exactly the
+# thing the redirect exists to prevent.
+[[redirects]]
+  from = "/hello"
+  to = "/"
+  status = 302
+
 # ── CHECKOUT FUNCTIONS ──
 # The three endpoints in netlify/functions/. They live outside dist/ on
 # purpose: build-site.mjs assembles dist from an allow list of static files,
