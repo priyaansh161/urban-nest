@@ -997,9 +997,26 @@
         sv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
         stageEl.insertBefore(sv, poster);
         dViewer = sv;
-        poster.classList.add('gone');
-        hint.classList.add('show');
-        status.textContent = '';
+
+        /* spline-viewer fires no load event — not 'load', 'load-complete',
+           'ready' or any other name; the room pages do not listen for one
+           either. So the poster is held until the viewer has actually put a
+           canvas in its shadow root, and a beat longer for the first frame.
+           Dropping it when the runtime finished downloading, as this used to,
+           showed an empty stage while the scene was still coming down. */
+        var waited = 0;
+        var settle = setInterval(function () {
+          waited += 150;
+          var drawn = sv.shadowRoot && sv.shadowRoot.querySelector('canvas');
+          if (!drawn && waited < 9000) return;
+          clearInterval(settle);
+          setTimeout(function () {
+            if (dViewer !== sv) return;   // another piece was opened meanwhile
+            poster.classList.add('gone');
+            hint.classList.add('show');
+            status.textContent = drawn ? '' : 'The 3D view is taking a while';
+          }, drawn ? 400 : 0);
+        }, 150);
       }, function () {
         status.textContent = 'The 3D view could not be loaded';
       });
