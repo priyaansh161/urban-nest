@@ -987,6 +987,15 @@
     /* A Spline close-up, straight from the dot this piece came from. The
        room shows the same scene; nothing is duplicated but the URL. */
     if (!it.model_url && it.spline_url) {
+      /* A Spline close-up is an object on a transparent background, and
+         most of these are dark — a grey spatula rest on the near-black
+         stage is invisible, which reads as a broken viewer rather than a
+         dark object. They open on the light ground instead. Not recorded
+         as a preference, and never over a choice already made. */
+      var chosenBg = null;
+      try { chosenBg = localStorage.getItem('un-stage-bg'); } catch (e) {}
+      if (!chosenBg) setStageBg('light', false);
+
       status.textContent = 'Preparing the 3D view';
       loadSpline().then(function () {
         // The sheet may have been closed, or another piece opened, while
@@ -1062,11 +1071,15 @@
     dViewer = mv;
   }
 
-  function setStageBg(mode) {
+  /* remember === false sets the background without recording it as a
+     preference — used when a piece opens on the ground that suits it,
+     which must not overwrite a choice the visitor made themselves. */
+  function setStageBg(mode, remember) {
     document.getElementById('dStage').classList.toggle('light', mode === 'light');
     var dots = document.querySelectorAll('.d-bg-btn');
     for (var i = 0; i < dots.length; i++)
       dots[i].setAttribute('aria-pressed', String(dots[i].getAttribute('data-bg') === mode));
+    if (remember === false) return;
     try { localStorage.setItem('un-stage-bg', mode); } catch (e) {}
   }
   // Restore the choice before the first piece is opened, so the sheet never
