@@ -445,6 +445,11 @@
     object-fit: cover !important; display: block !important;
   }
   nav .nav-logo-text {
+    /* Stated here rather than inherited from .nav-logo. About, The Nest
+       Edit and Join each set their own colour on this element, and an
+       inherited value loses to any rule that matches directly — so in
+       light mode the wordmark went near-black on the teal bar. */
+    color: var(--topbar-ink) !important;
     font-family: 'Bodoni Moda', Didot, Georgia, serif !important;
     font-size: 15px !important; letter-spacing: 0.18em !important;
     white-space: nowrap !important; font-weight: 400 !important;
