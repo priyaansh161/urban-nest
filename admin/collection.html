@@ -280,7 +280,13 @@
       </div>
       <div class="form-group">
         <label for="itemImage">Image URL</label>
-        <input type="url" id="itemImage" placeholder="https://…"/>
+        <div class="field-row">
+          <input type="url" id="itemImage" placeholder="https://…"/>
+          <button type="button" class="btn btn-secondary" id="imageUploadBtn"
+                  onclick="document.getElementById('imageFile').click()">Upload photo</button>
+        </div>
+        <input type="file" id="imageFile" accept="image/*" style="display:none" onchange="uploadImage(this)"/>
+        <span class="hint" id="imageHint">Choose a photograph and it goes to Supabase Storage &mdash; no dashboard, no copying URLs. Shrunk to 1600px and saved as WebP on the way, because a tile is 374px wide and a 3&nbsp;MB photograph in it is the slowest thing on the site.</span>
       </div>
       <div class="form-group full">
         <label for="itemModel">3D Model URL (optional)</label>
@@ -864,6 +870,75 @@ async function uploadModel(input) {
 
 // Both likely failures are fixed in the Supabase dashboard, so name them
 // rather than passing the raw message through.
+/* Draws the file into a canvas no larger than IMAGE_MAX on its long edge
+   and re-encodes it. A 5600px camera original becomes a ~150 KB WebP, and
+   the tile it lands in is 374px wide. */
+const IMAGE_BUCKET = 'Blog Images';   // the bucket the photographs already live in
+const IMAGE_MAX    = 1600;
+
+function shrinkImage(file) {
+  return new Promise(function (resolve, reject) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function () {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, IMAGE_MAX / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      c.toBlob(function (blob) {
+        // A browser without WebP encoding returns null; the original then
+        // goes up unchanged rather than the upload failing.
+        resolve(blob ? { blob: blob, w: w, h: h, type: 'image/webp', ext: 'webp' }
+                     : { blob: file, w: img.width, h: img.height, type: file.type, ext: (file.name.split('.').pop() || 'jpg') });
+      }, 'image/webp', 0.82);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('That file could not be read as an image')); };
+    img.src = url;
+  });
+}
+
+async function uploadImage(input) {
+  const file = input.files && input.files[0];
+  input.value = '';
+  if (!file) return;
+
+  const btn  = document.getElementById('imageUploadBtn');
+  const hint = document.getElementById('imageHint');
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Uploading…';
+
+  let shrunk;
+  try { shrunk = await shrinkImage(file); }
+  catch (e) { btn.disabled = false; btn.textContent = label; showToast(e.message, 'error'); return; }
+
+  const beforeKb = Math.round(file.size / 1024);
+  const afterKb  = Math.round(shrunk.blob.size / 1024);
+  hint.textContent = `Uploading — ${beforeKb} KB down to ${afterKb} KB at ${shrunk.w}x${shrunk.h}.`;
+
+  const base = slugify(document.getElementById('itemName').value)
+            || slugify(file.name.replace(/\.[^.]+$/, ''))
+            || 'piece';
+  const path = `${base}-${Date.now().toString(36)}.${shrunk.ext}`;
+
+  // Same Blob re-wrap as the model upload: supabase-js only honours
+  // contentType on the raw-body path, so the type has to be on the Blob.
+  const body = new Blob([shrunk.blob], { type: shrunk.type });
+  const { error } = await db.storage.from(IMAGE_BUCKET).upload(path, body, {
+    contentType: shrunk.type, cacheControl: '31536000', upsert: false,
+  });
+
+  btn.disabled = false; btn.textContent = label;
+
+  if (error) { hint.textContent = 'Upload failed.'; showToast(storageError(error), 'error'); return; }
+
+  const { data } = db.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+  document.getElementById('itemImage').value = data.publicUrl;
+  hint.textContent = `Uploaded — ${afterKb} KB at ${shrunk.w}x${shrunk.h}. The URL is in the field above.`;
+  showToast('Photograph uploaded');
+}
+
 function storageError(error) {
   const m = (error && error.message) || '';
   if (/bucket not found/i.test(m))        return 'No "models" bucket yet — create a public bucket called models in Supabase → Storage';
