@@ -1131,6 +1131,15 @@
     bedroom:     'images/room-bedroom.webp',
     bathroom:    'images/room-bath.webp',
     kitchen:     'images/room-kitchen.webp',
+    /* The Essentials slugs, which are not the Collection's. Without these
+       every one of them fell through to CAT_FALLBACK_ANY — so Kitchen and
+       Bath both showed the same white vase until a real tile photograph
+       is set on the category. */
+    'kitchen-essentials': 'images/tile-kitchen.webp',
+    'bath-essentials':    'images/tile-bath.webp',
+    storage:              'images/det-knobs.webp',
+    desk:                 'images/det-handle.webp',
+    entryway:             'images/det-tap.webp',
   };
   var CAT_FALLBACK_ANY = 'images/tile-vase.webp';
 

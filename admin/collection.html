@@ -222,7 +222,7 @@
         <div class="form-group">
           <label for="catSlug">Slug</label>
           <input type="text" id="catSlug" placeholder="chandeliers"/>
-          <span class="hint">Its address — <strong>collection.html?c=chandeliers</strong> — and the value stored on each item. Changing it on a live category detaches every piece already filed under it.</span>
+          <span class="hint">Its address — <strong id="slugAddr">collection.html?c=chandeliers</strong> — and the value stored on each item. Changing it on a live category detaches every piece already filed under it.</span>
         </div>
         <div class="form-group full">
           <label for="catSummary">Summary</label>
@@ -391,6 +391,16 @@ const SECTION_COPY = {
   essentials: ['Essentials', 'Cheap, available and good \u2014 the things a home runs on that no shop puts in front of you']
 };
 
+/* The slug hint names the page a category will live on, and that page is
+   different for each section. It said collection.html on both. */
+function paintSlugAddr() {
+  const el = document.getElementById('slugAddr');
+  if (!el) return;
+  const page = currentSection === 'essentials' ? 'essentials.html' : 'collection.html';
+  const slug = (document.getElementById('catSlug') || {}).value || 'chandeliers';
+  el.textContent = page + '?c=' + slug;
+}
+
 async function setSection(next) {
   if (next === currentSection) return;
   currentSection = next;
@@ -398,6 +408,7 @@ async function setSection(next) {
   document.getElementById('sectionHeading').textContent = heading;
   document.getElementById('sectionBlurb').innerHTML = blurb;
   document.getElementById('secCollection').classList.toggle('on', next === 'collection');
+  paintSlugAddr();
   document.getElementById('secEssentials').classList.toggle('on', next === 'essentials');
   // A form left open belongs to the section it was opened in.
   if (typeof resetForm === 'function') { try { resetForm(); } catch (e) {} }
@@ -413,7 +424,7 @@ async function setSection(next) {
   fillCategorySelect('');
 }
 
-(async () => { await requireAuth(); await loadCategories(); await loadSellersList(); loadItems(); })();
+(async () => { await requireAuth(); await loadCategories(); await loadSellersList(); loadItems(); paintSlugAddr(); })();
 
 async function loadItems() {
   const { data, error } = await db.from('collection_items')
