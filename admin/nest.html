@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/admin/config.js"></script>
 <script src="/admin/auth.js"></script>
+<script src="/admin/image-upload.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
@@ -78,6 +79,8 @@
   .fmt-select option[value="h3"] { font-size: 16px; }
   .fmt-select option[value="h4"] { font-size: 13.5px; }
   .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+  .field-row { display: flex; gap: 10px; align-items: stretch; }
+  .field-row input { flex: 1; min-width: 0; }
   .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
   .btn-primary { background: var(--black); color: var(--white); }
   .btn-primary:hover { background: #222; }
@@ -219,7 +222,15 @@
       </div>
       <div class="form-group full">
         <label for="postImage">Cover Image URL (optional)</label>
-        <input type="url" id="postImage" placeholder="https://…"/>
+        <div class="field-row">
+          <input type="url" id="postImage" placeholder="https://…"/>
+          <button type="button" class="btn btn-secondary" id="postImageBtn"
+                  onclick="document.getElementById('postImageFile').click()">Upload</button>
+        </div>
+        <input type="file" id="postImageFile" accept="image/*" style="display:none"
+               data-target="postImage" data-btn="postImageBtn" data-hint="postImageHint" data-name="postTitle"
+               onchange="uploadImage(this)"/>
+        <span class="hint" id="postImageHint">Choose a photograph and it goes straight to Supabase Storage — shrunk to 1600px and saved as WebP on the way, then the URL fills itself.</span>
       </div>
       <div class="form-group">
         <label for="postSlug">Slug (optional)</label>

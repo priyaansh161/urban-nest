@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/admin/config.js"></script>
 <script src="/admin/auth.js"></script>
+<script src="/admin/image-upload.js"></script>
 <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,6 +47,8 @@
   input:focus, select:focus { border-color: var(--gold); }
   .form-hint { font-size: 11px; color: var(--grey); margin-top: 4px; line-height: 1.5; }
   .form-actions { display: flex; gap: 12px; margin-top: 8px; }
+  .field-row { display: flex; gap: 10px; align-items: stretch; }
+  .field-row input { flex: 1; min-width: 0; }
   .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
   .btn-primary { background: var(--black); color: var(--white); }
   .btn-primary:hover { background: #222; }
@@ -151,8 +154,15 @@
         </div>
         <div class="form-group">
           <label for="sceneCover">Cover Image URL</label>
-          <input type="url" id="sceneCover" placeholder="https://…"/>
-          <span class="form-hint">The photo on this scene's homepage tile. Leave empty and a stock shot for the room is used.</span>
+          <div class="field-row">
+            <input type="url" id="sceneCover" placeholder="https://…"/>
+            <button type="button" class="btn btn-secondary" id="sceneCoverBtn"
+                    onclick="document.getElementById('sceneCoverFile').click()">Upload</button>
+          </div>
+          <input type="file" id="sceneCoverFile" accept="image/*" style="display:none"
+                 data-target="sceneCover" data-btn="sceneCoverBtn" data-hint="sceneCoverHint" data-name="sceneName"
+                 onchange="uploadImage(this)"/>
+          <span class="form-hint" id="sceneCoverHint">The photo on this scene's homepage tile. Leave empty and a stock shot for the room is used.</span>
         </div>
         <div class="form-group">
           <label for="sceneUrl">Spline Scene URL</label>
