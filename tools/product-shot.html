@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Product Shot · Urban Nest</title>
+<!--
+  Puts an Urban Nest background behind a product photograph.
+
+  WHY: retailer photographs are shot on white. Dropped into a tile on the
+  teal, a white square reads as a sticker rather than as a piece. This
+  puts the same ground behind every one of them, so a page of listings
+  looks chosen rather than collected.
+
+  TWO MODES, AND MAT IS THE DEFAULT ON PURPOSE:
+
+    Mat     keeps the photograph whole and sets it on a coloured field
+            with room around it. Works on every image, cannot go wrong.
+
+    Cutout  drops near-white pixels so the object sits directly on the
+            background. Looks better — but it keys on white, so it eats
+            any part of the product that IS white. A white toilet brush
+            on a white background is exactly the case it cannot do.
+            Preview before trusting it.
+
+  No build step and no dependencies, like the rest of this project.
+  Open the file, drop a photograph, download the result.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --teal: #0E3238; --paper: #F4F3EF; --ink: #0D0D0D;
+    --muted: #6B6B68; --line: #E4E3DE; --gold: #A37B3F;
+  }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--paper); color: var(--ink); line-height: 1.6; }
+
+  header { background: var(--teal); color: #F5F7F6; padding: 22px 32px; }
+  header h1 { font-family: 'Bodoni Moda', serif; font-size: 22px; font-weight: 400; letter-spacing: .04em; }
+  header p { font-size: 12.5px; color: rgba(245,247,246,.66); margin-top: 3px; }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 28px 32px 80px; display: grid; grid-template-columns: 300px 1fr; gap: 32px; align-items: start; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+
+  .panel { background: #fff; border: 1px solid var(--line); padding: 20px; }
+  .panel h2 { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+
+  label { display: block; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 16px 0 6px; }
+  label:first-of-type { margin-top: 0; }
+
+  input[type=file] { width: 100%; font: inherit; font-size: 13px; }
+  input[type=range] { width: 100%; }
+  select, button { font: inherit; }
+  select { width: 100%; padding: 9px 10px; border: 1px solid var(--line); background: #fff; }
+
+  .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sw { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); cursor: pointer; }
+  .sw[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gold); }
+
+  .btn { display: inline-block; width: 100%; margin-top: 18px; padding: 12px; border: 0; cursor: pointer;
+         background: var(--ink); color: #fff; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); margin-top: 8px; }
+
+  .hint { display: block; font-size: 11.5px; color: var(--muted); line-height: 1.6; margin-top: 8px; }
+  .warn { border-left: 2px solid var(--gold); padding-left: 10px; }
+
+  .stage { background: #fff; border: 1px solid var(--line); padding: 20px; }
+  .stage canvas { width: 100%; height: auto; display: block; background:
+      repeating-conic-gradient(#f0efea 0% 25%, #fff 0% 50%) 50% / 18px 18px; }
+  .meta { font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .empty { display: grid; place-items: center; min-height: 320px; color: var(--muted); font-size: 13px; text-align: center; }
+  /* display:grid above beats the browser's own [hidden] { display: none },
+     so hiding it has to be said again — otherwise the placeholder stays
+     sitting over the canvas once a photograph is loaded. */
+  .empty[hidden] { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Product Shot</h1>
+  <p>Puts an Urban Nest ground behind a retailer photograph, sized for a tile.</p>
+</header>
+
+<main>
+  <div class="panel">
+    <h2>Source</h2>
+    <input type="file" id="file" accept="image/*"/>
+    <span class="hint">A photograph from the retailer, or your own.</span>
+
+    <label>Background</label>
+    <div class="swatches" id="swatches"></div>
+
+    <label>Treatment</label>
+    <select id="mode">
+      <option value="mat">Mat — keep the photo whole</option>
+      <option value="cutout">Cutout — drop the white behind the object</option>
+    </select>
+    <span class="hint warn" id="modeHint"></span>
+
+    <label>Padding <span id="padOut">12%</span></label>
+    <input type="range" id="pad" min="0" max="30" value="12"/>
+
+    <label id="tolWrap" hidden>White tolerance <span id="tolOut">18</span></label>
+    <input type="range" id="tol" min="2" max="60" value="18" hidden/>
+
+    <label>Size</label>
+    <select id="size">
+      <option value="1200">1200 × 1200</option>
+      <option value="1600" selected>1600 × 1600</option>
+      <option value="900">900 × 900</option>
+    </select>
+
+    <button class="btn" id="download" disabled>Download .webp</button>
+    <button class="btn secondary" id="downloadPng" disabled>Download .png</button>
+    <span class="hint">Then upload it with the Upload&nbsp;photo button in Admin&nbsp;→&nbsp;Collection.</span>
+  </div>
+
+  <div class="stage">
+    <div class="empty" id="empty">Choose a photograph to begin.</div>
+    <canvas id="out" hidden></canvas>
+    <div class="meta" id="meta"></div>
+  </div>
+</main>
+
+<script>
+/* The grounds worth having. Teal is the top bar and the page heroes;
+   paper is the body of every light page. The two gradients are the same
+   colours with somewhere for the eye to go. */
+const BACKGROUNDS = [
+  { id: 'teal',      label: 'Teal',            css: '#0E3238' },
+  { id: 'tealsoft',  label: 'Teal, graded',    grad: ['#134048', '#0B282D'] },
+  { id: 'paper',     label: 'Paper',           css: '#F4F3EF' },
+  { id: 'papersoft', label: 'Paper, graded',   grad: ['#FFFFFF', '#EDEBE4'] },
+  { id: 'stone',     label: 'Stone',           css: '#E4E3DE' },
+  { id: 'ink',       label: 'Ink',             css: '#0D0D0D' },
+  { id: 'none',      label: 'Transparent',     css: null }
+];
+
+let bg = BACKGROUNDS[0], img = null;
+
+const $ = id => document.getElementById(id);
+
+/* swatches */
+const swWrap = $('swatches');
+BACKGROUNDS.forEach((b, i) => {
+  const el = document.createElement('button');
+  el.className = 'sw';
+  el.type = 'button';
+  el.title = b.label;
+  el.setAttribute('aria-pressed', String(i === 0));
+  el.style.background = b.grad ? 'linear-gradient(160deg,' + b.grad[0] + ',' + b.grad[1] + ')'
+                     : (b.css || 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 10px 10px');
+  el.onclick = () => {
+    bg = b;
+    [...swWrap.children].forEach((c, j) => c.setAttribute('aria-pressed', String(j === i)));
+    render();
+  };
+  swWrap.appendChild(el);
+});
+
+const MODE_HINT = {
+  mat: 'Safe on any photograph. The whole image is placed on the ground, so nothing can be cut away by mistake.',
+  cutout: 'Keys on white, so it removes white parts of the product too. Fine for a dark object on white; wrong for a white one. Check the preview.'
+};
+
+function paintModeHint() {
+  $('modeHint').textContent = MODE_HINT[$('mode').value];
+  const cut = $('mode').value === 'cutout';
+  $('tolWrap').hidden = !cut;
+  $('tol').hidden = !cut;
+}
+paintModeHint();
+
+$('mode').onchange = () => { paintModeHint(); render(); };
+$('pad').oninput = () => { $('padOut').textContent = $('pad').value + '%'; render(); };
+$('tol').oninput = () => { $('tolOut').textContent = $('tol').value; render(); };
+$('size').onchange = render;
+
+$('file').onchange = e => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  const url = URL.createObjectURL(f);
+  const i = new Image();
+  i.onload = () => { URL.revokeObjectURL(url); img = i; render(); };
+  i.onerror = () => { URL.revokeObjectURL(url); alert('That file could not be read as an image.'); };
+  i.src = url;
+};
+
+/* Removes near-white pixels. Feathered rather than a hard cut: a pixel
+   part of the way to white loses part of its alpha, so the edge does not
+   come out jagged. */
+function knockOutWhite(ctx, w, h, tol) {
+  const d = ctx.getImageData(0, 0, w, h);
+  const p = d.data;
+  const hard = 255 - tol;          // at or above this, fully transparent
+  const soft = hard - tol * 1.6;   // below this, fully kept
+  for (let i = 0; i < p.length; i += 4) {
+    const min = Math.min(p[i], p[i + 1], p[i + 2]);
+    if (min >= hard) { p[i + 3] = 0; continue; }
+    if (min > soft) p[i + 3] = Math.round(p[i + 3] * (hard - min) / (hard - soft));
+  }
+  ctx.putImageData(d, 0, 0);
+}
+
+function render() {
+  if (!img) return;
+  const S = parseInt($('size').value, 10);
+  const pad = parseInt($('pad').value, 10) / 100;
+  const c = $('out');
+  c.width = S; c.height = S;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, S, S);
+
+  if (bg.grad) {
+    const g = ctx.createLinearGradient(0, 0, S, S);
+    g.addColorStop(0, bg.grad[0]); g.addColorStop(1, bg.grad[1]);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+  } else if (bg.css) {
+    ctx.fillStyle = bg.css; ctx.fillRect(0, 0, S, S);
+  }
+
+  // The photograph, fitted inside the padding with its ratio kept.
+  const box = S * (1 - pad * 2);
+  const scale = Math.min(box / img.width, box / img.height);
+  const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+  const x = Math.round((S - w) / 2), y = Math.round((S - h) / 2);
+
+  if ($('mode').value === 'cutout') {
+    // Knocked out on its own canvas first, so the erase cannot touch the
+    // background already painted underneath.
+    const t = document.createElement('canvas');
+    t.width = w; t.height = h;
+    const tc = t.getContext('2d');
+    tc.drawImage(img, 0, 0, w, h);
+    knockOutWhite(tc, w, h, parseInt($('tol').value, 10));
+    ctx.drawImage(t, x, y);
+  } else {
+    ctx.drawImage(img, x, y, w, h);
+  }
+
+  c.hidden = false;
+  $('empty').hidden = true;
+  $('meta').textContent = 'Source ' + img.width + ' × ' + img.height +
+    '  ·  output ' + S + ' × ' + S + '  ·  ' + bg.label.toLowerCase() +
+    ', ' + $('mode').value + ', ' + $('pad').value + '% padding';
+  $('download').disabled = false;
+  $('downloadPng').disabled = false;
+}
+
+function save(type, ext) {
+  $('out').toBlob(b => {
+    if (!b) { alert('This browser could not encode ' + ext + '.'); return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(b);
+    a.download = 'product-' + Date.now().toString(36) + '.' + ext;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  }, type, 0.9);
+}
+$('download').onclick = () => save('image/webp', 'webp');
+$('downloadPng').onclick = () => save('image/png', 'png');
+</script>
+</body>
+</html>
