@@ -50,11 +50,13 @@ begin
     admin_test := 'auth.role() = ''authenticated''';
   end if;
 
-  -- Read: anyone. Visitors are never signed in, so models must be
-  -- world-readable. Nothing private goes in this bucket.
+  -- Read: no policy, deliberately. The bucket is public, so a model is
+  -- already served through /object/public/… with no auth and no policy —
+  -- that is what public means. A SELECT policy adds nothing to it and
+  -- does grant list(), which let an unauthenticated caller pull a full
+  -- inventory of all 28 models in one request. Dropped here so re-running
+  -- this script removes it. See admin/tighten-storage-read.sql.
   execute 'drop policy if exists "Models are readable by anyone" on storage.objects';
-  execute 'create policy "Models are readable by anyone" on storage.objects
-             for select using (bucket_id = ''Models'')';
 
   -- Write: admin only.
   execute 'drop policy if exists "Admin uploads models" on storage.objects';

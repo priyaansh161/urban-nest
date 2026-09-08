@@ -42,9 +42,13 @@ begin
     admin_test := 'auth.role() = ''authenticated''';
   end if;
 
+  -- Read: no policy, deliberately. The bucket is public, so a photograph
+  -- is already served through /object/public/… with no auth and no policy.
+  -- A SELECT policy adds nothing to that and does grant list(), which let
+  -- an unauthenticated caller pull the whole file list — including photos
+  -- for pieces not published yet. Dropped here so re-running this script
+  -- removes it. See admin/tighten-storage-read.sql.
   execute 'drop policy if exists "Images are readable by anyone" on storage.objects';
-  execute 'create policy "Images are readable by anyone" on storage.objects
-             for select using (bucket_id = ''Blog Images'')';
 
   execute 'drop policy if exists "Admin uploads images" on storage.objects';
   execute 'create policy "Admin uploads images" on storage.objects
