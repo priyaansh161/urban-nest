@@ -987,17 +987,6 @@
     /* A Spline close-up, straight from the dot this piece came from. The
        room shows the same scene; nothing is duplicated but the URL. */
     if (!it.model_url && it.spline_url) {
-      /* A Spline close-up is an object on a transparent background, so
-         whether it can be seen depends on what is behind it: the dark grey
-         spatula rest disappears on the near-black stage, the pale blue
-         shower mat disappears on the cream one. No single default suits
-         both, so each piece carries its own — popup_bg, set in the admin,
-         null meaning the dark the stage has always defaulted to.
-         Not recorded as a preference, and never over a choice already made. */
-      var chosenBg = null;
-      try { chosenBg = localStorage.getItem('un-stage-bg'); } catch (e) {}
-      if (!chosenBg) setStageBg(it.popup_bg === 'light' ? 'light' : 'dark', false);
-
       status.textContent = 'Preparing the 3D view';
       loadSpline().then(function () {
         // The sheet may have been closed, or another piece opened, while
@@ -1073,15 +1062,11 @@
     dViewer = mv;
   }
 
-  /* remember === false sets the background without recording it as a
-     preference — used when a piece opens on the ground that suits it,
-     which must not overwrite a choice the visitor made themselves. */
-  function setStageBg(mode, remember) {
+  function setStageBg(mode) {
     document.getElementById('dStage').classList.toggle('light', mode === 'light');
     var dots = document.querySelectorAll('.d-bg-btn');
     for (var i = 0; i < dots.length; i++)
       dots[i].setAttribute('aria-pressed', String(dots[i].getAttribute('data-bg') === mode));
-    if (remember === false) return;
     try { localStorage.setItem('un-stage-bg', mode); } catch (e) {}
   }
   // Restore the choice before the first piece is opened, so the sheet never
@@ -1197,7 +1182,7 @@
         console.warn('The Essentials needs admin/add-essentials-section.sql to be run.');
         return { data: [] };
       }
-      return askItems('id,name,category,price,image_url,description,coming_soon,spline_url,popup_bg');
+      return askItems('id,name,category,price,image_url,description,coming_soon,spline_url');
     });
     // Categories are optional in the same way: before
     // setup-collection-categories.sql is run there is no table, and the page
