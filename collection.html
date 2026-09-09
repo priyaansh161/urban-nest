@@ -330,8 +330,10 @@
       /* Stacked, the mark lands on the stage rather than on the page, so it
          takes its colour from whichever background the swatches have set. */
       /* The touch wording is half again as long as the mouse one; without
-         this it wraps and the second line falls off the bottom edge. */
+         this it wraps to a second line. The smallest phones still in use
+         need the extra step down, the way the rooms shrink theirs. */
       .d-hint { letter-spacing: .1em; padding: 0 10px; }
+      @media (max-width: 360px) { .d-hint { font-size: 8px; letter-spacing: .06em; } }
       .sheet-close { color: rgba(234,242,241,.72); }
       .sheet:has(.d-stage.light) .sheet-close { color: rgba(16,16,16,.55); }
     }
@@ -907,7 +909,7 @@
      that actually work. Set once at load: a phone does not grow a mouse
      halfway through. */
   if (window.matchMedia('(pointer: coarse)').matches)
-    document.getElementById('dHint').textContent = 'One finger turns · two pan · pinch zooms';
+    document.getElementById('dHint').textContent = 'One finger to rotate · two to pan · pinch to zoom';
 
   function openDetail(id) {
     var it = ITEMS[id];
