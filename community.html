@@ -940,7 +940,10 @@
   <div id="articleOverlay" onclick="handleOverlayClick(event)">
     <div id="articleModal">
       <button class="modal-close" onclick="closeArticle()" title="Close">×</button>
-      <div class="modal-hero"><img id="modalImg" src="" alt=""/></div>
+      <!-- No src: an empty one is a request for this page, fetched and
+           then rejected as an image on every visit. openNestArticle fills
+           it in, and hides the hero entirely when a post has no picture. -->
+      <div class="modal-hero"><img id="modalImg" alt=""/></div>
       <div class="modal-body">
         <div id="modalCat" class="modal-cat"></div>
         <h2 id="modalTitle" class="modal-title"></h2>
