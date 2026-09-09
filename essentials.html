@@ -329,6 +329,9 @@
       .d-body { padding: 28px 22px 34px; max-height: none; overflow: visible; background: var(--white); }
       /* Stacked, the mark lands on the stage rather than on the page, so it
          takes its colour from whichever background the swatches have set. */
+      /* The touch wording is half again as long as the mouse one; without
+         this it wraps and the second line falls off the bottom edge. */
+      .d-hint { letter-spacing: .1em; padding: 0 10px; }
       .sheet-close { color: rgba(234,242,241,.72); }
       .sheet:has(.d-stage.light) .sheet-close { color: rgba(16,16,16,.55); }
     }
@@ -901,6 +904,13 @@
   // immediately; the model arrives behind the poster while they are read, and
   // fades in when it is ready — the same trade the rooms make.
   var dViewer = null;
+
+  /* The hint on the stage is written for a mouse. On a touch screen there
+     is no drag and no scroll wheel, so it is replaced with the gestures
+     that actually work. Set once at load: a phone does not grow a mouse
+     halfway through. */
+  if (window.matchMedia('(pointer: coarse)').matches)
+    document.getElementById('dHint').textContent = 'One finger turns · two pan · pinch zooms';
 
   function openDetail(id) {
     var it = ITEMS[id];
