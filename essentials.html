@@ -1006,6 +1006,9 @@
         if (!document.getElementById('detail').classList.contains('open')) return;
         var sv = document.createElement('spline-viewer');
         sv.setAttribute('url', it.spline_url);
+        // Set before it is in the page, so a piece opened in light mode never
+        // shows the scene's own dark ground on the way in.
+        sv.setAttribute('background', stageBg());
         sv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
         stageEl.insertBefore(sv, poster);
         dViewer = sv;
@@ -1074,11 +1077,32 @@
     dViewer = mv;
   }
 
+  /* The colour the stylesheet has settled on for the stage right now. Read
+     rather than repeated here, so the swatches, the CSS and the 3D view
+     cannot drift apart the way three copies of a hex code eventually do. */
+  function stageBg() {
+    var v = getComputedStyle(document.getElementById('dStage')).getPropertyValue('--stage-bg');
+    return (v || '').trim() || '#0F1F22';
+  }
+
   function setStageBg(mode) {
     document.getElementById('dStage').classList.toggle('light', mode === 'light');
     var dots = document.querySelectorAll('.d-bg-btn');
     for (var i = 0; i < dots.length; i++)
       dots[i].setAttribute('aria-pressed', String(dots[i].getAttribute('data-bg') === mode));
+
+    /* WHY THIS PAGE NEEDS A LINE THE COLLECTION DOES NOT. Every Collection
+       piece is a .glb shown in model-viewer, which draws on a transparent
+       canvas — the stage colour behind it is what you see, so toggling the
+       class is enough. Every Essentials piece came from a room and is a
+       Spline scene, and a Spline scene paints its own background across the
+       whole canvas. The class was flipping correctly and the stage really
+       was repainting; the canvas on top of it simply hid the result, which
+       is why the identical control looked broken here and fine there.
+       spline-viewer takes a background attribute — hand it the same colour. */
+    if (dViewer && dViewer.tagName === 'SPLINE-VIEWER')
+      dViewer.setAttribute('background', stageBg());
+
     try { localStorage.setItem('un-stage-bg', mode); } catch (e) {}
   }
   // Restore the choice before the first piece is opened, so the sheet never
