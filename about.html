@@ -477,6 +477,32 @@
     nav .nav-logo-text { font-size: 13px !important; letter-spacing: 0.13em !important; }
     nav .nav-right { gap: 8px !important; }
   }
+
+  /* ── PAGE HERO · SHARED ──
+     The teal band at the top of Collection, Essentials, Spaces, The Nest
+     Edit, About and Policies. This block is identical on all six pages and
+     sits last in each sheet, so it wins over the page's own older rules.
+
+     Measured before it existed, the six bands came out anywhere from 373
+     to 426px tall at 1440 wide, and 285 to 384 on a phone — four different
+     paddings, two subtitle sizes, and two layouts. The title was the same
+     72px everywhere; everything around it was not.
+
+     The height is now fixed rather than whatever the words add up to. The
+     title lands in the same place on every page, and a page with less to
+     say gets the same band with more room under it. Colour is deliberately
+     left to each page, so the light theme's own rules still apply. */
+  .page-hero { box-sizing: border-box; padding: 140px 48px 56px; min-height: 420px; }
+  .page-hero .hero-inner { max-width: 1280px; margin: 0 auto; position: relative; z-index: 1; display: block; }
+  /* Line height set here, not inherited: Spaces and Policies set a taller one
+     on body, which pushed their titles 3-5px lower than the other four. */
+  .page-hero .page-tag { font-size: 10px; line-height: 1.5; letter-spacing: .3em; text-transform: uppercase; margin-bottom: 20px; }
+  .page-hero .page-title { font-size: clamp(40px, 6vw, 72px); line-height: 1; max-width: none; }
+  .page-hero .page-sub { margin-top: 18px; max-width: 60ch; font-size: 14px; line-height: 1.9; padding: 0; }
+  @media (max-width: 768px) {
+    .page-hero { padding: 100px 20px 44px; min-height: 372px; }
+    .page-hero .page-title { font-size: 40px; }
+  }
 </style>
 </head>
 <body>
@@ -518,8 +544,10 @@
 
   <div class="page-hero">
     <div class="page-hero-bg"></div>
-    <div class="page-tag">WHO WE ARE</div>
-    <h1 class="page-title">We believe your home should feel like <em>you.</em></h1>
+    <div class="hero-inner">
+      <div class="page-tag">WHO WE ARE</div>
+      <h1 class="page-title">We believe your home should feel like <em>you.</em></h1>
+    </div>
   </div>
 
   <!-- OUR NEST -->
