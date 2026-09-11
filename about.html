@@ -100,8 +100,13 @@
     /* Two by two. The column this sits in caps at about 920px, so four
        across never fits and three leaves the fourth card stranded. */
     .contact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; margin-top: 8px; background: var(--border); }
-    .contact-card { background: var(--white); padding: 28px; transition: background 0.2s; }
-    .contact-card:hover { background: var(--grey-light); }
+    /* The whole box is the link: the anchor's ::after is stretched over the
+       card, so each card keeps exactly one real link (keyboard and screen
+       readers see no change) but a tap anywhere inside it follows that link. */
+    .contact-card { position: relative; background: var(--white); padding: 28px; transition: background 0.2s; }
+    .contact-card:hover, .contact-card:focus-within { background: var(--grey-light); }
+    .contact-card .contact-value::after { content: ''; position: absolute; inset: 0; }
+    .contact-card:hover .contact-value { color: var(--gold); }
     .contact-icon { font-size: 18px; margin-bottom: 14px; color: var(--gold); }
     .contact-type { font-size: 9px; letter-spacing: 0.22em; color: var(--gold); margin-bottom: 8px; }
     .contact-value { font-size: 14px; color: var(--black); text-decoration: none; display: block; transition: color 0.2s; line-height: 1.5; }
