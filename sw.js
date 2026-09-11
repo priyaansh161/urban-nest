@@ -38,6 +38,10 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
+  // Partial (Range) requests are the browser's business: a cached full file
+  // handed back for a byte range, or a 206 fragment cached as the whole
+  // file, would corrupt media and 3D downloads.
+  if (req.headers.has('range')) return;
 
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
