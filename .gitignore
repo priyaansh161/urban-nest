@@ -23,6 +23,10 @@ dist/
 # sharp alone is ~100 MB, and Netlify deploys whatever it is not told to ignore.
 tools/node_modules/
 
+# Screenshots from tools/regression.mjs. Retaken before every change, so
+# there is nothing here worth keeping.
+tools/regression/
+
 # never the raw project files
 *.blend
 *.fbx

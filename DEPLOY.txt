@@ -55,6 +55,34 @@ If you see that, it is live. Open the site and press Ctrl+Shift+R
 to force a fresh copy rather than the one your browser saved.
 
 
+BEFORE AND AFTER ANY CHANGE: THE REGRESSION CHECK
+----------------------------------------------------------
+
+To be sure a small change did not break a page nobody touched:
+
+  1. BEFORE you (or Claude) change anything, run:
+
+         node tools/regression.mjs --baseline
+
+     It photographs every page at laptop and phone size.
+
+  2. Make the change.
+
+  3. AFTER, before deploying, run:
+
+         node tools/regression.mjs
+
+     It photographs everything again and compares. Read the summary
+     it prints, or open tools\regression\report.html for before /
+     after / difference side by side.
+
+The page you edited should say CHANGED. If any OTHER page says
+CHANGED, or it lists a NEW ERROR, look at it before deploying.
+
+Take a fresh baseline every time: products in Supabase change, and a
+baseline from last week would show those as differences.
+
+
 THE ONE RULE
 ----------------------------------------------------------
 
