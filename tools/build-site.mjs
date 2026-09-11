@@ -25,7 +25,7 @@ const DIST = join(ROOT, 'dist');
 // Each rule is a folder plus the extensions that ship from it. `deep: false`
 // means the folder's own files only — its subfolders are working material.
 const RULES = [
-  { dir: '.',      exts: ['.html', '.splinecode', '.png', '.js', '.toml'], deep: false },
+  { dir: '.',      exts: ['.html', '.splinecode', '.png', '.js', '.toml', '.webmanifest'], deep: false },
   { dir: 'admin',  exts: ['.html', '.js'],                                 deep: false },
   { dir: 'images', exts: ['.webp', '.png', '.jpg', '.svg'],                deep: false },
   /* models/ is deliberately NOT here. Every one of the 21 listings with a 3D
