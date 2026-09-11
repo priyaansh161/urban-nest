@@ -68,7 +68,7 @@
   .chip { padding: 7px 13px; border: 0.5px solid var(--border); background: transparent; font-family: 'DM Sans', sans-serif; font-size: 10.5px; letter-spacing: 0.08em; color: var(--grey); cursor: pointer; transition: all 0.2s; }
   .chip:hover { color: var(--black); border-color: var(--black); }
   .chip[aria-pressed="true"] { background: var(--black); color: var(--white); border-color: var(--black); }
-  .swatches { display: flex; gap: 8px; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
   .swatch { width: 30px; height: 30px; border-radius: 50%; border: 0.5px solid var(--border); cursor: pointer; padding: 0; transition: box-shadow 0.2s, transform 0.2s; }
   .swatch:hover { transform: scale(1.1); }
   .swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--gold); }
@@ -123,7 +123,7 @@
 
   .mini-row { display: flex; gap: 10px; align-items: stretch; }
   .mini-row input[type="text"] { flex: 1; }
-  .mini-preview { width: 62px; aspect-ratio: 9 / 16; background: #0F1F22; flex-shrink: 0;
+  .mini-preview { width: 62px; aspect-ratio: 9 / 16; background: #0E3238; flex-shrink: 0;
                    box-shadow: 0 3px 10px rgba(17,17,16,0.16); }
 
   .btn { padding: 12px 22px; border: none; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
@@ -142,7 +142,7 @@
      whole time — there is nothing to pose. */
   .stage-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
   #stage { position: relative; overflow: hidden; aspect-ratio: 9 / 16; height: min(82vh, 920px);
-           background: #0F1F22; box-shadow: 0 14px 50px rgba(17,17,16,0.16); }
+           background: #0E3238; box-shadow: 0 14px 50px rgba(17,17,16,0.16); }
   #mv, #sv { width: 100%; height: 100%; background: transparent; --poster-color: transparent; }
   #sheet { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
   #stage.showing-canvas #sheet { display: block; }
@@ -460,12 +460,27 @@
 
       <div class="ctrl-group">
         <span class="ctrl-label">Ground</span>
+        <!-- Four families, in order: the brand teals, the blues, pale tints,
+             neutrals. Every dark one keeps white text above 5:1 and every
+             light one keeps the dark ink above 7:1, so any of them is safe
+             for the name and price cards. -->
         <div class="swatches" id="grounds">
-          <button type="button" class="swatch" data-bg="#0F1F22" data-tone="dark"  style="background:#0F1F22" aria-pressed="true"  aria-label="Teal"></button>
-          <button type="button" class="swatch" data-bg="#101010" data-tone="dark"  style="background:#101010" aria-pressed="false" aria-label="Black"></button>
-          <button type="button" class="swatch" data-bg="#F2F0EB" data-tone="light" style="background:#F2F0EB" aria-pressed="false" aria-label="Bone"></button>
-          <button type="button" class="swatch" data-bg="#FFFFFF" data-tone="light" style="background:#FFFFFF" aria-pressed="false" aria-label="White"></button>
+          <button type="button" class="swatch" data-bg="#0E3238" data-tone="dark"  style="background:#0E3238" aria-pressed="true"  aria-label="Brand teal" title="Brand teal · #0E3238"></button>
+          <button type="button" class="swatch" data-bg="#0F1F22" data-tone="dark"  style="background:#0F1F22" aria-pressed="false" aria-label="Ink teal"   title="Ink teal · #0F1F22"></button>
+          <button type="button" class="swatch" data-bg="#1C4A50" data-tone="dark"  style="background:#1C4A50" aria-pressed="false" aria-label="Lagoon"     title="Lagoon · #1C4A50"></button>
+          <button type="button" class="swatch" data-bg="#2E6A6E" data-tone="dark"  style="background:#2E6A6E" aria-pressed="false" aria-label="Sea teal"   title="Sea teal · #2E6A6E"></button>
+          <button type="button" class="swatch" data-bg="#13293D" data-tone="dark"  style="background:#13293D" aria-pressed="false" aria-label="Midnight"   title="Midnight · #13293D"></button>
+          <button type="button" class="swatch" data-bg="#274B63" data-tone="dark"  style="background:#274B63" aria-pressed="false" aria-label="Harbour"    title="Harbour · #274B63"></button>
+          <button type="button" class="swatch" data-bg="#A7BDC9" data-tone="light" style="background:#A7BDC9" aria-pressed="false" aria-label="Dusty blue" title="Dusty blue · #A7BDC9"></button>
+          <button type="button" class="swatch" data-bg="#CFE0DD" data-tone="light" style="background:#CFE0DD" aria-pressed="false" aria-label="Mist"       title="Mist · #CFE0DD"></button>
+          <button type="button" class="swatch" data-bg="#E6EFED" data-tone="light" style="background:#E6EFED" aria-pressed="false" aria-label="Sea salt"   title="Sea salt · #E6EFED"></button>
+          <button type="button" class="swatch" data-bg="#F2F0EB" data-tone="light" style="background:#F2F0EB" aria-pressed="false" aria-label="Bone"       title="Bone · #F2F0EB"></button>
+          <button type="button" class="swatch" data-bg="#FFFFFF" data-tone="light" style="background:#FFFFFF" aria-pressed="false" aria-label="White"      title="White · #FFFFFF"></button>
+          <button type="button" class="swatch" data-bg="#101010" data-tone="dark"  style="background:#101010" aria-pressed="false" aria-label="Black"      title="Black · #101010"></button>
         </div>
+        <span class="hint" id="groundName">Brand teal · #0E3238</span>
+        <label class="toggle-row"><input type="checkbox" id="brandBookends" checked/> Open &amp; close on brand teal</label>
+        <span class="hint">Ground colours the scenes in between. Brass, wood or gold → a teal. Black or dark pieces → Mist or Sea salt. White and cream → Lagoon, Harbour or Dusty blue.</span>
       </div>
 
       <div class="ctrl-group">
@@ -543,7 +558,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 let W = 1080, H = 1920;
-let ground = '#0F1F22', tone = 'dark';
+let ground = '#0E3238', tone = 'dark';
 let current = 'story';
 let running = false;
 
@@ -1987,6 +2002,46 @@ document.getElementById('template').addEventListener('change', (e) => switchTemp
   });
 })();
 
+/* ── BRAND BOOKENDS ──
+   The first and last card of every reel is painted in the brand teal,
+   whatever Ground is picked. Ground exists so each piece can sit on the
+   colour that flatters it (brass on a teal, a black vase on Mist, white
+   ceramic on Harbour); the bookends are what make every reel recognisably
+   Urban Nest however far the middle strays from teal.
+
+   Each open/close draw is wrapped rather than edited: for the length of
+   that one call, ground and tone ARE the brand values, so every INK(),
+   ACCENT() and DIM() inside it follows without the draw functions knowing.
+   Scene lists and the close-card mini previews look these names up when
+   they run, so they all get the wrapped versions. Untick the box to use
+   Ground everywhere, as before. */
+const BRAND_GROUND = '#0E3238';
+function asBookend(draw) {
+  return function (t, dur) {
+    if (!document.getElementById('brandBookends').checked) return draw(t, dur);
+    const g = ground, tn = tone;
+    ground = BRAND_GROUND; tone = 'dark';
+    try { return draw(t, dur); } finally { ground = g; tone = tn; }
+  };
+}
+drawStoryClose   = asBookend(drawStoryClose);
+drawRoundupOpen  = asBookend(drawRoundupOpen);
+drawRoundupClose = asBookend(drawRoundupClose);
+drawMontageOpen  = asBookend(drawMontageOpen);
+drawMontageClose = asBookend(drawMontageClose);
+drawQuoteOpen    = asBookend(drawQuoteOpen);
+drawQuoteClose   = asBookend(drawQuoteClose);
+drawTestiOpen    = asBookend(drawTestiOpen);
+drawTestiClose   = asBookend(drawTestiClose);
+drawTourOpen     = asBookend(drawTourOpen);
+drawTourClose    = asBookend(drawTourClose);
+
+document.getElementById('brandBookends').addEventListener('change', () => {
+  if (!TEMPLATES[current].liveViewer) renderStaticPreview();
+  renderRoundupCloseMini();
+  renderMontageCloseMini();
+});
+
 function wireChips(groupId, after) {
   document.getElementById(groupId).addEventListener('click', (e) => {
     const btn = e.target.closest('.chip, .swatch');
@@ -2010,6 +2065,7 @@ wireChips('ratios', (btn) => {
 
 wireChips('grounds', (btn) => {
   ground = btn.dataset.bg; tone = btn.dataset.tone;
+  document.getElementById('groundName').textContent = btn.getAttribute('aria-label') + ' · ' + ground;
   document.getElementById('stage').style.background = ground;
   turnFrames = []; tourFrames = [];   // the stills carry the old ground behind them
   if (!TEMPLATES[current].liveViewer) renderStaticPreview();
