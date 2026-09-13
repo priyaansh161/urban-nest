@@ -26,6 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase.js"></script>
+  <script src="share.js"></script>
   <!-- Renders a single .glb as an orbitable object. One file per piece; no
        scene, no camera rig, nothing to arrange — which is why these do not
        need Spline the way the rooms do. -->
@@ -164,6 +165,12 @@
     button.buy { background: none; color: var(--black); font-family: inherit; cursor: pointer; }
     button.buy[disabled] { opacity: .45; cursor: default; border-style: dashed; }
     button.buy[disabled]:hover { background: none; color: var(--black); }
+    /* Share sits beside the buy button: a quiet ring, never louder than it. */
+    .share { flex: none; margin-left: auto; width: 34px; height: 34px; display: grid; place-items: center; padding: 0; background: none; color: var(--black); border: 1px solid color-mix(in srgb, currentColor 35%, transparent); border-radius: 50%; cursor: pointer; transition: border-color .25s, color .25s; }
+    .share:hover { border-color: var(--gold); color: var(--gold); }
+    .share svg { width: 14px; height: 14px; display: block; }
+    /* In the sheet the same ring sits level with the category line. */
+    .d-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .sold-by { display: block; font-size: 10px; letter-spacing: .1em; color: var(--grey); margin-top: 8px; }
     .d-second { display: block; font-size: 12px; color: var(--grey); margin-top: 10px; }
     .d-second a { color: var(--gold); }
@@ -696,7 +703,10 @@
         <span class="d-hint" id="dHint">Drag to turn · scroll to zoom</span>
       </div>
       <div class="d-body">
-        <span class="d-cat" id="dCat"></span>
+        <div class="d-top">
+          <span class="d-cat" id="dCat"></span>
+          <button class="share" type="button" id="dShare" aria-label="Share this piece" title="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+        </div>
         <h2 class="d-name" id="dName"></h2>
         <p class="d-desc" id="dDesc"></p>
         <div class="d-specs" id="dSpecs"></div>
@@ -778,10 +788,22 @@
         (item.description ? '<p class="desc">' + esc(item.description) + '</p>' : '<p class="desc"></p>') +
         '<div class="foot">' +
           '<span class="price">' + esc(priceText(item)) + '</span>' +
+          '<button class="share" type="button" data-share="' + esc(item.id) + '" aria-label="Share ' + esc(item.name) + '" title="Share">' + UNShare.icon + '</button>' +
           cardButton(item) +
         '</div>' +
         (soldByLine(item) ? '<span class="sold-by">' + esc(soldByLine(item)) + '</span>' : '') +
       '</div></article>';
+  }
+
+  /* A shared link opens the piece itself, inside its category (?c=&p=),
+     the same URL the homepage tiles use. share.js does the rest. */
+  function sharePiece(id) {
+    var it = ITEMS[id];
+    if (!it) return;
+    var u = new URL(location.pathname, location.origin);
+    if (it.category) u.searchParams.set('c', it.category);
+    u.searchParams.set('p', id);
+    UNShare.share({ title: it.name + ' · Urban Nest', text: it.name + ' — on Urban Nest', url: u.href });
   }
 
   var SELLERS = {};
@@ -840,6 +862,8 @@
     if (!e.target.closest) return;
     // Checked before the card, and stops there: adding a piece must not also
     // open it, and the button sits inside the card.
+    var share = e.target.closest('[data-share]');
+    if (share) { e.stopPropagation(); sharePiece(share.getAttribute('data-share')); return; }
     var add = e.target.closest('[data-add]');
     if (add) { e.stopPropagation(); addToCart(add.getAttribute('data-add')); return; }
     var rm = e.target.closest('[data-remove]');
@@ -953,6 +977,7 @@
     var it = ITEMS[id];
     if (!it) return;
     document.getElementById('dCat').textContent = catLabel(it.category);
+    document.getElementById('dShare').setAttribute('data-share', id);
     document.getElementById('dName').textContent = it.name || '';
     document.getElementById('dDesc').textContent = it.description || '';
 

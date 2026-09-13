@@ -17,6 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase.js"></script>
+  <script src="share.js"></script>
   <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -141,6 +142,9 @@
     .panel-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 0.5px solid #D9E0DE; flex-shrink: 0; position: sticky; top: 0; background: #F5F7F6; z-index: 5; }
     .panel-back { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.12em; color: #586366; cursor: pointer; border: none; background: none; transition: color 0.2s; padding: 6px 0; }
     .panel-back:hover { color: #0F1F22; }
+    .panel-share { display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.12em; color: #586366; cursor: pointer; border: none; background: none; transition: color 0.2s; padding: 6px 0; min-height: 34px; }
+    .panel-share:hover { color: #A37B3F; }
+    .panel-share svg { width: 13px; height: 13px; display: block; }
 
     .panel-3d { width: 100%; height: 50vh; background: #0F1F22; flex-shrink: 0; position: relative; overflow: hidden; }
     #product-viewer-wrap { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -496,6 +500,7 @@
   <div id="panel">
     <div class="panel-header">
       <button class="panel-back" id="close-btn">← BACK TO KITCHEN</button>
+      <button class="panel-share" id="share-btn" type="button" aria-label="Share this product">SHARE <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
     </div>
     <div class="panel-3d" id="panel-3d">
       <div id="product-viewer-wrap"></div>
@@ -545,6 +550,8 @@
     let posterUntil = 0;      // hold the logo until at least this timestamp
     const POSTER_HOLD = 2000; // logo time before a room is revealed
     const SWITCH_HOLD = 700;  // shorter hold when swapping views
+    let pendingProductId = null; // a shared link's product, opened once the room is revealed
+    let currentProductId = null; // the product in the drawer, for Share
 
     (async () => {
       const [sceneRes, prodRes] = await Promise.all([
@@ -568,6 +575,16 @@
       // the chooser. Otherwise: several views → choose first; one view → straight in.
       var wanted = new URLSearchParams(location.search).get('scene');
       var picked = wanted ? scenes.findIndex(function (s) { return String(s.id) === wanted; }) : -1;
+      // A shared product link (?p=) goes straight to the view that holds the
+      // product — no chooser in between — and opens its drawer on reveal.
+      var wantedP = new URLSearchParams(location.search).get('p');
+      var sharedP = wantedP ? allProducts.find(function (p) { return String(p.id) === wantedP; }) : null;
+      if (sharedP) {
+        pendingProductId = sharedP.id;
+        var home = sharedP.scene_id ? scenes.findIndex(function (s) { return s.id === sharedP.scene_id; }) : -1;
+        if (home >= 0) picked = home;
+        else if (picked < 0) picked = 0;
+      }
       if (picked >= 0) {
         if (scenes.length >= 2) renderLobby();   // so the Views button still works
         chooseScene(picked);
@@ -667,6 +684,11 @@
       }, 700);
       document.getElementById('hint').style.display = 'flex';
       document.getElementById('controls').style.display = 'block';
+      if (pendingProductId != null && products[pendingProductId]) {
+        const id = pendingProductId;
+        pendingProductId = null;
+        setTimeout(() => openPanel(id), 500);
+      }
       // let the visitor reopen the chooser to switch views (multi-scene rooms)
       if (scenes.length >= 2) { const vb = document.getElementById('viewsBtn'); if (vb) vb.style.display = ''; }
     }
@@ -794,6 +816,7 @@
     function openPanel(id) {
       const p = products[id];
       if (!p) return;
+      currentProductId = id;
       const wrap = document.getElementById('product-viewer-wrap');
       wrap.innerHTML = '';
       const panel3d = document.getElementById('panel-3d');
@@ -838,6 +861,17 @@
     }
 
     document.getElementById('close-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closePanel(); });
+    // The link names the view as well as the product, so it opens where the
+    // product was seen rather than at the chooser.
+    document.getElementById('share-btn').addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const p = products[currentProductId];
+      if (!p) return;
+      const u = new URL(location.pathname, location.origin);
+      if (currentSceneId != null) u.searchParams.set('scene', currentSceneId);
+      u.searchParams.set('p', p.id);
+      UNShare.share({ title: p.name + ' · Urban Nest', text: p.name + ' — on Urban Nest', url: u.href });
+    });
     // Clicking the scene — or anywhere outside the drawer — closes it. The
     // back button is easy to miss when the drawer covers half the screen.
     // Listens on capture so the 3D viewer cannot swallow the event first.

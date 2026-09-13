@@ -356,6 +356,9 @@
     .modal-title { font-family: 'Bodoni Moda', serif; font-size: clamp(22px, 3.2vw, 40px); font-weight: 400; line-height: 1.12; margin-bottom: 22px; color: var(--black); }
     .modal-title em { font-style: italic; }
     .modal-meta { display: flex; gap: 24px; font-size: 12px; color: var(--grey); letter-spacing: 0.08em; margin-bottom: 36px; padding-bottom: 28px; border-bottom: 0.5px solid var(--border); }
+    .modal-share { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; background: none; border: none; padding: 0; font: inherit; font-size: 11px; letter-spacing: 0.14em; color: var(--gold); cursor: pointer; transition: color 0.2s; }
+    .modal-share:hover { color: var(--black); }
+    .modal-share svg { width: 13px; height: 13px; display: block; }
     .modal-content p { font-size: 15px; color: var(--black); line-height: 2.0; margin-bottom: 22px; }
     .modal-content h2 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; color: var(--black); margin: 44px 0 16px; }
     .modal-content h3 { font-family: 'Bodoni Moda', serif; font-size: 21px; font-weight: 400; font-style: italic; color: var(--black); margin: 36px 0 14px; }
@@ -799,6 +802,7 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
+<script src="share.js"></script>
 </head>
 <body>
 
@@ -986,6 +990,7 @@
           <span id="modalAuthor"></span>
           <span id="modalRead"></span>
           <span id="modalDate"></span>
+          <button class="modal-share" type="button" onclick="shareArticle()" aria-label="Share this article">SHARE <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
         </div>
         <div id="modalContent" class="modal-content"></div>
       </div>
@@ -1079,6 +1084,7 @@
     function openArticle(id) {
       const a = ARTICLES[id];
       if (!a) return;
+      currentArticle = { key: id, title: a.title.replace(/<[^>]*>/g, '') };
       document.getElementById('modalImg').src = a.img;
       document.getElementById('modalImg').alt = a.title.replace(/<[^>]*>/g,'');
       document.getElementById('modalCat').textContent = a.cat;
@@ -1095,6 +1101,18 @@
     function closeArticle() {
       document.getElementById('articleOverlay').classList.remove('open');
       document.body.style.overflow = '';
+      // A shared link's ?a= has done its job once the reader is closed.
+      if (new URLSearchParams(location.search).has('a')) history.replaceState(null, '', location.pathname);
+    }
+
+    // Articles have no page of their own, so a shared link is this page
+    // with ?a=<id>, which opens the reader on load (see loadNestPosts).
+    let currentArticle = null;
+    function shareArticle() {
+      if (!currentArticle) return;
+      const u = new URL(location.pathname, location.origin);
+      u.searchParams.set('a', currentArticle.key);
+      UNShare.share({ title: currentArticle.title + ' · The Nest Edit', text: currentArticle.title + ' — The Nest Edit, Urban Nest', url: u.href });
     }
 
     function handleOverlayClick(e) {
@@ -1199,6 +1217,7 @@
     function openNestArticle(id) {
       const p = nestPosts[id];
       if (!p) return;
+      currentArticle = { key: id, title: p.title };
       const hero = document.querySelector('.modal-hero');
       if (p.image_url) {
         hero.style.display = '';
@@ -1368,6 +1387,10 @@
 
       renderFilters();
       renderNest();
+
+      const shared = new URLSearchParams(location.search).get('a');
+      if (shared && ARTICLES[shared]) openArticle(shared);
+      else if (shared && nestPosts[shared]) openNestArticle(shared);
     }
 
     loadNestPosts();
