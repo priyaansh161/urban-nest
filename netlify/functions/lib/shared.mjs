@@ -14,7 +14,11 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
    the static files, which is fine for a .glb and not fine for an endpoint
    that creates payments — so these check the origin themselves. */
 const ALLOWED = [
-  'https://storeurbannest.netlify.app',
+  'https://storeurbannest.in',          // the primary domain, from Sept 2026
+  'https://www.storeurbannest.in',
+  'https://storeurbannest.co.in',       // redirects to .in, listed in case a page is ever served there
+  'https://www.storeurbannest.co.in',
+  'https://storeurbannest.netlify.app', // still answers; redirected to .in by netlify.toml
   'http://localhost:3000',   // npx serve
   'http://localhost:4322',   // npx serve, older port
   'http://localhost:8888'    // netlify dev

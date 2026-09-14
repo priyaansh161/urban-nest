@@ -38,6 +38,39 @@
   to = "/"
   status = 302
 
+# ── THE DOMAIN ──
+# storeurbannest.in is the address. storeurbannest.co.in and the original
+# storeurbannest.netlify.app both still reach this site, so each is sent to
+# the same page on .in — one address for Google, for link previews, and in
+# the browser bar. www is not listed: Netlify already sends www to the bare
+# domain once .in is set as primary.
+#
+# DEPLOY ORDER MATTERS. Deploy this only after https://storeurbannest.in is
+# connected in Netlify and loads with its padlock. Deployed any earlier, the
+# netlify.app address would forward every visitor to a domain that does not
+# answer yet, and the site would be unreachable.
+#
+# 301 here, unlike /hello above: these addresses are never meant to change.
+# The printed QR still works: it ends on the homepage at .in, whichever of
+# the two redirects Netlify happens to apply first.
+[[redirects]]
+  from = "https://storeurbannest.netlify.app/*"
+  to = "https://storeurbannest.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://storeurbannest.co.in/*"
+  to = "https://storeurbannest.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.storeurbannest.co.in/*"
+  to = "https://storeurbannest.in/:splat"
+  status = 301
+  force = true
+
 # ── CHECKOUT FUNCTIONS ──
 # The three endpoints in netlify/functions/. They live outside dist/ on
 # purpose: build-site.mjs assembles dist from an allow list of static files,
