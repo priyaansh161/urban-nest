@@ -129,7 +129,51 @@
       .door, .door-arrow { transition: none; }
       .door:hover { transform: none; }
     }
-  </style>
+  
+  /* ── LIGHT PALETTE · SHARED ──
+     Light mode only. Dark mode is deliberately untouched: nothing below can
+     match unless the page is in light mode.
+
+     Identical on every page that has a theme, so the ground, the cards and
+     the title band are the same everywhere; change a value here, paste the
+     block into every page again.
+
+     Mist #CFE0DD is the ground under every page. Cards, sheets and forms sit
+     one step lighter on Sea salt #E6EFED. The page title band is Lagoon
+     #1C4A50, a different teal from the top bar, so the two read as two
+     bands instead of one tall slab. The top bar, footer and the other dark
+     bands keep their colours.
+
+     The site's gold drops to 2.8:1 on Mist, so small gold text on a light
+     surface takes a deeper gold (#735427, 5.1:1) and headline gold a
+     slightly deeper one (#94703A, 3.3:1). Every pair was measured.
+
+     Each rule appears twice: once for a visitor who chose light, once for a
+     device that is simply in light mode and nobody chose. */
+    :root[data-theme="light"] { --border: #B7CCC8; --hairline: #B7CCC8; }
+    :root[data-theme="light"] :is(body:not(:has(#panel-3d)), .site) { background: #CFE0DD !important; }
+    :root[data-theme="light"] :is(.pillar-card, .contact-card, .cat-tile, .item, .sheet, a.room, main.card, .d-body, #articleModal, .form-card, .comments-section, .comment-input, .callout, #panel, .panel-header) { background: #E6EFED !important; }
+    :root[data-theme="light"] :is(.page-hero) { background: #1C4A50 !important; }
+    :root[data-theme="light"] :is(.page-hero .page-title em) { color: #C2934D !important; }
+    :root[data-theme="light"] :is(.page-hero .page-tag) { color: #CFE0DD !important; }
+    :root[data-theme="light"] :is(.page-hero .page-sub) { color: rgba(234,242,241,0.80) !important; }
+    :root[data-theme="light"] :is(.collect-all, .cl-tagline, .contact-type-label, .contact-ico, .cat-tile-go, .room-go, .d-cat, .d-spec-k, .na-cat, .nest-eyebrow, .comments-label, .contact-card .contact-type, .contact-icon, .perk-icon, .hero-tag, .panel-render-note a, body:has(.toc) main section a) { color: #735427 !important; }
+    :root[data-theme="light"] :is(.statement-type b) { color: #94703A !important; }
+    :root[data-theme="light"] :is(.panel-render-note, .optional) { color: #586366 !important; }
+  @media not (prefers-color-scheme: dark) {
+    :root:not([data-theme="dark"]) { --border: #B7CCC8; --hairline: #B7CCC8; }
+    :root:not([data-theme="dark"]) :is(body:not(:has(#panel-3d)), .site) { background: #CFE0DD !important; }
+    :root:not([data-theme="dark"]) :is(.pillar-card, .contact-card, .cat-tile, .item, .sheet, a.room, main.card, .d-body, #articleModal, .form-card, .comments-section, .comment-input, .callout, #panel, .panel-header) { background: #E6EFED !important; }
+    :root:not([data-theme="dark"]) :is(.page-hero) { background: #1C4A50 !important; }
+    :root:not([data-theme="dark"]) :is(.page-hero .page-title em) { color: #C2934D !important; }
+    :root:not([data-theme="dark"]) :is(.page-hero .page-tag) { color: #CFE0DD !important; }
+    :root:not([data-theme="dark"]) :is(.page-hero .page-sub) { color: rgba(234,242,241,0.80) !important; }
+    :root:not([data-theme="dark"]) :is(.collect-all, .cl-tagline, .contact-type-label, .contact-ico, .cat-tile-go, .room-go, .d-cat, .d-spec-k, .na-cat, .nest-eyebrow, .comments-label, .contact-card .contact-type, .contact-icon, .perk-icon, .hero-tag, .panel-render-note a, body:has(.toc) main section a) { color: #735427 !important; }
+    :root:not([data-theme="dark"]) :is(.statement-type b) { color: #94703A !important; }
+    :root:not([data-theme="dark"]) :is(.panel-render-note, .optional) { color: #586366 !important; }
+  }
+  /* ── end LIGHT PALETTE · SHARED ── */
+</style>
 </head>
 <body>
 
