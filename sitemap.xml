@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Urban Nest's public pages, for search engines. robots.txt points here.
+     Add a line when a new public page is added. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://storeurbannest.in/</loc></url>
+  <url><loc>https://storeurbannest.in/collection.html</loc></url>
+  <url><loc>https://storeurbannest.in/essentials.html</loc></url>
+  <url><loc>https://storeurbannest.in/spaces.html</loc></url>
+  <url><loc>https://storeurbannest.in/community.html</loc></url>
+  <url><loc>https://storeurbannest.in/kitchen.html</loc></url>
+  <url><loc>https://storeurbannest.in/bathroom.html</loc></url>
+  <url><loc>https://storeurbannest.in/bedroom.html</loc></url>
+  <url><loc>https://storeurbannest.in/about.html</loc></url>
+  <url><loc>https://storeurbannest.in/join.html</loc></url>
+  <url><loc>https://storeurbannest.in/policies.html</loc></url>
+</urlset>

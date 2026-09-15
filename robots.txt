@@ -1,0 +1,14 @@
+# Urban Nest — instructions for search engines.
+#
+# Everything a visitor browses is open. The admin, the checkout, the offline
+# fallback and the payment functions are kept out of search results; they
+# are useless as a landing page. This is not security — the admin is
+# protected by its login, not by this file.
+
+User-agent: *
+Disallow: /admin/
+Disallow: /checkout.html
+Disallow: /offline.html
+Disallow: /.netlify/
+
+Sitemap: https://storeurbannest.in/sitemap.xml

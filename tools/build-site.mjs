@@ -26,6 +26,10 @@ const DIST = join(ROOT, 'dist');
 // means the folder's own files only — its subfolders are working material.
 const RULES = [
   { dir: '.',      exts: ['.html', '.splinecode', '.png', '.js', '.toml', '.webmanifest'], deep: false },
+  /* Named, not by extension. The root folder also holds DEPLOY.txt and
+     DEPLOY-CHECKLIST.txt — private working notes — and allowing every .txt
+     would have published them. */
+  { dir: '.',      names: ['robots.txt', 'sitemap.xml'] },
   { dir: 'admin',  exts: ['.html', '.js'],                                 deep: false },
   { dir: 'images', exts: ['.webp', '.png', '.jpg', '.svg'],                deep: false },
   /* models/ is deliberately NOT here. Every one of the 21 listings with a 3D
@@ -39,6 +43,10 @@ const RULES = [
      back to this list or that piece will 404. */
 ];
 
+// A rule ships files by extension, or an exact list of names.
+const wanted = (rule, name) => rule.names ? rule.names.includes(name)
+  : rule.exts.includes(extname(name).toLowerCase());
+
 await rm(DIST, { recursive: true, force: true });
 await mkdir(DIST, { recursive: true });
 
@@ -50,7 +58,7 @@ for (const rule of RULES) {
   catch { continue; }
 
   for (const e of entries) {
-    if (!e.isFile() || !rule.exts.includes(extname(e.name).toLowerCase())) continue;
+    if (!e.isFile() || !wanted(rule, e.name)) continue;
     const src = join(from, e.name);
     const dest = join(DIST, relative(ROOT, src));
     await mkdir(dirname(dest), { recursive: true });
@@ -59,7 +67,7 @@ for (const rule of RULES) {
     count++;
   }
   console.log(`  ${rule.dir.padEnd(8)} ${String(entries.filter(e => e.isFile() &&
-    rule.exts.includes(extname(e.name).toLowerCase())).length).padStart(3)} files`);
+    wanted(rule, e.name)).length).padStart(3)} files${rule.names ? '  (' + rule.names.join(', ') + ')' : ''}`);
 }
 
 console.log(`\n  dist/ — ${count} files, ${(bytes / 1048576).toFixed(1)} MB`);
