@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join the Nest · Urban Nest</title>
+  <meta name="description" content="Beautiful home pieces, hand-picked from across India and shown in 3D. Join the Nest for new pieces, décor ideas and store openings near you."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Join the Nest · Urban Nest"/>
+  <meta property="og:description" content="Home pieces worth living with, hand-picked and shown in 3D."/>
+  <meta property="og:url" content="https://storeurbannest.in/nest"/>
+  <meta property="og:image" content="https://storeurbannest.in/images/share-card.jpg"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="icon" type="image/png" href="/favicon.png"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
+  <meta name="theme-color" content="#0E3238"/>
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png"/>
+  <script src="/pwa.js" defer></script>
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('un-theme');
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       JOIN THE NEST, THE SHORT VERSION — storeurbannest.in/nest
+       One page for the Instagram bio link, the visiting-card QR and
+       WhatsApp: who Urban Nest is in a line, a handful of real pieces from
+       the Collection as proof, and a three-field form. No menu on purpose:
+       every way off the page before the form is a sign-up lost. The full
+       site is one tap away after joining, and at the foot.
+
+       Sign-ups go into the same subscribers table as join.html, with
+       source "nest-page", or "nest-page:<src>" when the link carries
+       ?src=instagram / ?src=qr / ?src=whatsapp, so the admin can see which
+       channel works.
+       ═══════════════════════════════════════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --teal: #0E3238; --gold: #A37B3F; --gold-lift: #C2934D;
+      --ground: #E6EFED; --card: #FFFFFF; --ink: #0F1F22; --grey: #586366; --line: #CFDCD9;
+      --field: #FFFFFF; --small-gold: #735427;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --ground: #061E23; --card: #0A2429; --ink: #EAF2F1; --grey: #8FA2A5; --line: #16363D; --field: #061E23; --gold: #C2934D; --small-gold: #C2934D; }
+    }
+    :root[data-theme="dark"] { --ground: #061E23; --card: #0A2429; --ink: #EAF2F1; --grey: #8FA2A5; --line: #16363D; --field: #061E23; --gold: #C2934D; --small-gold: #C2934D; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--ground); color: var(--ink); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    a { color: inherit; }
+
+    /* ── HERO ── */
+    .hero { background: var(--teal); color: #F5F7F6; position: relative; overflow: hidden; padding: 28px 20px 56px; text-align: center; }
+    .hero::before { content: ''; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(234,242,241,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(234,242,241,0.035) 1px, transparent 1px); background-size: 64px 64px; }
+    .hero > * { position: relative; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .brand img { width: 30px; height: 30px; border-radius: 50%; display: block; }
+    .brand span { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.2em; }
+    .tag { font-size: 10px; letter-spacing: 0.32em; color: var(--gold-lift); margin: 44px 0 16px; font-weight: 500; }
+    h1 { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: clamp(36px, 8.5vw, 64px); line-height: 1.04; max-width: 760px; margin: 0 auto; }
+    h1 em { color: var(--gold-lift); }
+    .lead { font-size: 15.5px; line-height: 1.75; color: rgba(245,247,246,0.74); max-width: 520px; margin: 20px auto 0; }
+    .cta { display: inline-flex; align-items: center; gap: 10px; margin-top: 30px; padding: 15px 34px; border-radius: 100px; background: #F5F7F6; color: var(--teal); text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; transition: background .25s, color .25s; }
+    .cta:hover { background: var(--gold-lift); }
+    .proof { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 22px; margin-top: 28px; font-size: 11px; letter-spacing: 0.1em; color: rgba(245,247,246,0.55); }
+    .proof span::before { content: '◈ '; color: var(--gold-lift); }
+
+    /* ── PIECES ── */
+    .pieces { padding: 52px 0 12px; }
+    .sec-head { max-width: 1080px; margin: 0 auto; padding: 0 20px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+    .sec-k { font-size: 10px; letter-spacing: 0.3em; color: var(--small-gold); font-weight: 500; }
+    .sec-t { font-family: 'Bodoni Moda', serif; font-size: clamp(26px, 5vw, 36px); font-weight: 400; margin-top: 8px; line-height: 1.1; }
+    .sec-all { font-size: 11px; letter-spacing: 0.14em; color: var(--small-gold); text-decoration: none; white-space: nowrap; padding-bottom: 4px; }
+    .rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 20px; padding: 22px 20px 26px; scrollbar-width: none; max-width: 1080px; margin: 0 auto; }
+    .rail::-webkit-scrollbar { display: none; }
+    .piece { flex: 0 0 64%; max-width: 250px; scroll-snap-align: start; background: var(--card); text-decoration: none; color: inherit; box-shadow: 0 2px 6px rgba(8,8,7,.07), 0 14px 30px rgba(8,8,7,.10); display: flex; flex-direction: column; }
+    .piece-img { aspect-ratio: 1 / 1; width: 100%; object-fit: cover; display: block; background: #D9E3E1; }
+    .piece-b { padding: 14px 16px 16px; }
+    .piece-n { font-family: 'Bodoni Moda', serif; font-size: 17px; line-height: 1.25; min-height: 2.5em; }
+    .piece-go { display: inline-block; margin-top: 10px; font-size: 10px; letter-spacing: 0.16em; color: var(--small-gold); font-weight: 500; }
+    .rail-skel .piece { min-height: 320px; }
+    /* Wider screens: all six at once in a grid, nothing cut off at the edge. */
+    @media (min-width: 760px) { .rail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; overflow: visible; padding: 26px 20px 30px; } .piece { max-width: none; } }
+    @media (min-width: 1100px) { .rail { grid-template-columns: repeat(6, 1fr); } }
+
+    /* ── JOIN ── */
+    .join { padding: 30px 20px 64px; }
+    .card { max-width: 520px; margin: 0 auto; background: var(--card); padding: 34px 26px 30px; box-shadow: 0 2px 6px rgba(8,8,7,.07), 0 18px 40px rgba(8,8,7,.12); }
+    .card .sec-t { margin-top: 8px; }
+    .perks { list-style: none; margin: 18px 0 24px; display: grid; gap: 10px; }
+    .perks li { font-size: 14px; line-height: 1.55; color: var(--grey); padding-left: 24px; position: relative; }
+    .perks li::before { content: '✦'; position: absolute; left: 0; top: 0; color: var(--gold); font-size: 12px; }
+    .perks strong { color: var(--ink); font-weight: 500; }
+    .f { display: grid; gap: 14px; }
+    .fl label { display: block; font-size: 10px; letter-spacing: 0.2em; color: var(--grey); margin-bottom: 7px; }
+    .fl input { width: 100%; padding: 13px 14px; font: inherit; font-size: 16px; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 0; outline: none; transition: border-color .2s; }
+    .fl input:focus { border-color: var(--gold); }
+    .hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+    .go { margin-top: 6px; width: 100%; padding: 16px; border: none; border-radius: 100px; background: var(--teal); color: #F5F7F6; font: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; cursor: pointer; transition: background .25s; }
+    :root[data-theme="dark"] .go { background: var(--gold); color: #061E23; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .go { background: var(--gold); color: #061E23; } }
+    .go:hover { background: var(--gold); }
+    .go:disabled { opacity: .55; cursor: wait; }
+    .msg { font-size: 13px; color: #B03A2E; min-height: 0; text-align: center; }
+    .msg:empty { display: none; }
+    .fine { font-size: 11.5px; line-height: 1.65; color: var(--grey); text-align: center; margin-top: 12px; }
+    .fine a { color: var(--small-gold); }
+    .done { text-align: center; padding: 10px 0 4px; }
+    .done-mark { width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 16px; background: var(--teal); color: var(--gold-lift); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .done h3 { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: 30px; }
+    .done p { font-size: 14.5px; line-height: 1.75; color: var(--grey); margin: 10px 0 24px; }
+    .done .go { display: inline-block; width: auto; padding: 15px 30px; text-decoration: none; }
+
+    /* ── FOOT ── */
+    .foot { background: var(--teal); color: rgba(234,242,241,0.45); text-align: center; padding: 30px 20px 36px; font-size: 11.5px; line-height: 1.8; }
+    .foot a { color: var(--gold-lift); text-decoration: none; }
+    .foot .links { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; letter-spacing: 0.12em; font-size: 10.5px; }
+    .foot .links a { color: rgba(234,242,241,0.72); }
+
+    @media (min-width: 760px) {
+      .hero { padding: 34px 40px 80px; }
+      .tag { margin-top: 70px; }
+      .card { padding: 44px 44px 38px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/supabase.js"></script>
+</head>
+<body>
+
+  <header class="hero">
+    <a class="brand" href="/"><img src="/logo-icon.png" alt=""/><span>URBAN NEST</span></a>
+    <div class="tag">JUST THE RIGHT FEEL</div>
+    <h1>Home pieces <em>worth living with.</em></h1>
+    <p class="lead">We hand-pick beautiful décor from across India and show every piece in 3D, so you can see how it will feel in your home before you buy.</p>
+    <a class="cta" href="#join">JOIN THE NEST ↓</a>
+    <div class="proof"><span>Hand-picked, never bulk</span><span>Every piece in 3D</span><span>Made for Indian homes</span></div>
+  </header>
+
+  <section class="pieces" aria-labelledby="piecesTitle">
+    <div class="sec-head">
+      <div>
+        <div class="sec-k">FROM THE COLLECTION</div>
+        <h2 class="sec-t" id="piecesTitle">A few we love</h2>
+      </div>
+      <a class="sec-all" href="/collection.html">SEE ALL →</a>
+    </div>
+    <div class="rail rail-skel" id="rail" aria-live="polite">
+      <div class="piece"></div><div class="piece"></div><div class="piece"></div><div class="piece"></div>
+    </div>
+  </section>
+
+  <section class="join" id="join">
+    <div class="card">
+      <div id="joinForm">
+        <div class="sec-k">COMMUNITY · EARLY ACCESS</div>
+        <h2 class="sec-t">Join the Nest.</h2>
+        <ul class="perks">
+          <li><strong>New pieces first</strong>, before they go public.</li>
+          <li><strong>The Nest Edit</strong>: décor ideas and inspiration from Urban Nest and the designers who write for it.</li>
+          <li><strong>Store openings</strong>: know first when we open near you.</li>
+        </ul>
+        <form class="f" id="f" novalidate>
+          <div class="fl"><label for="n">YOUR NAME</label><input id="n" autocomplete="name" maxlength="80" required/></div>
+          <div class="fl"><label for="e">EMAIL</label><input id="e" type="email" autocomplete="email" inputmode="email" maxlength="120" required/></div>
+          <div class="fl"><label for="c">CITY</label><input id="c" autocomplete="address-level2" maxlength="60" list="cities" required/></div>
+          <datalist id="cities">
+            <option value="New Delhi"/><option value="Gurugram"/><option value="Noida"/><option value="Ghaziabad"/><option value="Faridabad"/>
+            <option value="Mumbai"/><option value="Pune"/><option value="Bangalore"/><option value="Hyderabad"/><option value="Chennai"/>
+            <option value="Kolkata"/><option value="Jaipur"/><option value="Lucknow"/><option value="Chandigarh"/>
+          </datalist>
+          <div class="hp" aria-hidden="true"><label for="w">Leave this empty</label><input id="w" tabindex="-1" autocomplete="off"/></div>
+          <p class="msg" id="msg" role="alert"></p>
+          <button class="go" type="submit" id="go">JOIN THE NEST</button>
+        </form>
+        <p class="fine">By joining, you agree to receive occasional emails from Urban Nest. Unsubscribe anytime. We never share your details. <a href="/policies.html">Policies</a></p>
+      </div>
+      <div class="done" id="done" hidden>
+        <div class="done-mark">✦</div>
+        <h3>You're in.</h3>
+        <p id="doneText">Welcome to the Nest. We'll be in touch when there's something worth your inbox.</p>
+        <a class="go" href="/collection.html">EXPLORE THE COLLECTION →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="links"><a href="/">HOME</a><a href="/collection.html">COLLECTION</a><a href="/spaces.html">SPACES</a><a href="/community.html">THE NEST EDIT</a><a href="/about.html">ABOUT</a></div>
+    Pieces are shown as 3D models built with AI assistance from the maker's photographs. <a href="/about.html#renders">How we model things →</a><br/>
+    © 2026 Urban Nest
+  </footer>
+
+<script>
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+
+  /* Retailer titles run long; the first clause is the piece (as on the homepage). */
+  var label = function (name) {
+    var s = String(name || '').split(/[,(|]/)[0].trim();
+    return s.length > 34 ? s.slice(0, 33).replace(/\s+\S*$/, '') + '…' : s;
+  };
+
+  /* Six of the newest twelve Collection pieces, shuffled, so the page is a
+     live window rather than a fixture. Same query as the homepage strip. */
+  (function pieces() {
+    var rail = document.getElementById('rail');
+    if (typeof db === 'undefined') { rail.parentNode.hidden = true; return; }
+    db.from('collection_items').select('id,name,category,image_url')
+      .eq('published', true).eq('section', 'collection')
+      .order('created_at', { ascending: false }).limit(12)
+      .then(function (r) {
+        var pool = ((r && r.data) || []).filter(function (it) { return it.image_url; });
+        if (!pool.length) { rail.parentNode.hidden = true; return; }
+        for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+        rail.classList.remove('rail-skel');
+        rail.innerHTML = pool.slice(0, 6).map(function (it) {
+          var p = new URLSearchParams();
+          if (it.category) p.set('c', it.category);
+          p.set('p', it.id);
+          return '<a class="piece" href="/collection.html?' + p.toString() + '">'
+            + '<img class="piece-img" src="' + esc(it.image_url) + '" alt="' + esc(label(it.name)) + '" loading="lazy" decoding="async"/>'
+            + '<span class="piece-b"><span class="piece-n" style="display:block">' + esc(label(it.name)) + '</span>'
+            + '<span class="piece-go">VIEW IN 3D →</span></span></a>';
+        }).join('');
+      }, function () { rail.parentNode.hidden = true; });
+  })();
+
+  /* Where the visitor came from: ?src=instagram, ?src=qr, ?src=whatsapp … */
+  var SRC = (function () {
+    var s = (new URLSearchParams(location.search).get('src') || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 20);
+    return s ? 'nest-page:' + s : 'nest-page';
+  })();
+
+  document.getElementById('f').addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    var msg = document.getElementById('msg');
+    var name = document.getElementById('n').value.trim();
+    var email = document.getElementById('e').value.trim();
+    var city = document.getElementById('c').value.trim();
+    msg.textContent = '';
+    if (document.getElementById('w').value) return;                       // a bot filled the hidden field
+    if (name.length < 2) { msg.textContent = 'Add your name.'; document.getElementById('n').focus(); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = 'That email doesn\'t look right.'; document.getElementById('e').focus(); return; }
+    if (city.length < 2) { msg.textContent = 'Add your city, so we know where to open next.'; document.getElementById('c').focus(); return; }
+
+    var btn = document.getElementById('go');
+    btn.disabled = true; btn.textContent = 'JOINING…';
+    var error = null;
+    try {
+      var res = await db.from('subscribers').insert({ name: name, email: email, city: city, source: SRC });
+      error = res.error;
+    } catch (e) { error = e; }
+    btn.disabled = false; btn.textContent = 'JOIN THE NEST';
+
+    // Already on the list counts as success: they're in either way.
+    if (error && !/unique|duplicate/i.test(error.message || '')) {
+      msg.textContent = 'That didn\'t go through. Check your connection and try again.';
+      return;
+    }
+    document.getElementById('doneText').textContent = error
+      ? 'You were already on the list, ' + name.split(' ')[0] + '. Good to see you again.'
+      : 'Welcome to the Nest, ' + name.split(' ')[0] + '. We\'ll be in touch when there\'s something worth your inbox.';
+    document.getElementById('joinForm').hidden = true;
+    document.getElementById('done').hidden = false;
+    document.getElementById('join').scrollIntoView({ block: 'start' });
+  });
+</script>
+</body>
+</html>
