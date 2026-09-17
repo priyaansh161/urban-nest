@@ -11,7 +11,7 @@
  * Deploys are free on Cloudflare Pages (500 a month on the free plan), so
  * this log is for knowing what went live when, not for counting credits.
  */
-import { execSync, spawnSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { appendFileSync, existsSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,10 +32,21 @@ console.log('Building dist/ …');
 execSync('node tools/build-site.mjs', { cwd: ROOT, stdio: 'inherit' });
 
 console.log('Deploying to Cloudflare Pages …');
-const r = spawnSync('npx', ['wrangler', 'pages', 'deploy', '--branch', 'main', '--commit-hash', commit,
-  '--commit-message', note, '--commit-dirty=true'], { cwd: ROOT, encoding: 'utf8', shell: true });
-const out = (r.stdout || '') + (r.stderr || '');
+/* execSync with one quoted command line, not spawnSync with shell: true:
+   the latter crashed Node on Windows (a libuv "UV_HANDLE_CLOSING" assertion)
+   before wrangler uploaded anything. */
+const q = v => '"' + String(v).replace(/"/g, "'") + '"';
+let out = '', status = 0;
+try {
+  out = execSync(['npx wrangler pages deploy --branch main --commit-dirty=true',
+    '--commit-hash', q(commit), '--commit-message', q(note)].join(' '),
+    { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 20 * 1024 * 1024 });
+} catch (err) {
+  out = (err.stdout || '') + (err.stderr || '');
+  status = err.status || 1;
+}
 process.stdout.write(out);
+const r = { status };
 const url = (out.match(/https:\/\/[a-z0-9]+\.storeurbannest\.pages\.dev/) || [])[0];
 if (r.status !== 0 || !url) {
   console.error('\nDeploy failed, so nothing was added to DEPLOY-LOG.md.');

@@ -22,3 +22,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-09-17 | ~17:03 | e887e5b | Forgot-password link on the admin sign-in | https://0ea8e5b7.storeurbannest.pages.dev |
 | 2026-09-17 | ~17:06 | a0d6330 | Clean email logo (images/email-logo.png) | https://540690bc.storeurbannest.pages.dev |
 | 2026-09-17 | ~17:25 | 5fa18c0 | Branded not-found page (real 404) | https://f863d9b2.storeurbannest.pages.dev |
+| 2026-09-17 | 20:57 | cfba91a | Join the Nest landing page at /nest (the "uncommitted" change was only the deploy script fix) | https://3513f437.storeurbannest.pages.dev |
