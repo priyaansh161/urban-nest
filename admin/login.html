@@ -88,6 +88,14 @@
     text-decoration: none; transition: color 0.2s;
   }
   .back-link:hover { color: var(--black); }
+  .forgot {
+    display: block; width: 100%; margin-top: 14px; padding: 4px;
+    background: none; border: none; cursor: pointer; text-align: center;
+    font-family: 'DM Sans', sans-serif; font-size: 11.5px; letter-spacing: 0.04em;
+    color: var(--grey); transition: color 0.2s;
+  }
+  .forgot:hover { color: var(--black); }
+  .error-msg.ok { color: #1F7A55; }
 </style>
 <link rel="stylesheet" href="/admin/studio-colors.css"/>
 </head>
@@ -110,6 +118,7 @@
     <button class="btn" type="submit" id="loginBtn">Enter</button>
     <p class="error-msg" id="errorMsg"></p>
   </form>
+  <button class="forgot" type="button" id="forgotBtn">Forgot your password?</button>
   <a href="../index.html" class="back-link">← Back to Urban Nest</a>
 </div>
 <script>
@@ -136,6 +145,24 @@
         ? 'Signed out after an hour of inactivity. Please sign in again.'
         : 'Your session expired. Please sign in again.';
   })();
+
+  /* Forgot password. The email's link opens the Nest Studio's "choose a new
+     password" screen, which already handles reset links, and that URL is
+     already on Supabase's allowed redirect list. After saving, the studio
+     recognises the admin and offers a "Go to the admin" button. */
+  document.getElementById('forgotBtn').addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    const msg = document.getElementById('errorMsg');
+    msg.className = 'error-msg';
+    if (!email) { msg.textContent = 'Type your email above first.'; document.getElementById('email').focus(); return; }
+    const btn = document.getElementById('forgotBtn');
+    btn.disabled = true; btn.textContent = 'Sending…';
+    const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/studio/' });
+    btn.disabled = false; btn.textContent = 'Forgot your password?';
+    if (error) { msg.textContent = /rate|seconds/i.test(error.message) ? 'Please wait a minute before asking for another email.' : error.message; return; }
+    msg.className = 'error-msg ok';
+    msg.textContent = 'If that email has a login, a reset link is on its way. Check your inbox.';
+  });
 
   // Already logged in → go to dashboard
   db.auth.getSession().then(({ data: { session } }) => {
