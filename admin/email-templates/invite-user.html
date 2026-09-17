@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="color-scheme" content="light only"/>
+<title>Welcome to The Nest Edit.</title>
+</head>
+<body style="margin:0;padding:0;background:#E6EFED;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#E6EFED;">Choose a password to open your Nest Studio.</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#E6EFED;">
+  <tr><td align="center" style="padding:32px 16px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
+
+      <!-- Brand band -->
+      <tr><td align="center" style="background:#0E3238;padding:30px 24px 26px;">
+        <img src="https://storeurbannest.in/images/app-icon-192.png" width="52" height="52" alt="" style="display:block;border:0;border-radius:50%;margin:0 auto 14px;"/>
+        <div style="font-family:'Bodoni Moda', Didot, Georgia, 'Times New Roman', serif;font-size:20px;letter-spacing:5px;color:#F5F7F6;">URBAN NEST</div>
+        <div style="font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:10px;letter-spacing:3px;color:#C2934D;margin-top:6px;">JUST THE RIGHT FEEL</div>
+      </td></tr>
+
+      <!-- Message -->
+      <tr><td style="background:#FFFFFF;padding:40px 40px 34px;">
+        <div style="font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:10px;letter-spacing:3px;color:#735427;margin-bottom:14px;">THE NEST STUDIO</div>
+        <div style="font-family:'Bodoni Moda', Didot, Georgia, 'Times New Roman', serif;font-size:28px;line-height:1.2;color:#0F1F22;margin-bottom:22px;">Welcome to <em style="color:#94703A;">The Nest Edit.</em></div>
+        <p style="font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:15px;line-height:1.75;color:#3F4A4C;margin:0 0 16px;">Urban Nest has set up your Nest Studio: your own space to publish articles, show your finished projects on a portfolio page, and receive enquiries from people who'd like to work with you.</p>
+        <p style="font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:15px;line-height:1.75;color:#3F4A4C;margin:0 0 16px;">Tap below to choose your password. That's all it takes.</p>
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 26px;">
+          <tr><td align="center" bgcolor="#0E3238" style="border-radius:100px;">
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:15px 36px;font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;font-weight:bold;letter-spacing:2px;color:#FFFFFF;text-decoration:none;border-radius:100px;">CHOOSE MY PASSWORD</a>
+          </td></tr>
+        </table>
+        <p style="font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:13px;line-height:1.7;color:#586366;margin:0 0 12px;">After that, sign in any time at <a href="https://storeurbannest.in/studio/" style="color:#735427;">storeurbannest.in/studio</a>.</p>
+        <p style="font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:13px;line-height:1.7;color:#586366;margin:0 0 12px;">This link works once and expires after a while. If it has, ask Urban Nest to send a new one.</p>
+        <p style="font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;line-height:1.7;color:#586366;margin:18px 0 0;padding-top:18px;border-top:1px solid #D9E0DE;">If the button doesn't work, copy this link into your browser:<br/><a href="{{ .ConfirmationURL }}" style="color:#735427;word-break:break-all;">{{ .ConfirmationURL }}</a></p>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td align="center" style="padding:22px 24px 8px;">
+        <p style="font-family:'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:11px;line-height:1.7;color:#586366;margin:0;">Sent to {{ .Email }} by Urban Nest<br/><a href="https://storeurbannest.in" style="color:#735427;text-decoration:none;">storeurbannest.in</a></p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
