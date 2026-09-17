@@ -17,7 +17,7 @@
  * the new worker takes over. netlify.toml serves this file with no-cache so
  * phones pick up a new one on their next visit.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `un-${VERSION}`;
 const PRECACHE = ['/offline.html', '/favicon.png', '/images/app-icon-192.png'];
 
@@ -45,7 +45,8 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.startsWith('/admin/') || url.pathname.startsWith('/.netlify/')) return;
+  // The studio is a signed-in writing tool, like the admin: always live.
+  if (url.pathname.startsWith('/admin/') || url.pathname.startsWith('/studio/') || url.pathname.startsWith('/.netlify/')) return;
 
   if (req.mode === 'navigate' || /\.(html|js|webmanifest)$/.test(url.pathname)) {
     event.respondWith(networkFirst(event, req));

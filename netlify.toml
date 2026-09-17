@@ -71,6 +71,16 @@
   status = 301
   force = true
 
+# ── DESIGNER PAGES ──
+# storeurbannest.in/designers/<address> is one page, designer.html, which
+# reads the address from the URL and fills itself from Supabase. 200 is a
+# rewrite, not a redirect: the visitor's address bar keeps the nice link.
+# Below the domain rules on purpose, so the old addresses still forward first.
+[[redirects]]
+  from = "/designers/*"
+  to = "/designer.html"
+  status = 200
+
 # ── CHECKOUT FUNCTIONS ──
 # The three endpoints in netlify/functions/. They live outside dist/ on
 # purpose: build-site.mjs assembles dist from an allow list of static files,

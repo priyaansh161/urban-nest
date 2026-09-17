@@ -28,6 +28,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const pages = [
   ...readdirSync(ROOT).filter(f => f.endsWith('.html')),
   ...readdirSync(join(ROOT, 'admin')).filter(f => f.endsWith('.html')).map(f => 'admin/' + f),
+  ...(existsSync(join(ROOT, 'studio')) ? readdirSync(join(ROOT, 'studio')).filter(f => f.endsWith('.html')).map(f => 'studio/' + f) : []),
   ...readdirSync(join(ROOT, 'tools')).filter(f => f.endsWith('.html')).map(f => 'tools/' + f),
 ];
 

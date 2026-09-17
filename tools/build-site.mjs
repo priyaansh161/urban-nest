@@ -30,7 +30,8 @@ const RULES = [
      DEPLOY-CHECKLIST.txt — private working notes — and allowing every .txt
      would have published them. */
   { dir: '.',      names: ['robots.txt', 'sitemap.xml'] },
-  { dir: 'admin',  exts: ['.html', '.js'],                                 deep: false },
+  { dir: 'admin',  exts: ['.html', '.js', '.css'],                                 deep: false },
+  { dir: 'studio', exts: ['.html', '.js'],                                 deep: false },
   { dir: 'images', exts: ['.webp', '.png', '.jpg', '.svg'],                deep: false },
   /* models/ is deliberately NOT here. Every one of the 21 listings with a 3D
      view stores an absolute Supabase Storage URL — the admin's upload button

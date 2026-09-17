@@ -120,7 +120,10 @@ async function uploadImage(input) {
   const base = imgSlugify(nameField && nameField.value)
             || imgSlugify(file.name.replace(/\.[^.]+$/, ''))
             || 'image';
-  const path = base + '-' + Date.now().toString(36) + '.' + shrunk.ext;
+  // A contributor may only upload into their own folder (setup-contributors.sql),
+  // so the studio sets IMG_PREFIX to it. The admin leaves it empty.
+  const prefix = d.prefix || window.IMG_PREFIX || '';
+  const path = prefix + base + '-' + Date.now().toString(36) + '.' + shrunk.ext;
 
   /* Re-wrapped in a Blob that declares its own type: supabase-js puts a
      File into a FormData part and only applies contentType on the raw-body

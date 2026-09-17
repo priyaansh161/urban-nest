@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex"/>
+<title>The Nest Studio · Urban Nest</title>
+<link rel="icon" type="image/png" href="/favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script>
+  /* Read before Supabase starts: an invite or password-reset link arrives
+     with its token after the #, and the client wipes the # as it signs in.
+     This is how the page knows to ask for a new password. */
+  window.UN_INITIAL_HASH = location.hash || '';
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  /* Local preview only: /studio/?demo on this computer swaps Supabase for
+     sample data (tools/studio-demo-mock.js). Never on the live site: the
+     address check fails there, and tools/ isn't deployed. */
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && /[?&]demo/.test(location.search)) {
+    document.write('<script src="/tools/studio-demo-mock.js"><\/script>');
+  }
+</script>
+<script src="/admin/config.js"></script>
+<script src="/admin/image-upload.js"></script>
+<script src="/admin/nest-format.js"></script>
+<script src="/nest-body.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   THE NEST STUDIO — where contributors write for The Nest Edit.
+   Deliberately small: overview, articles, write, profile. It is the
+   admin's Nest editor with everything that isn't theirs taken away,
+   in the brand teal rather than the admin's black.
+   ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --teal: #0E3238; --teal-2: #164149; --paper: #F5F7F6; --white: #FFFFFF;
+  --ink: #0F1F22; --stone: #586366; --hair: #D9E0DE; --gold: #A37B3F; --gold-lift: #C2934D;
+  --mist: #E6EFED; --red: #B03A2E;
+}
+[hidden] { display: none !important; }
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+button, input, select, textarea { font-family: inherit; }
+a { color: inherit; }
+
+/* ── SIGN IN / SET PASSWORD / NOT A WRITER ───────────────────── */
+.gate { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--teal); position: relative; overflow: hidden; }
+.gate::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(234,242,241,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(234,242,241,0.035) 1px, transparent 1px);
+  background-size: 80px 80px; }
+.gate-card { position: relative; width: 100%; max-width: 420px; background: var(--white); padding: 52px 44px 40px; }
+.gate-brand { text-align: center; margin-bottom: 30px; }
+.gate-mark { width: 54px; height: 54px; border-radius: 50%; overflow: hidden; margin: 0 auto 16px; }
+.gate-mark img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gate-name { font-family: 'Bodoni Moda', serif; font-size: 22px; letter-spacing: 0.2em; display: block; }
+.gate-tag { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); display: block; margin-top: 6px; }
+.gate-lead { font-size: 13px; line-height: 1.7; color: var(--stone); text-align: center; margin: -8px 0 24px; }
+.gate label, .field > label { display: block; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); margin-bottom: 8px; }
+.gate input[type=email], .gate input[type=password], .gate input[type=text] {
+  width: 100%; padding: 12px 14px; border: 0.5px solid var(--hair); background: var(--white); font-size: 14px; color: var(--ink); outline: none; margin-bottom: 18px; transition: border-color 0.2s; }
+.gate input:focus { border-color: var(--gold); }
+.show-pw { display: flex !important; align-items: center; gap: 8px; cursor: pointer; font-size: 11.5px !important; letter-spacing: 0.04em !important; text-transform: none !important; margin: -8px 0 18px !important; }
+.show-pw input { accent-color: var(--gold); }
+.gate-btn { width: 100%; padding: 14px; background: var(--teal); color: var(--white); border: none; cursor: pointer; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; transition: background 0.2s; }
+.gate-btn:hover { background: var(--teal-2); }
+.gate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.gate-msg { font-size: 12.5px; text-align: center; margin-top: 16px; min-height: 18px; color: var(--red); line-height: 1.6; }
+.gate-msg.ok { color: var(--teal); }
+.gate-link { display: block; text-align: center; margin-top: 18px; font-size: 11.5px; letter-spacing: 0.06em; color: var(--stone); background: none; border: none; cursor: pointer; width: 100%; text-decoration: none; }
+.gate-link:hover { color: var(--ink); }
+
+/* ── THE STUDIO ──────────────────────────────────────────────── */
+.app { display: flex; min-height: 100vh; }
+.side { width: 232px; background: var(--teal); color: #EAF2F1; display: flex; flex-direction: column; position: fixed; inset: 0 auto 0 0; z-index: 40; }
+.side-brand { padding: 30px 24px 22px; border-bottom: 0.5px solid rgba(234,242,241,0.1); display: flex; align-items: center; gap: 12px; }
+.side-brand .gate-mark { width: 34px; height: 34px; margin: 0; }
+.side-name { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.16em; display: block; }
+.side-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold-lift); display: block; margin-top: 3px; }
+.side-nav { flex: 1; padding: 18px 0; }
+.nav { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 24px; background: none; border: none; border-left: 2px solid transparent; color: rgba(234,242,241,0.6); font-size: 12.5px; letter-spacing: 0.06em; cursor: pointer; text-align: left; transition: all 0.2s; }
+.nav:hover { color: #fff; background: rgba(234,242,241,0.04); }
+.nav.active { color: #fff; border-left-color: var(--gold-lift); background: rgba(194,147,77,0.1); }
+.nav .ic { width: 18px; text-align: center; font-size: 14px; }
+.side-me { padding: 16px 24px; border-top: 0.5px solid rgba(234,242,241,0.1); display: flex; align-items: center; gap: 10px; }
+.side-me .av { width: 32px; height: 32px; }
+.side-me-name { font-size: 12px; line-height: 1.3; }
+.side-me-role { font-size: 10px; color: rgba(234,242,241,0.5); letter-spacing: 0.04em; }
+.side-foot { padding: 0 24px 22px; }
+.side-out { width: 100%; padding: 9px; background: transparent; border: 0.5px solid rgba(234,242,241,0.2); color: rgba(234,242,241,0.6); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+.side-out:hover { color: #fff; border-color: rgba(234,242,241,0.5); }
+.side-site { display: block; text-align: center; margin-top: 12px; font-size: 10px; letter-spacing: 0.14em; color: rgba(234,242,241,0.4); text-decoration: none; }
+.side-site:hover { color: rgba(234,242,241,0.75); }
+
+.main { margin-left: 232px; flex: 1; padding: 44px 48px 80px; max-width: 1180px; }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+.head h1 { font-family: 'Bodoni Moda', serif; font-size: 30px; font-weight: 400; line-height: 1.15; }
+.head p { font-size: 13px; color: var(--stone); margin-top: 6px; line-height: 1.6; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 24px; border: none; cursor: pointer; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; transition: all 0.2s; white-space: nowrap; }
+.btn-primary { background: var(--teal); color: #fff; }
+.btn-primary:hover { background: var(--teal-2); }
+.btn-gold { background: var(--gold); color: #fff; }
+.btn-gold:hover { background: #8d6934; }
+.btn-line { background: transparent; color: var(--stone); border: 0.5px solid var(--hair); }
+.btn-line:hover { color: var(--ink); border-color: var(--ink); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.panel { background: var(--white); border: 0.5px solid var(--hair); }
+.panel-pad { padding: 30px; }
+.panel-title { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); padding-bottom: 14px; margin-bottom: 22px; border-bottom: 0.5px solid var(--hair); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+/* Overview */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--hair); border: 0.5px solid var(--hair); margin-bottom: 28px; }
+.stat { background: var(--white); padding: 22px 24px; }
+.stat-n { font-family: 'Bodoni Moda', serif; font-size: 34px; line-height: 1; }
+.stat-l { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); margin-top: 10px; }
+.stat.gold .stat-n { color: var(--gold); }
+.two { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; }
+.top-art { display: flex; gap: 18px; align-items: center; }
+.top-art .thumb { width: 112px; height: 84px; }
+.top-art-t { font-family: 'Bodoni Moda', serif; font-size: 19px; line-height: 1.3; }
+.top-art-m { font-size: 12px; color: var(--stone); margin-top: 6px; }
+.note { font-size: 13px; line-height: 1.8; color: var(--stone); }
+.note strong { color: var(--ink); font-weight: 500; }
+.note p + p { margin-top: 10px; }
+
+/* Articles list */
+.arts { width: 100%; border-collapse: collapse; }
+.arts th { text-align: left; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); font-weight: 400; padding: 12px 18px; border-bottom: 0.5px solid var(--hair); }
+.arts td { padding: 14px 18px; border-bottom: 0.5px solid var(--hair); font-size: 13px; vertical-align: middle; }
+.arts tr:last-child td { border-bottom: none; }
+.arts tr:hover td { background: #FAFBFB; }
+.thumb { width: 64px; height: 48px; object-fit: cover; background: var(--mist); display: block; flex-shrink: 0; }
+.art-cell { display: flex; align-items: center; gap: 14px; }
+.art-t { font-family: 'Bodoni Moda', serif; font-size: 16px; line-height: 1.3; }
+.art-c { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-top: 3px; }
+.badge { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 9px; display: inline-block; }
+.badge-live { background: rgba(14,50,56,0.08); color: var(--teal); }
+.badge-draft { background: #EEF1F0; color: var(--stone); }
+.votes { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.votes::before { content: '▲ '; color: var(--gold); font-size: 10px; }
+.row-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.rb { padding: 5px 11px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--hair); background: transparent; cursor: pointer; color: var(--stone); text-decoration: none; transition: all 0.2s; }
+.rb:hover { color: var(--ink); border-color: var(--ink); }
+.rb.danger { color: var(--red); border-color: rgba(176,58,46,0.3); }
+.rb.danger:hover { background: rgba(176,58,46,0.05); }
+.empty { padding: 56px 24px; text-align: center; color: var(--stone); font-size: 13.5px; line-height: 1.8; }
+.empty .btn { margin-top: 18px; }
+
+/* Forms */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.field { display: flex; flex-direction: column; }
+.field.full { grid-column: 1 / -1; }
+.field input, .field select, .field textarea { padding: 11px 13px; border: 0.5px solid var(--hair); background: var(--white); font-size: 13.5px; color: var(--ink); outline: none; transition: border-color 0.2s; resize: vertical; width: 100%; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); }
+.field textarea { min-height: 90px; line-height: 1.7; }
+#postContent { min-height: 420px; border-top: none; }
+#postTitle { font-family: 'Bodoni Moda', serif; font-size: 22px; padding: 12px 14px; }
+.hint { font-size: 11px; color: var(--stone); line-height: 1.6; margin-top: 6px; }
+.field-row { display: flex; gap: 10px; }
+.field-row input { flex: 1; min-width: 0; }
+.cover-prev { margin-top: 10px; max-width: 280px; aspect-ratio: 16/10; object-fit: cover; display: block; background: var(--mist); }
+details.more { margin-top: 22px; border-top: 0.5px solid var(--hair); padding-top: 16px; }
+details.more summary { cursor: pointer; font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--stone); list-style: none; }
+details.more summary::before { content: '+ '; color: var(--gold); }
+details.more[open] summary::before { content: '− '; }
+details.more .grid2 { margin-top: 18px; }
+.form-acts { display: flex; gap: 10px; margin-top: 26px; align-items: center; flex-wrap: wrap; }
+.form-acts .spacer { flex: 1; }
+.saved-note { font-size: 11.5px; color: var(--stone); }
+.count { font-size: 11px; color: var(--stone); text-align: right; margin-top: 4px; }
+
+/* The shared toolbar (admin/nest-format.js) */
+.fmt-toolbar { display: flex; align-items: center; gap: 1px; flex-wrap: wrap; border: 0.5px solid var(--hair); border-bottom: 0.5px solid var(--hair); background: var(--paper); padding: 4px 6px; }
+.fmt-sep { width: 1px; align-self: stretch; margin: 4px 7px; background: var(--hair); }
+.fmt-btn { min-width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0 8px; border: 0.5px solid transparent; border-radius: 3px; background: none; cursor: pointer; color: var(--ink); }
+.fmt-btn:hover { border-color: var(--hair); background: var(--white); }
+.fmt-btn svg { width: 15px; height: 15px; display: block; }
+.fmt-select { height: 30px; padding: 0 6px; border: 0.5px solid var(--hair); border-radius: 3px; background: var(--white); font-size: 12px; color: var(--ink); cursor: pointer; outline: none; min-width: 124px; }
+
+/* Profile */
+.prof { display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+.av { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; background: var(--gold); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', serif; font-size: 34px; flex-shrink: 0; overflow: hidden; }
+.av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.av-row { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+
+/* The author card, exactly as readers see it on community.html */
+.card-demo-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); margin-bottom: 12px; }
+.author-card { padding: 22px 24px; border: 0.5px solid var(--hair); background: #EAEFED; }
+.ac-top { display: flex; align-items: center; gap: 16px; }
+.ac-photo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; flex-shrink: 0; background: var(--gold); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', serif; font-size: 24px; overflow: hidden; }
+.ac-photo img { width: 100%; height: 100%; object-fit: cover; }
+.ac-name { font-family: 'Bodoni Moda', serif; font-size: 20px; line-height: 1.2; }
+.ac-role { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-top: 4px; }
+.ac-bio { font-size: 14px; line-height: 1.8; margin-top: 14px; white-space: pre-line; }
+.ac-links { display: flex; gap: 18px; margin-top: 12px; font-size: 11px; letter-spacing: 0.12em; color: var(--gold); }
+
+/* Preview — the reader's own typography */
+.pv { position: fixed; inset: 0; z-index: 90; background: rgba(15,31,34,0.72); backdrop-filter: blur(5px); display: flex; align-items: flex-start; justify-content: center; padding: 32px 16px; overflow-y: auto; }
+.pv-box { width: 100%; max-width: 860px; background: var(--white); position: relative; }
+.pv-close { position: absolute; top: 0; right: 0; width: 50px; height: 50px; background: var(--teal); color: #fff; border: none; font-size: 22px; cursor: pointer; z-index: 2; }
+.pv-flag { position: absolute; top: 14px; left: 14px; z-index: 2; background: var(--gold); color: #fff; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; padding: 6px 10px; }
+.pv-hero { width: 100%; height: 46vh; object-fit: cover; display: block; background: var(--mist); }
+.pv-body { padding: 48px 52px 60px; }
+.pv-cat { font-size: 10px; letter-spacing: 0.32em; color: var(--gold); margin-bottom: 16px; text-transform: uppercase; }
+.pv-title { font-family: 'Bodoni Moda', serif; font-size: clamp(24px, 3.2vw, 40px); font-weight: 400; line-height: 1.12; margin-bottom: 22px; }
+.pv-meta { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--stone); letter-spacing: 0.08em; margin-bottom: 34px; padding-bottom: 26px; border-bottom: 0.5px solid var(--hair); }
+.pv-by { display: inline-flex; align-items: center; gap: 9px; color: var(--ink); }
+.pv-by .ac-photo { width: 26px; height: 26px; font-size: 12px; }
+.pv-excerpt { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 18px; line-height: 1.6; color: var(--stone); margin-bottom: 28px; }
+.pv-content p { font-size: 15px; line-height: 2; margin-bottom: 22px; }
+.pv-content h2 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; margin: 44px 0 16px; }
+.pv-content h3 { font-family: 'Bodoni Moda', serif; font-size: 21px; font-weight: 400; font-style: italic; margin: 36px 0 14px; }
+.pv-content h4 { font-family: 'Bodoni Moda', serif; font-size: 16.5px; font-weight: 500; font-style: italic; margin: 28px 0 10px; }
+.pv-content strong { font-weight: 600; }
+.pv-content ul, .pv-content ol { margin: 0 0 22px 20px; }
+.pv-content li { font-size: 15px; line-height: 1.9; margin-bottom: 8px; }
+.pv-content a { color: var(--gold); }
+
+/* Portfolio link strip, on the overview */
+.page-strip { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--white); border: 0.5px solid var(--hair); padding: 16px 22px; margin: -8px 0 28px; }
+.page-strip .spacer { flex: 1; }
+.page-strip-l { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--stone); }
+.page-strip-url { font-family: 'Bodoni Moda', serif; font-size: 17px; color: var(--teal); text-decoration: none; word-break: break-all; display: inline-block; margin-top: 4px; }
+.page-strip-url:hover { color: var(--gold); }
+.nav-count { margin-left: auto; min-width: 20px; height: 18px; padding: 0 6px; border-radius: 9px; background: var(--gold-lift); color: var(--teal); font-size: 10.5px; font-weight: 500; display: inline-flex; align-items: center; justify-content: center; }
+
+/* Portfolio list */
+.projs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: var(--hair); }
+.proj { background: var(--white); display: flex; flex-direction: column; }
+.proj-img { aspect-ratio: 4 / 3; width: 100%; object-fit: cover; display: block; background: var(--mist); }
+.proj-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.proj-t { font-family: 'Bodoni Moda', serif; font-size: 18px; line-height: 1.3; }
+.proj-m { font-size: 12px; color: var(--stone); }
+.proj .row-acts { margin-top: auto; padding-top: 10px; }
+.proj-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+/* Photo manager */
+.ph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.ph-grid:empty { display: none; }
+.ph { border: 0.5px solid var(--hair); background: var(--paper); position: relative; }
+.ph img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; background: var(--mist); }
+.ph-cover { position: absolute; top: 8px; left: 8px; background: var(--gold); color: #fff; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; padding: 4px 8px; }
+.ph input { width: 100%; border: none; border-top: 0.5px solid var(--hair); padding: 8px 10px; font-size: 12px; background: var(--white); outline: none; }
+.ph input:focus { background: #FFFDF8; }
+.ph-acts { display: flex; border-top: 0.5px solid var(--hair); }
+.ph-acts button { flex: 1; padding: 7px 0; background: var(--white); border: none; border-right: 0.5px solid var(--hair); cursor: pointer; font-size: 12px; color: var(--stone); }
+.ph-acts button:last-child { border-right: none; }
+.ph-acts button:hover:not(:disabled) { color: var(--ink); background: var(--paper); }
+.ph-acts button:disabled { opacity: 0.3; cursor: default; }
+.ph-acts .del:hover { color: var(--red) !important; }
+
+/* Enquiries */
+.enq-filter { padding: 10px 12px; border: 0.5px solid var(--hair); background: var(--white); font-size: 13px; color: var(--ink); outline: none; }
+.enq { background: var(--white); border: 0.5px solid var(--hair); padding: 22px 26px; margin-bottom: 14px; }
+.enq.is-new { border-left: 3px solid var(--gold); }
+.enq-top { display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+.enq-name { font-family: 'Bodoni Moda', serif; font-size: 21px; line-height: 1.2; }
+.enq-when { font-size: 12px; color: var(--stone); margin-top: 4px; }
+.enq-top .spacer { flex: 1; }
+.enq-status { padding: 7px 10px; border: 0.5px solid var(--hair); background: var(--white); font-size: 12px; color: var(--ink); outline: none; }
+.enq-facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.enq-fact { font-size: 11.5px; padding: 5px 10px; background: var(--mist); color: var(--teal); }
+.enq-msg { font-size: 14px; line-height: 1.8; margin-top: 14px; white-space: pre-line; }
+.enq-contact { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+
+.slug-row { display: flex; align-items: stretch; border: 0.5px solid var(--hair); background: var(--white); }
+.slug-row:focus-within { border-color: var(--gold); }
+.slug-pre { padding: 11px 0 11px 13px; font-size: 13.5px; color: var(--stone); white-space: nowrap; }
+.field .slug-row input { border: none; padding-left: 0; min-width: 0; flex: 1; }
+.check-row { display: flex !important; align-items: center; gap: 9px; font-size: 13.5px !important; letter-spacing: 0 !important; text-transform: none !important; color: var(--ink) !important; padding: 11px 0; cursor: pointer; }
+.check-row input { accent-color: var(--gold); width: 16px; height: 16px; }
+
+.toast { position: fixed; bottom: 28px; right: 28px; z-index: 99; padding: 13px 22px; font-size: 13px; background: var(--teal); color: #fff; transform: translateY(20px); opacity: 0; transition: all 0.3s; max-width: calc(100vw - 56px); }
+.toast.show { transform: none; opacity: 1; }
+.toast-error { background: var(--red); }
+
+/* Phone: the sidebar becomes a bar across the top. */
+@media (max-width: 860px) {
+  .side { position: sticky; top: 0; inset: auto; width: 100%; flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .side-brand { border: none; padding: 12px 16px; }
+  .side-tag, .side-me, .side-site { display: none; }
+  /* flex-basis, not width: the desktop rule's flex: 1 would otherwise win
+     and squeeze the tabs onto the brand's row. */
+  .side-nav { order: 3; flex: 0 0 100%; display: flex; overflow-x: auto; padding: 0; border-top: 0.5px solid rgba(234,242,241,0.1); }
+  .nav { width: auto; border-left: none; border-bottom: 2px solid transparent; padding: 12px 14px; white-space: nowrap; }
+  .nav.active { border-bottom-color: var(--gold-lift); }
+  .side-foot { margin-left: auto; padding: 0 16px; }
+  .side-out { padding: 7px 10px; }
+  .app { flex-direction: column; }
+  .main { margin-left: 0; padding: 26px 16px 70px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .nav-count { margin-left: 6px; }
+  .slug-pre { font-size: 12px; padding-left: 10px; }
+  .enq { padding: 18px 16px; }
+  .two, .prof, .grid2 { grid-template-columns: 1fr; }
+  .arts thead { display: none; }
+  .arts tr { display: block; padding: 14px 16px; border-bottom: 0.5px solid var(--hair); }
+  .arts td { display: block; padding: 4px 0; border: none; }
+  .pv-body { padding: 28px 20px 40px; }
+  .gate-card { padding: 40px 26px 30px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── SIGN IN ─────────────────────────────────────────────── -->
+<section class="gate" id="viewSignIn" hidden>
+  <div class="gate-card">
+    <div class="gate-brand">
+      <div class="gate-mark"><img src="/logo-icon.png" alt=""/></div>
+      <span class="gate-name">URBAN NEST</span>
+      <span class="gate-tag">The Nest Studio</span>
+    </div>
+    <p class="gate-lead">For the designers who write The Nest Edit.</p>
+    <form id="signInForm">
+      <label for="siEmail">Email</label>
+      <input type="email" id="siEmail" required autocomplete="email"/>
+      <label for="siPassword">Password</label>
+      <input type="password" id="siPassword" required autocomplete="current-password"/>
+      <label class="show-pw"><input type="checkbox" data-toggle-pw="siPassword"/> Show password</label>
+      <button class="gate-btn" type="submit" id="siBtn">Sign in</button>
+      <p class="gate-msg" id="siMsg"></p>
+    </form>
+    <button class="gate-link" type="button" id="forgotBtn">Forgot your password?</button>
+    <a class="gate-link" href="/community.html">← The Nest Edit</a>
+  </div>
+</section>
+
+<!-- ── SET A PASSWORD (invite link / reset link) ───────────── -->
+<section class="gate" id="viewSetPassword" hidden>
+  <div class="gate-card">
+    <div class="gate-brand">
+      <div class="gate-mark"><img src="/logo-icon.png" alt=""/></div>
+      <span class="gate-name">URBAN NEST</span>
+      <span class="gate-tag">The Nest Studio</span>
+    </div>
+    <p class="gate-lead" id="spLead">Choose a password for your studio.</p>
+    <form id="setPwForm">
+      <label for="spPassword">New password</label>
+      <input type="password" id="spPassword" required minlength="8" autocomplete="new-password"/>
+      <label for="spConfirm">Type it again</label>
+      <input type="password" id="spConfirm" required minlength="8" autocomplete="new-password"/>
+      <label class="show-pw"><input type="checkbox" data-toggle-pw="spPassword,spConfirm"/> Show password</label>
+      <button class="gate-btn" type="submit" id="spBtn">Save password</button>
+      <p class="gate-msg" id="spMsg"></p>
+    </form>
+  </div>
+</section>
+
+<!-- ── SIGNED IN, BUT NOT A WRITER ─────────────────────────── -->
+<section class="gate" id="viewNotWriter" hidden>
+  <div class="gate-card">
+    <div class="gate-brand">
+      <div class="gate-mark"><img src="/logo-icon.png" alt=""/></div>
+      <span class="gate-name">URBAN NEST</span>
+      <span class="gate-tag">The Nest Studio</span>
+    </div>
+    <p class="gate-lead" id="nwText">This login isn't set up as a Nest writer yet. Ask Urban Nest to add you, then sign in again.</p>
+    <a class="gate-btn" id="nwAdmin" href="/admin/" style="display:block;text-align:center;text-decoration:none;margin-bottom:10px" hidden>Go to the admin</a>
+    <button class="gate-btn" type="button" onclick="signOut()">Sign out</button>
+  </div>
+</section>
+
+<!-- ── THE STUDIO ──────────────────────────────────────────── -->
+<div class="app" id="viewApp" hidden>
+  <aside class="side">
+    <div class="side-brand">
+      <div class="gate-mark"><img src="/logo-icon.png" alt=""/></div>
+      <div><span class="side-name">URBAN NEST</span><span class="side-tag">The Nest Studio</span></div>
+    </div>
+    <nav class="side-nav">
+      <button class="nav" data-view="overview"><span class="ic">◈</span> Overview</button>
+      <button class="nav" data-view="articles"><span class="ic">▤</span> My articles</button>
+      <button class="nav" data-view="write"><span class="ic">✎</span> Write</button>
+      <button class="nav" data-view="portfolio"><span class="ic">▦</span> Portfolio</button>
+      <button class="nav" data-view="enquiries"><span class="ic">✉</span> Enquiries <span class="nav-count" id="navEnq" hidden></span></button>
+      <button class="nav" data-view="profile"><span class="ic">◎</span> Profile</button>
+    </nav>
+    <div class="side-me">
+      <span class="av" id="sideAv" style="width:32px;height:32px;font-size:14px"></span>
+      <div><div class="side-me-name" id="sideName"></div><div class="side-me-role" id="sideRole"></div></div>
+    </div>
+    <div class="side-foot">
+      <button class="side-out" type="button" onclick="signOut()">Sign out</button>
+      <a class="side-site" href="/community.html" target="_blank" rel="noopener">The Nest Edit →</a>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <section data-page="overview" hidden>
+      <div class="head">
+        <div><h1 id="hello">Welcome</h1><p>Your articles on The Nest Edit, and how readers are responding.</p></div>
+        <button class="btn btn-primary" type="button" onclick="newArticle()">Write an article</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-n" id="stTotal">0</div><div class="stat-l">Articles</div></div>
+        <div class="stat"><div class="stat-n" id="stLive">0</div><div class="stat-l">Live</div></div>
+        <div class="stat gold"><div class="stat-n" id="stVotes">0</div><div class="stat-l">Upvotes</div></div>
+        <div class="stat"><div class="stat-n" id="stEnq">0</div><div class="stat-l">Enquiries</div></div>
+      </div>
+      <div class="page-strip" id="pageStrip" hidden>
+        <div>
+          <div class="page-strip-l">Your portfolio page</div>
+          <a class="page-strip-url" id="pageUrl" target="_blank" rel="noopener">storeurbannest.in/designers/</a>
+        </div>
+        <span class="spacer"></span>
+        <button class="rb" type="button" onclick="copyPageLink()">Copy link</button>
+        <a class="rb" id="pageOpen" target="_blank" rel="noopener">Open ↗</a>
+      </div>
+      <div class="two">
+        <div class="panel panel-pad">
+          <div class="panel-title">Your most upvoted</div>
+          <div id="topArt"></div>
+        </div>
+        <div class="panel panel-pad">
+          <div class="panel-title">How it works</div>
+          <div class="note">
+            <p><strong>Publish</strong> puts an article live on The Nest Edit straight away. <strong>Save draft</strong> keeps it here, private, until you're ready.</p>
+            <p><strong>Upvotes</strong> come from readers: one per reader, on any article they love. They're how the best pieces get noticed.</p>
+            <p>Your <strong>portfolio page</strong> shows your profile, your published projects and your articles. Share its link anywhere: your Instagram bio, WhatsApp, a visiting card.</p>
+            <p><strong>Enquiries</strong> from the Enquire form on your page arrive here, under Enquiries.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARTICLES -->
+    <section data-page="articles" hidden>
+      <div class="head">
+        <div><h1>My articles</h1><p>Everything you've written, live and draft.</p></div>
+        <button class="btn btn-primary" type="button" onclick="newArticle()">Write an article</button>
+      </div>
+      <div class="panel" id="artList"></div>
+    </section>
+
+    <!-- WRITE -->
+    <section data-page="write" hidden>
+      <div class="head">
+        <div><h1 id="writeTitle">Write an article</h1><p id="writeSub">Save a draft any time. Publish when it's ready and it goes live on The Nest Edit.</p></div>
+      </div>
+      <div class="panel panel-pad">
+        <input type="hidden" id="editingId"/>
+        <div class="grid2">
+          <div class="field full">
+            <label for="postTitle">Title</label>
+            <input type="text" id="postTitle" maxlength="140" placeholder="A title readers will stop for"/>
+          </div>
+          <div class="field">
+            <label for="postCategory">Category</label>
+            <select id="postCategory">
+              <option value="trends">Trends</option>
+              <option value="tips">Tips &amp; Guides</option>
+              <option value="inspiration">Inspiration</option>
+              <option value="community">Community</option>
+              <option value="behind-the-scenes">Behind the Scenes</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="postReadTime">Read time</label>
+            <input type="text" id="postReadTime" placeholder="Worked out as you write"/>
+          </div>
+          <div class="field full">
+            <label for="postExcerpt">Summary</label>
+            <textarea id="postExcerpt" maxlength="260" style="min-height:64px" placeholder="One or two lines, shown on the article card and at the top of the article."></textarea>
+            <div class="count" id="excerptCount"></div>
+          </div>
+          <div class="field full">
+            <label for="postContent">Article</label>
+            <div class="fmt-toolbar">
+              <button type="button" class="fmt-btn" data-fmt="bold" title="Bold (Ctrl+B)" aria-label="Bold">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7z"/><path d="M7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/></svg>
+              </button>
+              <button type="button" class="fmt-btn" data-fmt="italic" title="Italic (Ctrl+I)" aria-label="Italic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 5h-5"/><path d="M14 19H9"/><path d="M14.5 5l-4 14"/></svg>
+              </button>
+              <span class="fmt-sep"></span>
+              <select class="fmt-select" id="fmtStyle" title="Text style">
+                <option value="paragraph">Normal text</option>
+                <option value="h2">Heading 1</option>
+                <option value="h3">Heading 2</option>
+                <option value="h4">Heading 3</option>
+              </select>
+              <span class="fmt-sep"></span>
+              <button type="button" class="fmt-btn" data-fmt="bullets" title="Bullet list" aria-label="Bullet list">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="4.5" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="4.5" cy="17.5" r="1.4" fill="currentColor" stroke="none"/><path d="M9.5 6.5H20M9.5 12H20M9.5 17.5H20"/></svg>
+              </button>
+              <button type="button" class="fmt-btn" data-fmt="numbers" title="Numbered list" aria-label="Numbered list">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6.5H20M10 12H20M10 17.5H20"/><path d="M3.2 5.2l1.3-.7V8"/><path d="M3.2 11h2.2l-2.2 2.6h2.2"/><path d="M3.4 16.2h2v1.4h-2v1.4h2"/></svg>
+              </button>
+            </div>
+            <textarea id="postContent" placeholder="Write your article here. Leave a blank line between paragraphs."></textarea>
+            <span class="hint">Select text and use the buttons, or Ctrl+B / Ctrl+I. Leave a blank line between paragraphs. Links (https://…) become clickable. <span id="wordCount"></span></span>
+          </div>
+          <div class="field full">
+            <label for="postImage">Cover photo</label>
+            <div class="field-row">
+              <input type="url" id="postImage" placeholder="Upload a photo, or paste a link"/>
+              <button type="button" class="btn btn-line" id="postImageBtn" onclick="document.getElementById('postImageFile').click()">Upload</button>
+            </div>
+            <input type="file" id="postImageFile" accept="image/*" hidden data-target="postImage" data-btn="postImageBtn" data-hint="postImageHint" data-name="postTitle" onchange="uploadImage(this)"/>
+            <span class="hint" id="postImageHint">Landscape photos work best. Large photos are shrunk automatically.</span>
+            <img class="cover-prev" id="coverPrev" alt="" hidden/>
+          </div>
+        </div>
+        <details class="more">
+          <summary>More options (tags, search)</summary>
+          <div class="grid2">
+            <div class="field">
+              <label for="postTags">Tags</label>
+              <input type="text" id="postTags" placeholder="Small spaces, Lighting"/>
+            </div>
+            <div class="field">
+              <label for="postSlug">Web address name</label>
+              <input type="text" id="postSlug" placeholder="made from the title"/>
+            </div>
+            <div class="field full">
+              <label for="postMeta">Search description</label>
+              <textarea id="postMeta" maxlength="170" style="min-height:60px" placeholder="About 155 characters, shown under the title in Google."></textarea>
+            </div>
+          </div>
+        </details>
+        <div class="form-acts">
+          <button class="btn btn-line" type="button" onclick="cancelWrite()">Cancel</button>
+          <span class="spacer"></span>
+          <span class="saved-note" id="savedNote"></span>
+          <button class="btn btn-line" type="button" onclick="openPreview()">Preview</button>
+          <button class="btn btn-line" type="button" id="draftBtn" onclick="saveArticle(false)">Save draft</button>
+          <button class="btn btn-gold" type="button" id="publishBtn" onclick="saveArticle(true)">Publish</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section data-page="portfolio" hidden>
+      <div class="head">
+        <div><h1>Portfolio</h1><p>Your finished projects, shown on your page. Published projects are public; drafts are only visible to you.</p></div>
+        <div class="row-acts">
+          <a class="btn btn-line" id="pfViewPage" target="_blank" rel="noopener">View my page ↗</a>
+          <button class="btn btn-primary" type="button" onclick="newProject()">Add a project</button>
+        </div>
+      </div>
+      <div class="panel" id="projList"></div>
+    </section>
+
+    <!-- PROJECT EDITOR -->
+    <section data-page="project" hidden>
+      <div class="head">
+        <div><h1 id="projHead">Add a project</h1><p>A room or a home you've finished. Photos first: they're what people look at.</p></div>
+      </div>
+      <div class="panel panel-pad">
+        <input type="hidden" id="projId"/>
+        <div class="grid2">
+          <div class="field full">
+            <label for="projTitle">Project name</label>
+            <input type="text" id="projTitle" maxlength="100" placeholder="A calm family home in Vasant Kunj" style="font-family:'Bodoni Moda',serif;font-size:20px"/>
+          </div>
+          <div class="field">
+            <label for="projKind">Type</label>
+            <select id="projKind">
+              <option value="">Choose one</option>
+              <option>Full home</option>
+              <option>Living room</option>
+              <option>Bedroom</option>
+              <option>Kitchen</option>
+              <option>Bathroom</option>
+              <option>Dining</option>
+              <option>Kids' room</option>
+              <option>Office</option>
+              <option>Commercial</option>
+              <option>Styling</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="projPlace">Where</label>
+            <input type="text" id="projPlace" maxlength="80" placeholder="3BHK · Gurugram"/>
+          </div>
+          <div class="field">
+            <label for="projYear">Year finished</label>
+            <input type="number" id="projYear" min="1980" max="2100" placeholder="2026"/>
+          </div>
+          <div class="field full">
+            <label for="projSummary">About the project</label>
+            <textarea id="projSummary" maxlength="2000" style="min-height:130px" placeholder="What the client wanted, what you did, and what you're proud of. A few short paragraphs is plenty."></textarea>
+            <div class="count" id="projSummaryCount"></div>
+          </div>
+          <div class="field full">
+            <label>Photos</label>
+            <div class="ph-grid" id="projPhotos"></div>
+            <div class="field-row" style="margin-top:12px;align-items:center">
+              <button type="button" class="btn btn-line" id="projAddBtn" onclick="document.getElementById('projFiles').click()">Add photos</button>
+              <span class="hint" id="projPhotoHint" style="margin:0">The first photo is the cover. Choose several at once; each is shrunk before upload. Up to 30.</span>
+            </div>
+            <input type="file" id="projFiles" accept="image/*" multiple hidden onchange="addProjectPhotos(this)"/>
+          </div>
+        </div>
+        <div class="form-acts">
+          <button class="btn btn-line" type="button" onclick="cancelProject()">Cancel</button>
+          <span class="spacer"></span>
+          <button class="btn btn-line" type="button" id="projDraftBtn" onclick="saveProject(false)">Save draft</button>
+          <button class="btn btn-gold" type="button" id="projPubBtn" onclick="saveProject(true)">Publish</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENQUIRIES -->
+    <section data-page="enquiries" hidden>
+      <div class="head">
+        <div><h1>Enquiries</h1><p>People who used the Enquire form on your page. Reply to them directly, then mark where things stand.</p></div>
+        <select class="enq-filter" id="enqFilter" aria-label="Show">
+          <option value="open">New &amp; contacted</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="closed">Closed</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+      <div id="enqList"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section data-page="profile" hidden>
+      <div class="head">
+        <div><h1>Profile</h1><p>What readers see when they tap your name on one of your articles.</p></div>
+      </div>
+      <div class="prof">
+        <div>
+          <div class="panel panel-pad">
+            <div class="panel-title">About you</div>
+            <div class="av-row">
+              <span class="av" id="pfAvPrev"></span>
+              <div style="flex:1">
+                <div class="field-row">
+                  <input type="url" id="pfAvatar" placeholder="Upload a photo, or paste a link" style="padding:11px 13px;border:0.5px solid var(--hair);font-size:13px"/>
+                  <button type="button" class="btn btn-line" id="pfAvatarBtn" onclick="document.getElementById('pfAvatarFile').click()">Upload</button>
+                </div>
+                <input type="file" id="pfAvatarFile" accept="image/*" hidden data-target="pfAvatar" data-btn="pfAvatarBtn" data-hint="pfAvatarHint" data-name="pfName" onchange="uploadImage(this)"/>
+                <span class="hint" id="pfAvatarHint">A clear, square-ish photo of you.</span>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label for="pfName">Name</label>
+                <input type="text" id="pfName" maxlength="60"/>
+              </div>
+              <div class="field">
+                <label for="pfTitle">What you do</label>
+                <input type="text" id="pfTitle" maxlength="60" placeholder="Interior Designer"/>
+              </div>
+              <div class="field">
+                <label for="pfCity">City</label>
+                <input type="text" id="pfCity" maxlength="40" placeholder="New Delhi"/>
+              </div>
+              <div class="field">
+                <label for="pfEmail">Email (your login)</label>
+                <input type="email" id="pfEmail" disabled style="background:var(--paper);color:var(--stone)"/>
+              </div>
+              <div class="field full">
+                <label for="pfBio">Short bio</label>
+                <textarea id="pfBio" maxlength="300" placeholder="Two or three lines about your work and what you care about in a home."></textarea>
+                <div class="count" id="bioCount"></div>
+              </div>
+              <div class="field">
+                <label for="pfInstagram">Instagram</label>
+                <input type="text" id="pfInstagram" maxlength="120" placeholder="@yourstudio"/>
+              </div>
+              <div class="field">
+                <label for="pfWebsite">Website</label>
+                <input type="text" id="pfWebsite" maxlength="160" placeholder="yourstudio.com"/>
+              </div>
+            </div>
+            <div class="form-acts">
+              <span class="spacer"></span>
+              <button class="btn btn-primary" type="button" id="pfSave" onclick="saveProfile()">Save profile</button>
+            </div>
+          </div>
+
+          <div class="panel panel-pad" style="margin-top:24px">
+            <div class="panel-title">Your portfolio page</div>
+            <div class="grid2">
+              <div class="field full">
+                <label for="pfSlug">Page address</label>
+                <div class="slug-row"><span class="slug-pre">storeurbannest.in/designers/</span><input type="text" id="pfSlug" maxlength="40" placeholder="your-name"/></div>
+                <span class="hint">Lower-case letters, numbers and hyphens. Changing it breaks links you've already shared.</span>
+              </div>
+              <div class="field full">
+                <label for="pfAbout">About your work</label>
+                <textarea id="pfAbout" maxlength="2000" style="min-height:150px" placeholder="Longer than the bio: how you work, the kind of homes you love doing, what a client can expect. Leave a blank line between paragraphs."></textarea>
+                <div class="count" id="aboutCount"></div>
+              </div>
+              <div class="field full">
+                <label for="pfServices">Services</label>
+                <input type="text" id="pfServices" maxlength="300" placeholder="Full home design, Styling, Kitchens, Turnkey projects"/>
+                <span class="hint">Separate with commas. Each shows as a tag on your page.</span>
+              </div>
+              <div class="field">
+                <label for="pfWhatsapp">WhatsApp number <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+                <input type="tel" id="pfWhatsapp" maxlength="20" placeholder="98765 43210"/>
+                <span class="hint">Public if filled in. After someone sends an enquiry, they get a button to message you on WhatsApp too.</span>
+              </div>
+              <div class="field">
+                <label>New projects</label>
+                <label class="check-row"><input type="checkbox" id="pfAccepting"/> I'm taking new projects</label>
+                <span class="hint">Untick to hide the Enquire form. Your page stays up.</span>
+              </div>
+            </div>
+            <div class="form-acts">
+              <a class="btn btn-line" id="pfOpenPage" target="_blank" rel="noopener">View my page ↗</a>
+              <span class="spacer"></span>
+              <button class="btn btn-primary" type="button" id="pfSave2" onclick="saveProfile()">Save page details</button>
+            </div>
+          </div>
+
+          <div class="panel panel-pad" style="margin-top:24px">
+            <div class="panel-title">Password</div>
+            <div class="grid2">
+              <div class="field">
+                <label for="pwNew">New password</label>
+                <input type="password" id="pwNew" minlength="8" autocomplete="new-password"/>
+              </div>
+              <div class="field">
+                <label for="pwConfirm">Type it again</label>
+                <input type="password" id="pwConfirm" minlength="8" autocomplete="new-password"/>
+              </div>
+            </div>
+            <div class="form-acts">
+              <span class="hint" style="margin:0">At least 8 characters.</span>
+              <span class="spacer"></span>
+              <button class="btn btn-line" type="button" id="pwSave" onclick="changePassword()">Change password</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-demo-label">Your author card, as readers see it</div>
+          <div class="author-card">
+            <div class="ac-top">
+              <span class="ac-photo" id="cdPhoto"></span>
+              <div><div class="ac-name" id="cdName"></div><div class="ac-role" id="cdRole"></div></div>
+            </div>
+            <p class="ac-bio" id="cdBio"></p>
+            <div class="ac-links" id="cdLinks"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ── PREVIEW ─────────────────────────────────────────────── -->
+<div class="pv" id="preview" hidden onclick="if (event.target === this) closePreview()">
+  <div class="pv-box">
+    <span class="pv-flag">Preview</span>
+    <button class="pv-close" type="button" onclick="closePreview()" aria-label="Close preview">×</button>
+    <img class="pv-hero" id="pvHero" alt="" hidden/>
+    <div class="pv-body">
+      <div class="pv-cat" id="pvCat"></div>
+      <h2 class="pv-title" id="pvTitle"></h2>
+      <div class="pv-meta">
+        <span class="pv-by" id="pvBy"></span>
+        <span id="pvRead"></span>
+        <span id="pvDate"></span>
+      </div>
+      <p class="pv-excerpt" id="pvExcerpt"></p>
+      <div class="pv-content" id="pvContent"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const CAT_LABELS = { trends: 'Trends', tips: 'Tips & Guides', inspiration: 'Inspiration', community: 'Community',
+  'behind-the-scenes': 'Behind the Scenes', general: 'General', announcement: 'Announcement', collection: 'Collection Update' };
+
+let me = null;          // the contributors row
+let posts = [];
+let dirty = false;      // unsaved changes in the editor
+let projects = [];      // portfolio_projects rows
+let enquiries = [];     // designer_enquiries rows
+let projEditing = false, projDirty = false, projUploading = 0;
+let projPhotos = [];    // [{ url, caption }] for the project being edited
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const initialOf = name => esc((name || '?').trim().charAt(0).toUpperCase() || '?');
+
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = 'toast' + (type === 'error' ? ' toast-error' : '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3200);
+}
+
+// Every "Show password" box names the field(s) it reveals.
+document.querySelectorAll('[data-toggle-pw]').forEach(box => box.addEventListener('change', () => {
+  box.dataset.togglePw.split(',').forEach(id => { $(id).type = box.checked ? 'text' : 'password'; });
+}));
+
+// ── Which screen ──────────────────────────────────────────────
+const VIEWS = ['viewSignIn', 'viewSetPassword', 'viewNotWriter', 'viewApp'];
+function showView(id) { VIEWS.forEach(v => { $(v).hidden = v !== id; }); }
+
+async function boot() {
+  const hash = window.UN_INITIAL_HASH;
+  const needsPassword = /type=(invite|recovery)/.test(hash);
+  const linkError = /error_code=([^&]+)/.exec(hash);
+
+  const { data: { session } } = await db.auth.getSession();
+
+  if (linkError && !session) {
+    showView('viewSignIn');
+    $('siMsg').textContent = /expired/.test(linkError[1])
+      ? 'That link has expired. Ask Urban Nest to send a new one, or use "Forgot your password?".'
+      : 'That link didn\'t work. Ask Urban Nest to send a new one.';
+    return;
+  }
+  if (session && needsPassword) {
+    $('spLead').textContent = /invite/.test(hash)
+      ? 'Welcome to The Nest Studio. Choose a password to finish setting up.'
+      : 'Choose a new password.';
+    showView('viewSetPassword');
+    return;
+  }
+  if (!session) { showView('viewSignIn'); return; }
+  await enterStudio();
+}
+
+async function enterStudio() {
+  const { data: cid, error } = await db.rpc('my_contributor_id');
+  if (error || !cid) {
+    let admin = false;
+    try { const r = await db.rpc('is_admin'); admin = r.data === true; } catch (e) {}
+    $('nwAdmin').hidden = !admin;
+    $('nwText').textContent = admin
+      ? 'You\'re signed in as the Urban Nest admin, not as a Nest writer. Add writers from the admin\'s Contributors page.'
+      : error && /function|does not exist/i.test(error.message)
+        ? 'The studio isn\'t switched on yet. Urban Nest needs to finish setting it up.'
+        : 'This login isn\'t set up as a Nest writer yet. Ask Urban Nest to add you, then sign in again.';
+    showView('viewNotWriter');
+    return;
+  }
+  const { data: row, error: rowErr } = await db.from('contributors').select('*').eq('id', cid).single();
+  if (rowErr || !row) { showToast('Could not load your profile', 'error'); showView('viewNotWriter'); return; }
+  me = row;
+  window.IMG_PREFIX = 'contributors/' + me.id + '/';   // the only folder they may upload into
+  showView('viewApp');
+  paintMe();
+  await Promise.all([loadPosts(), loadProjects(), loadEnquiries()]);
+  go(location.hash.replace('#', '') || 'overview');
+}
+
+// ── Sign in / out / passwords ─────────────────────────────────
+$('signInForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = $('siBtn'), msg = $('siMsg');
+  btn.disabled = true; btn.textContent = 'Signing in…'; msg.textContent = ''; msg.className = 'gate-msg';
+  const { error } = await db.auth.signInWithPassword({ email: $('siEmail').value.trim(), password: $('siPassword').value });
+  btn.disabled = false; btn.textContent = 'Sign in';
+  if (error) { msg.textContent = /invalid/i.test(error.message) ? 'That email and password don\'t match.' : error.message; return; }
+  await enterStudio();
+});
+
+$('forgotBtn').addEventListener('click', async () => {
+  const email = $('siEmail').value.trim(), msg = $('siMsg');
+  if (!email) { msg.className = 'gate-msg'; msg.textContent = 'Type your email above first.'; $('siEmail').focus(); return; }
+  const { error } = await db.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/studio/' });
+  msg.className = error ? 'gate-msg' : 'gate-msg ok';
+  msg.textContent = error ? error.message : 'If that email has a studio login, a reset link is on its way.';
+});
+
+$('setPwForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const a = $('spPassword').value, b = $('spConfirm').value, msg = $('spMsg');
+  msg.className = 'gate-msg';
+  if (a.length < 8) { msg.textContent = 'Use at least 8 characters.'; return; }
+  if (a !== b) { msg.textContent = 'The two passwords don\'t match.'; return; }
+  $('spBtn').disabled = true;
+  const { error } = await db.auth.updateUser({ password: a });
+  $('spBtn').disabled = false;
+  if (error) { msg.textContent = error.message; return; }
+  history.replaceState(null, '', location.pathname);
+  window.UN_INITIAL_HASH = '';
+  showToast('Password saved');
+  await enterStudio();
+});
+
+async function signOut() {
+  if (dirty && !confirm('You have unsaved changes. Sign out anyway?')) return;
+  dirty = false;
+  await db.auth.signOut();
+  location.href = location.pathname;
+}
+
+async function changePassword() {
+  const a = $('pwNew').value, b = $('pwConfirm').value;
+  if (a.length < 8) { showToast('Use at least 8 characters', 'error'); return; }
+  if (a !== b) { showToast('The two passwords don\'t match', 'error'); return; }
+  $('pwSave').disabled = true;
+  const { error } = await db.auth.updateUser({ password: a });
+  $('pwSave').disabled = false;
+  if (error) { showToast(error.message, 'error'); return; }
+  $('pwNew').value = ''; $('pwConfirm').value = '';
+  showToast('Password changed');
+}
+
+// ── Navigation ────────────────────────────────────────────────
+function go(view) {
+  if (!['overview', 'articles', 'write', 'portfolio', 'project', 'enquiries', 'profile'].includes(view)) view = 'overview';
+  // The project editor has nothing to show without a project or a fresh start.
+  if (view === 'project' && !projEditing) view = 'portfolio';
+  const cur = document.querySelector('[data-page]:not([hidden])');
+  if (cur && cur.dataset.page === 'write' && view !== 'write' && dirty
+      && !confirm('You have unsaved changes to this article. Leave without saving?')) return;
+  if (cur && cur.dataset.page === 'write' && view !== 'write') dirty = false;
+  if (cur && cur.dataset.page === 'project' && view !== 'project' && projDirty
+      && !confirm('You have unsaved changes to this project. Leave without saving?')) return;
+  if (cur && cur.dataset.page === 'project' && view !== 'project') { projDirty = false; projEditing = false; }
+  if (view === 'enquiries') renderEnquiries();
+  document.querySelectorAll('[data-page]').forEach(s => { s.hidden = s.dataset.page !== view; });
+  document.querySelectorAll('.nav').forEach(n => n.classList.toggle('active', n.dataset.view === view));
+  if (view === 'write' && !$('editingId').value && !dirty) resetEditor();
+  if (view === 'profile') fillProfile();
+  history.replaceState(null, '', '#' + view);
+  window.scrollTo({ top: 0 });
+}
+document.querySelectorAll('.nav').forEach(n => n.addEventListener('click', () => go(n.dataset.view)));
+window.addEventListener('beforeunload', (e) => { if (dirty || projDirty || projUploading) { e.preventDefault(); e.returnValue = ''; } });
+
+// ── Me ────────────────────────────────────────────────────────
+function avatarHtml(url, name) {
+  return url ? '<img src="' + esc(url) + '" alt=""/>' : initialOf(name);
+}
+function paintMe() {
+  $('sideAv').innerHTML = avatarHtml(me.avatar_url, me.display_name);
+  $('sideName').textContent = me.display_name;
+  $('sideRole').textContent = me.title || 'Nest writer';
+  $('hello').textContent = 'Welcome, ' + (me.display_name || '').split(' ')[0];
+  // Until setup-designer-portfolio.sql has run there is no slug, and no page.
+  const url = me.slug ? location.origin + '/designers/' + encodeURIComponent(me.slug) : '';
+  $('pageStrip').hidden = !url;
+  $('pageUrl').textContent = url.replace(/^https?:\/\//, '');
+  ['pageUrl', 'pageOpen', 'pfViewPage', 'pfOpenPage'].forEach(id => {
+    const a = $(id);
+    if (url) { a.href = url; a.hidden = false; } else { a.removeAttribute('href'); a.hidden = true; }
+  });
+}
+function pageLink() { return me && me.slug ? location.origin + '/designers/' + encodeURIComponent(me.slug) : ''; }
+async function copyPageLink() {
+  const url = pageLink();
+  if (!url) return;
+  try { await navigator.clipboard.writeText(url); showToast('Link copied'); }
+  catch (e) { prompt('Copy your page link', url); }
+}
+
+// ── Articles ──────────────────────────────────────────────────
+async function loadPosts() {
+  const { data, error } = await db.from('nest_posts').select('*')
+    .eq('contributor_id', me.id).order('updated_at', { ascending: false });
+  if (error) { showToast('Could not load your articles', 'error'); return; }
+  posts = data || [];
+  renderOverview();
+  renderList();
+}
+
+function renderOverview() {
+  const live = posts.filter(p => p.published);
+  const votes = posts.reduce((n, p) => n + (p.upvote_count || 0), 0);
+  $('stTotal').textContent = posts.length;
+  $('stLive').textContent = live.length;
+  $('stVotes').textContent = votes;
+  $('stEnq').textContent = enquiries.length;
+  const top = live.slice().sort((a, b) => (b.upvote_count || 0) - (a.upvote_count || 0))[0];
+  $('topArt').innerHTML = top
+    ? '<div class="top-art">' + (top.image_url ? '<img class="thumb" src="' + esc(top.image_url) + '" alt=""/>' : '<span class="thumb"></span>')
+      + '<div><div class="top-art-t">' + esc(top.title) + '</div><div class="top-art-m"><span class="votes">' + (top.upvote_count || 0)
+      + '</span> · ' + esc(CAT_LABELS[top.category] || top.category || '') + '</div>'
+      + '<div class="row-acts" style="margin-top:12px"><a class="rb" href="/community.html?a=' + esc(top.id) + '" target="_blank" rel="noopener">View on site</a>'
+      + '<button class="rb" type="button" onclick="editArticle(\'' + esc(top.id) + '\')">Edit</button></div></div></div>'
+    : '<p class="note">' + (posts.length ? 'Publish an article and its upvotes will show here.' : 'Nothing published yet. Your first article will show here.') + '</p>';
+}
+
+function fmtDate(d) {
+  return d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+}
+
+function renderList() {
+  const el = $('artList');
+  if (!posts.length) {
+    el.innerHTML = '<div class="empty">You haven\'t written anything yet.<br/><button class="btn btn-primary" type="button" onclick="newArticle()">Write your first article</button></div>';
+    return;
+  }
+  el.innerHTML = '<table class="arts"><thead><tr><th>Article</th><th>Status</th><th>Upvotes</th><th>Updated</th><th></th></tr></thead><tbody>'
+    + posts.map(p => {
+      const id = esc(p.id);
+      return '<tr>'
+        + '<td><div class="art-cell">' + (p.image_url ? '<img class="thumb" src="' + esc(p.image_url) + '" alt="" loading="lazy"/>' : '<span class="thumb"></span>')
+        + '<div><div class="art-t">' + esc(p.title) + '</div><div class="art-c">' + esc(CAT_LABELS[p.category] || p.category || '') + '</div></div></div></td>'
+        + '<td><span class="badge ' + (p.published ? 'badge-live">Live' : 'badge-draft">Draft') + '</span></td>'
+        + '<td><span class="votes">' + (p.upvote_count || 0) + '</span></td>'
+        + '<td style="color:var(--stone);font-size:12px;white-space:nowrap">' + fmtDate(p.updated_at || p.created_at) + '</td>'
+        + '<td><div class="row-acts">'
+        + '<button class="rb" type="button" onclick="editArticle(\'' + id + '\')">Edit</button>'
+        + (p.published ? '<a class="rb" href="/community.html?a=' + id + '" target="_blank" rel="noopener">View</a>' : '')
+        + '<button class="rb" type="button" onclick="togglePublish(\'' + id + '\')">' + (p.published ? 'Unpublish' : 'Publish') + '</button>'
+        + '<button class="rb danger" type="button" onclick="deleteArticle(\'' + id + '\')">Delete</button>'
+        + '</div></td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+async function togglePublish(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  if (p.published && !confirm('Take "' + p.title + '" off The Nest Edit? It stays here as a draft.')) return;
+  const { error } = await db.from('nest_posts').update({ published: !p.published, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) { showToast('Could not update: ' + error.message, 'error'); return; }
+  showToast(p.published ? 'Unpublished — it\'s a draft again' : 'Published — it\'s live on The Nest Edit');
+  await loadPosts();
+}
+
+async function deleteArticle(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p || !confirm('Delete "' + p.title + '" for good? This can\'t be undone, and its upvotes go with it.')) return;
+  const { error } = await db.from('nest_posts').delete().eq('id', id);
+  if (error) { showToast('Could not delete: ' + error.message, 'error'); return; }
+  showToast('Article deleted');
+  await loadPosts();
+}
+
+// ── Editor ────────────────────────────────────────────────────
+const FIELDS = { title: 'postTitle', category: 'postCategory', read_time: 'postReadTime', excerpt: 'postExcerpt',
+  content: 'postContent', image_url: 'postImage', tags: 'postTags', slug: 'postSlug', meta_description: 'postMeta' };
+
+function resetEditor() {
+  $('editingId').value = '';
+  Object.values(FIELDS).forEach(id => { $(id).value = ''; });
+  $('postCategory').value = 'trends';
+  $('writeTitle').textContent = 'Write an article';
+  $('writeSub').textContent = 'Save a draft any time. Publish when it\'s ready and it goes live on The Nest Edit.';
+  $('publishBtn').textContent = 'Publish';
+  $('draftBtn').textContent = 'Save draft';
+  $('savedNote').textContent = '';
+  refreshEditorBits();
+  dirty = false;
+}
+
+function newArticle() {
+  if (dirty && !confirm('You have unsaved changes. Start a new article anyway?')) return;
+  dirty = false;
+  resetEditor();
+  go('write');
+  $('postTitle').focus();
+}
+
+function editArticle(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  if (dirty && !confirm('You have unsaved changes. Open another article anyway?')) return;
+  dirty = false;
+  go('write');
+  $('editingId').value = p.id;
+  Object.entries(FIELDS).forEach(([k, fid]) => { $(fid).value = p[k] || ''; });
+  $('postCategory').value = p.category || 'general';
+  $('writeTitle').textContent = 'Edit article';
+  $('writeSub').textContent = p.published ? 'This article is live. Saving updates it on The Nest Edit straight away.' : 'This article is a draft, visible only to you.';
+  $('publishBtn').textContent = p.published ? 'Update live article' : 'Publish';
+  $('draftBtn').textContent = p.published ? 'Unpublish & save as draft' : 'Save draft';
+  $('savedNote').textContent = 'Last saved ' + fmtDate(p.updated_at);
+  refreshEditorBits();
+  dirty = false;
+  fmtSyncStyle();
+}
+
+function cancelWrite() {
+  if (dirty && !confirm('Discard your unsaved changes?')) return;
+  dirty = false;
+  $('editingId').value = '';
+  go(posts.length ? 'articles' : 'overview');
+}
+
+function wordsIn(text) { return (text.trim().match(/\S+/g) || []).length; }
+let readTimeTouched = false;
+function refreshEditorBits() {
+  const words = wordsIn($('postContent').value);
+  $('wordCount').textContent = words ? '· ' + words + ' words' : '';
+  if (!readTimeTouched || !$('postReadTime').value.trim()) {
+    $('postReadTime').placeholder = words ? Math.max(1, Math.round(words / 200)) + ' min read' : 'Worked out as you write';
+  }
+  const ex = $('postExcerpt').value.length;
+  $('excerptCount').textContent = ex ? ex + ' / 260' : '';
+  const url = $('postImage').value.trim();
+  $('coverPrev').hidden = !url;
+  if (url) $('coverPrev').src = url;
+}
+['postTitle', 'postCategory', 'postReadTime', 'postExcerpt', 'postContent', 'postImage', 'postTags', 'postSlug', 'postMeta']
+  .forEach(id => $(id).addEventListener('input', () => { dirty = true; refreshEditorBits(); }));
+$('postReadTime').addEventListener('input', () => { readTimeTouched = true; });
+
+function formPayload() {
+  const title = $('postTitle').value.trim();
+  const slugRaw = $('postSlug').value.trim() || title;
+  const words = wordsIn($('postContent').value);
+  return {
+    title,
+    category: $('postCategory').value,
+    content: $('postContent').value.trim(),
+    excerpt: $('postExcerpt').value.trim() || null,
+    read_time: $('postReadTime').value.trim() || (words ? Math.max(1, Math.round(words / 200)) + ' min read' : null),
+    image_url: $('postImage').value.trim() || null,
+    tags: $('postTags').value.trim() || null,
+    slug: slugRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || null,
+    meta_description: $('postMeta').value.trim() || null,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+async function saveArticle(publish) {
+  const payload = formPayload();
+  if (!payload.title) { showToast('Give the article a title first', 'error'); $('postTitle').focus(); return; }
+  if (publish && wordsIn(payload.content) < 50) { showToast('The article looks very short to publish — add some more, or save it as a draft', 'error'); return; }
+  const id = $('editingId').value;
+  const existing = id && posts.find(x => x.id === id);
+  if (publish && !existing?.published && !confirm('Publish "' + payload.title + '"? It goes live on The Nest Edit straight away.')) return;
+  payload.published = publish;
+
+  $('publishBtn').disabled = $('draftBtn').disabled = true;
+  let res;
+  if (id) res = await db.from('nest_posts').update(payload).eq('id', id).select().single();
+  else    res = await db.from('nest_posts').insert(payload).select().single();
+  $('publishBtn').disabled = $('draftBtn').disabled = false;
+
+  if (res.error) { showToast('Could not save: ' + res.error.message, 'error'); return; }
+  dirty = false;
+  showToast(publish ? (existing?.published ? 'Updated on The Nest Edit' : 'Published — it\'s live on The Nest Edit') : 'Draft saved');
+  await loadPosts();
+  if (publish) { $('editingId').value = ''; go('articles'); }
+  else editArticle(res.data.id);
+}
+
+// ── Preview ───────────────────────────────────────────────────
+function openPreview() {
+  const p = formPayload();
+  $('pvHero').hidden = !p.image_url;
+  if (p.image_url) $('pvHero').src = p.image_url;
+  $('pvCat').textContent = CAT_LABELS[p.category] || p.category;
+  $('pvTitle').textContent = p.title || 'Untitled';
+  $('pvBy').innerHTML = '<span class="ac-photo">' + avatarHtml(me.avatar_url, me.display_name) + '</span>' + esc(me.display_name);
+  $('pvRead').textContent = p.read_time || '';
+  $('pvDate').textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  $('pvExcerpt').textContent = p.excerpt || '';
+  $('pvExcerpt').hidden = !p.excerpt;
+  $('pvContent').innerHTML = formatBody(p.content) || '<p style="color:var(--stone)">Nothing written yet.</p>';
+  $('preview').hidden = false;
+  $('preview').scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+function closePreview() { $('preview').hidden = true; document.body.style.overflow = ''; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('preview').hidden) closePreview(); });
+
+// ── Profile ───────────────────────────────────────────────────
+const PF = { display_name: 'pfName', title: 'pfTitle', city: 'pfCity', bio: 'pfBio', avatar_url: 'pfAvatar', instagram: 'pfInstagram', website: 'pfWebsite' };
+// The portfolio page's own fields (setup-designer-portfolio.sql).
+const PG = { slug: 'pfSlug', about: 'pfAbout', services: 'pfServices', whatsapp: 'pfWhatsapp' };
+function fillProfile() {
+  Object.entries(PF).forEach(([k, id]) => { $(id).value = me[k] || ''; });
+  Object.entries(PG).forEach(([k, id]) => { $(id).value = me[k] || ''; });
+  $('pfAccepting').checked = me.accepting_projects !== false;
+  $('pfEmail').value = me.email;
+  paintCard();
+}
+$('pfAbout').addEventListener('input', () => {
+  $('aboutCount').textContent = $('pfAbout').value.length ? $('pfAbout').value.length + ' / 2000' : '';
+});
+const slugify = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
+function linkFor(kind, v) {
+  if (!v) return '';
+  if (kind === 'instagram') return /^https?:\/\//i.test(v) ? v : 'https://instagram.com/' + v.replace(/^@/, '');
+  return /^https?:\/\//i.test(v) ? v : 'https://' + v;
+}
+function paintCard() {
+  const name = $('pfName').value.trim() || 'Your name', photo = $('pfAvatar').value.trim();
+  $('pfAvPrev').innerHTML = avatarHtml(photo, name);
+  $('cdPhoto').innerHTML = avatarHtml(photo, name);
+  $('cdName').textContent = name;
+  $('cdRole').textContent = [$('pfTitle').value.trim(), $('pfCity').value.trim()].filter(Boolean).join(' · ');
+  $('cdBio').textContent = $('pfBio').value.trim();
+  const links = [];
+  if ($('pfInstagram').value.trim()) links.push('<span>INSTAGRAM ↗</span>');
+  if ($('pfWebsite').value.trim()) links.push('<span>WEBSITE ↗</span>');
+  $('cdLinks').innerHTML = links.join('');
+  $('bioCount').textContent = $('pfBio').value.length ? $('pfBio').value.length + ' / 300' : '';
+}
+Object.values(PF).forEach(id => $(id).addEventListener('input', paintCard));
+
+async function saveProfile() {
+  const upd = {};
+  Object.entries(PF).forEach(([k, id]) => { upd[k] = $(id).value.trim() || null; });
+  if (!upd.display_name) { showToast('Your name can\'t be empty', 'error'); return; }
+  // Portfolio fields only once the columns exist, so the profile still saves before the SQL has run.
+  const portfolioOn = 'slug' in me;
+  if (portfolioOn) {
+    Object.entries(PG).forEach(([k, id]) => { upd[k] = $(id).value.trim() || null; });
+    upd.slug = slugify(upd.slug) || null;
+    if (upd.slug && upd.slug.length < 3) { showToast('Make the page address at least 3 characters', 'error'); return; }
+    if (me.slug && upd.slug !== me.slug && !confirm('Change your page address? Links you\'ve already shared to storeurbannest.in/designers/' + me.slug + ' will stop working.')) return;
+    const wa = (upd.whatsapp || '').replace(/\D/g, '');
+    if (upd.whatsapp && (wa.length < 10 || wa.length > 15)) { showToast('That WhatsApp number looks too short or too long', 'error'); return; }
+    upd.accepting_projects = $('pfAccepting').checked;
+  }
+  $('pfSave').disabled = $('pfSave2').disabled = true;
+  const { data, error } = await db.from('contributors').update(upd).eq('id', me.id).select().single();
+  $('pfSave').disabled = $('pfSave2').disabled = false;
+  if (error) { showToast('Could not save: ' + error.message, 'error'); return; }
+  me = data;
+  paintMe();
+  fillProfile();   // the database may have adjusted the address (e.g. added -2)
+  showToast(portfolioOn && upd.slug && me.slug !== upd.slug ? 'Saved. That address was taken, so yours is ' + me.slug : 'Profile saved');
+}
+
+// ── Portfolio ─────────────────────────────────────────────────
+let portfolioMissing = false;
+async function loadProjects() {
+  const { data, error } = await db.from('portfolio_projects').select('*')
+    .eq('contributor_id', me.id).order('sort_order', { ascending: true });
+  portfolioMissing = !!error;
+  projects = (data || []).slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)
+    || String(b.created_at).localeCompare(String(a.created_at)));
+  renderProjects();
+}
+
+const photosOf = p => Array.isArray(p.photos) ? p.photos.filter(x => x && x.url) : [];
+
+function renderProjects() {
+  const el = $('projList');
+  if (portfolioMissing) {
+    el.innerHTML = '<div class="empty">The portfolio isn\'t switched on yet. Urban Nest needs to finish setting it up.</div>';
+    return;
+  }
+  if (!projects.length) {
+    el.innerHTML = '<div class="empty">No projects yet. Add a finished room or home with a few good photos.<br/><button class="btn btn-primary" type="button" onclick="newProject()">Add your first project</button></div>';
+    return;
+  }
+  el.innerHTML = '<div class="projs">' + projects.map((p, i) => {
+    const id = esc(p.id), ph = photosOf(p), cover = ph[0];
+    return '<div class="proj">'
+      + (cover ? '<img class="proj-img" src="' + esc(cover.url) + '" alt="" loading="lazy"/>' : '<span class="proj-img"></span>')
+      + '<div class="proj-body">'
+      + '<div class="proj-top"><span class="art-c" style="margin:0">' + esc(p.kind || '') + '</span>'
+      + '<span class="badge ' + (p.published ? 'badge-live">Live' : 'badge-draft">Draft') + '</span></div>'
+      + '<div class="proj-t">' + esc(p.title) + '</div>'
+      + '<div class="proj-m">' + esc([p.place, p.year, ph.length + (ph.length === 1 ? ' photo' : ' photos')].filter(Boolean).join(' · ')) + '</div>'
+      + '<div class="row-acts">'
+      + '<button class="rb" type="button" onclick="editProject(\'' + id + '\')">Edit</button>'
+      + '<button class="rb" type="button" onclick="toggleProject(\'' + id + '\')">' + (p.published ? 'Unpublish' : 'Publish') + '</button>'
+      + '<button class="rb" type="button" title="Show earlier on your page" onclick="moveProject(\'' + id + '\',-1)"' + (i === 0 ? ' disabled' : '') + '>↑</button>'
+      + '<button class="rb" type="button" title="Show later on your page" onclick="moveProject(\'' + id + '\',1)"' + (i === projects.length - 1 ? ' disabled' : '') + '>↓</button>'
+      + '<button class="rb danger" type="button" onclick="deleteProject(\'' + id + '\')">Delete</button>'
+      + '</div></div></div>';
+  }).join('') + '</div>';
+}
+
+const PJ = { title: 'projTitle', kind: 'projKind', place: 'projPlace', summary: 'projSummary' };
+
+function openProjectEditor(p) {
+  if (portfolioMissing) { showToast('The portfolio isn\'t switched on yet', 'error'); return; }
+  projEditing = true;
+  go('project');
+  $('projId').value = p ? p.id : '';
+  Object.entries(PJ).forEach(([k, id]) => { $(id).value = (p && p[k]) || ''; });
+  $('projYear').value = (p && p.year) || '';
+  projPhotos = p ? photosOf(p).map(x => ({ url: x.url, caption: x.caption || '' })) : [];
+  $('projHead').textContent = p ? 'Edit project' : 'Add a project';
+  $('projPubBtn').textContent = p && p.published ? 'Update live project' : 'Publish';
+  $('projDraftBtn').textContent = p && p.published ? 'Unpublish & save as draft' : 'Save draft';
+  renderProjPhotos();
+  refreshProjBits();
+  projDirty = false;
+}
+function newProject() { openProjectEditor(null); $('projTitle').focus(); }
+function editProject(id) { const p = projects.find(x => x.id === id); if (p) openProjectEditor(p); }
+function cancelProject() {
+  if (projUploading) { showToast('Wait for the photos to finish uploading', 'error'); return; }
+  go('portfolio');
+}
+
+function refreshProjBits() {
+  const n = $('projSummary').value.length;
+  $('projSummaryCount').textContent = n ? n + ' / 2000' : '';
+}
+['projTitle', 'projKind', 'projPlace', 'projYear', 'projSummary'].forEach(id =>
+  $(id).addEventListener('input', () => { projDirty = true; refreshProjBits(); }));
+
+function renderProjPhotos() {
+  $('projPhotos').innerHTML = projPhotos.map((x, i) => '<div class="ph">'
+    + (i === 0 ? '<span class="ph-cover">Cover</span>' : '')
+    + '<img src="' + esc(x.url) + '" alt="" loading="lazy"/>'
+    + '<input type="text" maxlength="140" placeholder="Caption (optional)" value="' + esc(x.caption) + '" oninput="projPhotos[' + i + '].caption=this.value;projDirty=true"/>'
+    + '<div class="ph-acts">'
+    + '<button type="button" title="Move earlier" onclick="moveProjPhoto(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + '>←</button>'
+    + '<button type="button" title="Make this the cover" onclick="moveProjPhoto(' + i + ',-' + i + ')"' + (i === 0 ? ' disabled' : '') + '>★</button>'
+    + '<button type="button" title="Move later" onclick="moveProjPhoto(' + i + ',1)"' + (i === projPhotos.length - 1 ? ' disabled' : '') + '>→</button>'
+    + '<button type="button" class="del" title="Remove" onclick="removeProjPhoto(' + i + ')">✕</button>'
+    + '</div></div>').join('');
+}
+function moveProjPhoto(i, by) {
+  const j = i + by;
+  if (j < 0 || j >= projPhotos.length) return;
+  const [x] = projPhotos.splice(i, 1);
+  projPhotos.splice(j, 0, x);
+  projDirty = true;
+  renderProjPhotos();
+}
+function removeProjPhoto(i) {
+  projPhotos.splice(i, 1);
+  projDirty = true;
+  renderProjPhotos();
+}
+
+// Several at once, one after another, each shrunk by the shared uploader's
+// shrinkImage() and put in this contributor's own folder.
+async function addProjectPhotos(input) {
+  const files = Array.from(input.files || []);
+  input.value = '';
+  if (!files.length) return;
+  const room = 30 - projPhotos.length;
+  if (room <= 0) { showToast('A project can have up to 30 photos', 'error'); return; }
+  if (files.length > room) showToast('Only the first ' + room + ' will be added: a project can have up to 30 photos', 'error');
+  const todo = files.slice(0, room);
+  const btn = $('projAddBtn'), hint = $('projPhotoHint'), hintWas = hint.textContent;
+  btn.disabled = true;
+  projUploading++;
+  let done = 0, failed = 0;
+  const base = imgSlugify($('projTitle').value) || 'project';
+  for (const file of todo) {
+    btn.textContent = 'Uploading ' + (done + failed + 1) + ' of ' + todo.length + '…';
+    try {
+      const s = await shrinkImage(file);
+      const path = window.IMG_PREFIX + 'projects/' + base + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) + '.' + s.ext;
+      const { error } = await db.storage.from(IMG_BUCKET).upload(path, new Blob([s.blob], { type: s.type }),
+        { contentType: s.type, cacheControl: '31536000', upsert: false });
+      if (error) throw new Error(imgStorageError(error));
+      projPhotos.push({ url: db.storage.from(IMG_BUCKET).getPublicUrl(path).data.publicUrl, caption: '' });
+      projDirty = true;
+      done++;
+      renderProjPhotos();
+    } catch (e) {
+      failed++;
+      showToast((file.name ? file.name + ': ' : '') + e.message, 'error');
+    }
+  }
+  projUploading--;
+  btn.disabled = false; btn.textContent = 'Add photos';
+  hint.textContent = hintWas;
+  if (done) showToast(done + (done === 1 ? ' photo' : ' photos') + ' added' + (failed ? ', ' + failed + ' failed' : '') + '. Save to keep them.');
+}
+
+async function saveProject(publish) {
+  if (projUploading) { showToast('Wait for the photos to finish uploading', 'error'); return; }
+  const title = $('projTitle').value.trim();
+  if (!title) { showToast('Give the project a name first', 'error'); $('projTitle').focus(); return; }
+  if (publish && !projPhotos.length) { showToast('Add at least one photo before publishing', 'error'); return; }
+  const yr = parseInt($('projYear').value, 10);
+  const id = $('projId').value;
+  const existing = id && projects.find(x => x.id === id);
+  const row = {
+    title,
+    kind: $('projKind').value || null,
+    place: $('projPlace').value.trim() || null,
+    year: yr >= 1980 && yr <= 2100 ? yr : null,
+    summary: $('projSummary').value.trim() || null,
+    photos: projPhotos.map(x => ({ url: x.url, caption: (x.caption || '').trim() })),
+    published: publish,
+    updated_at: new Date().toISOString(),
+  };
+  if (!existing) row.sort_order = projects.length ? Math.min(...projects.map(p => p.sort_order || 0)) - 1 : 0;   // newest first
+  $('projPubBtn').disabled = $('projDraftBtn').disabled = true;
+  const res = existing
+    ? await db.from('portfolio_projects').update(row).eq('id', id).select().single()
+    : await db.from('portfolio_projects').insert(row).select().single();
+  $('projPubBtn').disabled = $('projDraftBtn').disabled = false;
+  if (res.error) { showToast('Could not save: ' + res.error.message, 'error'); return; }
+  projDirty = false;
+  showToast(publish ? (existing && existing.published ? 'Updated on your page' : 'Published — it\'s on your page') : 'Draft saved');
+  await loadProjects();
+  if (publish) go('portfolio');
+  else editProject(res.data.id);
+}
+
+async function toggleProject(id) {
+  const p = projects.find(x => x.id === id);
+  if (!p) return;
+  if (!p.published && !photosOf(p).length) { showToast('Add at least one photo before publishing', 'error'); return; }
+  if (p.published && !confirm('Take "' + p.title + '" off your page? It stays here as a draft.')) return;
+  const { error } = await db.from('portfolio_projects').update({ published: !p.published, updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) { showToast('Could not update: ' + error.message, 'error'); return; }
+  showToast(p.published ? 'Unpublished — it\'s a draft again' : 'Published — it\'s on your page');
+  await loadProjects();
+}
+
+async function moveProject(id, by) {
+  const i = projects.findIndex(x => x.id === id), j = i + by;
+  if (i < 0 || j < 0 || j >= projects.length) return;
+  const order = projects.slice();
+  const [x] = order.splice(i, 1);
+  order.splice(j, 0, x);
+  // Renumber everything: simplest way to keep the order exact.
+  const results = await Promise.all(order.map((p, n) => p.sort_order === n ? { error: null }
+    : db.from('portfolio_projects').update({ sort_order: n }).eq('id', p.id)));
+  const bad = results.find(r => r.error);
+  if (bad) showToast('Could not reorder: ' + bad.error.message, 'error');
+  await loadProjects();
+}
+
+async function deleteProject(id) {
+  const p = projects.find(x => x.id === id);
+  if (!p || !confirm('Delete "' + p.title + '" for good? This can\'t be undone.')) return;
+  const { error } = await db.from('portfolio_projects').delete().eq('id', id);
+  if (error) { showToast('Could not delete: ' + error.message, 'error'); return; }
+  showToast('Project deleted');
+  await loadProjects();
+}
+
+// ── Enquiries ─────────────────────────────────────────────────
+let enquiriesMissing = false;
+async function loadEnquiries() {
+  const { data, error } = await db.from('designer_enquiries').select('*')
+    .eq('contributor_id', me.id).order('created_at', { ascending: false });
+  enquiriesMissing = !!error;
+  enquiries = data || [];
+  const fresh = enquiries.filter(e => e.status === 'new').length;
+  $('navEnq').textContent = fresh;
+  $('navEnq').hidden = !fresh;
+  renderOverview();
+  renderEnquiries();
+}
+
+const waLink = v => { let d = String(v || '').replace(/\D/g, ''); if (d.length === 10) d = '91' + d; return d.length >= 11 ? 'https://wa.me/' + d : ''; };
+const ENQ_STATUS = { new: 'New', contacted: 'Contacted', closed: 'Closed' };
+
+function renderEnquiries() {
+  const el = $('enqList');
+  if (enquiriesMissing) { el.innerHTML = '<div class="panel empty">Enquiries aren\'t switched on yet. Urban Nest needs to finish setting them up.</div>'; return; }
+  const f = $('enqFilter').value;
+  const list = enquiries.filter(e => f === 'all' ? true : f === 'open' ? e.status !== 'closed' : e.status === f);
+  if (!list.length) {
+    el.innerHTML = '<div class="panel empty">' + (enquiries.length ? 'Nothing here with that filter.'
+      : 'No enquiries yet. Share your page link, from Overview, on Instagram and WhatsApp: that\'s where they come from.') + '</div>';
+    return;
+  }
+  el.innerHTML = list.map(e => {
+    const id = esc(e.id);
+    const facts = [e.project_kind, e.budget, e.city].filter(Boolean).map(x => '<span class="enq-fact">' + esc(x) + '</span>').join('');
+    const wa = waLink(e.phone);
+    const contact = []
+      .concat(e.phone ? ['<a class="rb" href="tel:' + esc(e.phone) + '">Call ' + esc(e.phone) + '</a>'] : [])
+      .concat(wa ? ['<a class="rb" href="' + esc(wa) + '?text=' + encodeURIComponent('Hi ' + String(e.name).split(' ')[0] + ', this is ' + me.display_name + '. Thank you for your enquiry on Urban Nest.') + '" target="_blank" rel="noopener">WhatsApp</a>'] : [])
+      .concat(e.email ? ['<a class="rb" href="mailto:' + esc(e.email) + '?subject=' + encodeURIComponent('Your enquiry on Urban Nest') + '">Email ' + esc(e.email) + '</a>'] : []);
+    return '<div class="enq' + (e.status === 'new' ? ' is-new' : '') + '">'
+      + '<div class="enq-top"><div><div class="enq-name">' + esc(e.name) + '</div>'
+      + '<div class="enq-when">' + new Date(e.created_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }) + '</div></div>'
+      + '<span class="spacer"></span>'
+      + '<select class="enq-status" aria-label="Status" onchange="setEnquiryStatus(\'' + id + '\', this.value)">'
+      + Object.entries(ENQ_STATUS).map(([k, l]) => '<option value="' + k + '"' + (e.status === k ? ' selected' : '') + '>' + l + '</option>').join('')
+      + '</select></div>'
+      + (facts ? '<div class="enq-facts">' + facts + '</div>' : '')
+      + (e.message ? '<p class="enq-msg">' + esc(e.message) + '</p>' : '')
+      + '<div class="enq-contact">' + contact.join('') + '</div>'
+      + '</div>';
+  }).join('');
+}
+$('enqFilter').addEventListener('change', renderEnquiries);
+
+async function setEnquiryStatus(id, status) {
+  const { error } = await db.from('designer_enquiries').update({ status }).eq('id', id);
+  if (error) { showToast('Could not update: ' + error.message, 'error'); await loadEnquiries(); return; }
+  const e = enquiries.find(x => x.id === id);
+  if (e) e.status = status;
+  const fresh = enquiries.filter(x => x.status === 'new').length;
+  $('navEnq').textContent = fresh;
+  $('navEnq').hidden = !fresh;
+  renderEnquiries();
+}
+
+boot();
+</script>
+</body>
+</html>

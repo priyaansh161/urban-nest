@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Contributors — Urban Nest Admin</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/admin/config.js"></script>
+<script src="/admin/auth.js"></script>
+<script src="/admin/image-upload.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; }
+  .page-header { margin-bottom: 32px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; }
+
+  .panel { background: var(--white); border: 0.5px solid var(--border); margin-bottom: 32px; }
+  .panel-pad { padding: 32px; }
+  .panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey); }
+  input, textarea { padding: 11px 14px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black); outline: none; transition: border-color 0.2s; resize: vertical; }
+  input:focus, textarea:focus { border-color: var(--gold); }
+  textarea { min-height: 80px; }
+  .field-row { display: flex; gap: 10px; }
+  .field-row input { flex: 1; min-width: 0; }
+  .hint { font-size: 11px; color: var(--grey); line-height: 1.6; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--grey); text-transform: none; letter-spacing: 0.02em; cursor: pointer; }
+  .check input { accent-color: var(--gold); }
+  .form-actions { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
+  .btn { padding: 11px 28px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; }
+  .btn-primary { background: var(--black); color: var(--white); }
+  .btn-primary:hover { background: #222; }
+  .btn-secondary { background: transparent; color: var(--grey); border: 0.5px solid var(--border); }
+  .btn-secondary:hover { color: var(--black); border-color: var(--black); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 24px; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey); text-align: left; border-bottom: 0.5px solid var(--border); font-weight: 400; }
+  td { padding: 16px 24px; font-size: 13px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #faf9f5; }
+  .who { display: flex; align-items: center; gap: 12px; }
+  .av { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: var(--gold); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', serif; font-size: 16px; overflow: hidden; flex-shrink: 0; }
+  .av img { width: 100%; height: 100%; object-fit: cover; }
+  .sub { font-size: 11.5px; color: var(--grey); margin-top: 2px; }
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .badge-gold { background: var(--gold-light); color: var(--gold); }
+  .badge-grey { background: #eee; color: var(--grey); }
+  .row-actions { display: flex; gap: 8px; }
+  .row-btn { padding: 5px 12px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+  .row-btn:hover { border-color: var(--black); color: var(--black); }
+  .empty-state { padding: 48px 24px; text-align: center; color: var(--grey); font-size: 13px; line-height: 1.8; }
+
+  .steps { counter-reset: s; list-style: none; }
+  .steps li { counter-increment: s; position: relative; padding-left: 34px; font-size: 13px; line-height: 1.8; color: var(--black); margin-bottom: 12px; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 2px; width: 22px; height: 22px; border-radius: 50%; background: var(--gold-light); color: var(--gold); font-size: 11px; display: flex; align-items: center; justify-content: center; }
+  .steps code { background: var(--bg); padding: 1px 6px; font-size: 12px; }
+  .steps strong { font-weight: 500; }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: #c0392b; }
+</style>
+<link rel="stylesheet" href="/admin/studio-colors.css"/>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="contributors.html" class="nav-item active"><span class="icon">✧</span> Contributors</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <div class="nav-group-label">Commerce</div>
+    <a href="sellers.html" class="nav-item"><span class="icon">⬢</span> Sellers</a>
+    <a href="orders.html" class="nav-item"><span class="icon">▦</span> Orders</a>
+    <div class="nav-group-label">Content Creation</div>
+    <a href="social.html" class="nav-item"><span class="icon">▣</span> Media Engagement</a>
+    <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
+    <a href="article-card.html" class="nav-item"><span class="icon">▤</span> Article Cards</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Contributors</h1>
+    <p>Designers who write for The Nest Edit from their own studio at <strong>/studio/</strong>.</p>
+  </div>
+
+  <div class="panel panel-pad">
+    <div class="panel-title">
+      <span id="formTitle">Add a contributor</span>
+      <button class="btn btn-secondary" id="cancelBtn" onclick="resetForm()" hidden>Cancel edit</button>
+    </div>
+    <input type="hidden" id="editingId"/>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="cEmail">Email — must match their login</label>
+        <input type="email" id="cEmail" placeholder="designer@example.com"/>
+      </div>
+      <div class="form-group">
+        <label for="cName">Name</label>
+        <input type="text" id="cName" placeholder="As it should appear on articles"/>
+      </div>
+      <div class="form-group">
+        <label for="cTitle">What they do</label>
+        <input type="text" id="cTitle" placeholder="Interior Designer"/>
+      </div>
+      <div class="form-group">
+        <label for="cCity">City</label>
+        <input type="text" id="cCity" placeholder="New Delhi"/>
+      </div>
+      <div class="form-group full">
+        <label for="cBio">Short bio</label>
+        <textarea id="cBio" maxlength="300" placeholder="Optional — they can write their own from their studio."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="cAvatar">Photo</label>
+        <div class="field-row">
+          <input type="url" id="cAvatar" placeholder="Optional"/>
+          <button type="button" class="btn btn-secondary" id="cAvatarBtn" onclick="document.getElementById('cAvatarFile').click()">Upload</button>
+        </div>
+        <input type="file" id="cAvatarFile" accept="image/*" style="display:none" data-target="cAvatar" data-btn="cAvatarBtn" data-name="cName" onchange="uploadImage(this)"/>
+      </div>
+      <div class="form-group">
+        <label for="cInstagram">Instagram</label>
+        <input type="text" id="cInstagram" placeholder="@handle"/>
+      </div>
+      <div class="form-group">
+        <label class="check"><input type="checkbox" id="cActive" checked/> Active — can sign in and write</label>
+        <span class="hint">Untick to switch off their studio. Their published articles stay up.</span>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" id="saveBtn" onclick="saveContributor()">Add contributor</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title" style="padding:20px 24px 16px;margin:0">All contributors</div>
+    <div id="list"><div class="empty-state">Loading…</div></div>
+  </div>
+
+  <div class="panel panel-pad">
+    <div class="panel-title">How their login works</div>
+    <ol class="steps">
+      <li><strong>Add them above.</strong> Urban Nest emails them an invite straight away.</li>
+      <li>They tap the link in the email and <strong>choose their own password</strong>. You never see it.</li>
+      <li>From then on they sign in at <code>storeurbannest.in/studio/</code>. The <strong>Login</strong> column above shows whether they've done it.</li>
+    </ol>
+    <p class="hint" style="margin-top:6px">Invite expired, or they can't find the email? Press <strong>Send login email</strong> on their row. Supabase sends only a few emails an hour, so if it says to wait, try again later.</p>
+    <details style="margin-top:14px">
+      <summary class="hint" style="cursor:pointer">If the button ever doesn't work</summary>
+      <p class="hint" style="margin-top:8px">Send it by hand: <strong>Supabase → Authentication → Users → Add user → Send invitation</strong>, with the same email.</p>
+    </details>
+  </div>
+</main>
+
+<script>
+let contributors = [];
+let postStats = {};
+
+(async () => {
+  await requireAuth();
+  load();
+})();
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const $ = id => document.getElementById(id);
+
+async function load() {
+  const [{ data: cs, error }, { data: ps }, { data: es }, { data: prs }] = await Promise.all([
+    db.from('contributors').select('*').order('created_at', { ascending: true }),
+    db.from('nest_posts').select('contributor_id, published, upvote_count').not('contributor_id', 'is', null),
+    // Both empty until setup-designer-portfolio.sql has run.
+    db.from('designer_enquiries').select('contributor_id').then(r => r, () => ({ data: [] })),
+    db.from('portfolio_projects').select('contributor_id, published').then(r => r, () => ({ data: [] })),
+  ]);
+  if (error) {
+    $('list').innerHTML = '<div class="empty-state">' + (/relation|does not exist|schema cache/i.test(error.message)
+      ? 'Contributors aren\'t set up yet — run <strong>admin/setup-contributors.sql</strong> in the Supabase SQL editor first.'
+      : 'Could not load contributors: ' + esc(error.message)) + '</div>';
+    return;
+  }
+  contributors = cs || [];
+  postStats = {};
+  (ps || []).forEach(p => {
+    const s = postStats[p.contributor_id] ||= { total: 0, live: 0, votes: 0 };
+    s.total++; if (p.published) s.live++; s.votes += p.upvote_count || 0;
+  });
+  const stat = id => postStats[id] ||= { total: 0, live: 0, votes: 0 };
+  (es || []).forEach(e => { const s = stat(e.contributor_id); s.enq = (s.enq || 0) + 1; });
+  (prs || []).forEach(p => { if (p.published) { const s = stat(p.contributor_id); s.proj = (s.proj || 0) + 1; } });
+  render();
+  loadLoginStatus();
+}
+
+// ── Their login: sent from here, through netlify/functions/contributor-login.mjs ──
+let loginStatus = null;      // { contributorId: { state, sent|last } }, null until known
+let loginUnavailable = false;
+
+async function loginCall(payload) {
+  const { data: { session } } = await db.auth.getSession();
+  const res = await fetch('/.netlify/functions/contributor-login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session ? session.access_token : '') },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json().catch(() => null);
+  if (!data) throw new Error('unavailable');   // e.g. on this computer, where there are no Netlify functions
+  if (!res.ok) throw new Error(data.error || 'Something went wrong');
+  return data;
+}
+
+async function loadLoginStatus() {
+  try { loginStatus = (await loginCall({ action: 'status' })).status; loginUnavailable = false; }
+  catch (e) { loginStatus = null; loginUnavailable = e.message === 'unavailable'; }
+  render();
+}
+
+function ago(d) {
+  const days = Math.floor((Date.now() - new Date(d)) / 86400000);
+  return days <= 0 ? 'today' : days === 1 ? 'yesterday' : days < 30 ? days + ' days ago' : new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+}
+
+function loginCell(c) {
+  const btn = '<button class="row-btn" onclick="sendLogin(\'' + esc(c.id) + '\', this)">Send login email</button>';
+  if (!c.active) return '<span class="sub">Switched off</span>';
+  if (loginUnavailable) return '<span class="sub">Works on the live site</span>';
+  const s = loginStatus && loginStatus[c.id];
+  if (!s) return '<span class="sub">…</span>';
+  if (s.state === 'active') return '<span class="badge badge-gold">Signed in</span><div class="sub">last ' + ago(s.last) + '</div>';
+  if (s.state === 'invited') return '<span class="badge badge-grey">Invite sent</span><div class="sub">' + ago(s.sent) + ', not opened yet</div>' + '<div style="margin-top:6px">' + btn + '</div>';
+  return '<span class="badge badge-grey">No login yet</span><div style="margin-top:6px">' + btn + '</div>';
+}
+
+async function sendLogin(id, btn) {
+  const c = contributors.find(x => x.id === id);
+  if (!c) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+  await inviteByEmail(c.email, c.display_name);
+  loadLoginStatus();
+}
+
+// Returns quietly either way: adding the contributor has already worked.
+async function inviteByEmail(email, name) {
+  const first = String(name || 'them').split(' ')[0];
+  try {
+    const { result } = await loginCall({ action: 'invite', email });
+    showToast(result === 'invited' ? 'Invite emailed to ' + first + ' — they choose their own password from the link'
+      : result === 'reminder' ? first + ' already had a login, so they\'ve been emailed a link to set their password'
+      : first + ' has already signed in — nothing to send');
+  } catch (e) {
+    showToast(e.message === 'unavailable'
+      ? 'Saved. The invite email can only be sent from the live site — use "Send login email" there'
+      : 'Saved, but the invite didn\'t send: ' + e.message, 'error');
+  }
+}
+
+function render() {
+  if (!contributors.length) { $('list').innerHTML = '<div class="empty-state">No contributors yet. Add your first one above.</div>'; return; }
+  $('list').innerHTML = '<table><thead><tr><th>Contributor</th><th>Status</th><th>Articles</th><th>Live</th><th>Upvotes</th><th>Projects</th><th>Enquiries sent</th><th>Login</th><th></th></tr></thead><tbody>'
+    + contributors.map(c => {
+      const s = postStats[c.id] || { total: 0, live: 0, votes: 0 };
+      const av = c.avatar_url ? '<img src="' + esc(c.avatar_url) + '" alt=""/>' : esc((c.display_name || '?').charAt(0).toUpperCase());
+      return '<tr><td><div class="who"><span class="av">' + av + '</span><div><div>' + esc(c.display_name) + '</div>'
+        + '<div class="sub">' + esc([c.title, c.email].filter(Boolean).join(' · ')) + '</div></div></div></td>'
+        + '<td><span class="badge ' + (c.active ? 'badge-gold">Active' : 'badge-grey">Off') + '</span></td>'
+        + '<td>' + s.total + '</td><td>' + s.live + '</td><td>' + s.votes + '</td>'
+        + '<td>' + (s.proj || 0) + '</td><td>' + (s.enq || 0) + '</td>'
+        + '<td>' + loginCell(c) + '</td>'
+        + '<td><div class="row-actions"><button class="row-btn" onclick="editContributor(\'' + esc(c.id) + '\')">Edit</button>'
+        + (c.slug ? '<a class="row-btn" style="text-decoration:none" href="/designers/' + encodeURIComponent(c.slug) + '" target="_blank" rel="noopener">Page ↗</a>' : '')
+        + '</div></td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+const F = { email: 'cEmail', display_name: 'cName', title: 'cTitle', city: 'cCity', bio: 'cBio', avatar_url: 'cAvatar', instagram: 'cInstagram' };
+
+function editContributor(id) {
+  const c = contributors.find(x => x.id === id);
+  if (!c) return;
+  $('editingId').value = id;
+  Object.entries(F).forEach(([k, fid]) => { $(fid).value = c[k] || ''; });
+  $('cActive').checked = !!c.active;
+  $('formTitle').textContent = 'Edit contributor';
+  $('saveBtn').textContent = 'Save changes';
+  $('cancelBtn').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  $('editingId').value = '';
+  Object.values(F).forEach(fid => { $(fid).value = ''; });
+  $('cActive').checked = true;
+  $('formTitle').textContent = 'Add a contributor';
+  $('saveBtn').textContent = 'Add contributor';
+  $('cancelBtn').hidden = true;
+}
+
+async function saveContributor() {
+  const row = {};
+  Object.entries(F).forEach(([k, fid]) => { row[k] = $(fid).value.trim() || null; });
+  row.active = $('cActive').checked;
+  if (!row.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(row.email)) { showToast('Enter a valid email', 'error'); return; }
+  if (!row.display_name) { showToast('Enter their name', 'error'); return; }
+  const id = $('editingId').value;
+  $('saveBtn').disabled = true;
+  const { error } = id
+    ? await db.from('contributors').update(row).eq('id', id)
+    : await db.from('contributors').insert(row);
+  $('saveBtn').disabled = false;
+  if (error) {
+    showToast(/duplicate|unique/i.test(error.message) ? 'That email is already a contributor' : 'Save failed: ' + error.message, 'error');
+    return;
+  }
+  resetForm();
+  if (id) showToast('Contributor updated');
+  else if (row.active) await inviteByEmail(row.email, row.display_name);
+  else showToast('Contributor added, switched off — tick Active and press "Send login email" when they\'re ready');
+  load();
+}
+</script>
+</body>
+</html>

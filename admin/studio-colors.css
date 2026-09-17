@@ -1,0 +1,55 @@
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN COLOURS — the Nest Studio's palette on every admin page.
+
+   Linked last in each admin page's <head>, after its own <style>, so it
+   wins without touching any layout. Colours only: nothing in here moves
+   or resizes anything. To go back to the old black admin, remove the
+   <link> line from the pages (or empty this file).
+
+   Teal #0E3238 for the sidebar and the solid buttons, paper #F5F7F6
+   behind, white panels, the site's gold #A37B3F, and the lighter
+   gold #C2934D wherever gold sits on teal. The same values as
+   studio/index.html.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --gold: #A37B3F !important;
+  --gold-light: rgba(163,123,63,0.1) !important;
+  --white: #FFFFFF !important;
+  --black: #0F1F22 !important;      /* text */
+  --grey: #586366 !important;
+  --border: #D9E0DE !important;
+  --bg: #F5F7F6 !important;
+  --un-teal: #0E3238;
+  --un-teal-2: #164149;
+  --un-gold-lift: #C2934D;
+}
+
+/* The sidebar */
+.sidebar { background: var(--un-teal) !important; }
+.sidebar-brand-tag { color: var(--un-gold-lift) !important; }
+.nav-item.active { border-left-color: var(--un-gold-lift) !important; background: rgba(194,147,77,0.1) !important; }
+
+/* Solid buttons and "selected" states: teal instead of black */
+.btn-primary,
+.chip[aria-pressed="true"],
+.fmt-btn[aria-pressed="true"],
+.filter-btn.active,
+.room-tab.active,
+.section-switch button.on,
+.sell-preview .pv-btn {
+  background: var(--un-teal) !important;
+  border-color: var(--un-teal) !important;
+  color: #FFFFFF !important;
+}
+.btn-primary:hover:not(:disabled) { background: var(--un-teal-2) !important; }
+
+/* Row hover: a cool tint rather than the old warm one */
+tr:hover td { background: #FAFBFB !important; }
+
+/* Toasts */
+.toast:not(.toast-error) { background: var(--un-teal) !important; }
+
+/* The sign-in page: teal ground, like the studio's */
+body:has(.login-card) { background: var(--un-teal) !important; }
+.login-card .btn { background: var(--un-teal) !important; }
+.login-card .btn:hover:not(:disabled) { background: var(--un-teal-2) !important; }

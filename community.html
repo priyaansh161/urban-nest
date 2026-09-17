@@ -360,6 +360,41 @@
     .modal-share { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; background: none; border: none; padding: 0; font: inherit; font-size: 11px; letter-spacing: 0.14em; color: var(--gold); cursor: pointer; transition: color 0.2s; }
     .modal-share:hover { color: var(--black); }
     .modal-share svg { width: 13px; height: 13px; display: block; }
+
+    /* ── AUTHOR BYLINE, AUTHOR CARD, UPVOTE ──
+       A contributor's byline is a button: photo + name. It opens the card
+       in the article, between the byline and the text, rather than a
+       floating popup — nothing to position, and it reads well on a phone. */
+    .modal-author { display: inline-flex; align-items: center; }
+    .ma-btn { display: inline-flex; align-items: center; gap: 9px; background: none; border: none; padding: 0; font: inherit; color: inherit; letter-spacing: inherit; cursor: pointer; }
+    .ma-photo { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+    .ma-initial { background: var(--gold); color: var(--white); font-family: 'Bodoni Moda', serif; font-size: 13px; letter-spacing: 0; }
+    .ma-name { color: var(--black); border-bottom: 0.5px solid var(--gold); padding-bottom: 1px; transition: color 0.2s; }
+    .ma-btn:hover .ma-name, .ma-btn[aria-expanded="true"] .ma-name { color: var(--gold); }
+    .modal-upvote { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; background: none; border: 0.5px solid var(--gold); border-radius: 999px; padding: 5px 13px; font: inherit; font-size: 11px; letter-spacing: 0.14em; color: var(--gold); cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .modal-upvote[hidden] { display: none; }
+    .modal-upvote svg { width: 12px; height: 12px; display: block; }
+    .modal-upvote:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+    .modal-upvote.voted { background: var(--gold); color: var(--white); }
+    .modal-upvote .mu-count { font-variant-numeric: tabular-nums; }
+    .modal-upvote .mu-count:empty { display: none; }
+    .modal-upvote:not([hidden]) + .modal-share { margin-left: 18px; }
+    .author-card { position: relative; margin: -16px 0 32px; padding: 22px 24px; border: 0.5px solid var(--border); background: var(--grey-light); animation: acIn 0.25s ease; }
+    .author-card[hidden] { display: none; }
+    @keyframes acIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+    .ac-close { position: absolute; top: 8px; right: 10px; background: none; border: none; font-size: 20px; color: var(--grey); cursor: pointer; line-height: 1; padding: 4px; }
+    .ac-close:hover { color: var(--black); }
+    .ac-top { display: flex; align-items: center; gap: 16px; }
+    .ac-photo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .ac-photo[hidden] { display: none; }
+    .ac-name { font-family: 'Bodoni Moda', serif; font-size: 20px; color: var(--black); line-height: 1.2; }
+    .ac-role { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-top: 4px; }
+    .ac-role:empty { display: none; }
+    .ac-bio { font-size: 14px; line-height: 1.8; color: var(--black); margin-top: 14px; }
+    .ac-bio[hidden], .ac-links[hidden] { display: none; }
+    .ac-links { display: flex; gap: 18px; margin-top: 12px; font-size: 11px; letter-spacing: 0.12em; }
+    .ac-links a { color: var(--gold); text-decoration: none; }
+    .ac-links a:hover { color: var(--black); }
     .modal-content p { font-size: 15px; color: var(--black); line-height: 2.0; margin-bottom: 22px; }
     .modal-content h2 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; color: var(--black); margin: 44px 0 16px; }
     .modal-content h3 { font-family: 'Bodoni Moda', serif; font-size: 21px; font-weight: 400; font-style: italic; color: var(--black); margin: 36px 0 14px; }
@@ -851,6 +886,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
 <script src="share.js"></script>
+<script src="nest-body.js"></script>
 <script>
   /* ── THEME SWITCH · SHARED ──
      The sun/moon switch used to light up only after a visitor had tapped
@@ -1056,10 +1092,24 @@
         <div id="modalCat" class="modal-cat"></div>
         <h2 id="modalTitle" class="modal-title"></h2>
         <div class="modal-meta">
-          <span id="modalAuthor"></span>
+          <span id="modalAuthor" class="modal-author"></span>
           <span id="modalRead"></span>
           <span id="modalDate"></span>
+          <button class="modal-upvote" id="modalUpvote" type="button" onclick="toggleUpvote()" aria-pressed="false" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg><span id="modalUpvoteLabel">UPVOTE</span><span class="mu-count" id="modalUpvoteCount"></span></button>
           <button class="modal-share" type="button" onclick="shareArticle()" aria-label="Share this article">SHARE <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg></button>
+        </div>
+        <!-- Opens from the author's photo or name in the byline above. -->
+        <div class="author-card" id="authorCard" hidden>
+          <button class="ac-close" type="button" onclick="closeAuthorCard()" aria-label="Close">×</button>
+          <div class="ac-top">
+            <img class="ac-photo" id="acPhoto" alt="" hidden/>
+            <div>
+              <div class="ac-name" id="acName"></div>
+              <div class="ac-role" id="acRole"></div>
+            </div>
+          </div>
+          <p class="ac-bio" id="acBio"></p>
+          <div class="ac-links" id="acLinks"></div>
         </div>
         <div id="modalContent" class="modal-content"></div>
       </div>
@@ -1159,6 +1209,8 @@
       document.getElementById('modalCat').textContent = a.cat;
       document.getElementById('modalTitle').innerHTML = a.title;
       document.getElementById('modalAuthor').textContent = a.author;
+      closeAuthorCard();
+      renderUpvote(null);
       document.getElementById('modalRead').textContent = a.read;
       document.getElementById('modalDate').textContent = a.date;
       document.getElementById('modalContent').innerHTML = a.body;
@@ -1169,6 +1221,7 @@
 
     function closeArticle() {
       document.getElementById('articleOverlay').classList.remove('open');
+      closeAuthorCard();
       document.body.style.overflow = '';
       // A shared link's ?a= has done its job once the reader is closed.
       if (new URLSearchParams(location.search).has('a')) history.replaceState(null, '', location.pathname);
@@ -1248,38 +1301,6 @@
     // paragraphs, and bare URLs become links. This is what the admin's
     // formatting toolbar writes — plain-text syntax, not markup, so a post
     // is still just as readable and editable as a text file.
-    function formatBody(raw) {
-      const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      // Bold before italic: once ** pairs become <strong>, the single *'s
-      // left over are unambiguously italic markers, not a leftover half of
-      // a bold pair.
-      const bold = s => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      const italic = s => s.replace(/\*(.+?)\*/g, '<em>$1</em>');
-      const linkify = s => s.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-      const inline = s => linkify(italic(bold(esc(s))));
-      return (raw || '').replace(/\r/g,'').split(/\n\s*\n/).map(block => {
-        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-        if (!lines.length) return '';
-        // Heading: 1–3 #'s pick the level — # the biggest, ### the
-        // smallest — space after them optional. Four or more #'s is
-        // treated the same as three, rather than erroring.
-        const hm = lines[0].match(/^(#{1,3})#*\s*(.*)$/);
-        if (hm) {
-          const tag = hm[1].length === 1 ? 'h2' : hm[1].length === 2 ? 'h3' : 'h4';
-          const heading = hm[2].replace(/\s*#+\s*$/, '').trim();
-          return '<' + tag + '>' + inline(heading) + '</' + tag + '>' +
-            (lines.length > 1 ? '<p>' + lines.slice(1).map(inline).join('<br>') + '</p>' : '');
-        }
-        if (lines.every(l => /^[-*]\s+/.test(l))) {
-          return '<ul>' + lines.map(l => '<li>' + inline(l.replace(/^[-*]\s+/, '')) + '</li>').join('') + '</ul>';
-        }
-        if (lines.every(l => /^\d+[.)]\s+/.test(l))) {
-          return '<ol>' + lines.map(l => '<li>' + inline(l.replace(/^\d+[.)]\s+/, '')) + '</li>').join('') + '</ol>';
-        }
-        return '<p>' + lines.map(inline).join('<br>') + '</p>';
-      }).join('');
-    }
-
     // Open an admin-authored Nest post in the same full-screen reader as the
     // built-in articles.
     let nestPosts = {};
@@ -1297,7 +1318,8 @@
       }
       document.getElementById('modalCat').textContent = (p.category || 'The Nest').toUpperCase();
       document.getElementById('modalTitle').textContent = p.title;
-      document.getElementById('modalAuthor').textContent = p.author || 'Urban Nest Editorial';
+      renderAuthor(p);
+      renderUpvote(p);
       document.getElementById('modalRead').textContent = p.read_time || '';
       document.getElementById('modalDate').textContent =
         new Date(p.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
@@ -1339,7 +1361,8 @@
         author: p.author || 'Urban Nest',
         read: p.read_time || '',
         date: new Date(p.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' }),
-        ts: Date.parse(p.created_at) || 0, pinned: !!p.pinned
+        ts: Date.parse(p.created_at) || 0, pinned: !!p.pinned,
+        votes: p.upvote_count || 0
       };
     }
 
@@ -1364,7 +1387,7 @@
             </span>
           </div>`;
       }
-      const meta = [it.author, it.read, it.date].filter(Boolean).join(' · ');
+      const meta = [it.author, it.read, it.date].filter(Boolean).join(' · ') + (it.votes ? ' · ▲ ' + it.votes : '');
       return `<div class="na na-${variant}" onclick="${naOpen(it)}">
           ${naMedia(it)}
           <span class="na-cat">${it.cat}</span>
@@ -1432,6 +1455,138 @@
         + cats.map(c => `<button class="filter-btn${nestFilter === c ? ' active' : ''}" onclick="filterArticles('${c}', this)">${CAT_LABELS[c] || c}</button>`).join('');
     }
 
+    // ── AUTHORS AND UPVOTES ──
+    // A post written by a contributor carries contributor_id. Their public
+    // profile (never their email) comes from the public_contributors view.
+    // Both lookups fail quietly: until setup-contributors.sql has run, or if
+    // Supabase is unreachable, articles simply show the plain byline.
+    let nestContributors = {};
+    let myVotes = new Set();
+    let currentNestId = null;
+
+    // One vote per device: a random id this browser keeps.
+    function voterId() {
+      try {
+        let v = localStorage.getItem('un-voter');
+        if (!v) {
+          v = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+            : Date.now().toString(36) + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+          localStorage.setItem('un-voter', v);
+        }
+        return v;
+      } catch (e) { return null; }   // storage blocked: counts still show, voting is off
+    }
+
+    async function loadNestExtras(rows) {
+      const ids = [...new Set(rows.map(p => p.contributor_id).filter(Boolean))];
+      if (ids.length) {
+        try {
+          const { data } = await db.from('public_contributors').select('*').in('id', ids);
+          (data || []).forEach(c => { nestContributors[c.id] = c; });
+        } catch (e) {}
+      }
+      const v = voterId();
+      if (v && rows.length) {
+        try {
+          const { data } = await db.rpc('my_nest_upvotes', { p_voter: v });
+          myVotes = new Set((data || []).map(r => typeof r === 'string' ? r : Object.values(r)[0]));
+        } catch (e) {}
+      }
+    }
+
+    const acEsc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    function renderAuthor(p) {
+      const el = document.getElementById('modalAuthor');
+      closeAuthorCard();
+      const c = p && p.contributor_id && nestContributors[p.contributor_id];
+      if (!c) { el.textContent = (p && p.author) || 'Urban Nest Editorial'; return; }
+      const photo = c.avatar_url
+        ? '<img class="ma-photo" src="' + acEsc(c.avatar_url) + '" alt=""/>'
+        : '<span class="ma-photo ma-initial">' + acEsc((c.display_name || '?').trim().charAt(0).toUpperCase()) + '</span>';
+      el.innerHTML = '<button type="button" class="ma-btn" onclick="toggleAuthorCard()" aria-expanded="false" aria-controls="authorCard">'
+        + photo + '<span class="ma-name">' + acEsc(c.display_name) + '</span></button>';
+      fillAuthorCard(c);
+    }
+
+    function fillAuthorCard(c) {
+      const img = document.getElementById('acPhoto');
+      if (c.avatar_url) { img.src = c.avatar_url; img.alt = c.display_name || ''; img.hidden = false; }
+      else { img.removeAttribute('src'); img.hidden = true; }
+      document.getElementById('acName').textContent = c.display_name || '';
+      document.getElementById('acRole').textContent = [c.title, c.city].filter(Boolean).join(' · ');
+      const bio = document.getElementById('acBio');
+      bio.textContent = c.bio || '';
+      bio.hidden = !c.bio;
+      const links = [];
+      if (c.instagram) {
+        const ig = /^https?:\/\//i.test(c.instagram) ? c.instagram : 'https://instagram.com/' + c.instagram.replace(/^@/, '');
+        links.push('<a href="' + acEsc(ig) + '" target="_blank" rel="noopener">INSTAGRAM ↗</a>');
+      }
+      if (c.website) {
+        const w = /^https?:\/\//i.test(c.website) ? c.website : 'https://' + c.website;
+        links.push('<a href="' + acEsc(w) + '" target="_blank" rel="noopener">WEBSITE ↗</a>');
+      }
+      // Their portfolio page, once setup-designer-portfolio.sql has given them an address.
+      if (c.slug) links.unshift('<a href="/designers/' + encodeURIComponent(c.slug) + '">VIEW PORTFOLIO →</a>');
+      const le = document.getElementById('acLinks');
+      le.innerHTML = links.join('');
+      le.hidden = !links.length;
+    }
+
+    function toggleAuthorCard() {
+      const card = document.getElementById('authorCard');
+      const opening = card.hidden;
+      card.hidden = !opening;
+      const btn = document.querySelector('.ma-btn');
+      if (btn) btn.setAttribute('aria-expanded', String(opening));
+    }
+    function closeAuthorCard() {
+      const card = document.getElementById('authorCard');
+      if (card) card.hidden = true;
+      const btn = document.querySelector('.ma-btn');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    // Built-in articles (not in the database) can't be upvoted: no button.
+    function renderUpvote(p) {
+      const btn = document.getElementById('modalUpvote');
+      currentNestId = p ? p.id : null;
+      if (!p || !voterId()) { btn.hidden = true; return; }
+      const voted = myVotes.has(p.id);
+      btn.hidden = false;
+      btn.setAttribute('aria-pressed', String(voted));
+      btn.classList.toggle('voted', voted);
+      document.getElementById('modalUpvoteLabel').textContent = voted ? 'UPVOTED' : 'UPVOTE';
+      const n = p.upvote_count || 0;
+      document.getElementById('modalUpvoteCount').textContent = n ? String(n) : '';
+    }
+
+    let upvoteBusy = false;
+    async function toggleUpvote() {
+      const id = currentNestId, p = nestPosts[id], v = voterId();
+      if (!p || !v || upvoteBusy) return;
+      upvoteBusy = true;
+      // Answer the tap at once; the database confirms (or corrects) it after.
+      const was = myVotes.has(id);
+      if (was) myVotes.delete(id); else myVotes.add(id);
+      p.upvote_count = Math.max(0, (p.upvote_count || 0) + (was ? -1 : 1));
+      renderUpvote(p);
+      try {
+        const { data, error } = await db.rpc('toggle_nest_upvote', { p_post: id, p_voter: v });
+        if (error || !data) throw error || new Error('no answer');
+        if (data.voted) myVotes.add(id); else myVotes.delete(id);
+        p.upvote_count = data.count;
+      } catch (e) {
+        if (was) myVotes.add(id); else myVotes.delete(id);
+        p.upvote_count = Math.max(0, (p.upvote_count || 0) + (was ? 1 : -1));
+      }
+      upvoteBusy = false;
+      if (currentNestId === id) renderUpvote(p);
+      const it = nestItems.find(x => x.key === id);
+      if (it) { it.votes = p.upvote_count || 0; renderNest(); }
+    }
+
     // Load published Nest posts, then build the grid from both sources.
     async function loadNestPosts() {
       let rows = [];
@@ -1448,6 +1603,7 @@
       }
       nestPosts = {};
       rows.forEach(p => { nestPosts[p.id] = p; });
+      await loadNestExtras(rows);
 
       const dynamic = rows.map(normaliseNest);
       const builtIn = Object.keys(ARTICLES).map(id => normaliseStatic(id, ARTICLES[id]));

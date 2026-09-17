@@ -69,6 +69,19 @@ async function requireAuth() {
   const reason = expiryReason();
   if (reason) { await endSession(reason); return null; }
 
+  /* A contributor's login is a real Supabase login too. The admin's data
+     is locked to is_admin() either way, but they shouldn't land on an admin
+     screen that fails to load: send them to their studio. If the check itself
+     fails (functions not installed yet, network), carry on exactly as before
+     rather than risk locking the admin out. */
+  try {
+    const { data: contributor, error } = await db.rpc('is_contributor');
+    if (!error && contributor === true) {
+      const { data: admin } = await db.rpc('is_admin');
+      if (admin !== true) { window.location.href = '/studio/'; return null; }
+    }
+  } catch (e) {}
+
   // First admin page after signing in starts the clock.
   try {
     if (!localStorage.getItem(STARTED_KEY)) localStorage.setItem(STARTED_KEY, String(Date.now()));
