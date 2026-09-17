@@ -2,7 +2,7 @@
    ADMIN COLOURS — the Nest Studio's palette on every admin page.
 
    Linked last in each admin page's <head>, after its own <style>, so it
-   wins without touching any layout. Colours only: nothing in here moves
+   wins without touching any layout. Colours, plus one shared sidebar rule at the end: nothing else moves
    or resizes anything. To go back to the old black admin, remove the
    <link> line from the pages (or empty this file).
 
@@ -53,3 +53,23 @@ tr:hover td { background: #FAFBFB !important; }
 body:has(.login-card) { background: var(--un-teal) !important; }
 .login-card .btn { background: var(--un-teal) !important; }
 .login-card .btn:hover:not(:disabled) { background: var(--un-teal-2) !important; }
+
+/* ── SIDEBAR THAT FITS ANY SCREEN ──
+   The one layout rule in this file, because every admin page shares it.
+   The menu grew past a laptop screen's height, and the sidebar is fixed
+   to the window, so Sign Out sat below the bottom edge with no way to
+   scroll to it. The link list now scrolls on its own; the brand stays at
+   the top and Sign Out stays pinned at the bottom. */
+.sidebar { overflow: hidden !important; }
+.sidebar-brand, .sidebar-footer { flex-shrink: 0 !important; }
+.sidebar-nav {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(234,242,241,0.22) transparent;
+}
+.sidebar-nav::-webkit-scrollbar { width: 6px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(234,242,241,0.22); border-radius: 3px; }
+.sidebar-footer { background: var(--un-teal) !important; border-top: 0.5px solid rgba(234,242,241,0.12) !important; }
