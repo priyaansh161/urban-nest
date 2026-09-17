@@ -8,12 +8,12 @@
  *
  * It is also the only one that hears about failures and refunds.
  */
-import { sb, hmacHex, signatureMatches } from './lib/shared.mjs';
+import { sb, hmacHex, signatureMatches, envOptional } from './lib/shared.mjs';
 
 export default async (req) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
-  const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  const secret = envOptional('RAZORPAY_WEBHOOK_SECRET');
   // Unset means the webhook has not been configured yet. Refuse rather than
   // accept unverified calls — an endpoint that writes orders on request is
   // worse than one that is temporarily switched off.

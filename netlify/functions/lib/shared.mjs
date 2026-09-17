@@ -19,6 +19,7 @@ const ALLOWED = [
   'https://storeurbannest.co.in',       // redirects to .in, listed in case a page is ever served there
   'https://www.storeurbannest.co.in',
   'https://storeurbannest.netlify.app', // still answers; redirected to .in by netlify.toml
+  'https://storeurbannest.pages.dev',   // Cloudflare Pages address, for testing before the domain moves
   'http://localhost:3000',   // npx serve
   'http://localhost:4322',   // npx serve, older port
   'http://localhost:8888'    // netlify dev
@@ -56,8 +57,18 @@ export function fail(status, message, origin) {
   return json(status, { error: message }, origin);
 }
 
+/* Netlify puts settings in process.env. Cloudflare hands them to each
+   request instead; functions/api/*.js stores them in globalThis.UN_ENV
+   before calling the handler. Reading both means one copy of every
+   function serves either host. */
+export function envOptional(name) {
+  const cf = globalThis.UN_ENV && globalThis.UN_ENV[name];
+  if (cf) return cf;
+  return typeof process !== 'undefined' && process.env ? process.env[name] : undefined;
+}
+
 export function env(name) {
-  const v = process.env[name];
+  const v = envOptional(name);
   if (!v) throw new Error('Missing environment variable: ' + name);
   return v;
 }

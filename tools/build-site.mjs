@@ -1,7 +1,7 @@
 /* Assemble dist/ — the folder that actually gets deployed.
  *
  *   node tools/build-site.mjs
- *   netlify deploy --prod --dir dist
+ *   npx wrangler pages deploy        (Cloudflare Pages; wrangler.toml says where)
  *
  * WHY THIS EXISTS: `netlify deploy --dir .` uploads the whole project folder.
  * It reads neither .gitignore nor .netlifyignore — netlify-cli 27 has no
@@ -29,7 +29,7 @@ const RULES = [
   /* Named, not by extension. The root folder also holds DEPLOY.txt and
      DEPLOY-CHECKLIST.txt — private working notes — and allowing every .txt
      would have published them. */
-  { dir: '.',      names: ['robots.txt', 'sitemap.xml'] },
+  { dir: '.',      names: ['robots.txt', 'sitemap.xml', '_redirects', '_headers'] },
   { dir: 'admin',  exts: ['.html', '.js', '.css'],                                 deep: false },
   { dir: 'studio', exts: ['.html', '.js'],                                 deep: false },
   { dir: 'images', exts: ['.webp', '.png', '.jpg', '.svg'],                deep: false },
@@ -72,7 +72,7 @@ for (const rule of RULES) {
 }
 
 console.log(`\n  dist/ — ${count} files, ${(bytes / 1048576).toFixed(1)} MB`);
-console.log('  Deploy it with:  netlify deploy --prod --dir dist\n');
+console.log('  Deploy it with:  npx wrangler pages deploy\n');
 
 // The .sql files in admin/ are deliberately absent: they are run by hand in
 // the Supabase dashboard and nothing on the site fetches them.

@@ -235,13 +235,13 @@ async function load() {
   loadLoginStatus();
 }
 
-// ── Their login: sent from here, through netlify/functions/contributor-login.mjs ──
+// ── Their login: sent from here, through functions/api/contributor-login.js ──
 let loginStatus = null;      // { contributorId: { state, sent|last } }, null until known
 let loginUnavailable = false;
 
 async function loginCall(payload) {
   const { data: { session } } = await db.auth.getSession();
-  const res = await fetch('/.netlify/functions/contributor-login', {
+  const res = await fetch('/api/contributor-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (session ? session.access_token : '') },
     body: JSON.stringify(payload),

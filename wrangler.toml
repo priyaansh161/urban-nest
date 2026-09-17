@@ -1,0 +1,11 @@
+# Cloudflare Pages: where Urban Nest is hosted.
+#   node tools/build-site.mjs
+#   npx wrangler pages deploy
+# Settings with secrets (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
+# RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET) are entered in the Cloudflare
+# dashboard, never in this file.
+name = "storeurbannest"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
+# node:crypto (Razorpay signatures) and Buffer, used by lib/shared.mjs
+compatibility_flags = ["nodejs_compat"]

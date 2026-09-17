@@ -46,7 +46,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
   // The studio is a signed-in writing tool, like the admin: always live.
-  if (url.pathname.startsWith('/admin/') || url.pathname.startsWith('/studio/') || url.pathname.startsWith('/.netlify/')) return;
+  if (url.pathname.startsWith('/admin/') || url.pathname.startsWith('/studio/') || url.pathname.startsWith('/.netlify/') || url.pathname.startsWith('/api/')) return;
 
   if (req.mode === 'navigate' || /\.(html|js|webmanifest)$/.test(url.pathname)) {
     event.respondWith(networkFirst(event, req));

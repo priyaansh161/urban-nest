@@ -35,3 +35,7 @@ tools/regression/
 # Secrets for local function testing. Real keys live here and never in the
 # repo — the deployed site reads the same names from Netlify's env vars.
 .env
+
+# Local Cloudflare settings for `wrangler pages dev`. Placeholders only; never real keys.
+.dev.vars
+.wrangler/

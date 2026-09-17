@@ -4,7 +4,7 @@
  * It sends ids and quantities. Every rupee is read here, from the database,
  * so a cart edited in devtools buys nothing at a discount.
  */
-import { json, fail, sb, razorpay, assertTestMode, cors, originAllowed } from './lib/shared.mjs';
+import { json, fail, sb, razorpay, assertTestMode, cors, originAllowed, env } from './lib/shared.mjs';
 
 // Ids come from the browser and are interpolated into a PostgREST filter.
 // Anything that is not a plain uuid never gets near the query.
@@ -150,7 +150,7 @@ export default async (req) => {
       razorpay_order_id: rzp.id,
       amount: total,
       currency: 'INR',
-      key_id: process.env.RAZORPAY_KEY_ID
+      key_id: env('RAZORPAY_KEY_ID')
     }, origin);
 
   } catch (err) {

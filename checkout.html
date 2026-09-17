@@ -534,7 +534,7 @@
 <script>
 (function () {
   var CART_KEY = 'un-cart';
-  var FN = '/.netlify/functions/';
+  var FN = '/api/';   // Cloudflare Pages Functions (functions/api/)
 
   var lines = [];          // [{ id, qty, item, seller }]
   var totalPaise = 0;
@@ -690,7 +690,7 @@
       body: JSON.stringify(body)
     });
     if (res.status === 404) {
-      throw new Error('The payment service is not running. If you are testing locally, start it with "netlify dev".');
+      throw new Error('The payment service is not running. If you are testing locally, start it with "npx wrangler pages dev dist".');
     }
     var data = await res.json().catch(function () { return {}; });
     if (!res.ok) throw new Error(data.error || 'Something went wrong.');

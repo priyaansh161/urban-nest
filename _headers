@@ -1,0 +1,13 @@
+# Cloudflare Pages response headers (the same as netlify.toml's [[headers]]).
+/*
+  Access-Control-Allow-Origin: *
+
+/*.splinecode
+  Content-Type: application/octet-stream
+
+# No-cache so a phone checks for a new service worker on every visit.
+/sw.js
+  Cache-Control: no-cache
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json

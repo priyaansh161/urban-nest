@@ -1,0 +1,12 @@
+# Cloudflare Pages rules (the same as netlify.toml's redirects).
+# The printed QR on the visiting cards encodes /hello. 302 on purpose, so its
+# destination can change without reprinting cards.
+/hello  /  302
+
+# One page, designer.html, serves every designer's address. 200 = rewrite:
+# the visitor keeps seeing /designers/<name>. The target has no .html:
+# Cloudflare redirects /designer.html to /designer, which would lose the name.
+/designers/*  /designer  200
+
+# storeurbannest.co.in and www. are forwarded to storeurbannest.in by
+# Redirect Rules in the Cloudflare dashboard; this file cannot match on domain.
