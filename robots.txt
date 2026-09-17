@@ -9,7 +9,10 @@ User-agent: *
 Disallow: /admin/
 Disallow: /studio/
 Disallow: /checkout.html
+Disallow: /checkout
 Disallow: /offline.html
+Disallow: /offline
 Disallow: /.netlify/
+Disallow: /api/
 
 Sitemap: https://storeurbannest.in/sitemap.xml
