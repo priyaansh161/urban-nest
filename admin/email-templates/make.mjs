@@ -36,7 +36,7 @@ function email({ preheader, eyebrow, title, paragraphs, button, after }) {
 
       <!-- Brand band -->
       <tr><td align="center" style="background:#0E3238;padding:30px 24px 26px;">
-        <img src="https://storeurbannest.in/images/app-icon-192.png" width="52" height="52" alt="" style="display:block;border:0;border-radius:50%;margin:0 auto 14px;"/>
+        <img src="https://storeurbannest.in/images/email-logo.png" width="52" height="52" alt="Urban Nest" style="display:block;border:0;margin:0 auto 14px;"/>
         <div style="font-family:${SERIF};font-size:20px;letter-spacing:5px;color:#F5F7F6;">URBAN NEST</div>
         <div style="font-family:${SANS};font-size:10px;letter-spacing:3px;color:#C2934D;margin-top:6px;">JUST THE RIGHT FEEL</div>
       </td></tr>
@@ -70,11 +70,11 @@ function email({ preheader, eyebrow, title, paragraphs, button, after }) {
 
 const TEMPLATES = {
   'invite-user': {
-    subject: "You're invited to write for The Nest Edit",
+    subject: 'Welcome to Urban Nest',
     html: email({
       preheader: 'Choose a password to open your Nest Studio.',
       eyebrow: 'THE NEST STUDIO',
-      title: 'Welcome to <em style="color:#94703A;">The Nest Edit.</em>',
+      title: 'Welcome to <em style="color:#94703A;">Urban Nest.</em>',
       paragraphs: [
         "Urban Nest has set up your Nest Studio: your own space to publish articles, show your finished projects on a portfolio page, and receive enquiries from people who'd like to work with you.",
         'Tap below to choose your password. That\'s all it takes.',
