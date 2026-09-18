@@ -25,3 +25,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-09-17 | 20:57 | cfba91a | Join the Nest landing page at /nest (the "uncommitted" change was only the deploy script fix) | https://3513f437.storeurbannest.pages.dev |
 | 2026-09-17 | 21:00 | 6dc7491 | WhatsApp preview tags on /nest | https://d4e0e852.storeurbannest.pages.dev |
 | 2026-09-18 | 12:16 | 0d415db | Creator sign-in link in footers + under The Nest Edit articles | https://07c8e56c.storeurbannest.pages.dev |
+| 2026-09-18 | 16:52 | 68ae4f0 | Sort and price filters on Collection and Essentials category pages | https://e54416b4.storeurbannest.pages.dev |
