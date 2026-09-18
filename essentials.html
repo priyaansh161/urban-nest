@@ -99,6 +99,42 @@
        so hiding either of these needs saying again — without this the grid
        kept its "Loading the collection…" line visible under the tiles. */
     .grid[hidden], .cats[hidden] { display: none; }
+
+    /* ── PIECE FILTERS · SHARED ──
+       Sort and price bands above a category's pieces. Byte-identical in
+       collection.html and essentials.html; change both together. Colours
+       come only from the page's own tokens, so both themes follow. */
+    .pf { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px;
+          padding-bottom: 22px; border-bottom: .5px solid var(--border); }
+    .pf[hidden] { display: none; }
+    .pf-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .pf-sort { display: inline-flex; align-items: center; gap: 12px; font-size: 10px;
+               letter-spacing: .22em; text-transform: uppercase; color: var(--grey); }
+    .pf-sort select { font: inherit; font-size: 12px; letter-spacing: .04em; text-transform: none;
+                      color: var(--black); background-color: var(--white); border: .5px solid var(--border);
+                      border-radius: 20px; padding: 8px 36px 8px 14px; cursor: pointer;
+                      -webkit-appearance: none; appearance: none;
+                      background-image: linear-gradient(45deg, transparent 50%, var(--gold) 50%),
+                                        linear-gradient(135deg, var(--gold) 50%, transparent 50%);
+                      background-position: calc(100% - 19px) 55%, calc(100% - 14px) 55%;
+                      background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
+    .pf-sort select option { color: var(--black); background: var(--white); }
+    .pf-sort select:focus-visible, .pf-band:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+    .pf-count { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); }
+    .pf-bands { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pf-band { font: inherit; font-size: 11px; letter-spacing: .06em; color: var(--grey); background: transparent;
+               border: .5px solid var(--border); border-radius: 20px; padding: 7px 14px; cursor: pointer;
+               transition: color .25s, border-color .25s, background-color .25s; }
+    .pf-band:hover { color: var(--black); border-color: var(--gold); }
+    .pf-band[aria-pressed="true"] { color: var(--white); background-color: var(--black); border-color: var(--black); }
+    .empty .pf-band { margin-top: 16px; }
+    @media (max-width: 768px) {
+      .pf { margin-bottom: 24px; padding-bottom: 18px; }
+      /* One swipeable line on a phone rather than three rows of chips. */
+      .pf-bands { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px; }
+      .pf-bands::-webkit-scrollbar { display: none; }
+      .pf-band { flex: none; }
+    }
     .cat-tile { display: flex; flex-direction: column; text-decoration: none; color: inherit;
                 border: .5px solid var(--border); background: var(--white); transition: border-color .3s; }
     /* The border stays as it is. The gold outline was the only one of
@@ -752,6 +788,7 @@
 
   <div class="grid-wrap">
     <div class="cats" id="cats" hidden></div>
+    <div class="pf" id="pf" hidden></div>
     <div class="grid" id="grid">
       <div class="empty">Loading the collection…</div>
     </div>
@@ -1321,6 +1358,109 @@
       '</div></a>';
   }
 
+  /* ── PIECE FILTERS · SHARED ──
+     Byte-identical in collection.html and essentials.html; change both
+     together. Sort and price bands for a category's pieces. The choice sits
+     in the URL (&sort=, &price=) through replaceState, so a shared link
+     keeps it without every tap adding a back-button step. A price is
+     price_paise when set, otherwise the first number in the price text —
+     "INR 1,699 to INR 1,999" counts as 1,699. Pieces with no price at all
+     go last in either price order and appear only under "All prices". */
+  var UNFilter = (function () {
+    var SORTS = [['featured', 'Featured'], ['new', 'Newest first'],
+                 ['price-asc', 'Price: low to high'], ['price-desc', 'Price: high to low']];
+    var BANDS = [['all', 'All prices', 0, Infinity], ['u1000', 'Under ₹1,000', 0, 1000],
+                 ['1000-2500', '₹1,000 – 2,500', 1000, 2500], ['2500-5000', '₹2,500 – 5,000', 2500, 5000],
+                 ['5000-up', '₹5,000 and up', 5000, Infinity]];
+    var rows = [], bands = [], sort = 'featured', band = 'all';
+
+    function value(it) {
+      if (it.price_paise) return it.price_paise / 100;
+      var m = String(it.price || '').replace(/,/g, '').match(/\d+(\.\d+)?/);
+      return m ? parseFloat(m[0]) : null;
+    }
+    function find(list, key) { for (var i = 0; i < list.length; i++) if (list[i][0] === key) return list[i]; return null; }
+    function fits(it, b) {
+      if (b[0] === 'all') return true;
+      var v = value(it);
+      return v != null && v >= b[2] && v < b[3];
+    }
+    function pieces() {
+      var b = find(BANDS, band) || BANDS[0];
+      var out = rows.map(function (it, i) { return { it: it, i: i, v: value(it) }; })
+                    .filter(function (x) { return fits(x.it, b); });
+      out.sort(function (a, z) {
+        if (sort === 'new')
+          return String(z.it.created_at || '').localeCompare(String(a.it.created_at || '')) || a.i - z.i;
+        if (sort === 'price-asc' || sort === 'price-desc') {
+          if (a.v == null || z.v == null) return (a.v == null) - (z.v == null) || a.i - z.i;
+          return (sort === 'price-asc' ? a.v - z.v : z.v - a.v) || a.i - z.i;
+        }
+        return a.i - z.i;   // featured: the order set in the admin
+      });
+      return out.map(function (x) { return x.it; });
+    }
+    function save() {
+      var u = new URL(location.href);
+      if (sort === 'featured') u.searchParams.delete('sort'); else u.searchParams.set('sort', sort);
+      if (band === 'all') u.searchParams.delete('price'); else u.searchParams.set('price', band);
+      history.replaceState(history.state, '', u.pathname + u.search);
+    }
+    function paint() {
+      var grid = document.getElementById('grid');
+      var list = pieces();
+      var btns = document.querySelectorAll('#pf .pf-band');
+      for (var i = 0; i < btns.length; i++)
+        btns[i].setAttribute('aria-pressed', String(btns[i].getAttribute('data-pf-band') === band));
+      var sel = document.getElementById('pfSort');
+      if (sel) sel.value = sort;
+      var count = document.getElementById('pfCount');
+      if (count) count.textContent = list.length === rows.length
+        ? rows.length + (rows.length === 1 ? ' piece' : ' pieces')
+        : 'Showing ' + list.length + ' of ' + rows.length;
+      grid.innerHTML = list.length ? list.map(card).join('')
+        : '<div class="empty">Nothing in this price range just yet.<br/>' +
+          '<button type="button" class="pf-band" data-pf-band="all">Show every piece</button></div>';
+    }
+    function show(all) {
+      rows = all;
+      var bar = document.getElementById('pf');
+      // Only the bands something actually falls into — a chip that empties
+      // the page is worse than no chip.
+      bands = BANDS.filter(function (b) {
+        return b[0] === 'all' || rows.some(function (it) { return fits(it, b); });
+      });
+      var q = new URLSearchParams(location.search);
+      sort = find(SORTS, q.get('sort')) ? q.get('sort') : 'featured';
+      band = find(bands, q.get('price')) ? q.get('price') : 'all';
+      if (bar && rows.length > 1) {
+        bar.innerHTML =
+          '<div class="pf-row">' +
+            '<label class="pf-sort"><span>Sort</span><select id="pfSort">' +
+              SORTS.map(function (s) { return '<option value="' + s[0] + '">' + s[1] + '</option>'; }).join('') +
+            '</select></label>' +
+            '<span class="pf-count" id="pfCount"></span>' +
+          '</div>' +
+          (bands.length > 2 ? '<div class="pf-bands" role="group" aria-label="Price">' +
+            bands.map(function (b) {
+              return '<button type="button" class="pf-band" data-pf-band="' + b[0] + '">' + b[1] + '</button>';
+            }).join('') + '</div>' : '');
+        bar.hidden = false;
+      }
+      paint();
+    }
+    document.addEventListener('change', function (e) {
+      if (e.target.id !== 'pfSort') return;
+      sort = e.target.value; save(); paint();
+    });
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pf-band]');
+      if (!b) return;
+      band = b.getAttribute('data-pf-band'); save(); paint();
+    });
+    return { show: show };
+  })();
+
   (function load() {
     var grid = document.getElementById('grid');
     var catsEl = document.getElementById('cats');
@@ -1455,7 +1595,7 @@
         grid.innerHTML = '<div class="empty">Nothing in this category just yet.<br/>Check back very soon.</div>';
         return;
       }
-      grid.innerHTML = rows.map(card).join('');
+      UNFilter.show(rows);
     }
 
     // No categories set up at all, or none of them holds anything: the page
@@ -1465,7 +1605,7 @@
         grid.innerHTML = '<div class="empty">The first pieces are being photographed and modelled.<br/>Check back very soon.</div>';
         return;
       }
-      grid.innerHTML = rows.map(card).join('');
+      UNFilter.show(rows);
     }
   })();
 </script>

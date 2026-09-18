@@ -132,11 +132,14 @@ for (const page of pages) {
      The page's own scripts only. A shared file like auth.js names ids it
      creates itself, and image-upload.js documents ids belonging to other
      pages; neither is this page's problem. Ids assembled at runtime, like
-     'o-' + id, do not match the pattern and are skipped. */
+     'o-' + id, do not match the pattern and are skipped. So are ids the
+     page's script writes into its own HTML strings (id="pfSort" inside a
+     template), since they exist by the time anything asks for them. */
   const wanted = new Set();
   for (const m of inlineJs.matchAll(/getElementById\(\s*['"]([^'"]+)['"]\s*\)/g)) wanted.add(m[1]);
   for (const m of inlineJs.matchAll(/querySelector(?:All)?\(\s*['"]#([A-Za-z][\w-]*)['"]\s*\)/g)) wanted.add(m[1]);
-  [...wanted].forEach(id => { if (!idSet.has(id)) bugs.push('script asks for #' + id + ' — not in the markup'); });
+  const built = new Set([...inlineJs.matchAll(/\sid="([\w-]+)"/g)].map(m => m[1]));
+  [...wanted].forEach(id => { if (!idSet.has(id) && !built.has(id)) bugs.push('script asks for #' + id + ' — not in the markup'); });
 
   /* ── a local file that is not there ── */
   for (const m of markup.matchAll(/\s(?:src|href)="([^"]+)"/g)) {
