@@ -268,6 +268,9 @@
     .nest-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 34px 32px; }
     /* 1 / -1, not span 12: stacked, this grid has a single column, and
        asking for twelve made it generate eleven implicit ones. */
+    .nest-writers { margin-top: 56px; padding-top: 22px; border-top: 0.5px solid var(--border); display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px 24px; font-size: 13px; color: var(--grey); }
+    .nest-writers a { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); text-decoration: none; transition: color 0.2s; }
+    .nest-writers a:hover { color: var(--black); }
     .nest-empty { grid-column: 1 / -1; padding: 44px 0; color: var(--grey); font-size: 14px; }
 
     .na { display: flex; flex-direction: column; gap: 11px; cursor: pointer; text-decoration: none; color: inherit; }
@@ -988,6 +991,11 @@
       <div class="nest-grid" id="nestGrid">
         <div class="nest-empty">Loading the latest…</div>
       </div>
+      <!-- Designers who write here find their way in from this line and the footer. -->
+      <div class="nest-writers">
+        <span>Interior designer writing for The Nest Edit?</span>
+        <a href="/studio/">Creator sign in →</a>
+      </div>
     </div>
   </section>
 
@@ -1077,7 +1085,7 @@
       <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
       <span class="footer-logo">URBAN NEST</span>
     </div>
-    <a href="policies.html" class="footer-note" style="text-decoration:none;margin-right:16px">Policies</a><div class="footer-note">© 2026 Urban Nest · All rights reserved</div>
+    <a href="policies.html" class="footer-note" style="text-decoration:none;margin-right:16px">Policies</a><a href="/studio/" class="footer-note" style="text-decoration:none;margin-right:16px">Creator sign in</a><div class="footer-note">© 2026 Urban Nest · All rights reserved</div>
   </footer>
 
   <!-- ARTICLE MODAL -->
