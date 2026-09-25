@@ -26,3 +26,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-09-17 | 21:00 | 6dc7491 | WhatsApp preview tags on /nest | https://d4e0e852.storeurbannest.pages.dev |
 | 2026-09-18 | 12:16 | 0d415db | Creator sign-in link in footers + under The Nest Edit articles | https://07c8e56c.storeurbannest.pages.dev |
 | 2026-09-18 | 16:52 | 68ae4f0 | Sort and price filters on Collection and Essentials category pages | https://e54416b4.storeurbannest.pages.dev |
+| 2026-09-25 | 21:52 | 077d04c | Reel Studio: 3D capture waits for the model to be drawn, loading overlay, Spline viewer loads only for Spline Tour | https://0f949c77.storeurbannest.pages.dev |
