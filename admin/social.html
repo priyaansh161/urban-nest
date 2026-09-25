@@ -10,7 +10,6 @@
 <script src="/admin/config.js"></script>
 <script src="/admin/auth.js"></script>
 <script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
-<script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
   :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; }
@@ -780,6 +779,23 @@ async function chooseStoryPiece(p) {
 
   loadPhoto(p.image_url);
   paintMeta();
+  if (p.model_url) showModelLoading(p);
+}
+
+/* The model takes seconds to arrive and the frame shows only the ground
+   colour until it does, which looked like a broken viewer. Say so instead. */
+async function showModelLoading(p) {
+  if (running) return;
+  busy(true, 'Loading the 3D model', 0);
+  const onProgress = e => { if (storyPiece === p && !running && current === 'story') busy(true, 'Loading the 3D model', e.detail.totalProgress); };
+  mv.addEventListener('progress', onProgress);
+  await new Promise(r => setTimeout(r, 300));   // let the new src register before checking
+  await waitForModel(60000);
+  mv.removeEventListener('progress', onProgress);
+  if (storyPiece !== p || running) return;      // another piece was picked, or a run owns the overlay
+  busy(false);
+  if (!modelReady()) document.getElementById('pickHint').innerHTML =
+    '<span class="warn">The 3D model has not appeared after a minute. Check it opens on the Collection page.</span>';
 }
 
 function storySpecRows(p) {
@@ -806,6 +822,19 @@ function loadPhoto(url) {
   img.src = url;
 }
 
+/* ── "LOADED" IS NOT "DRAWN" ──
+   mv.loaded turns true the moment a new src is set — several seconds before
+   the model is on screen. A frame grabbed in that gap is an empty
+   rectangle ("0.0% drawn, tonal range 0"), so everything that captures
+   waits for modelIsVisible, which only turns true once the model has been
+   drawn. */
+const modelReady = () => mv.loaded && mv.modelIsVisible;
+async function waitForModel(ms) {
+  const t = performance.now();
+  while (!modelReady() && performance.now() - t < ms) await new Promise(r => setTimeout(r, 200));
+  if (modelReady()) await settleFrame();
+}
+
 async function grabMv() {
   const blob = await mv.toBlob({ mimeType: 'image/webp', qualityArgument: 0.92 });
   return createImageBitmap(blob);
@@ -827,7 +856,7 @@ const turnFrameCount = () => {
 async function captureTurn(onProgress) {
   turnFrames = [];
   turnBlank = false;
-  if (!storyPiece.model_url || !mv.loaded) return;
+  if (!storyPiece.model_url || !modelReady()) return;
 
   const orbit = mv.getCameraOrbit();          // keep the height and zoom set by hand
   const wasAuto = mv.hasAttribute('auto-rotate');
@@ -989,15 +1018,11 @@ function storyScenes() {
 async function storyPreRoll(onProgress) {
   if (!document.getElementById('scTurn').checked || !storyPiece || !storyPiece.model_url) return;
   if (Number(document.getElementById('dialTurn').value) <= 0) return;   // 0s — timeline() drops it anyway, nothing to capture for
-  if (!mv.loaded) {
+  if (!modelReady()) {
     busy(true, 'Waiting for the model', 0);
-    await new Promise(r => {
-      const t = setTimeout(r, 25000);
-      if (mv.loaded) { clearTimeout(t); return r(); }
-      mv.addEventListener('load', () => { clearTimeout(t); r(); }, { once: true });
-    });
+    await waitForModel(25000);
   }
-  if (!mv.loaded) {
+  if (!modelReady()) {
     showToast('The model did not load — the turn will be left out', 'error');
     turnBlank = true;
     return;
@@ -1870,8 +1895,27 @@ const TPL_HINTS = {
   tour: 'A Spline room scene, captured live and played back, framed with a title and a call to explore.',
 };
 
+/* ── THE SPLINE VIEWER LOADS ONLY FOR THE SPLINE TOUR ──
+   spline-viewer and model-viewer each bundle their own copy of Three.js, and
+   with both on the page model-viewer never gets its drawing surface: the
+   model stays invisible and every Product Story capture comes back empty
+   (0% drawn). So spline-viewer is fetched the first time the Tour template
+   is opened, never at page load. Once loaded it cannot be unloaded, hence
+   the reload warning on switching back to the Product Story. */
+let splineLoaded = false;
+function loadSplineViewer() {
+  if (splineLoaded) return;
+  splineLoaded = true;
+  const s = document.createElement('script');
+  s.type = 'module';
+  s.src = 'https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js';
+  document.head.appendChild(s);
+}
+
 function switchTemplate(id) {
   current = id;
+  if (id !== 'story') busy(false);   // the model-loading overlay belongs to the Product Story
+  if (id === 'tour') loadSplineViewer();
   document.querySelectorAll('.tpl-panel').forEach(el => el.classList.toggle('active', el.dataset.tpl === id));
   document.getElementById('tplHint').textContent = TPL_HINTS[id] || '';
   document.getElementById('testTurn').style.display = id === 'story' ? '' : 'none';
@@ -1882,6 +1926,8 @@ function switchTemplate(id) {
     mv.style.display = ''; sv.style.display = 'none';
     stage.classList.remove('showing-canvas');
     if (storyPiece) chooseStoryPiece(storyPiece);
+    if (splineLoaded) document.getElementById('pickHint').innerHTML =
+      '<span class="warn">The Spline Tour was opened on this page, which stops the 3D capture here. Reload the page before exporting a Product Story.</span>';
   } else if (id === 'tour') {
     mv.style.display = 'none'; sv.style.display = '';
     stage.classList.remove('showing-canvas');
@@ -2165,7 +2211,12 @@ async function testCapture(kind) {
   try {
     if (kind === 'story') {
       if (!storyPiece || !storyPiece.model_url) { hint.textContent = 'This piece has no 3D model.'; return; }
-      if (!mv.loaded) { hint.innerHTML = '<span class="warn">The model has not loaded yet. Wait for it to appear in the frame, then test again.</span>'; return; }
+      if (!modelReady()) {
+        btn.textContent = 'Waiting for the model…';
+        await waitForModel(25000);
+        btn.textContent = 'Testing…';
+      }
+      if (!modelReady()) { hint.innerHTML = '<span class="warn">The model has not appeared in the frame yet. Wait for it to show, then test again.</span>'; return; }
     } else {
       if (!tourScene) { hint.textContent = 'Pick a scene first.'; return; }
     }
