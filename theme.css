@@ -1,0 +1,56 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ROUNDED CORNERS, SITE-WIDE  (decided 5 Oct 2026: "done with pointed edges")
+   Linked last in every public page's <head>, so it is the one place the
+   site's corners are set. Three sizes:
+     --r     20px  cards, photographs, panels, dialogs
+     --r-sm  12px  a photograph inside a card, inputs, small tiles
+     pills         buttons and tags (most already were)
+   Full-bleed bands — hero, quote band, the dark philosophy band, footer —
+   stay edge to edge: they have no corners on screen to round.
+   !important only on border-radius, which nothing else on the site sets,
+   so it cannot fight the colour rules (light mode etc.).
+   ═══════════════════════════════════════════════════════════════════ */
+:root { --r: 20px; --r-sm: 12px; }
+
+/* ── cards that hold a photograph: the card rounds, and clips what is in it ── */
+.sp, .ct, .wstrip figure, .room-fig,                 /* home */
+a.room, .room-media,                                 /* spaces */
+.cat-tile, .item, .cat-hero-media,                   /* collection, essentials */
+.na-media, .na-card .na-media,                       /* the nest edit */
+                                                     /* (/nest pieces: see below) */
+.nf-card                                             /* 404 */
+{ border-radius: var(--r) !important; overflow: hidden; }
+.sp::after, .ct::after, .wstrip figure::after { border-radius: inherit !important; }
+.cat-tile-media { border-radius: var(--r) var(--r) 0 0 !important; }
+.item .stage { border-radius: var(--r) var(--r) 0 0 !important; }
+
+/* ── panels, forms and dialogs ── */
+.form-card, main.card, .card, .gate-card, .callout,
+.pillars-grid, .contact-grid,                        /* about: rounded outside, hairline grid inside */
+#articleModal, .sheet, .lobby-card, .comments-section
+{ border-radius: var(--r) !important; }
+.pillars-grid, .contact-grid { overflow: hidden; }   /* not .sheet or #articleModal: they scroll on a phone */
+#articleModal .modal-hero { border-radius: var(--r) var(--r) 0 0 !important; }
+.wband { border-radius: var(--r) !important; }                     /* policies: already clips */
+.rail .piece { border-radius: var(--r) !important; overflow: hidden; } /* /nest */
+.rail .piece .piece-img { border-radius: 0 !important; }
+main.card .logo, main.card .logo img { border-radius: 50% !important; }
+
+/* the piece sheet on Collection / Essentials: stage on the left, details on the right */
+@media (min-width: 821px) {
+  .sheet .d-stage, .sheet .d-poster { border-radius: var(--r) 0 0 var(--r) !important; }
+}
+
+/* the product drawer in the 3D rooms: a side drawer on a laptop, a bottom sheet on a phone */
+#panel { border-radius: var(--r) 0 0 var(--r) !important; overflow-x: hidden; }
+@media (max-width: 768px) { #panel { border-radius: var(--r) var(--r) 0 0 !important; } }
+
+/* ── inputs ── */
+input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="search"], input:not([type]),
+select, textarea, .comment-input, .newsletter-input
+{ border-radius: var(--r-sm) !important; }
+
+/* ── buttons: pills ── */
+.submit-btn, .gate-btn, .newsletter-btn, .comment-submit, .back-home, .btn-similar, .buy, .d-buy, .state .btn
+{ border-radius: 100px !important; }
+.door { border-radius: 16px !important; }

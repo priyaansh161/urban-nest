@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base href="../"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>Collection Reels Mock · Urban Nest</title>
+<!-- MOCK ONLY (mocks/ never deploys). The Collection as vertical cards, one
+     at a time: categories first, then the pieces inside one. Live data. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
+<style>
+  :root {
+    --paper:#F5F7F6; --ink:#0F1F22; --stone:#586366; --hairline:#D9E0DE; --gold:#A37B3F; --card:#FFFFFF;
+    --panel:#0E3238; --panel-ink:#EAF2F1; --edge-soft:rgba(163,123,63,.34);
+    --ease:cubic-bezier(.16,.7,.2,1); --r:22px; --top:58px; --peek:34px;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper:#061E23; --ink:#EAF2F1; --stone:#7F9295; --hairline:#123037; --gold:#C2934D; --card:#0A2A30; --edge-soft:rgba(194,147,77,.36); } }
+  :root[data-theme="dark"] { --paper:#061E23; --ink:#EAF2F1; --stone:#7F9295; --hairline:#123037; --gold:#C2934D; --card:#0A2A30; --edge-soft:rgba(194,147,77,.36); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; }
+  body { background:var(--paper); color:var(--ink); font-family:'DM Sans',sans-serif; overflow:hidden; overscroll-behavior:none; }
+  button { font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+  a { color:inherit; text-decoration:none; }
+
+  /* the phone. On a laptop it sits in the middle so the gesture can be tried
+     with a trackpad or mouse wheel. */
+  .phone { position:relative; height:100svh; width:100%; max-width:440px; margin:0 auto; overflow:hidden; background:var(--paper); }
+  @media (min-width:700px){ .phone { height:min(900px, 96vh); margin-top:2vh; border-radius:36px; box-shadow:0 0 0 10px #111, 0 30px 80px rgba(0,0,0,.5); } }
+
+  .top { position:absolute; z-index:5; top:0; left:0; right:0; height:var(--top); display:flex; align-items:center; gap:10px; padding:0 16px;
+    background:var(--panel); color:var(--panel-ink); }
+  .top .back { width:34px; height:34px; border-radius:50%; display:none; place-items:center; margin-left:-6px; }
+  .top .back svg { width:20px; height:20px; }
+  body.in-cat .top .back { display:grid; }
+  .top .ttl { flex:1; font-family:'Bodoni Moda',serif; font-size:19px; letter-spacing:.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .top .cnt { font-size:11px; letter-spacing:.16em; color:rgba(234,242,241,.6); }
+
+  /* ── THE REEL ──
+     y mandatory with no snap-stop: a gentle swipe moves exactly one card, a
+     hard flick carries on past several, the way Instagram does. */
+  .reel { position:absolute; top:var(--top); left:0; right:0; bottom:0; overflow-y:auto; scroll-snap-type:y mandatory;
+    overscroll-behavior:contain; scrollbar-width:none; padding:10px 12px 0; transition:transform .45s var(--ease), opacity .35s; }
+  .reel::-webkit-scrollbar { display:none; }
+  .reel > .c { scroll-snap-align:start; scroll-margin-top:10px; height:calc(100% - var(--peek)); margin-bottom:10px; }
+  .reel::after { content:''; display:block; height:var(--peek); }
+  #pieces { transform:translateX(100%); opacity:0; pointer-events:none; }
+  body.in-cat #cats { transform:translateX(-30%); opacity:0; pointer-events:none; }
+  body.in-cat #pieces { transform:none; opacity:1; pointer-events:auto; }
+
+  /* category card */
+  .cat { position:relative; display:block; border-radius:var(--r); overflow:hidden; background:var(--panel); color:#F5F7F6; touch-action:pan-y; }
+  .cat > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transform:scale(1.04); transition:transform 1.2s var(--ease); }
+  .cat.seen > img { transform:scale(1); }
+  .cat::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(6,20,23,.92) 0%, rgba(6,20,23,.35) 42%, rgba(6,20,23,0) 65%); }
+  .cat-body { position:absolute; z-index:1; left:20px; right:20px; bottom:22px; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border-radius:100px; font-size:9.5px; letter-spacing:.18em; text-transform:uppercase;
+    background:rgba(245,247,246,.16); backdrop-filter:blur(6px); color:#F5F7F6; }
+  .chip.gold { background:var(--gold); color:#fff; }
+  .cat-name { font-family:'Bodoni Moda',serif; font-weight:400; font-size:40px; line-height:1.05; margin:12px 0 8px; }
+  .cat-sum { font-size:13.5px; line-height:1.55; color:rgba(245,247,246,.78); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .thumbs { display:flex; align-items:center; margin:16px 0 18px; }
+  .thumbs img, .thumbs span { width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid rgba(6,20,23,.9); margin-right:-10px; background:var(--panel); }
+  .thumbs span { display:grid; place-items:center; font-size:11px; background:var(--gold); color:#fff; }
+  .cat-foot { display:flex; justify-content:space-between; align-items:center; }
+  .hint-up { display:inline-flex; flex-direction:column; align-items:center; gap:2px; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:rgba(245,247,246,.65); }
+  .hint-up svg { width:18px; height:18px; animation:nudge 1.6s infinite; }
+  @keyframes nudge { 0%,100% { transform:translateY(3px); opacity:.5; } 50% { transform:translateY(-3px); opacity:1; } }
+
+  /* piece card */
+  .piece { display:flex; flex-direction:column; border-radius:var(--r); overflow:hidden; background:var(--card); border:1px solid var(--edge-soft); touch-action:pan-y; }
+  .piece-ph { position:relative; flex:1 1 auto; min-height:0; margin:8px 8px 0; border-radius:15px; overflow:hidden; background:var(--hairline); }
+  .piece-ph img { width:100%; height:100%; object-fit:cover; display:block; transform:scale(1.04); transition:transform 1.2s var(--ease); }
+  .piece.seen .piece-ph img { transform:scale(1); }
+  .piece-ph::after { content:''; position:absolute; inset:8px; border:1px solid rgba(245,247,246,.5); border-radius:9px; pointer-events:none; }
+  .piece-ph .chip { position:absolute; left:16px; bottom:16px; background:rgba(8,8,7,.55); }
+  .save { position:absolute; z-index:1; top:16px; right:16px; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; background:rgba(245,247,246,.92); color:#0F1F22; transition:transform .25s; }
+  .save:active { transform:scale(.88); }
+  .save.on { background:var(--gold); color:#fff; }
+  .save.on svg { fill:currentColor; }
+  .save svg { width:18px; height:18px; }
+  .piece-body { padding:16px 18px 18px; }
+  .piece-cat { font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); }
+  .piece-name { font-family:'Bodoni Moda',serif; font-size:20px; line-height:1.25; margin:7px 0 12px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .piece-foot { display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid var(--hairline); }
+  .piece-price { font-size:17px; }
+  .piece-go { font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--gold); }
+  .piece-hint { margin-top:10px; text-align:center; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--stone); }
+
+  /* the swipe-back gesture follows the finger */
+  .c.pulling { transition:none; }
+
+  /* mock chrome */
+  .mocknote { position:fixed; z-index:20; left:50%; bottom:14px; transform:translateX(-50%); width:min(560px, calc(100vw - 24px));
+    background:#151515; color:#ddd; border-radius:16px; padding:12px 14px 12px 16px; font-size:12px; line-height:1.5; box-shadow:0 8px 30px rgba(0,0,0,.4); display:flex; gap:12px; align-items:flex-start; }
+  .mocknote b { color:#E9C46A; font-weight:500; }
+  .mocknote button { flex-shrink:0; border:1px solid #555; border-radius:100px; padding:5px 11px; font-size:11px; color:#eee; }
+  .mocknote.gone { display:none; }
+  .empty { padding:40px 20px; text-align:center; color:var(--stone); }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="top">
+    <button class="back" id="back" aria-label="Back to categories"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
+    <span class="ttl" id="ttl">The Collection</span>
+    <span class="cnt" id="cnt"></span>
+  </div>
+  <main class="reel" id="cats"><p class="empty">Loading the collection…</p></main>
+  <main class="reel" id="pieces"></main>
+</div>
+
+<div class="mocknote" id="mocknote">
+  <span><b>MOCK</b> · Swipe up gently for the next card, or flick hard to skip ahead. Tap a category to open it; swipe right (or the back arrow) to return. On a laptop, scroll with the trackpad or mouse wheel. Real categories and pieces, live.</span>
+  <button type="button" onclick="document.getElementById('mocknote').classList.add('gone')">Hide</button>
+</div>
+
+<script>
+(function () {
+  var esc = function (s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
+  var CAT_FALLBACK = { chandeliers: 'images/tile-chandelier.webp', lighting: 'images/det-pendants.webp', sculptures: 'images/det-vase.webp',
+    artifacts: 'images/det-bowl.webp', decor: 'images/det-jug.webp', accessories: 'images/det-knobs.webp', living: 'images/tile-living.webp' };
+  function price(it) {
+    if (it.price_paise) return '₹' + Math.round(it.price_paise / 100).toLocaleString('en-IN');
+    return it.price || '';
+  }
+  var cats = [], byCat = {}, saved = {};
+  try { saved = JSON.parse(localStorage.getItem('un-saved-reel') || '{}'); } catch (e) {}
+
+  var catsEl = document.getElementById('cats'), piecesEl = document.getElementById('pieces');
+  var ttl = document.getElementById('ttl'), cnt = document.getElementById('cnt');
+
+  /* which card is on screen → the counter, and a slow settle on its photo */
+  function watch(reel) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('seen');
+          var all = Array.prototype.indexOf.call(reel.children, e.target);
+          if (reel === (document.body.classList.contains('in-cat') ? piecesEl : catsEl)) cnt.textContent = (all + 1) + ' / ' + reel.children.length;
+        }
+      });
+    }, { root: reel, threshold: 0.6 });
+    Array.prototype.forEach.call(reel.children, function (c) { io.observe(c); });
+  }
+
+  function paintCats() {
+    if (!cats.length) { catsEl.innerHTML = '<p class="empty">No published pieces yet.</p>'; return; }
+    catsEl.innerHTML = cats.map(function (c, i) {
+      var list = byCat[c.slug] || [];
+      var thumbs = list.slice(0, 3).map(function (it) { return '<img src="' + esc(it.image_url || 'images/det-vase.webp') + '" alt=""/>'; }).join('') +
+        (list.length > 3 ? '<span>+' + (list.length - 3) + '</span>' : '');
+      return '<a class="c cat" href="#" data-i="' + i + '"><img src="' + esc(c.tile_image_url || c.hero_image_url || CAT_FALLBACK[c.slug] || (list[0] && list[0].image_url) || 'images/tile-vase.webp') + '" alt=""/>' +
+        '<span class="cat-body"><span class="chip">' + list.length + (list.length === 1 ? ' piece' : ' pieces') + '</span>' +
+        '<h2 class="cat-name">' + esc(c.name) + '</h2>' +
+        (c.summary ? '<p class="cat-sum">' + esc(c.summary) + '</p>' : '') +
+        '<span class="thumbs">' + thumbs + '</span>' +
+        '<span class="cat-foot"><span class="chip gold">Tap to open</span>' +
+        (i < cats.length - 1 ? '<span class="hint-up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg>Next</span>' : '') +
+        '</span></span></a>';
+    }).join('');
+    watch(catsEl);
+  }
+
+  function openCat(i) {
+    var c = cats[i], list = byCat[c.slug] || [];
+    piecesEl.innerHTML = list.map(function (it, j) {
+      var href = 'collection.html?c=' + encodeURIComponent(c.slug) + '&p=' + encodeURIComponent(it.id);
+      return '<a class="c piece" href="' + href + '"><span class="piece-ph"><img src="' + esc(it.image_url || 'images/det-vase.webp') + '" alt="" loading="lazy"/>' +
+        '<button type="button" class="save' + (saved[it.id] ? ' on' : '') + '" data-id="' + esc(it.id) + '" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10Z"/></svg></button>' +
+        (it.model_url ? '<span class="chip">↻ View in 3D</span>' : '') + '</span>' +
+        '<span class="piece-body"><span class="piece-cat">' + esc(c.name) + '</span>' +
+        '<span class="piece-name">' + esc(it.name) + '</span>' +
+        '<span class="piece-foot"><span class="piece-price">' + esc(price(it)) + '</span><span class="piece-go">View piece →</span></span>' +
+        (j === 0 ? '<span class="piece-hint" style="display:block">Swipe up for the next piece · swipe right to go back</span>' : '') +
+        '</span></a>';
+    }).join('');
+    piecesEl.scrollTop = 0;
+    ttl.textContent = c.name;
+    document.body.classList.add('in-cat');
+    watch(piecesEl);
+  }
+  function closeCat() {
+    document.body.classList.remove('in-cat');
+    ttl.textContent = 'The Collection';
+    var c = Math.round(catsEl.scrollTop / (catsEl.children[0] ? catsEl.children[0].offsetHeight + 10 : 1));
+    cnt.textContent = (c + 1) + ' / ' + catsEl.children.length;
+  }
+
+  catsEl.addEventListener('click', function (e) {
+    var a = e.target.closest('.cat'); if (!a) return;
+    e.preventDefault(); openCat(+a.dataset.i);
+  });
+  document.getElementById('back').onclick = closeCat;
+  piecesEl.addEventListener('click', function (e) {
+    var s = e.target.closest('.save');
+    if (s) {
+      e.preventDefault(); e.stopPropagation();
+      var on = !s.classList.contains('on'); s.classList.toggle('on', on);
+      if (on) saved[s.dataset.id] = 1; else delete saved[s.dataset.id];
+      try { localStorage.setItem('un-saved-reel', JSON.stringify(saved)); } catch (e2) {}
+      return;
+    }
+    if (piecesEl.dataset.swiped) { e.preventDefault(); delete piecesEl.dataset.swiped; return; }
+    e.preventDefault();   /* mock: the real build opens the piece sheet */
+  }, true);
+
+  /* swipe right on a piece = back to the categories (touch only, the way
+     iOS goes back). Vertical movement stays with the reel. */
+  var sw = null;
+  piecesEl.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse') return;
+    sw = { x: e.clientX, y: e.clientY, card: e.target.closest('.c'), on: false };
+  });
+  piecesEl.addEventListener('pointermove', function (e) {
+    if (!sw) return;
+    var dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (!sw.on && dx > 12 && Math.abs(dx) > Math.abs(dy) * 1.4) sw.on = true;
+    if (sw.on && sw.card) { sw.card.classList.add('pulling'); sw.card.style.transform = 'translateX(' + Math.max(0, dx) * 0.6 + 'px)'; }
+  });
+  function swEnd(e) {
+    if (!sw) return;
+    var dx = e.clientX - sw.x;
+    if (sw.card) { sw.card.classList.remove('pulling'); sw.card.style.transform = ''; }
+    if (sw.on && dx > 80) { piecesEl.dataset.swiped = '1'; closeCat(); }
+    sw = null;
+  }
+  piecesEl.addEventListener('pointerup', swEnd);
+  piecesEl.addEventListener('pointercancel', swEnd);
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('in-cat')) closeCat(); });
+
+  /* live data: the same two tables the Collection page reads */
+  if (typeof db === 'undefined') { catsEl.innerHTML = '<p class="empty">Could not reach the database.</p>'; return; }
+  Promise.all([
+    db.from('collection_items').select('*').eq('published', true).eq('section', 'collection').order('sort_order').order('created_at'),
+    db.from('collection_categories').select('*').eq('published', true).eq('section', 'collection').order('sort_order').order('name')
+      .then(function (r) { return r.error ? { data: [] } : r; })
+  ]).then(function (res) {
+    var items = (res[0] && res[0].data) || [], catRows = (res[1] && res[1].data) || [];
+    items.forEach(function (it) { var k = it.category || 'other'; (byCat[k] = byCat[k] || []).push(it); });
+    cats = catRows.filter(function (c) { return (byCat[c.slug] || []).length; });
+    Object.keys(byCat).forEach(function (k) {
+      if (!cats.some(function (c) { return c.slug === k; })) cats.push({ slug: k, name: k.charAt(0).toUpperCase() + k.slice(1) });
+    });
+    paintCats();
+  }, function () { catsEl.innerHTML = '<p class="empty">Could not reach the database.</p>'; });
+})();
+</script>
+</body>
+</html>

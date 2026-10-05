@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Homepage Redesign Mock · Urban Nest</title>
+<!-- MOCK ONLY. Lives in mocks/, which tools/build-site.mjs never copies, so it
+     cannot reach the live site. Prices and article titles are placeholders. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --paper:#F5F7F6; --ink:#0F1F22; --stone:#586366; --hairline:#D9E0DE; --gold:#A37B3F;
+    --card:#FFFFFF; --panel:#0E3238; --panel-ink:#EAF2F1; --panel-dim:rgba(234,242,241,.6);
+    --shadow:0 10px 30px rgba(15,31,34,.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#061E23; --ink:#EAF2F1; --stone:#7F9295; --hairline:#123037; --gold:#C2934D;
+      --card:#0B2A30; --panel:#0B343C; --shadow:0 10px 30px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#061E23; --ink:#EAF2F1; --stone:#7F9295; --hairline:#123037; --gold:#C2934D;
+    --card:#0B2A30; --panel:#0B343C; --shadow:0 10px 30px rgba(0,0,0,.4);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { -webkit-text-size-adjust:100%; }
+  body { background:var(--paper); color:var(--ink); font-family:'DM Sans',sans-serif; font-weight:400; overflow-x:hidden; }
+  img { display:block; max-width:100%; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+  .serif { font-family:'Bodoni Moda',serif; font-weight:400; }
+  .shell { width:min(1240px, 100%); margin:0 auto; padding:0 16px; }
+  @media (min-width:768px){ .shell { padding:0 40px; } }
+
+  /* ── mock chrome ── */
+  .mockbar { position:sticky; top:0; z-index:500; display:flex; gap:8px; align-items:center; justify-content:space-between;
+    padding:8px 16px; background:#1a1a1a; color:#eee; font-size:12px; letter-spacing:.04em; }
+  .mockbar b { color:#E9C46A; font-weight:500; }
+  .mockbar .tools { display:flex; gap:6px; }
+  .mockbar button { border:1px solid #444; border-radius:999px; padding:5px 10px; font-size:11px; color:#eee; }
+  .mockbar button[aria-pressed="true"] { background:#E9C46A; color:#111; border-color:#E9C46A; }
+  .note { display:inline-flex; gap:6px; align-items:flex-start; margin:0 0 14px; padding:8px 12px; border-radius:10px;
+    background:rgba(233,196,106,.16); border:1px dashed #C9A13B; color:var(--ink); font-size:12.5px; line-height:1.45; max-width:640px; }
+  .note::before { content:'MOCK NOTE'; font-size:9.5px; letter-spacing:.14em; color:#9a7420; font-weight:500; padding-top:2px; white-space:nowrap; }
+  :root[data-theme="dark"] .note::before { color:#E9C46A; }
+  body.hide-notes .note { display:none; }
+
+  /* ── nav (unchanged from the site, shortened) ── */
+  .nav { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:var(--panel); color:var(--panel-ink); }
+  .nav .logo { display:flex; gap:10px; align-items:center; font-size:13px; letter-spacing:.32em; }
+  .nav .logo img { width:26px; height:26px; }
+  .nav .join { font-size:11px; letter-spacing:.14em; text-transform:uppercase; border:1px solid var(--gold); color:var(--panel-ink); padding:8px 14px; border-radius:999px; }
+
+  /* ── 1. HERO: a room you can tap ── */
+  .hero { position:relative; }
+  .hero-stage { position:relative; height:calc(100svh - 110px); min-height:520px; overflow:hidden; background:#222; }
+  .hero-stage img { width:100%; height:100%; object-fit:cover; }
+  .hero-scrim { position:absolute; inset:0; background:linear-gradient(to top, rgba(6,20,23,.85) 0%, rgba(6,20,23,.15) 45%, transparent 70%); pointer-events:none; }
+  .hero-copy { position:absolute; left:0; right:0; bottom:0; padding:0 16px 22px; color:#F5F7F6; }
+  .hero-copy h1 { font-family:'Bodoni Moda',serif; font-weight:400; font-size:clamp(30px,8vw,56px); line-height:1.05; }
+  .hero-copy h1 em { color:#E3C08A; }
+  .hero-copy .tap-hint { display:inline-flex; gap:8px; align-items:center; margin-top:12px; font-size:12px; letter-spacing:.08em; opacity:.85; }
+  .hero-copy .tap-hint i { width:10px; height:10px; border-radius:50%; background:#E3C08A; box-shadow:0 0 0 0 rgba(227,192,138,.7); animation:ping 1.8s infinite; }
+  .hs { position:absolute; transform:translate(-50%,-50%); width:34px; height:34px; display:grid; place-items:center; z-index:3; touch-action:manipulation; }
+  .hs::before { content:''; position:absolute; inset:0; border-radius:50%; background:rgba(245,247,246,.25); backdrop-filter:blur(4px); border:1.5px solid rgba(255,255,255,.85); animation:ping 2.2s infinite; }
+  .hs::after { content:''; width:10px; height:10px; border-radius:50%; background:#fff; position:relative; }
+  .hs.on::before { background:var(--gold); border-color:#fff; animation:none; }
+  @keyframes ping { 0%{ box-shadow:0 0 0 0 rgba(255,255,255,.55);} 70%{ box-shadow:0 0 0 14px rgba(255,255,255,0);} 100%{ box-shadow:0 0 0 0 rgba(255,255,255,0);} }
+  .pop { position:absolute; z-index:4; width:min(260px, calc(100% - 32px)); background:var(--card); color:var(--ink); border-radius:16px; box-shadow:var(--shadow);
+    display:grid; grid-template-columns:72px 1fr; gap:12px; padding:10px; opacity:0; transform:translateY(8px) scale(.96); pointer-events:none; transition:.22s ease; }
+  .pop.open { opacity:1; transform:none; pointer-events:auto; }
+  .pop img { width:72px; height:72px; object-fit:cover; border-radius:10px; }
+  .pop .pn { font-size:13.5px; line-height:1.3; }
+  .pop .pp { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .pill { display:inline-flex; align-items:center; gap:6px; font-size:11px; letter-spacing:.06em; padding:6px 11px; border-radius:999px; border:1px solid var(--hairline); background:var(--card); white-space:nowrap; }
+  .pill.gold { background:var(--gold); color:#fff; border-color:var(--gold); }
+  .room-pills { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding:14px 16px 4px; scroll-snap-type:x mandatory; }
+  .room-pills::-webkit-scrollbar { display:none; }
+  .room-pills a { scroll-snap-align:start; display:flex; align-items:center; gap:8px; padding:6px 14px 6px 6px; border-radius:999px; background:var(--card); border:1px solid var(--hairline); font-size:13px; white-space:nowrap; transition:.2s; }
+  .room-pills a img { width:30px; height:30px; border-radius:50%; object-fit:cover; }
+  .room-pills a:hover, .room-pills a.cur { border-color:var(--gold); color:var(--gold); }
+  .hero-cta { display:flex; gap:10px; padding:10px 16px 0; }
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:13px 20px; border-radius:999px; font-size:12px; letter-spacing:.12em; text-transform:uppercase; border:1px solid var(--gold); transition:.2s; }
+  .btn.solid { background:var(--gold); color:#fff; }
+  .btn:hover { transform:translateY(-1px); }
+
+  @media (min-width:900px){
+    .hero { display:grid; grid-template-columns: 1fr 1.05fr; gap:48px; align-items:center; padding:48px 40px; max-width:1320px; margin:0 auto; }
+    .hero-stage { height:min(78vh, 720px); border-radius:24px; order:2; }
+    .hero-scrim, .hero-copy { display:none; }
+    .hero-side { order:1; }
+    .hero-side h1 { font-family:'Bodoni Moda',serif; font-weight:400; font-size:clamp(44px,4.6vw,72px); line-height:1.02; }
+    .hero-side h1 em { color:var(--gold); }
+    .hero-side .sub { margin:18px 0 26px; color:var(--stone); font-size:15px; max-width:420px; line-height:1.6; }
+    .room-pills, .hero-cta { padding-left:0; padding-right:0; }
+    .room-pills { flex-wrap:wrap; overflow:visible; }
+  }
+  @media (max-width:899px){ .hero-side h1, .hero-side .sub { display:none; } }
+
+  /* ── section heads ── */
+  section.block { padding:56px 0 8px; }
+  .head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px; }
+  .eyebrow { font-size:10.5px; letter-spacing:.28em; text-transform:uppercase; color:var(--gold); }
+  .head h2 { font-family:'Bodoni Moda',serif; font-weight:400; font-size:clamp(26px,5vw,40px); line-height:1.1; margin-top:6px; }
+  .head h2 em { color:var(--gold); }
+  .arrows { display:none; gap:8px; }
+  @media (hover:hover) and (pointer:fine){ .arrows { display:flex; } }
+  .arrows button { width:44px; height:44px; border-radius:50%; border:1px solid var(--hairline); display:grid; place-items:center; transition:.2s; }
+  .arrows button:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); }
+  .arrows button:disabled { opacity:.3; cursor:default; }
+  .arrows svg { width:18px; height:18px; }
+
+  /* ── THE SWIPE RAIL (one component, used everywhere) ── */
+  .rail { display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-padding:0 16px; padding:4px 16px 16px;
+    scrollbar-width:none; overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch; }
+  .rail::-webkit-scrollbar { display:none; }
+  .rail > * { scroll-snap-align:start; flex:0 0 auto; }
+  .rail.dragging { scroll-snap-type:none; cursor:grabbing; }
+  .rail.dragging * { pointer-events:none; user-select:none; }
+  @media (hover:hover) and (pointer:fine){ .rail { cursor:grab; } }
+  @media (min-width:768px){ .rail { padding:4px max(40px, calc((100vw - 1240px)/2 + 40px)) 18px; scroll-padding:0 max(40px, calc((100vw - 1240px)/2 + 40px)); gap:16px; } }
+  .progress { display:flex; gap:6px; justify-content:center; padding:2px 0 0; }
+  .progress i { width:6px; height:6px; border-radius:999px; background:var(--hairline); transition:.3s; }
+  .progress i.on { width:22px; background:var(--gold); }
+
+  /* ── 2. Little things: tap-to-flip ── */
+  .lead { font-family:'Bodoni Moda',serif; font-size:clamp(24px,5.4vw,40px); line-height:1.15; max-width:760px; }
+  .lead b { font-weight:400; color:var(--gold); font-style:italic; }
+  .flip { width:min(72vw, 280px); aspect-ratio:3/4; perspective:1000px; }
+  .flip-in { position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.2,.7,.2,1); transform-style:preserve-3d; }
+  .flip.flipped .flip-in { transform:rotateY(180deg); }
+  @media (hover:hover) and (pointer:fine){ .flip:hover .flip-in { transform:rotateY(180deg); } }
+  .face { position:absolute; inset:0; backface-visibility:hidden; border-radius:20px; overflow:hidden; }
+  .face.front img { width:100%; height:100%; object-fit:cover; }
+  .face.front .lbl { position:absolute; left:12px; bottom:12px; right:12px; display:flex; justify-content:space-between; align-items:center; }
+  .face.front .lbl span:first-child { background:rgba(245,247,246,.92); color:#0F1F22; padding:7px 12px; border-radius:999px; font-size:12.5px; }
+  .face.front .turn { width:32px; height:32px; border-radius:50%; background:rgba(245,247,246,.92); color:#0F1F22; display:grid; place-items:center; font-size:15px; }
+  .face.back { transform:rotateY(180deg); background:var(--panel); color:var(--panel-ink); padding:22px; display:flex; flex-direction:column; justify-content:space-between; }
+  .face.back .q { font-family:'Bodoni Moda',serif; font-size:22px; line-height:1.25; }
+  .face.back .q em { color:#E3C08A; }
+  .face.back .meta { display:flex; gap:6px; flex-wrap:wrap; }
+  .face.back .meta .pill { background:transparent; color:var(--panel-ink); border-color:rgba(234,242,241,.25); }
+  .face.back .meta .pill.gold { background:var(--gold); border-color:var(--gold); }
+
+  /* ── 3. Spaces: mixed big & small cubes ── */
+  .room { position:relative; border-radius:22px; overflow:hidden; background:#222; color:#F5F7F6; }
+  .room.big { width:min(78vw, 420px); aspect-ratio:4/5; }
+  .room.small { width:min(58vw, 260px); aspect-ratio:4/5; align-self:flex-end; height:auto; }
+  @media (min-width:768px){ .room.small { aspect-ratio:3/4; } }
+  .room img { width:100%; height:100%; object-fit:cover; transition:transform .8s cubic-bezier(.2,.7,.2,1); }
+  .room:hover img { transform:scale(1.06); }
+  .room .shade { position:absolute; inset:0; background:linear-gradient(to top, rgba(6,20,23,.8), transparent 55%); }
+  .room .cap { position:absolute; left:16px; right:16px; bottom:16px; }
+  .room .cap .n { font-family:'Bodoni Moda',serif; font-size:clamp(22px,4.4vw,30px); }
+  .room .cap .row { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .room .cap .pill { background:rgba(245,247,246,.14); color:#F5F7F6; border-color:rgba(245,247,246,.3); backdrop-filter:blur(6px); }
+  .room .cap .pill.gold { background:var(--gold); border-color:var(--gold); }
+  .room .soon { position:absolute; top:14px; left:14px; }
+  .room .soon .pill { background:rgba(15,31,34,.6); color:#F5F7F6; border-color:transparent; }
+  .room .badge3d { position:absolute; top:14px; right:14px; width:42px; height:42px; border-radius:50%; background:rgba(245,247,246,.92); color:#0F1F22; display:grid; place-items:center; font-size:11px; font-weight:500; letter-spacing:.04em; }
+
+  /* ── 4. Collection rail ── */
+  .piece { width:min(56vw, 240px); }
+  .piece .ph { position:relative; aspect-ratio:1; border-radius:18px; overflow:hidden; background:var(--card); }
+  .piece .ph img { width:100%; height:100%; object-fit:cover; transition:transform .6s; }
+  .piece:hover .ph img { transform:scale(1.07); }
+  .piece .save { position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%; background:rgba(245,247,246,.92); color:#0F1F22; display:grid; place-items:center; transition:.2s; }
+  .piece .save.on { background:var(--gold); color:#fff; }
+  .piece .save svg { width:16px; height:16px; }
+  .piece .p3d { position:absolute; left:10px; bottom:10px; }
+  .piece .p3d .pill { background:rgba(15,31,34,.65); color:#fff; border-color:transparent; backdrop-filter:blur(4px); }
+  .piece .nm { margin-top:10px; font-size:13.5px; line-height:1.35; }
+  .piece .pr { margin-top:6px; display:flex; gap:6px; }
+
+  /* ── 5. Why Urban Nest: cubes (A) & a deck (B) ── */
+  .opt { display:inline-block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; padding:5px 10px; border-radius:6px; background:var(--ink); color:var(--paper); margin-bottom:10px; }
+  .cube { width:min(66vw, 250px); aspect-ratio:1; border-radius:22px; padding:20px; display:flex; flex-direction:column; justify-content:space-between;
+    background:var(--card); border:1px solid var(--hairline); transition:transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s; }
+  .cube:nth-child(4n+2) { background:var(--panel); color:var(--panel-ink); border-color:transparent; }
+  .cube:nth-child(4n+3) { background:var(--gold); color:#fff; border-color:transparent; }
+  .cube:hover { transform:translateY(-6px) rotate(-1deg); box-shadow:var(--shadow); }
+  .cube .ic { width:46px; height:46px; border-radius:14px; display:grid; place-items:center; background:rgba(163,123,63,.14); color:var(--gold); }
+  .cube:nth-child(4n+2) .ic, .cube:nth-child(4n+3) .ic { background:rgba(255,255,255,.14); color:inherit; }
+  .cube .ic svg { width:24px; height:24px; }
+  .cube .t { font-family:'Bodoni Moda',serif; font-size:23px; line-height:1.15; }
+  .cube .d { font-size:13px; line-height:1.5; opacity:.75; margin-top:8px; }
+
+  .deck-wrap { display:grid; gap:28px; align-items:center; }
+  @media (min-width:900px){ .deck-wrap { grid-template-columns: 1fr 1fr; } }
+  .deck { position:relative; width:min(84vw, 340px); aspect-ratio:1; margin:0 auto; }
+  .dcard { position:absolute; inset:0; border-radius:26px; padding:26px; display:flex; flex-direction:column; justify-content:space-between;
+    background:var(--card); border:1px solid var(--hairline); box-shadow:var(--shadow); touch-action:pan-y; user-select:none;
+    transition:transform .35s cubic-bezier(.2,.7,.2,1), opacity .35s; will-change:transform; }
+  .dcard.dark { background:var(--panel); color:var(--panel-ink); border-color:transparent; }
+  .dcard.goldc { background:var(--gold); color:#fff; border-color:transparent; }
+  .dcard .stars { color:var(--gold); letter-spacing:3px; font-size:15px; }
+  .dcard.dark .stars, .dcard.goldc .stars { color:#F3D9A8; }
+  .dcard .qt { font-family:'Bodoni Moda',serif; font-size:clamp(20px,5vw,25px); line-height:1.3; }
+  .dcard .who { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .dcard .who i { width:36px; height:36px; border-radius:50%; background:rgba(163,123,63,.25); display:grid; place-items:center; font-style:normal; font-weight:500; }
+  .deck-ctrl { display:flex; justify-content:center; gap:12px; margin-top:16px; }
+  .deck-ctrl button { width:48px; height:48px; border-radius:50%; border:1px solid var(--hairline); display:grid; place-items:center; }
+  .deck-ctrl button:hover { border-color:var(--gold); color:var(--gold); }
+  .deck-ctrl svg { width:18px; height:18px; }
+  .deck-side p { color:var(--stone); font-size:14.5px; line-height:1.6; max-width:420px; }
+
+  /* ── 6. Nest Edit: stories ── */
+  .story { position:relative; width:min(46vw, 210px); aspect-ratio:9/16; border-radius:18px; overflow:hidden; color:#fff; }
+  .story img { width:100%; height:100%; object-fit:cover; transition:transform .7s; }
+  .story:hover img { transform:scale(1.06); }
+  .story::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.78), transparent 60%); }
+  .story .ring { position:absolute; inset:0; border-radius:18px; box-shadow:inset 0 0 0 2px var(--gold); z-index:2; pointer-events:none; }
+  .story .tx { position:absolute; left:12px; right:12px; bottom:12px; z-index:3; }
+  .story .tx .pill { background:rgba(255,255,255,.18); color:#fff; border-color:transparent; font-size:10px; backdrop-filter:blur(4px); }
+  .story .tx h3 { font-family:'Bodoni Moda',serif; font-weight:400; font-size:17px; line-height:1.2; margin-top:8px; }
+
+  /* ── 7. Contact as big buttons ── */
+  .reach { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .reach a { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; aspect-ratio:1; border-radius:20px; background:var(--card); border:1px solid var(--hairline); font-size:12.5px; transition:.25s; }
+  .reach a:hover { border-color:var(--gold); color:var(--gold); transform:translateY(-3px); }
+  .reach svg { width:28px; height:28px; }
+  @media (min-width:768px){ .reach { max-width:620px; } .reach a { aspect-ratio:auto; padding:28px 10px; } }
+
+  footer { margin-top:56px; padding:28px 16px 40px; background:var(--panel); color:var(--panel-dim); text-align:center; font-size:12px; letter-spacing:.06em; }
+  footer b { color:var(--panel-ink); font-weight:400; letter-spacing:.3em; display:block; margin-bottom:6px; }
+</style>
+</head>
+<body>
+
+<div class="mockbar">
+  <span><b>MOCK</b> · not live</span>
+  <span class="tools">
+    <button id="notesBtn" aria-pressed="true">Notes</button>
+    <button id="lightBtn" aria-pressed="false">Light</button>
+    <button id="darkBtn" aria-pressed="false">Dark</button>
+  </span>
+</div>
+
+<nav class="nav">
+  <span class="logo"><img src="../logo-icon.png" alt=""/>URBAN NEST</span>
+  <a class="join" href="#">Join the Nest</a>
+</nav>
+
+<!-- ════════ 1. HERO ════════ -->
+<header class="hero">
+  <div class="hero-stage" id="stage">
+    <img id="heroImg" src="../images/room-bedroom.webp" alt="A finished bedroom"/>
+    <div class="hero-scrim"></div>
+    <div class="hero-copy">
+      <h1>Where your space<br/>finds its <em>character.</em></h1>
+      <span class="tap-hint"><i></i>Tap the dots to see each piece</span>
+    </div>
+    <div class="pop" id="pop"><img alt=""/><div><div class="pn"></div><div class="pp"></div></div></div>
+  </div>
+
+  <div class="hero-side">
+    <p class="note" style="margin-top:14px">The headline sits on the photo on a phone; on a laptop it moves to the left and the room becomes a big tappable card. Each dot opens a product card, the same idea as the 3D rooms.</p>
+    <h1>Where your space finds its <em>character.</em></h1>
+    <p class="sub">Tap anything in the room. Not the hundred things on offer, just the few worth living with.</p>
+    <div class="room-pills" id="roomPills">
+      <a href="#" class="cur"><img src="../images/cover-bed-1.webp" alt=""/>Bedroom</a>
+      <a href="#"><img src="../images/cover-bath-1.webp" alt=""/>Bathroom</a>
+      <a href="#"><img src="../images/cover-kitchen-1.webp" alt=""/>Kitchen</a>
+      <a href="#"><img src="../images/tile-living.webp" alt=""/>Living</a>
+      <a href="#"><img src="../images/tile-chandelier.webp" alt=""/>Statement pieces</a>
+    </div>
+    <div class="hero-cta">
+      <a href="#" class="btn solid">Step inside in 3D →</a>
+      <a href="#" class="btn">Shop</a>
+    </div>
+  </div>
+</header>
+
+<!-- ════════ 2. THE LITTLE THINGS ════════ -->
+<section class="block">
+  <div class="shell">
+    <p class="note">Replaces the two jugaad paragraphs. The idea stays, but it's told through objects. Tap a card (or hover on a laptop) to flip it.</p>
+    <span class="eyebrow">The little things</span>
+    <p class="lead" style="margin:8px 0 22px">It's the little things that make a house <b>a home.</b></p>
+  </div>
+  <div class="rail" data-rail>
+    <div class="flip" tabindex="0">
+      <div class="flip-in">
+        <div class="face front"><img src="../images/det-bowl.webp" alt=""/><div class="lbl"><span>The bowl on the counter</span><span class="turn">↻</span></div></div>
+        <div class="face back"><p class="q">Jugaad got us here. <em>It's no longer necessary.</em></p><div class="meta"><span class="pill">Kitchen</span><span class="pill gold">From ₹499</span></div></div>
+      </div>
+    </div>
+    <div class="flip" tabindex="0">
+      <div class="flip-in">
+        <div class="face front"><img src="../images/det-knobs.webp" alt=""/><div class="lbl"><span>The handle you touch daily</span><span class="turn">↻</span></div></div>
+        <div class="face back"><p class="q">Never the thing a shop puts <em>in front of you.</em></p><div class="meta"><span class="pill">Doors &amp; drawers</span><span class="pill gold">From ₹299</span></div></div>
+      </div>
+    </div>
+    <div class="flip" tabindex="0">
+      <div class="flip-in">
+        <div class="face front"><img src="../images/det-faucet.webp" alt=""/><div class="lbl"><span>The tap by the sink</span><span class="turn">↻</span></div></div>
+        <div class="face back"><p class="q">Small, cheap, <em>and it changes the whole room.</em></p><div class="meta"><span class="pill">Bathroom</span><span class="pill gold">From ₹1,199</span></div></div>
+      </div>
+    </div>
+    <div class="flip" tabindex="0">
+      <div class="flip-in">
+        <div class="face front"><img src="../images/det-jug.webp" alt=""/><div class="lbl"><span>The jug on the table</span><span class="turn">↻</span></div></div>
+        <div class="face back"><p class="q">That is <em>the part we do.</em></p><div class="meta"><span class="pill">Dining</span><span class="pill gold">From ₹649</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="progress" data-progress></div>
+</section>
+
+<!-- ════════ 3. SPACES ════════ -->
+<section class="block">
+  <div class="shell">
+    <p class="note">The swipe rail with big and small cards mixed. On a phone the next card peeks in from the edge so people know to swipe. On a laptop you can drag it or use the arrows.</p>
+    <div class="head">
+      <div><span class="eyebrow">The spaces</span><h2>Step <em>inside.</em></h2></div>
+      <div class="arrows" data-arrows><button aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    </div>
+  </div>
+  <div class="rail" data-rail style="align-items:flex-end">
+    <a href="#" class="room big"><img src="../images/room-bedroom.webp" alt=""/><span class="shade"></span><span class="badge3d">3D</span>
+      <span class="cap"><span class="n">The Bedroom</span><span class="row"><span class="pill">8 pieces</span><span class="pill gold">Enter →</span></span></span></a>
+    <a href="#" class="room small"><img src="../images/room-bath.webp" alt=""/><span class="shade"></span><span class="badge3d">3D</span>
+      <span class="cap"><span class="n">The Bathroom</span><span class="row"><span class="pill">10 pieces</span></span></span></a>
+    <a href="#" class="room big"><img src="../images/room-kitchen.webp" alt=""/><span class="shade"></span><span class="badge3d">3D</span>
+      <span class="cap"><span class="n">The Kitchen</span><span class="row"><span class="pill">12 pieces</span><span class="pill gold">Enter →</span></span></span></a>
+    <a href="#" class="room small"><img src="../images/tile-living.webp" alt=""/><span class="shade"></span><span class="soon"><span class="pill">Coming soon</span></span>
+      <span class="cap"><span class="n">The Living Room</span></span></a>
+    <a href="#" class="room big"><img src="../images/cover-bed-2.webp" alt=""/><span class="shade"></span><span class="badge3d">3D</span>
+      <span class="cap"><span class="n">Bedroom, MK2</span><span class="row"><span class="pill">A darker take</span></span></span></a>
+  </div>
+  <div class="progress" data-progress></div>
+</section>
+
+<!-- ════════ 4. COLLECTION ════════ -->
+<section class="block">
+  <div class="shell">
+    <p class="note">Statement pieces, one tap from the photo to the 3D view. The heart button saves a piece, which gives people a reason to come back.</p>
+    <div class="head">
+      <div><span class="eyebrow">The collection</span><h2>Pieces that <em>hold a room.</em></h2></div>
+      <div class="arrows" data-arrows><button aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    </div>
+  </div>
+  <div class="rail" data-rail id="pieces"></div>
+  <div class="progress" data-progress></div>
+</section>
+
+<!-- ════════ 5. WHY URBAN NEST ════════ -->
+<section class="block">
+  <div class="shell">
+    <p class="note">This is the block of four stacked text rows near the bottom of today's homepage. Here are both ways to do the swipe-card idea you saw. Pick one.</p>
+    <span class="opt">Option A · Cubes</span>
+    <div class="head" style="margin-top:4px">
+      <div><span class="eyebrow">Why Urban Nest</span><h2>Affordable luxury, <em>for real homes.</em></h2></div>
+      <div class="arrows" data-arrows><button aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    </div>
+  </div>
+  <div class="rail" data-rail>
+    <div class="cube"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></span><div><div class="t">Small things, big impact</div><div class="d">A soap dispenser can change a whole room.</div></div></div>
+    <div class="cube"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 13 9 5 9-5"/></svg></span><div><div class="t">See it before you buy it</div><div class="d">Walk through the room in 3D first.</div></div></div>
+    <div class="cube"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10Z"/></svg></span><div><div class="t">Curated, not catalogued</div><div class="d">The few worth living with.</div></div></div>
+    <div class="cube"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span><div><div class="t">The complete look</div><div class="d">Pieces that work together.</div></div></div>
+  </div>
+  <div class="progress" data-progress></div>
+
+  <div class="shell" style="margin-top:44px">
+    <span class="opt">Option B · Swipe deck</span>
+    <div class="deck-wrap">
+      <div class="deck-side">
+        <span class="eyebrow">What people say</span>
+        <h2 class="serif" style="font-size:clamp(26px,5vw,40px);line-height:1.1;margin:6px 0 12px">Swipe <em style="color:var(--gold)">through.</em></h2>
+        <p class="note">Cards stacked like a deck. Swipe the top one away, left or right, and the next comes up. This suits real customer reviews once you have them. Until then it can hold the four promises. The quotes below are placeholders.</p>
+      </div>
+      <div>
+        <div class="deck" id="deck"></div>
+        <div class="deck-ctrl">
+          <button id="deckBack" aria-label="Previous card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+          <button id="deckNext" aria-label="Next card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 6. NEST EDIT ════════ -->
+<section class="block">
+  <div class="shell">
+    <p class="note">The Nest Edit as tall story covers, the shape people already swipe on Instagram. Titles are placeholders.</p>
+    <div class="head">
+      <div><span class="eyebrow">The Nest Edit</span><h2>Read in <em>a minute.</em></h2></div>
+      <div class="arrows" data-arrows><button aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><button aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    </div>
+  </div>
+  <div class="rail" data-rail>
+    <a href="#" class="story"><img src="../images/cover-bath-2.webp" alt=""/><span class="ring"></span><span class="tx"><span class="pill">3 min · Bathroom</span><h3>Why your bathroom still feels unfinished</h3></span></a>
+    <a href="#" class="story"><img src="../images/det-pendants.webp" alt=""/><span class="ring"></span><span class="tx"><span class="pill">4 min · Light</span><h3>Three lamps, one mood</h3></span></a>
+    <a href="#" class="story"><img src="../images/cover-kitchen-2.webp" alt=""/><span class="ring"></span><span class="tx"><span class="pill">2 min · Kitchen</span><h3>The ₹500 kitchen fix</h3></span></a>
+    <a href="#" class="story"><img src="../images/det-vase.webp" alt=""/><span class="ring"></span><span class="tx"><span class="pill">5 min · Ideas</span><h3>Jugaad, outgrown</h3></span></a>
+    <a href="#" class="story"><img src="../images/tile-peony.webp" alt=""/><span class="ring"></span><span class="tx"><span class="pill">3 min · Styling</span><h3>One flower, one jug, done</h3></span></a>
+  </div>
+  <div class="progress" data-progress></div>
+</section>
+
+<!-- ════════ 7. CONTACT ════════ -->
+<section class="block">
+  <div class="shell">
+    <p class="note">The contact list becomes three big buttons. Same details, one tap each.</p>
+    <span class="eyebrow">Say hello</span>
+    <h2 class="serif" style="font-size:clamp(26px,5vw,40px);margin:6px 0 18px">We'd love to <em style="color:var(--gold)">hear from you.</em></h2>
+    <div class="reach">
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h3l1.5 4-2 1.5a11 11 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"/></svg>WhatsApp</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="m3 6.5 9 6 9-6"/></svg>Email</a>
+      <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg>Instagram</a>
+    </div>
+  </div>
+</section>
+
+<footer><b>URBAN NEST</b>Just The Right Feel</footer>
+
+<script>
+(function () {
+  /* ── mock chrome ── */
+  var root = document.documentElement;
+  var notesBtn = document.getElementById('notesBtn');
+  notesBtn.onclick = function () {
+    var on = document.body.classList.toggle('hide-notes');
+    notesBtn.setAttribute('aria-pressed', String(!on));
+  };
+  function setTheme(t) {
+    if (root.getAttribute('data-theme') === t) { root.removeAttribute('data-theme'); t = null; }
+    else root.setAttribute('data-theme', t);
+    document.getElementById('lightBtn').setAttribute('aria-pressed', String(t === 'light'));
+    document.getElementById('darkBtn').setAttribute('aria-pressed', String(t === 'dark'));
+  }
+  document.getElementById('lightBtn').onclick = function () { setTheme('light'); };
+  document.getElementById('darkBtn').onclick = function () { setTheme('dark'); };
+
+  /* ── hero hotspots: positions are % of the photo itself, mapped through
+     object-fit:cover so a dot stays on its object at any screen shape ── */
+  var SPOTS = [
+    { x: 42, y: 36, name: 'Crystal rod chandelier, gold ring · 60 cm | Bedroom', price: '₹8,499', img: '../images/det-chandelier2.webp' },
+    { x: 65, y: 34, name: 'Gold-and-black circles wall art, set of 2 · 60×60 cm', price: '₹3,299', img: '../images/room-bedroom.webp' },
+    { x: 88, y: 47, name: 'Glass table lamp, linen shade · 58 cm | Bedside', price: '₹2,199', img: '../images/det-vase.webp' },
+    { x: 19, y: 66, name: 'Velvet bench, brass frame · 120 cm | Bed end', price: '₹11,999', img: '../images/room-bedroom.webp' },
+    { x: 56, y: 63, name: 'Geometric knit throw · 130×170 cm', price: '₹1,499', img: '../images/band-warm.webp' },
+    { x: 64, y: 87, name: 'Distressed grey rug · 5×8 ft', price: '₹6,799', img: '../images/band-calm.webp' }
+  ];
+  var stage = document.getElementById('stage'), heroImg = document.getElementById('heroImg'), pop = document.getElementById('pop');
+  var dots = SPOTS.map(function (s, i) {
+    var b = document.createElement('button');
+    b.className = 'hs'; b.setAttribute('aria-label', s.name);
+    b.onclick = function (e) { e.stopPropagation(); openPop(i); };
+    stage.appendChild(b); return b;
+  });
+  function place() {
+    var cw = stage.clientWidth, ch = stage.clientHeight;
+    var iw = heroImg.naturalWidth || 1100, ih = heroImg.naturalHeight || 1375;
+    var sc = Math.max(cw / iw, ch / ih), ox = (cw - iw * sc) / 2, oy = (ch - ih * sc) / 2;
+    SPOTS.forEach(function (s, i) {
+      var x = ox + s.x / 100 * iw * sc, y = oy + s.y / 100 * ih * sc;
+      dots[i].style.left = x + 'px'; dots[i].style.top = y + 'px';
+      var underCopy = innerWidth < 900 && y > ch * 0.8; /* phone: keep clear of the headline */
+      dots[i].style.display = (x < 16 || x > cw - 16 || y < 16 || y > ch - 16 || underCopy) ? 'none' : '';
+    });
+    if (open != null) openPop(open);
+  }
+  var open = null;
+  function openPop(i) {
+    open = i; var s = SPOTS[i], d = dots[i];
+    dots.forEach(function (b, j) { b.classList.toggle('on', j === i); });
+    pop.querySelector('img').src = s.img;
+    pop.querySelector('.pn').textContent = s.name;
+    pop.querySelector('.pp').innerHTML = '<span class="pill gold">' + s.price + '</span><span class="pill">View in 3D</span>';
+    var cw = stage.clientWidth, pw = pop.offsetWidth, ph = pop.offsetHeight;
+    var x = parseFloat(d.style.left), y = parseFloat(d.style.top);
+    var left = Math.min(Math.max(16, x - pw / 2), cw - pw - 16);
+    var top = y - ph - 26; if (top < 12) top = y + 26;
+    pop.style.left = left + 'px'; pop.style.top = top + 'px';
+    pop.classList.add('open');
+  }
+  stage.addEventListener('click', function () { open = null; pop.classList.remove('open'); dots.forEach(function (b) { b.classList.remove('on'); }); });
+  pop.addEventListener('click', function (e) { e.stopPropagation(); });
+  heroImg.complete ? place() : heroImg.addEventListener('load', place);
+  addEventListener('resize', place);
+
+  document.querySelectorAll('#roomPills a').forEach(function (a) {
+    a.onclick = function (e) { e.preventDefault(); document.querySelectorAll('#roomPills a').forEach(function (x) { x.classList.toggle('cur', x === a); }); };
+  });
+
+  /* ── collection cards ── */
+  var PIECES = [
+    ['tile-chandelier', 'Crystal cascade chandelier, 12 arms · 80 cm | Living', '₹24,999'],
+    ['det-pendants', 'Faceted glass pendant, set of 3 · 18 cm | Dining', '₹7,499'],
+    ['tile-vase', 'Matte white ceramic bud vase · 22 cm | Console', '₹1,299'],
+    ['det-vase', 'Stoneware bottle vases, set of 3 · 30 cm | Shelf', '₹2,799'],
+    ['tile-peony', 'Porcelain milk jug vase · 20 cm | Table', '₹999'],
+    ['det-chandelier2', 'Black crystal chandelier, 8 arms · 70 cm | Foyer', '₹18,499']
+  ];
+  document.getElementById('pieces').innerHTML = PIECES.map(function (p) {
+    return '<a href="#" class="piece"><span class="ph" style="display:block"><img src="../images/' + p[0] + '.webp" alt=""/>' +
+      '<button class="save" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10Z"/></svg></button>' +
+      '<span class="p3d"><span class="pill">↻ 3D</span></span></span>' +
+      '<div class="nm">' + p[1] + '</div><div class="pr"><span class="pill gold">' + p[2] + '</span></div></a>';
+  }).join('');
+  document.querySelectorAll('.piece .save').forEach(function (b) {
+    b.onclick = function (e) { e.preventDefault(); e.stopPropagation(); b.classList.toggle('on'); b.querySelector('svg').setAttribute('fill', b.classList.contains('on') ? 'currentColor' : 'none'); };
+  });
+  document.querySelectorAll('a[href="#"]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });
+
+  /* ── flip cards: tap on touch, hover on a laptop (CSS) ── */
+  document.querySelectorAll('.flip').forEach(function (f) {
+    f.addEventListener('click', function () { if (!matchMedia('(hover:hover) and (pointer:fine)').matches) f.classList.toggle('flipped'); });
+    f.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); f.classList.toggle('flipped'); } });
+  });
+
+  /* ── THE SWIPE RAIL: native scroll-snap for touch, drag + arrows for a
+     mouse, and a progress bar of dots. One function for every rail. ── */
+  document.querySelectorAll('[data-rail]').forEach(function (rail) {
+    var block = rail.closest('section');
+    var progress = rail.nextElementSibling && rail.nextElementSibling.matches('[data-progress]') ? rail.nextElementSibling : null;
+    var head = rail.previousElementSibling;
+    var arrows = head && head.querySelector('[data-arrows]');
+    var items = Array.prototype.slice.call(rail.children);
+    if (progress) progress.innerHTML = items.map(function () { return '<i></i>'; }).join('');
+    function current() {
+      var x = rail.scrollLeft, best = 0, bd = Infinity, pad = parseFloat(getComputedStyle(rail).scrollPaddingLeft) || 0;
+      items.forEach(function (it, i) { var d = Math.abs(it.offsetLeft - pad - x); if (d < bd) { bd = d; best = i; } });
+      if (rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4) best = items.length - 1;
+      return best;
+    }
+    function paint() {
+      var c = current();
+      if (progress) Array.prototype.forEach.call(progress.children, function (d, i) { d.classList.toggle('on', i === c); });
+      if (arrows) { arrows.children[0].disabled = rail.scrollLeft < 4; arrows.children[1].disabled = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4; }
+    }
+    rail.addEventListener('scroll', function () { requestAnimationFrame(paint); }, { passive: true });
+    paint();
+    if (arrows) {
+      arrows.children[0].onclick = function () { go(-1); };
+      arrows.children[1].onclick = function () { go(1); };
+    }
+    function go(dir) {
+      var i = Math.max(0, Math.min(items.length - 1, current() + dir));
+      var pad = parseFloat(getComputedStyle(rail).scrollPaddingLeft) || 0;
+      rail.scrollTo({ left: items[i].offsetLeft - pad, behavior: 'smooth' });
+    }
+    /* mouse drag; touch already scrolls natively */
+    var down = false, sx = 0, sl = 0, moved = false;
+    rail.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      down = true; moved = false; sx = e.clientX; sl = rail.scrollLeft;
+    });
+    addEventListener('pointermove', function (e) {
+      if (!down) return;
+      var dx = e.clientX - sx;
+      if (!moved && Math.abs(dx) > 5) { moved = true; rail.classList.add('dragging'); }
+      if (moved) rail.scrollLeft = sl - dx;
+    });
+    addEventListener('pointerup', function () {
+      if (!down) return; down = false;
+      if (moved) { rail.classList.remove('dragging'); go(0); }
+    });
+    rail.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+  });
+
+  /* ── Option B: the swipe deck ── */
+  var CARDS = [
+    { c: '', q: '"I didn\'t know a soap dispenser could change how my bathroom feels."', w: 'Ananya · Gurgaon' },
+    { c: 'dark', q: '"Seeing the lamp in the 3D room sold it before I\'d read a word."', w: 'Rohan · Pune' },
+    { c: 'goldc', q: '"Finally, a shop that shows me five good things instead of five hundred."', w: 'Meera · Bengaluru' },
+    { c: '', q: '"Bought the whole bedside set. It just works together."', w: 'Kabir · Delhi' }
+  ];
+  var deck = document.getElementById('deck'), top = 0;
+  function renderDeck() {
+    deck.innerHTML = '';
+    for (var k = Math.min(2, CARDS.length - 1); k >= 0; k--) {
+      var i = (top + k) % CARDS.length, d = CARDS[i];
+      var el = document.createElement('div');
+      el.className = 'dcard ' + d.c;
+      el.innerHTML = '<div class="stars">★★★★★</div><p class="qt">' + d.q + '</p><div class="who"><i>' + d.w[0] + '</i>' + d.w + '</div>';
+      el.style.transform = 'translateY(' + (k * 12) + 'px) scale(' + (1 - k * 0.05) + ')';
+      el.style.zIndex = 10 - k;
+      if (k === 0) drag(el);
+      deck.appendChild(el);
+    }
+  }
+  function fling(el, dir) {
+    el.style.transform = 'translateX(' + dir * 140 + '%) rotate(' + dir * 22 + 'deg)';
+    el.style.opacity = '0';
+    setTimeout(function () { top = (top + 1) % CARDS.length; renderDeck(); }, 280);
+  }
+  function drag(el) {
+    var sx = 0, dx = 0, on = false;
+    el.addEventListener('pointerdown', function (e) { on = true; sx = e.clientX; dx = 0; el.setPointerCapture(e.pointerId); el.style.transition = 'none'; });
+    el.addEventListener('pointermove', function (e) { if (!on) return; dx = e.clientX - sx; el.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 18 + 'deg)'; });
+    function end() {
+      if (!on) return; on = false; el.style.transition = '';
+      if (Math.abs(dx) > 90) fling(el, dx > 0 ? 1 : -1);
+      else el.style.transform = '';
+    }
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+  document.getElementById('deckNext').onclick = function () { fling(deck.lastElementChild, 1); };
+  document.getElementById('deckBack').onclick = function () { top = (top - 1 + CARDS.length) % CARDS.length; renderDeck(); };
+  renderDeck();
+})();
+</script>
+</body>
+</html>

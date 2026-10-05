@@ -74,6 +74,12 @@
     #scene-wrap { position: fixed; inset: 0; z-index: 1; opacity: 0; transition: opacity 0.9s ease; }
     #scene-wrap.revealed { opacity: 1; }
     #scene-wrap spline-viewer { position: absolute; inset: 0; width: 100%; height: 100%; }
+    /* Two-finger gestures belong to the 3D view, not the browser. Without this
+       a pinch or two-finger twist started a page zoom at the same moment the
+       scene tried to rotate, and the two fought: the room jerked, stuck, or
+       the whole page zoomed instead. Dots too, since a gesture often lands on one. */
+    #scene-wrap, #scene-wrap spline-viewer, .panel-3d, .panel-3d spline-viewer, #dots-layer .dot { touch-action: none; }
+    html, body { overscroll-behavior: none; }
 
     #loading { position: fixed; inset: 0; z-index: 60; background: #0A0A0A; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; pointer-events: none; opacity: 1; transition: opacity 0.7s ease; }
     #loading.fade-out { opacity: 0; }
@@ -498,6 +504,7 @@
   };
   /* ── end THEME SWITCH · SHARED ── */
 </script>
+  <link rel="stylesheet" href="/theme.css"/>
 </head>
 <body>
 
@@ -599,6 +606,11 @@
     const LOADING_TEXT = 'ENTERING THE BATHROOM';
     // On touch devices the scene needs a two-finger gesture (one finger scrolls the page)
     const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
+    // iOS Safari still pinch-zooms the page through touch-action on some
+    // versions; its own gesture events are the only reliable stop.
+    ['gesturestart', 'gesturechange'].forEach(t => document.addEventListener(t, (e) => {
+      if (e.target.closest && e.target.closest('#scene-wrap, .panel-3d, .dot')) e.preventDefault();
+    }, { passive: false }));
     if (IS_TOUCH) {
       document.getElementById('hint').textContent = 'USE TWO FINGERS TO EXPLORE THE SPACE';
       document.querySelector('.panel-3d-hint').textContent = 'TWO FINGERS TO ROTATE · THREE TO PAN';

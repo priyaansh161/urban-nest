@@ -1323,6 +1323,128 @@
   };
   /* ── end THEME SWITCH · SHARED ── */
 </script>
+
+  <!-- ── INTERACTIVE HOMEPAGE (Oct 2026): swipe rails, framed cards, the
+       swipe deck, the Nest Edit row, contact buttons. Corners: theme.css. ── -->
+  <style>
+:root { --un-card: #FFFFFF; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --un-card: #0A2A30; } }
+:root[data-theme="dark"] { --un-card: #0A2A30; }
+/* ── THE SWIPE RAIL: one component for every row ── */
+.un-rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+  scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; padding: 6px 2px 10px; }
+.un-rail::-webkit-scrollbar { display: none; }
+.un-rail > * { scroll-snap-align: start; flex: 0 0 auto; }
+.un-rail.dragging { scroll-snap-type: none; cursor: grabbing; }
+.un-rail.dragging * { pointer-events: none; user-select: none; }
+@media (hover: hover) and (pointer: fine) { .un-rail { cursor: grab; } }
+.un-progress { display: flex; justify-content: center; gap: 6px; margin-top: 10px; min-height: 6px; }
+.un-progress i { width: 6px; height: 6px; border-radius: 100px; background: var(--hairline); transition: width .35s var(--ease), background .35s; }
+.un-progress i.on { width: 22px; background: var(--gold); }
+.un-progress.idle { visibility: hidden; }
+.collect-right { display: inline-flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.un-arrows { display: none; gap: 8px; }
+@media (hover: hover) and (pointer: fine) { .un-arrows { display: inline-flex; } }
+.un-arrows button { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  background: none; color: var(--ink); border: 1px solid var(--edge-soft); transition: border-color .25s, color .25s, opacity .25s; }
+.un-arrows button:hover:not(:disabled) { border-color: var(--edge); color: var(--gold); }
+.un-arrows button:disabled { opacity: .3; cursor: default; }
+.un-arrows svg { width: 17px; height: 17px; }
+
+/* ── 2. collection: framed cards ── */
+.pc-rail { margin-top: 4px; }
+.pc { width: calc((100% - 42px) / 4); display: flex; flex-direction: column; text-decoration: none; color: inherit;
+  background: var(--un-card); border: 1px solid var(--edge-soft); padding: 10px; box-shadow: var(--lift-1);
+  transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .3s; }
+.pc:hover { transform: translateY(-4px); box-shadow: var(--lift-2); border-color: var(--edge); }
+.pc-frame { position: relative; display: block; aspect-ratio: 1 / 1; overflow: hidden; background: var(--hairline); }
+.pc-frame img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.1s var(--ease); }
+.pc:hover .pc-frame img { transform: scale(1.06); }
+/* the inner rule: a mount line drawn over the photograph, like a framed print */
+.pc-frame::after { content: ''; position: absolute; inset: 7px; border: 1px solid rgba(245,247,246,.55); pointer-events: none; }
+.pc-3d { position: absolute; left: 14px; bottom: 14px; z-index: 1; padding: 5px 8px; font-size: 9.5px; letter-spacing: .16em;
+  background: rgba(8,8,7,.6); color: #F5F7F6; backdrop-filter: blur(4px); }
+.pc-save { position: absolute; top: 14px; right: 14px; z-index: 2; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(245,247,246,.92); color: #0F1F22; border: 0; cursor: pointer; transition: background .25s, color .25s, transform .25s; }
+.pc-save:hover { transform: scale(1.08); }
+.pc-save[aria-pressed="true"] { background: var(--gold); color: #fff; }
+.pc-save[aria-pressed="true"] svg { fill: currentColor; }
+.pc-save svg { width: 16px; height: 16px; }
+.pc-body { display: flex; flex-direction: column; gap: 6px; padding: 14px 6px 4px; flex: 1; }
+.pc-cat { font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+.pc-name { font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 16px; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pc-foot { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--hairline); display: flex; justify-content: space-between; align-items: baseline; }
+.pc-price { font-size: 14px; }
+.pc-go { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+@media (max-width: 900px) { .pc { width: 72%; } }
+
+/* ── 4. the deck (inside the dark philosophy band) ── */
+.deck-col { display: flex; flex-direction: column; align-items: center; }
+.deck { position: relative; width: min(calc(100% - 24px), 380px); aspect-ratio: 1 / 1; margin-right: 24px; }
+.dcard { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(24px, 3cqw, 34px);
+  background: #15393F; color: var(--panel-ink); border: 1px solid var(--panel-line);
+  box-shadow: 0 18px 40px rgba(0,0,0,.35); touch-action: pan-y; user-select: none; cursor: grab;
+  transition: transform .4s var(--ease), opacity .4s; }
+.dcard.c1 { background: #0E3238; }
+.dcard.c2 { background: var(--gold); border-color: transparent; color: #fff; }
+.dcard.c3 { background: #F5F7F6; color: #0F1F22; border-color: transparent; }
+.dcard-n { font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 15px; letter-spacing: .1em; color: var(--gold); }
+.dcard.c2 .dcard-n { color: #fff; opacity: .8; }
+.dcard-t { font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: clamp(26px, 3cqw, 34px); line-height: 1.12; }
+.dcard-d { margin-top: 12px; font-size: 14px; line-height: 1.7; opacity: .78; }
+.dcard-hint { font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; opacity: .5; }
+.deck-ctrl { display: flex; align-items: center; gap: 16px; margin-top: 28px; }
+.deck-ctrl button { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  background: none; color: var(--panel-ink); border: 1px solid var(--panel-line); transition: border-color .25s, color .25s; }
+.deck-ctrl button:hover { border-color: var(--gold); color: var(--gold); }
+.deck-ctrl svg { width: 17px; height: 17px; }
+.deck-count { min-width: 44px; text-align: center; font-size: 11px; letter-spacing: .16em; color: var(--panel-dim); }
+
+/* ── 5. contact as big buttons ── */
+.reach { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border-top: 1px solid var(--hairline); padding-top: 30px; }
+.reach a { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 26px 22px; text-decoration: none; color: var(--ink);
+  border: 1px solid var(--edge-soft); background: transparent; transition: transform .4s var(--ease), box-shadow .4s var(--ease), border-color .3s, background .3s; }
+.reach a:hover { transform: translateY(-4px); border-color: var(--edge); background: var(--un-card); box-shadow: var(--lift-2); }
+.reach-ico { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--edge-soft); color: var(--gold); margin-bottom: 6px; transition: background .3s, color .3s; }
+.reach a:hover .reach-ico { background: var(--gold); color: #fff; border-color: var(--gold); }
+.reach-ico svg { width: 21px; height: 21px; }
+.reach-k { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+.reach-v { font-size: 14.5px; overflow-wrap: anywhere; }
+@media (max-width: 700px) {
+  .reach { gap: 8px; }
+  .reach a { align-items: center; padding: 20px 6px; text-align: center; }
+  .reach-v { display: none; }
+}
+
+/* ── 6. The Nest Edit: framed story covers ── */
+.edit { padding: var(--sec-tight) 0 var(--sec-tight); }
+.ed { width: calc((100% - 56px) / 5); display: flex; flex-direction: column; text-decoration: none; color: inherit;
+  background: var(--un-card); border: 1px solid var(--edge-soft); padding: 8px; box-shadow: var(--lift-1);
+  transition: transform .45s var(--ease), box-shadow .45s var(--ease), border-color .3s; }
+.ed:hover { transform: translateY(-4px); box-shadow: var(--lift-2); border-color: var(--edge); }
+.ed-ph { position: relative; aspect-ratio: 3 / 4; overflow: hidden; background: var(--hairline); }
+.ed-ph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.1s var(--ease); }
+.ed:hover .ed-ph img { transform: scale(1.06); }
+.ed-ph::after { content: ''; position: absolute; inset: 7px; border: 1px solid rgba(245,247,246,.55); pointer-events: none; }
+.ed-tag { position: absolute; left: 14px; top: 14px; z-index: 1; padding: 5px 8px; font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+  background: rgba(8,8,7,.6); color: #F5F7F6; backdrop-filter: blur(4px); }
+.ed-panel { margin-top: 8px; padding: 14px 12px 12px; background: var(--panel); color: var(--panel-ink); flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.ed-t { font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 16.5px; line-height: 1.25;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.ed-m { margin-top: auto; display: flex; justify-content: space-between; font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--panel-dim); }
+.ed-m span:last-child { color: var(--gold); }
+@media (max-width: 1100px) { .ed { width: calc((100% - 42px) / 4); } }
+@media (max-width: 900px) { .ed { width: 58%; } }
+
+/* corners for the pieces above (the rest of the site's are in theme.css) */
+.pc, .ed, .reach a { border-radius: var(--r); }
+.pc-frame, .ed-ph, .ed-panel { border-radius: var(--r-sm); }
+.pc-frame::after, .ed-ph::after { border-radius: 7px; }
+.pc-3d, .ed-tag { border-radius: 100px; }
+.dcard { border-radius: 24px; }
+  </style>
+  <link rel="stylesheet" href="/theme.css"/>
 </head>
 <body>
 
@@ -1430,9 +1552,14 @@
   <section class="collect shell" id="collect" style="display:none">
     <div class="collect-head rv">
       <span class="collect-label">Explore the Collection</span>
-      <a class="collect-all" href="collection.html">See all →</a>
+      <span class="collect-right"><a class="collect-all" href="collection.html">See all →</a>
+      <div class="un-arrows" data-arrows>
+        <button type="button" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <button type="button" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div></span>
     </div>
-    <div class="wstrip" id="collectGrid"></div>
+    <div class="un-rail pc-rail" id="collectGrid" data-rail></div>
+    <div class="un-progress" data-progress></div>
   </section>
 
   <!-- ── A PAUSE ── -->
@@ -1468,25 +1595,29 @@
         <h2 class="philosophy-type">Affordable luxury.<br/><em>For real homes.</em></h2>
         <p class="philosophy-body">You should not need a budget of five lakhs to make your space feel beautiful. Urban Nest introduces affordable luxury that uplifts the everyday, one intentional object at a time.</p>
       </div>
-      <div class="pillars">
-        <div class="pillar">
-          <div class="pillar-name">Small things, big impact</div>
-          <div class="pillar-desc">A soap dispenser, a bath rug, a cotton jar. The little things that quietly transform a home.</div>
-        </div>
-        <div class="pillar">
-          <div class="pillar-name">See it before you buy it</div>
-          <div class="pillar-desc">Walk through curated rooms. Discover products in context, not on a shelf.</div>
-        </div>
-        <div class="pillar">
-          <div class="pillar-name">Curated, not catalogued</div>
-          <div class="pillar-desc">Every item is chosen for how it functions, how it looks, and how it fits your life.</div>
-        </div>
-        <div class="pillar">
-          <div class="pillar-name">The complete look</div>
-          <div class="pillar-desc">Buy the feeling, not just the product. Collections designed to work together beautifully.</div>
+      <div class="deck-col">
+        <div class="deck" id="deck"></div>
+        <div class="deck-ctrl">
+          <button type="button" id="deckBack" aria-label="Previous card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+          <span class="deck-count" id="deckCount">1 / 4</span>
+          <button type="button" id="deckNext" aria-label="Next card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- ── THE NEST EDIT ──
+       Live from nest_posts; stays out of the page if there are none. -->
+  <section class="edit shell" id="edit" style="display:none">
+    <div class="spaces-head">
+      <span class="spaces-label">The Nest Edit</span>
+      <span class="collect-right"><a class="collect-all" href="community.html">All articles →</a><div class="un-arrows" data-arrows>
+        <button type="button" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <button type="button" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div></span>
+    </div>
+    <div class="un-rail ed-rail" id="edRail" data-rail></div>
+    <div class="un-progress" data-progress></div>
   </section>
 
   <!-- ── CONTACT ── -->
@@ -1499,20 +1630,10 @@
         <span class="cl-tagline">Just The Right Feel</span>
       </div>
     </div>
-    <div class="contact-grid">
-      <div class="contact-item">
-        <span class="contact-type-label">Email</span>
-        <a href="mailto:reachus.urbannest@gmail.com" class="contact-value contact-value-row"><span class="contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="m3 6.5 9 6 9-6"/></svg></span>reachus.urbannest@gmail.com</a>
-        <span class="contact-note">For partnerships and general enquiries</span>
-      </div>
-      <div class="contact-item">
-        <span class="contact-type-label">WhatsApp / Phone</span>
-        <a href="tel:+918588944583" class="contact-value contact-value-row"><span class="contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h3l1.5 4-2 1.5a11 11 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"/></svg></span>+91 85889 44583</a>
-      </div>
-      <div class="contact-item">
-        <span class="contact-type-label">Instagram</span>
-        <a href="https://instagram.com/store.urbannest" target="_blank" rel="noopener" class="contact-value contact-value-row"><span class="contact-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg></span>@store.urbannest</a>
-      </div>
+    <div class="reach">
+      <a href="https://wa.me/918588944583" target="_blank" rel="noopener"><span class="reach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h3l1.5 4-2 1.5a11 11 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"/></svg></span><span class="reach-k">WhatsApp</span><span class="reach-v">+91 85889 44583</span></a>
+      <a href="mailto:reachus.urbannest@gmail.com"><span class="reach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="m3 6.5 9 6 9-6"/></svg></span><span class="reach-k">Email</span><span class="reach-v">reachus.urbannest@gmail.com</span></a>
+      <a href="https://instagram.com/store.urbannest" target="_blank" rel="noopener"><span class="reach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg></span><span class="reach-k">Instagram</span><span class="reach-v">@store.urbannest</span></a>
     </div>
   </section>
 
@@ -1665,13 +1786,13 @@
         return a.slice(0, n);
       }
 
-      db.from('collection_items').select('id,name,category,image_url,model_url')
+      db.from('collection_items').select('*')
         .eq('published', true).eq('section', 'collection')
         .order('created_at', { ascending: false }).limit(POOL)
         .then(function (r) {
           var pool = (r && r.data) || [];
           if (!pool.length) return;
-          var rows = sample(pool, 3);
+          var rows = sample(pool, 10);
           var grid = document.getElementById('collectGrid');
 
           var esc = function (s) {
@@ -1690,21 +1811,24 @@
             return s.length > 34 ? s.slice(0, 33).replace(/\s+\S*$/, '') + '…' : s;
           };
 
+          /* Framed cards in a swipe rail. The full long-form name is kept (brand
+             and size are part of it); the card clamps it to two lines. */
           grid.innerHTML = rows.map(function (it) {
-            // IMG: COLLECTION placeholder, when a piece has no photo of its own
             var img = it.image_url || 'images/det-vase.webp';
-            // Straight to the piece, not the collection's front door — the
-            // category first (?c=), then the piece open on top of it (&p=),
-            // so leaving the piece lands back on its category, not here.
             var params = new URLSearchParams();
             if (it.category) params.set('c', it.category);
             params.set('p', it.id);
-            var href = 'collection.html?' + params.toString();
-            return '<a class="ct-piece" href="' + href + '">' +
-              '<figure><img src="' + esc(img) + '" alt="" loading="lazy" decoding="async"/>' +
-              '<figcaption>' + esc(label(it.name)) + (it.model_url ? ' · 3D' : '') + '</figcaption></figure></a>';
+            var price = it.price_paise ? '₹' + Math.round(it.price_paise / 100).toLocaleString('en-IN') : (it.price || '');
+            return '<a class="pc" href="collection.html?' + params.toString() + '">' +
+              '<span class="pc-frame"><img src="' + esc(img) + '" alt="" loading="lazy" decoding="async"/>' +
+              (it.model_url ? '<span class="pc-3d">3D</span>' : '') +
+              '<button type="button" class="pc-save" aria-label="Save" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10Z"/></svg></button></span>' +
+              '<span class="pc-body"><span class="pc-cat">' + esc(it.category || 'Collection') + '</span>' +
+              '<span class="pc-name">' + esc(it.name) + '</span>' +
+              '<span class="pc-foot">' + (price ? '<span class="pc-price">' + esc(price) + '</span>' : '<span></span>') + '<span class="pc-go">View →</span></span></span></a>';
           }).join('');
           document.getElementById('collect').style.display = '';
+          window.unRail && window.unRail(grid);
         }, function () {});
     })();
 
@@ -1868,5 +1992,169 @@
 
 
   </script>
+<script>
+/* Interactive homepage: one swipe-rail component for every row (touch
+   scrolls natively with snap; a mouse drags or uses the arrows), saving
+   pieces with the heart, the swipe deck, and the Nest Edit row. */
+(function () {
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  };
+  /* ── THE SWIPE RAIL ──
+     Touch scrolls natively with snap. A mouse can drag it or use the
+     arrows. The dots underneath show where you are and hide themselves
+     when everything already fits. */
+  function unRail(rail) {
+    if (!rail || rail.dataset.ready || !rail.children.length) return;
+    rail.dataset.ready = '1';
+    var sec = rail.closest('section');
+    var arrows = sec && sec.querySelector('[data-arrows]');
+    var progress = rail.nextElementSibling && rail.nextElementSibling.matches('[data-progress]') ? rail.nextElementSibling : null;
+    var items = function () { return Array.prototype.slice.call(rail.children); };
+    if (progress) progress.innerHTML = items().map(function () { return '<i></i>'; }).join('');
+
+    function startOf(el) { return el.offsetLeft - rail.offsetLeft - 2; }
+    function current() {
+      var x = rail.scrollLeft, best = 0, bd = Infinity;
+      items().forEach(function (it, i) { var d = Math.abs(startOf(it) - x); if (d < bd) { bd = d; best = i; } });
+      if (x + rail.clientWidth >= rail.scrollWidth - 4) best = items().length - 1;
+      return best;
+    }
+    function paint() {
+      var fits = rail.scrollWidth <= rail.clientWidth + 4, c = current();
+      if (progress) {
+        progress.classList.toggle('idle', fits);
+        Array.prototype.forEach.call(progress.children, function (d, i) { d.classList.toggle('on', i === c); });
+      }
+      if (arrows) {
+        arrows.style.visibility = fits ? 'hidden' : '';
+        arrows.children[0].disabled = rail.scrollLeft < 4;
+        arrows.children[1].disabled = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
+      }
+      rail.dispatchEvent(new CustomEvent('railchange', { detail: c }));
+    }
+    function go(i) {
+      var list = items();
+      i = Math.max(0, Math.min(list.length - 1, i));
+      rail.scrollTo({ left: startOf(list[i]), behavior: 'smooth' });
+    }
+    rail.unGo = go;
+    if (arrows) {
+      arrows.children[0].onclick = function () { go(current() - 1); };
+      arrows.children[1].onclick = function () { go(current() + 1); };
+    }
+    rail.addEventListener('scroll', function () { requestAnimationFrame(paint); }, { passive: true });
+    addEventListener('resize', paint);
+    paint();
+
+    var down = false, sx = 0, sl = 0, moved = false;
+    rail.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      if (e.target.closest('button')) return;
+      down = true; moved = false; sx = e.clientX; sl = rail.scrollLeft;
+      e.preventDefault();
+    });
+    addEventListener('pointermove', function (e) {
+      if (!down) return;
+      var dx = e.clientX - sx;
+      if (!moved && Math.abs(dx) > 5) { moved = true; rail.classList.add('dragging'); }
+      if (moved) rail.scrollLeft = sl - dx;
+    });
+    addEventListener('pointerup', function () {
+      if (!down) return;
+      down = false;
+      if (moved) { rail.classList.remove('dragging'); go(current()); setTimeout(function () { moved = false; }, 0); }
+    });
+    rail.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+  }
+  window.unRail = unRail;
+
+  /* ── saving a piece (the heart) ── */
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem('un-saved') || '{}'); } catch (e) {}
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.pc-save');
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var href = b.closest('a').getAttribute('href');
+    var on = b.getAttribute('aria-pressed') !== 'true';
+    b.setAttribute('aria-pressed', String(on));
+    if (on) saved[href] = 1; else delete saved[href];
+    try { localStorage.setItem('un-saved', JSON.stringify(saved)); } catch (e2) {}
+  }, true);
+  new MutationObserver(function () {
+    document.querySelectorAll('.pc-save').forEach(function (b) {
+      var a = b.closest('a');
+      if (a && saved[a.getAttribute('href')]) b.setAttribute('aria-pressed', 'true');
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+
+  /* ── the deck: the four pillars, one card at a time ── */
+  var CARDS = [
+    { c: 'c0', t: 'Small things, big impact', d: 'A soap dispenser, a bath rug, a cotton jar. The little things that quietly transform a home.' },
+    { c: 'c2', t: 'See it before you buy it', d: 'Walk through curated rooms. Discover products in context, not on a shelf.' },
+    { c: 'c3', t: 'Curated, not catalogued', d: 'Every item is chosen for how it functions, how it looks, and how it fits your life.' },
+    { c: 'c1', t: 'The complete look', d: 'Buy the feeling, not just the product. Collections designed to work together.' }
+  ];
+  var deck = document.getElementById('deck'), count = document.getElementById('deckCount'), top = 0;
+  function renderDeck() {
+    deck.innerHTML = '';
+    for (var k = 2; k >= 0; k--) {
+      var i = (top + k) % CARDS.length, d = CARDS[i];
+      var el = document.createElement('div');
+      el.className = 'dcard ' + d.c;
+      el.innerHTML = '<span class="dcard-n">0' + (i + 1) + ' / 04</span>' +
+        '<div><div class="dcard-t">' + d.t + '</div><p class="dcard-d">' + d.d + '</p></div>' +
+        '<span class="dcard-hint">' + (k === 0 ? 'Swipe →' : '') + '</span>';
+      el.style.transform = 'translate(' + (k * 12) + 'px,' + (k * 12) + 'px)';
+      el.style.zIndex = 10 - k;
+      if (k === 0) drag(el);
+      deck.appendChild(el);
+    }
+    count.textContent = (top + 1) + ' / ' + CARDS.length;
+  }
+  function fling(el, dir) {
+    el.style.transform = 'translateX(' + dir * 130 + '%) rotate(' + dir * 18 + 'deg)';
+    el.style.opacity = '0';
+    setTimeout(function () { top = (top + 1) % CARDS.length; renderDeck(); }, 300);
+  }
+  function drag(el) {
+    var sx = 0, dx = 0, on = false;
+    el.addEventListener('pointerdown', function (e) { on = true; sx = e.clientX; dx = 0; el.setPointerCapture(e.pointerId); el.style.transition = 'none'; });
+    el.addEventListener('pointermove', function (e) { if (!on) return; dx = e.clientX - sx; el.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 20 + 'deg)'; });
+    function end() {
+      if (!on) return; on = false; el.style.transition = '';
+      if (Math.abs(dx) > 80) fling(el, dx > 0 ? 1 : -1); else el.style.transform = '';
+    }
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+  }
+  document.getElementById('deckNext').onclick = function () { fling(deck.lastElementChild, 1); };
+  document.getElementById('deckBack').onclick = function () { top = (top - 1 + CARDS.length) % CARDS.length; renderDeck(); };
+  renderDeck();
+
+  /* ── The Nest Edit, from the live articles ── */
+  var edRail = document.getElementById('edRail');
+  function paintEdit(rows) {
+    edRail.innerHTML = rows.map(function (p) {
+      var href = p.id != null ? 'community.html?a=' + encodeURIComponent(p.id) : 'community.html';
+      return '<a class="ed" href="' + href + '"><span class="ed-ph"><img src="' + esc(p.image_url || 'images/det-vase.webp') + '" alt="" loading="lazy" decoding="async"/>' +
+        '<span class="ed-tag">' + esc(p.category || 'The Nest') + '</span></span>' +
+        '<span class="ed-panel"><span class="ed-t">' + esc(p.title) + '</span>' +
+        '<span class="ed-m"><span>' + esc(p.read_time || '') + '</span><span>Read →</span></span></span></a>';
+    }).join('');
+    if (!rows.length) return;          // no articles yet: the section stays hidden
+    document.getElementById('edit').style.display = '';
+    unRail(edRail);
+  }
+  if (typeof db !== 'undefined') {
+    db.from('nest_posts').select('*').eq('published', true)
+      .order('pinned', { ascending: false }).order('created_at', { ascending: false }).limit(10)
+      .then(function (r) { paintEdit((r && r.data) || []); }, function () {});
+  }
+
+  document.querySelectorAll('[data-rail]').forEach(unRail);
+})();
+</script>
 </body>
 </html>

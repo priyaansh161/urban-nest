@@ -727,6 +727,64 @@
   };
   /* ── end THEME SWITCH · SHARED ── */
 </script>
+
+  <!-- ── ONE CARD AT A TIME, ON A PHONE (Oct 2026) ──
+       The categories, and the pieces inside one, become full-height cards
+       the page snaps between: a gentle swipe up moves exactly one, a hard
+       flick carries on past several, the way Reels does. It is the page's
+       own scroll (snap on <html>), not a box inside it, so it feels native
+       and the browser's back gesture still works. Laptops are unchanged. -->
+  <style>
+    @media (max-width: 700px) {
+      html.reel { scroll-snap-type: y mandatory; }
+      html.reel .page-hero, html.reel .cat-hero, html.reel .pf { scroll-snap-align: start; }
+      html.reel footer { scroll-snap-align: end; }
+      html.reel .cats, html.reel .grid { display: flex; flex-direction: column; gap: 12px; }
+      html.reel .grid-wrap { padding-top: 14px; }
+      html.reel .cats > .cat-tile, html.reel .grid > .item {
+        scroll-snap-align: start; scroll-margin-top: calc(var(--navh, 64px) + 10px);
+        height: calc(100svh - var(--navh, 64px) - 54px); flex: none;
+      }
+
+      /* a category: its photograph fills the card, the words sit on it */
+      html.reel .cat-tile { position: relative; border: 0; background: #0F1F22; color: #F5F7F6; }
+      html.reel .cat-tile-media { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0 !important; }
+      html.reel .cat-tile-media::after { content: ''; position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(6,20,23,.92) 0%, rgba(6,20,23,.35) 45%, rgba(6,20,23,0) 68%); }
+      html.reel .cat-tile-count { top: 16px; bottom: auto; left: 16px; z-index: 1; }
+      html.reel .cat-tile-body { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; padding: 0 22px 24px; flex: none; }
+      html.reel .cat-tile-name { font-size: 38px; line-height: 1.05; }
+      html.reel .cat-tile-sum { color: rgba(245,247,246,.78); flex: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      html.reel .cat-tile-go { display: inline-block; align-self: flex-start; margin-top: 6px; padding: 8px 14px; border-radius: 100px; background: var(--gold); color: #fff; }
+
+      /* a piece: the 3D stage takes the room, the details stay short */
+      html.reel .item .stage { flex: 1 1 auto; min-height: 0; aspect-ratio: auto; }
+      html.reel .item .body { flex: none; padding: 16px 18px 18px; }
+      html.reel .item .desc { flex: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      html.reel .item .name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+      /* the first card says how it works, once */
+      html.reel .cats > .cat-tile:first-child::after, html.reel .grid > .item:first-child .stage::after {
+        content: 'Swipe up for the next ↑'; position: absolute; z-index: 3; right: 14px; top: 16px;
+        padding: 6px 11px; border-radius: 100px; font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+        background: rgba(8,8,7,.55); color: #F5F7F6; pointer-events: none; animation: reelHint 1.6s ease-in-out 3; }
+      @keyframes reelHint { 50% { transform: translateY(-4px); } }
+    }
+  </style>
+  <script>
+    /* Turn the card mode on, and keep the nav's height in a variable so a
+       card always fits exactly under it. */
+    (function () {
+      document.documentElement.classList.add('reel');
+      function navH() {
+        var n = document.querySelector('nav');
+        if (n) document.documentElement.style.setProperty('--navh', n.offsetHeight + 'px');
+      }
+      addEventListener('DOMContentLoaded', navH);
+      addEventListener('resize', navH);
+    })();
+  </script>
+  <link rel="stylesheet" href="/theme.css"/>
 </head>
 <body>
 

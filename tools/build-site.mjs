@@ -25,7 +25,7 @@ const DIST = join(ROOT, 'dist');
 // Each rule is a folder plus the extensions that ship from it. `deep: false`
 // means the folder's own files only — its subfolders are working material.
 const RULES = [
-  { dir: '.',      exts: ['.html', '.splinecode', '.png', '.js', '.toml', '.webmanifest'], deep: false },
+  { dir: '.',      exts: ['.html', '.css', '.splinecode', '.png', '.js', '.toml', '.webmanifest'], deep: false },
   /* Named, not by extension. The root folder also holds DEPLOY.txt and
      DEPLOY-CHECKLIST.txt — private working notes — and allowing every .txt
      would have published them. */
