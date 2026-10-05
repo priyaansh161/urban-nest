@@ -30,3 +30,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-05 | 17:51 | 63f4184 | Rounded corners site-wide; interactive homepage (collection swipe rail, swipe deck, Nest Edit row, contact buttons); card-by-card Collection on phones; two-finger 3D touch fix in rooms | https://95d14080.storeurbannest.pages.dev |
 | 2026-10-05 | 19:08 | 022ea4f | Lighter photos (Supabase resizing), depth shadows, flip cards, footer hello, Nest Edit above philosophy, bigger gold Spaces heading, snappier phone cards + Essentials card view, rounded admin and studio | https://a7e4bb1a.storeurbannest.pages.dev |
 | 2026-10-05 | 23:12 | ae5c5a3 | Flip card copy: card 2 is now a real question and answer; card 1's answer says why | https://9fb5a253.storeurbannest.pages.dev |
+| 2026-10-05 | 23:17 | d76c4bb | Flip card 1: answer stays with the sofa, not the bathroom | https://9468639f.storeurbannest.pages.dev |
