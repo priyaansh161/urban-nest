@@ -1321,7 +1321,7 @@
       if (p.image_url) {
         hero.style.display = '';
         const img = document.getElementById('modalImg');
-        img.src = p.image_url; img.alt = p.title;
+        img.src = unImg(p.image_url, 1200); img.alt = p.title;
       } else {
         hero.style.display = 'none';
       }
@@ -1379,7 +1379,7 @@
 
     function naMedia(it) {
       return it.img
-        ? `<span class="na-media"><img src="${naEsc(it.img)}" alt="" loading="lazy" decoding="async"/></span>`
+        ? `<span class="na-media"><img src="${naEsc(unImg(it.img, 900))}" alt="" loading="lazy" decoding="async"/></span>`
         : `<span class="na-media na-ph"><img src="favicon.png" alt="" aria-hidden="true"/></span>`;
     }
     function naOpen(it) {
@@ -1511,7 +1511,7 @@
       const c = p && p.contributor_id && nestContributors[p.contributor_id];
       if (!c) { el.textContent = (p && p.author) || 'Urban Nest Editorial'; return; }
       const photo = c.avatar_url
-        ? '<img class="ma-photo" src="' + acEsc(c.avatar_url) + '" alt=""/>'
+        ? '<img class="ma-photo" src="' + acEsc(unImg(c.avatar_url, 120)) + '" alt=""/>'
         : '<span class="ma-photo ma-initial">' + acEsc((c.display_name || '?').trim().charAt(0).toUpperCase()) + '</span>';
       el.innerHTML = '<button type="button" class="ma-btn" onclick="toggleAuthorCard()" aria-expanded="false" aria-controls="authorCard">'
         + photo + '<span class="ma-name">' + acEsc(c.display_name) + '</span></button>';
@@ -1520,7 +1520,7 @@
 
     function fillAuthorCard(c) {
       const img = document.getElementById('acPhoto');
-      if (c.avatar_url) { img.src = c.avatar_url; img.alt = c.display_name || ''; img.hidden = false; }
+      if (c.avatar_url) { img.src = unImg(c.avatar_url, 120); img.alt = c.display_name || ''; img.hidden = false; }
       else { img.removeAttribute('src'); img.hidden = true; }
       document.getElementById('acName').textContent = c.display_name || '';
       document.getElementById('acRole').textContent = [c.title, c.city].filter(Boolean).join(' · ');

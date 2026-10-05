@@ -73,3 +73,27 @@ body:has(.login-card) { background: var(--un-teal) !important; }
 .sidebar-nav::-webkit-scrollbar { width: 6px; }
 .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(234,242,241,0.22); border-radius: 3px; }
 .sidebar-footer { background: var(--un-teal) !important; border-top: 0.5px solid rgba(234,242,241,0.12) !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   ROUNDED CORNERS + DEPTH (5 Oct 2026) — the same system as the public
+   site's theme.css: 16px panels, 10px fields, pill buttons, and a soft
+   shadow so panels sit up off the paper. Shapes only; colours above.
+   ═══════════════════════════════════════════════════════════════ */
+.panel, .form-panel, .items-panel, .list-panel, .posts-panel, .preview-panel, .scenes-panel,
+.stage-panel, details.cat-panel, .stat-card, .stat, .stat-chip, .stat-strip, .guide, .empty-state,
+.arrangement-note, .cmd, .controls, .room-tabs, .login-card, .form-group
+{ border-radius: 16px !important; }
+.panel, .form-panel, .items-panel, .list-panel, .posts-panel, .preview-panel, .scenes-panel,
+.stage-panel, details.cat-panel, .stat-card, .login-card
+{ box-shadow: 0 1px 2px rgba(15,31,34,.05), 0 8px 22px rgba(15,31,34,.07) !important; }
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+select, textarea
+{ border-radius: 10px !important; }
+
+.btn, .row-btn, .filter-btn, .export-btn, .preview-btn, .cmd-copy, .chip, .tag, .room-tab
+{ border-radius: 100px !important; }
+
+#stage, canvas#sheet, model-viewer#mv { border-radius: 12px !important; overflow: hidden; }
+.cat-thumb, .form-panel img, .items-panel img, .list-panel img, .posts-panel img { border-radius: 8px !important; }
+.sign-out-btn { border-radius: 100px !important; }

@@ -231,7 +231,7 @@
           if (it.category) p.set('c', it.category);
           p.set('p', it.id);
           return '<a class="piece" href="/collection.html?' + p.toString() + '">'
-            + '<img class="piece-img" src="' + esc(it.image_url) + '" alt="' + esc(label(it.name)) + '" loading="lazy" decoding="async"/>'
+            + '<img class="piece-img" src="' + esc(unImg(it.image_url, 300)) + '" alt="' + esc(label(it.name)) + '" loading="lazy" decoding="async"/>'
             + '<span class="piece-b"><span class="piece-n" style="display:block">' + esc(label(it.name)) + '</span>'
             + '<span class="piece-go">VIEW IN 3D →</span></span></a>';
         }).join('');

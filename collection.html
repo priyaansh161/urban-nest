@@ -731,19 +731,25 @@
   <!-- ── ONE CARD AT A TIME, ON A PHONE (Oct 2026) ──
        The categories, and the pieces inside one, become full-height cards
        the page snaps between: a gentle swipe up moves exactly one, a hard
-       flick carries on past several, the way Reels does. It is the page's
+       swipe straight after it skips on, the way Reels does. It is the page's
        own scroll (snap on <html>), not a box inside it, so it feels native
        and the browser's back gesture still works. Laptops are unchanged. -->
   <style>
     @media (max-width: 700px) {
       html.reel { scroll-snap-type: y mandatory; }
-      html.reel .page-hero, html.reel .cat-hero, html.reel .pf { scroll-snap-align: start; }
+      html.reel .page-hero, html.reel .cat-hero { scroll-snap-align: start; }
+      /* the sort and price bar is always a stop: a flick from the header used
+         to sail straight past it to the first piece */
+      html.reel .pf { scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: var(--navh, 64px); }
       html.reel footer { scroll-snap-align: end; }
       html.reel .cats, html.reel .grid { display: flex; flex-direction: column; gap: 12px; }
       html.reel .grid-wrap { padding-top: 14px; }
       html.reel .cats > .cat-tile, html.reel .grid > .item {
         scroll-snap-align: start; scroll-margin-top: calc(var(--navh, 64px) + 10px);
         height: calc(100svh - var(--navh, 64px) - 54px); flex: none;
+        /* one card per swipe, settled at once: no coasting past and easing
+           back, so the next swipe can come straight away to skip ahead */
+        scroll-snap-stop: always;
       }
 
       /* a category: its photograph fills the card, the words sit on it */
@@ -917,7 +923,7 @@
       return '<div class="stage">' +
         (item.model_url ? '<span class="badge3d">3D</span>' : '') +
         (item.coming_soon ? '<span class="badge-soon">Coming soon</span>' : '') +
-        '<img src="' + esc(item.image_url) + '" alt="' + esc(item.name) + '" loading="lazy" decoding="async"/></div>';
+        '<img src="' + esc(unImg(item.image_url, 500)) + '" alt="' + esc(item.name) + '" loading="lazy" decoding="async"/></div>';
     }
     return '<div class="stage">' +
       (item.model_url ? '<span class="badge3d">3D</span>' : '') +
@@ -1205,7 +1211,7 @@
       status.textContent = it.image_url ? 'Photograph only' : 'No 3D view yet';
       if (it.image_url) {
         var img = document.createElement('img');
-        img.src = it.image_url; img.alt = it.name || '';
+        img.src = unImg(it.image_url, 900); img.alt = it.name || '';
         img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
         stageEl.insertBefore(img, poster);
         dViewer = img;
@@ -1308,7 +1314,7 @@
     var img = catImage(cat, 'tile');
     return '<a class="cat-tile" href="collection.html?c=' + encodeURIComponent(cat.slug) + '">' +
       '<div class="cat-tile-media">' +
-        '<img src="' + esc(img) + '" alt="' + esc(cat.name) + '" loading="lazy" decoding="async"' +
+        '<img src="' + esc(unImg(img, 600)) + '" alt="' + esc(cat.name) + '" loading="lazy" decoding="async"' +
         ' onerror="this.remove()"/>' +
         '<span class="cat-tile-count">' + count + (count === 1 ? ' piece' : ' pieces') + '</span>' +
       '</div>' +
@@ -1532,7 +1538,7 @@
       var img = catImage(cat, 'hero');
       var media = document.getElementById('catHeroMedia');
       var heroImg = document.getElementById('catHeroImg');
-      heroImg.src = img;
+      heroImg.src = unImg(img, 900);
       // Only if even the fallback fails to load — a missing file, someone
       // offline — rather than leaving half the header blank.
       heroImg.onerror = function () {

@@ -803,7 +803,7 @@
     $('dzName').textContent = d.display_name;
     $('dzRole').textContent = [d.city, d.bio].filter(Boolean).join(' — ');
     const photo = safeUrl(d.avatar_url);
-    $('dzPhoto').innerHTML = photo ? '<img src="' + esc(photo) + '" alt="' + esc(d.display_name) + '"/>' : esc(d.display_name.charAt(0).toUpperCase());
+    $('dzPhoto').innerHTML = photo ? '<img src="' + esc(unImg(photo, 200)) + '" alt="' + esc(d.display_name) + '"/>' : esc(d.display_name.charAt(0).toUpperCase());
     $('dzPhoto').hidden = false;
     $('dzEnquireBtn').textContent = 'Enquire with ' + firstName(d.display_name);
     $('dzEnquireBtn').addEventListener('click', e => { e.preventDefault(); goEnquire(); });
@@ -838,7 +838,7 @@
     el.innerHTML = projects.map(p => {
       const ph = photosOf(p), cover = ph[0];
       return '<button class="dz-proj" type="button" data-id="' + esc(p.id) + '">'
-        + (cover ? '<img class="dz-proj-img" src="' + esc(cover.url) + '" alt="" loading="lazy" decoding="async"/>' : '<span class="dz-proj-img"></span>')
+        + (cover ? '<img class="dz-proj-img" src="' + esc(unImg(cover.url, 600)) + '" alt="" loading="lazy" decoding="async"/>' : '<span class="dz-proj-img"></span>')
         + '<span class="dz-proj-body">'
         + (p.kind ? '<span class="dz-proj-kind">' + esc(p.kind) + '</span>' : '')
         + '<span class="dz-proj-title" style="display:block">' + esc(p.title) + '</span>'
@@ -853,7 +853,7 @@
     $('articles').innerHTML = rows.map(a => {
       const img = safeUrl(a.image_url);
       return '<a class="dz-art" href="/community.html?a=' + encodeURIComponent(a.id) + '">'
-        + (img ? '<img src="' + esc(img) + '" alt="" loading="lazy"/>' : '<span class="ph"></span>')
+        + (img ? '<img src="' + esc(unImg(img, 500)) + '" alt="" loading="lazy"/>' : '<span class="ph"></span>')
         + '<span style="min-width:0"><span class="dz-art-t" style="display:block">' + esc(a.title) + '</span>'
         + '<span class="dz-art-m" style="display:block">' + esc([a.read_time, a.upvote_count ? '▲ ' + a.upvote_count : ''].filter(Boolean).join(' · ')) + '</span></span>'
         + '<span class="dz-art-go">→</span></a>';
@@ -874,7 +874,7 @@
     $('pvMeta').textContent = metaOf(p);
     $('pvSummary').textContent = p.summary || '';
     $('pvSummary').hidden = !p.summary;
-    $('pvPhotos').innerHTML = ph.map((x, i) => '<figure><img src="' + esc(x.url) + '" alt="' + esc(x.caption || p.title) + '"' + (i > 1 ? ' loading="lazy"' : '') + ' decoding="async"/>'
+    $('pvPhotos').innerHTML = ph.map((x, i) => '<figure><img src="' + esc(unImg(x.url, 1400)) + '" alt="' + esc(x.caption || p.title) + '"' + (i > 1 ? ' loading="lazy"' : '') + ' decoding="async"/>'
       + (x.caption ? '<figcaption>' + esc(x.caption) + '</figcaption>' : '') + '</figure>').join('');
     $('pvEndText').textContent = designer.accepting_projects ? 'Want something like this?' : 'More from ' + firstName(designer.display_name) + ' above.';
     $('pvEnd').querySelector('.dz-btn').hidden = !designer.accepting_projects;

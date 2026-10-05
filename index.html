@@ -1444,6 +1444,72 @@
 .pc-3d, .ed-tag { border-radius: 100px; }
 .dcard { border-radius: 24px; }
   </style>
+
+  <!-- ── HOMEPAGE, ROUND 2 (Oct 2026): flip cards, arrows on the rails' sides,
+       the hello in the footer. Shadows for photo tiles are in theme.css. ── -->
+  <style>
+    /* flip cards: a question in front, the answer behind */
+    .flip { width: calc((100% - 42px) / 4); aspect-ratio: 3 / 4; perspective: 1200px; padding: 0; border: 0; background: none;
+      text-align: left; cursor: pointer; font: inherit; color: inherit; }
+    .flip-in { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d;
+      transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+    .flip[aria-pressed="true"] .flip-in { transform: rotateY(180deg); }
+    .flip-face { position: absolute; inset: 0; display: flex; flex-direction: column; padding: clamp(20px, 2cqw, 28px);
+      border-radius: var(--r); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+    .flip-front { background: var(--un-card); border: 1px solid var(--edge-soft); box-shadow: var(--depth); }
+    .flip-back { transform: rotateY(180deg); background: var(--panel); color: var(--panel-ink); box-shadow: var(--depth); justify-content: space-between; }
+    .flip-n { font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: 15px; letter-spacing: .1em; color: var(--gold); }
+    .flip-q { margin: auto 0; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-style: italic; font-size: clamp(21px, 1.9cqw, 26px); line-height: 1.25; }
+    .flip-hint { display: inline-flex; align-items: center; gap: 8px; font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--stone); }
+    .flip-hint svg { width: 15px; height: 15px; color: var(--gold); }
+    .flip:hover .flip-front { border-color: var(--edge); }
+    .flip-a { margin-top: 8px; font-family: 'Bodoni Moda', Didot, Georgia, serif; font-size: clamp(18px, 1.55cqw, 21px); line-height: 1.45; }
+    .flip-go { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); }
+    @media (max-width: 900px) { .flip { width: 74%; } }
+
+    /* arrows on the rails' sides: in the margin on a wide screen, over the
+       first and last card where there is no margin to spare */
+    .rail-wrap { position: relative; }
+    .un-arrows.side { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+    .un-arrows.side button { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto;
+      background: var(--un-card); box-shadow: var(--lift-1); width: 46px; height: 46px; }
+    .un-arrows.side button:first-child { left: -64px; }
+    .un-arrows.side button:last-child { right: -64px; }
+    .un-arrows.side button:disabled { opacity: 0; pointer-events: none; }
+    @media (max-width: 1340px) {
+      .un-arrows.side button:first-child { left: -14px; }
+      .un-arrows.side button:last-child { right: -14px; }
+    }
+
+    /* "The spaces" leads the 3D rooms, so it reads at the size of the
+       other big statements on the page, with the gold italic they use */
+    .spaces-label.spaces-title { font-size: clamp(32px, 4.4cqw, 56px); line-height: 1.08; letter-spacing: -0.015em; }
+    .spaces-title em { font-style: italic; color: var(--gold); }
+
+    /* the hello, now at the top of the footer */
+    .footer-hello { padding-top: clamp(40px, 5cqw, 64px); padding-bottom: 8px; }
+    .footer-hello-head { margin-bottom: 26px; }
+    .footer-hello .contact-type { color: var(--panel-ink); font-size: clamp(24px, 3cqw, 36px); }
+    .footer-hello .cl-name { color: var(--panel-ink); }
+    .reach.reach-sm { grid-template-columns: repeat(3, auto); justify-content: start; gap: 10px; border-top: 0; padding-top: 0; }
+    .reach.reach-sm .reach-v { white-space: nowrap; }
+    /* beats the light-mode rule that darkens every tagline for a pale page */
+    :root footer .footer-hello .cl-tagline.cl-tagline { color: #C2934D !important; }
+    .statement .rail-wrap { margin-top: clamp(30px, 4cqw, 48px); }
+    .reach.reach-sm a { flex-direction: row; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px;
+      color: var(--panel-ink); border-color: var(--panel-line); background: rgba(234,242,241,.04); }
+    .reach.reach-sm a:hover { background: rgba(234,242,241,.08); border-color: var(--gold); transform: translateY(-2px); box-shadow: none; }
+    .reach.reach-sm .reach-ico { width: 34px; height: 34px; margin: 0; flex-shrink: 0; border-color: rgba(194,147,77,.45); }
+    .reach.reach-sm .reach-ico svg { width: 16px; height: 16px; }
+    .reach.reach-sm .reach-k { display: none; }
+    .reach.reach-sm .reach-v { font-size: 13px; }
+    footer .footer-inner { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--panel-line); }
+    @media (max-width: 700px) {
+      .reach.reach-sm { grid-template-columns: repeat(3, 1fr); justify-content: stretch; }
+      .reach.reach-sm a { flex-direction: column; padding: 14px 6px; gap: 8px; }
+      .reach.reach-sm .reach-k { display: block; color: var(--panel-ink); font-size: 9.5px; }
+    }
+  </style>
   <link rel="stylesheet" href="/theme.css"/>
 </head>
 <body>
@@ -1540,10 +1606,63 @@
       <span class="mask"><span style="--d:90ms">that make a house</span></span>
       <span class="mask"><span style="--d:180ms"><b>a home.</b></span></span>
     </p>
-    <div class="statement-body">
-      <p>An Indian home has long run on jugaad &mdash; making do with whatever is to hand. That instinct is honourable, and it built a great deal. <strong>It is also no longer necessary.</strong></p>
-      <p>It's the soap dispenser, the bath rug, the jar on your countertop. None of them cost much. They are simply never the thing a shop puts in front of you. <strong>That is the part we do.</strong></p>
+    <div class="rail-wrap">
+      <div class="un-rail flip-rail" data-rail>
+      <button type="button" class="flip" aria-pressed="false">
+        <span class="flip-in">
+          <span class="flip-face flip-front">
+            <span class="flip-n">01</span>
+            <span class="flip-q">Spent a lakh on the sofa, and the room still feels unfinished?</span>
+            <span class="flip-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 21v-5h5"/></svg>Tap to flip</span>
+          </span>
+          <span class="flip-face flip-back">
+            <span class="flip-a">A room is felt in its little things — the soap dispenser, the jar, the lamp. That is where décor actually lives.</span>
+            <span class="flip-go">See the little things →</span>
+          </span>
+        </span>
+      </button>
+      <button type="button" class="flip" aria-pressed="false">
+        <span class="flip-in">
+          <span class="flip-face flip-front">
+            <span class="flip-n">02</span>
+            <span class="flip-q">Soap in a plastic case? Spatulas standing in a steel glass?</span>
+            <span class="flip-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 21v-5h5"/></svg>Tap to flip</span>
+          </span>
+          <span class="flip-face flip-back">
+            <span class="flip-a">Jugaad got us this far, and it was honest work. It is simply no longer necessary — the right piece rarely costs more.</span>
+            <span class="flip-go">See the little things →</span>
+          </span>
+        </span>
+      </button>
+      <button type="button" class="flip" aria-pressed="false">
+        <span class="flip-in">
+          <span class="flip-face flip-front">
+            <span class="flip-n">03</span>
+            <span class="flip-q">Why does a hotel bathroom feel calm, and ours doesn't?</span>
+            <span class="flip-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 21v-5h5"/></svg>Tap to flip</span>
+          </span>
+          <span class="flip-face flip-back">
+            <span class="flip-a">Often it is the same tiles. The difference is a matching set: dispenser, tumbler, dish and bin, chosen together.</span>
+            <span class="flip-go">See the little things →</span>
+          </span>
+        </span>
+      </button>
+      <button type="button" class="flip" aria-pressed="false">
+        <span class="flip-in">
+          <span class="flip-face flip-front">
+            <span class="flip-n">04</span>
+            <span class="flip-q">Why is there a laughing Buddha in every home, but hardly a spatula stand?</span>
+            <span class="flip-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.5-6.3L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.3L3 16"/><path d="M3 21v-5h5"/></svg>Tap to flip</span>
+          </span>
+          <span class="flip-face flip-back">
+            <span class="flip-a">Because one is put in front of you in every shop, and the other never is. Putting the quietly useful things in front of you is the part we do.</span>
+            <span class="flip-go">See the little things →</span>
+          </span>
+        </span>
+      </button>
+      </div>
     </div>
+    <div class="un-progress" data-progress></div>
   </section>
 
   <!-- ── COLLECTION ──
@@ -1552,13 +1671,15 @@
   <section class="collect shell" id="collect" style="display:none">
     <div class="collect-head rv">
       <span class="collect-label">Explore the Collection</span>
-      <span class="collect-right"><a class="collect-all" href="collection.html">See all →</a>
-      <div class="un-arrows" data-arrows>
+      <a class="collect-all" href="collection.html">See all →</a>
+    </div>
+    <div class="rail-wrap">
+      <div class="un-arrows side" data-arrows>
         <button type="button" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
         <button type="button" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-      </div></span>
+      </div>
+      <div class="un-rail pc-rail" id="collectGrid" data-rail></div>
     </div>
-    <div class="un-rail pc-rail" id="collectGrid" data-rail></div>
     <div class="un-progress" data-progress></div>
   </section>
 
@@ -1578,7 +1699,7 @@
        shows if that request fails, so the section is never empty. -->
   <section class="spaces shell" id="rooms">
     <div class="spaces-head rv">
-      <span class="spaces-label">The spaces</span>
+      <span class="spaces-label spaces-title">The <em>spaces.</em></span>
       <p class="spaces-note">Every room we have built in 3D. Step into any of them.</p>
     </div>
     <div class="spaces-grid" id="spacesGrid">
@@ -1586,6 +1707,23 @@
       <a class="sp sp-a" href="kitchen.html"><span class="sp-media"><img src="images/cover-kitchen-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Kitchen</span><span class="sp-name">The Kitchen</span></span></a>
       <a class="sp sp-b" href="bedroom.html"><span class="sp-media"><img src="images/cover-bed-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bedroom</span><span class="sp-name">The Bedroom</span></span></a>
     </div>
+  </section>
+
+  <!-- ── THE NEST EDIT ──
+       Live from nest_posts; stays out of the page if there are none. -->
+  <section class="edit shell" id="edit" style="display:none">
+    <div class="spaces-head">
+      <span class="spaces-label">The Nest Edit</span>
+      <a class="collect-all" href="community.html">All articles →</a>
+    </div>
+    <div class="rail-wrap">
+      <div class="un-arrows side" data-arrows>
+        <button type="button" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <button type="button" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </div>
+      <div class="un-rail ed-rail" id="edRail" data-rail></div>
+    </div>
+    <div class="un-progress" data-progress></div>
   </section>
 
   <!-- ── PHILOSOPHY ── -->
@@ -1606,23 +1744,10 @@
     </div>
   </section>
 
-  <!-- ── THE NEST EDIT ──
-       Live from nest_posts; stays out of the page if there are none. -->
-  <section class="edit shell" id="edit" style="display:none">
-    <div class="spaces-head">
-      <span class="spaces-label">The Nest Edit</span>
-      <span class="collect-right"><a class="collect-all" href="community.html">All articles →</a><div class="un-arrows" data-arrows>
-        <button type="button" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
-        <button type="button" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-      </div></span>
-    </div>
-    <div class="un-rail ed-rail" id="edRail" data-rail></div>
-    <div class="un-progress" data-progress></div>
-  </section>
-
-  <!-- ── CONTACT ── -->
-  <section class="contact shell rv">
-    <div class="contact-head">
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div class="footer-hello shell">
+    <div class="contact-head footer-hello-head">
       <h2 class="contact-type">We'd love to hear from you.</h2>
       <div class="contact-lockup">
         <span class="cl-logo"><img src="logo-icon.png" alt="" aria-hidden="true"/></span>
@@ -1630,15 +1755,12 @@
         <span class="cl-tagline">Just The Right Feel</span>
       </div>
     </div>
-    <div class="reach">
+    <div class="reach reach-sm">
       <a href="https://wa.me/918588944583" target="_blank" rel="noopener"><span class="reach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h3l1.5 4-2 1.5a11 11 0 0 0 5.5 5.5L16 12l4 1.5v3a2 2 0 0 1-2.2 2A15.5 15.5 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3Z"/></svg></span><span class="reach-k">WhatsApp</span><span class="reach-v">+91 85889 44583</span></a>
       <a href="mailto:reachus.urbannest@gmail.com"><span class="reach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="m3 6.5 9 6 9-6"/></svg></span><span class="reach-k">Email</span><span class="reach-v">reachus.urbannest@gmail.com</span></a>
       <a href="https://instagram.com/store.urbannest" target="_blank" rel="noopener"><span class="reach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/></svg></span><span class="reach-k">Instagram</span><span class="reach-v">@store.urbannest</span></a>
     </div>
-  </section>
-
-  <!-- ── FOOTER ── -->
-  <footer>
+    </div>
     <div class="footer-inner shell">
     <div class="footer-disclosure">
       Every piece here is shown as a 3D model, built with AI assistance from the
@@ -1647,10 +1769,6 @@
       Treat the specification and the retailer&rsquo;s own page as the final word.
       <a href="about.html#renders">How we model things &rarr;</a>
     </div>
-      <div class="footer-left">
-        <span class="footer-icon"><img src="logo-icon.png" alt=""/></span>
-        <span class="footer-logo">URBAN NEST</span>
-      </div>
       <a href="policies.html" class="footer-note" style="text-decoration:none;margin-right:14px">Policies</a><a href="/studio/" class="footer-note" style="text-decoration:none;margin-right:14px">Creator sign in</a><span class="footer-note">© 2026 Urban Nest · All rights reserved</span>
     </div>
   </footer>
@@ -1820,7 +1938,7 @@
             params.set('p', it.id);
             var price = it.price_paise ? '₹' + Math.round(it.price_paise / 100).toLocaleString('en-IN') : (it.price || '');
             return '<a class="pc" href="collection.html?' + params.toString() + '">' +
-              '<span class="pc-frame"><img src="' + esc(img) + '" alt="" loading="lazy" decoding="async"/>' +
+              '<span class="pc-frame"><img src="' + esc(unImg(img, 300)) + '" alt="" loading="lazy" decoding="async"/>' +
               (it.model_url ? '<span class="pc-3d">3D</span>' : '') +
               '<button type="button" class="pc-save" aria-label="Save" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10Z"/></svg></button></span>' +
               '<span class="pc-body"><span class="pc-cat">' + esc(it.category || 'Collection') + '</span>' +
@@ -1894,7 +2012,7 @@
           var href  = sc.id ? (page + '?scene=' + encodeURIComponent(sc.id)) : page;
           var cls   = (i % 5 < 2) ? 'sp-a' : 'sp-b';
           return '<a class="sp ' + cls + '" href="' + href + '">' +
-                 '<span class="sp-media"><img src="' + cover + '" alt="" loading="lazy" decoding="async"/></span>' +
+                 '<span class="sp-media"><img src="' + unImg(cover, 700) + '" alt="" loading="lazy" decoding="async"/></span>' +
                  '<span class="sp-cap"><span class="sp-room">' + label + '</span>' +
                  '<span class="sp-name">' + title + '</span></span></a>';
         }).join('');
@@ -2008,8 +2126,9 @@
     if (!rail || rail.dataset.ready || !rail.children.length) return;
     rail.dataset.ready = '1';
     var sec = rail.closest('section');
-    var arrows = sec && sec.querySelector('[data-arrows]');
-    var progress = rail.nextElementSibling && rail.nextElementSibling.matches('[data-progress]') ? rail.nextElementSibling : null;
+    var arrows = (rail.closest('.rail-wrap') || sec || rail).querySelector('[data-arrows]');
+    var after = (rail.closest('.rail-wrap') || rail).nextElementSibling;
+    var progress = after && after.matches('[data-progress]') ? after : null;
     var items = function () { return Array.prototype.slice.call(rail.children); };
     if (progress) progress.innerHTML = items().map(function () { return '<i></i>'; }).join('');
 
@@ -2138,7 +2257,7 @@
   function paintEdit(rows) {
     edRail.innerHTML = rows.map(function (p) {
       var href = p.id != null ? 'community.html?a=' + encodeURIComponent(p.id) : 'community.html';
-      return '<a class="ed" href="' + href + '"><span class="ed-ph"><img src="' + esc(p.image_url || 'images/det-vase.webp') + '" alt="" loading="lazy" decoding="async"/>' +
+      return '<a class="ed" href="' + href + '"><span class="ed-ph"><img src="' + esc(unImg(p.image_url, 260) || 'images/det-vase.webp') + '" alt="" loading="lazy" decoding="async"/>' +
         '<span class="ed-tag">' + esc(p.category || 'The Nest') + '</span></span>' +
         '<span class="ed-panel"><span class="ed-t">' + esc(p.title) + '</span>' +
         '<span class="ed-m"><span>' + esc(p.read_time || '') + '</span><span>Read →</span></span></span></a>';
@@ -2152,6 +2271,14 @@
       .order('pinned', { ascending: false }).order('created_at', { ascending: false }).limit(10)
       .then(function (r) { paintEdit((r && r.data) || []); }, function () {});
   }
+
+  /* flip cards: tap or click to turn; the back links to the little things */
+  document.querySelectorAll('.flip').forEach(function (f) {
+    f.addEventListener('click', function (e) {
+      if (e.target.closest('.flip-go') && f.getAttribute('aria-pressed') === 'true') { location.href = 'essentials.html'; return; }
+      f.setAttribute('aria-pressed', String(f.getAttribute('aria-pressed') !== 'true'));
+    });
+  });
 
   document.querySelectorAll('[data-rail]').forEach(unRail);
 })();
