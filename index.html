@@ -1486,6 +1486,12 @@
     .spaces-label.spaces-title { font-size: clamp(32px, 4.4cqw, 56px); line-height: 1.08; letter-spacing: -0.015em; }
     .spaces-title em { font-style: italic; color: var(--gold); }
 
+    /* the collection cards' words on their own panel, as on the Nest Edit cards */
+    .pc-body { margin-top: 8px; padding: 14px 12px 12px; background: var(--panel); color: var(--panel-ink); border-radius: var(--r-sm); }
+    .pc-body .pc-foot { border-top-color: var(--panel-line); }
+    .pc-body .pc-price { color: var(--panel-ink); }
+    :root .pc-body .pc-cat, :root .pc-body .pc-go { color: #C2934D !important; }
+
     /* the hello, now at the top of the footer */
     .footer-hello { padding-top: clamp(40px, 5cqw, 64px); padding-bottom: 8px; }
     .footer-hello-head { margin-bottom: 26px; }
@@ -2132,7 +2138,7 @@
     var items = function () { return Array.prototype.slice.call(rail.children); };
     if (progress) progress.innerHTML = items().map(function () { return '<i></i>'; }).join('');
 
-    function startOf(el) { return el.offsetLeft - rail.offsetLeft - 2; }
+    function startOf(el) { return el.offsetLeft - rail.offsetLeft - (parseFloat(getComputedStyle(rail).paddingLeft) || 0); }
     function current() {
       var x = rail.scrollLeft, best = 0, bd = Infinity;
       items().forEach(function (it, i) { var d = Math.abs(startOf(it) - x); if (d < bd) { bd = d; best = i; } });
@@ -2158,9 +2164,21 @@
       rail.scrollTo({ left: startOf(list[i]), behavior: 'smooth' });
     }
     rail.unGo = go;
+    /* Step from where the rail actually is, not from the card counted as
+       current: at the far end several cards share the screen, the last one
+       counts as current, and "one back" landed on a card already showing,
+       so the back arrow did nothing. */
+    function step(dir) {
+      var x = rail.scrollLeft, starts = items().map(startOf);
+      var target = dir < 0
+        ? starts.filter(function (s) { return s < x - 4; }).pop()
+        : starts.filter(function (s) { return s > x + 4; })[0];
+      if (target == null) target = dir < 0 ? 0 : rail.scrollWidth;
+      rail.scrollTo({ left: target, behavior: 'smooth' });
+    }
     if (arrows) {
-      arrows.children[0].onclick = function () { go(current() - 1); };
-      arrows.children[1].onclick = function () { go(current() + 1); };
+      arrows.children[0].onclick = function () { step(-1); };
+      arrows.children[1].onclick = function () { step(1); };
     }
     rail.addEventListener('scroll', function () { requestAnimationFrame(paint); }, { passive: true });
     addEventListener('resize', paint);

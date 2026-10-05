@@ -120,3 +120,33 @@ select, textarea, .comment-input, .newsletter-input
 #viewApp .btn, #viewApp .rb, #viewApp .side-out { border-radius: 100px !important; }
 #viewApp .nav { border-radius: 10px !important; }
 #viewApp img.cover-prev { border-radius: var(--r-sm) !important; }
+
+/* ═══ NO THIN WHITE LINES (5 Oct 2026) ═══
+   The mount line drawn over photos, the hairline rim around photo tiles,
+   and the faint rim the dark-mode shadow carried: all gone. The shadow
+   alone gives the edge. */
+.pc-frame::after, .ed-ph::after, .sp::after, .ct::after, .wstrip figure::after,
+.ir-photo::after, .piece-ph::after { display: none !important; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --depth: 0 4px 10px rgba(0,0,0,.40), 0 22px 48px rgba(0,0,0,.55);
+    --depth-hover: 0 6px 14px rgba(0,0,0,.45), 0 30px 64px rgba(0,0,0,.62);
+  }
+}
+:root[data-theme="dark"] {
+  --depth: 0 4px 10px rgba(0,0,0,.40), 0 22px 48px rgba(0,0,0,.55);
+  --depth-hover: 0 6px 14px rgba(0,0,0,.45), 0 30px 64px rgba(0,0,0,.62);
+}
+
+/* ═══ LISTINGS: the words on their own panel ═══
+   Collection and Essentials piece cards, the same lighter panel the Nest
+   Edit cards have under their photo. */
+.grid > .item { padding: 8px; }
+.grid > .item .stage { border-radius: var(--r-sm) !important; }
+.grid > .item .body { margin-top: 8px; border-radius: var(--r-sm); background: var(--panel); color: #EAF2F1; }
+.grid > .item .body .name, .grid > .item .body .price { color: #EAF2F1; }
+.grid > .item .body .desc { color: rgba(234,242,241,.66); }
+.grid > .item .body .cat { color: #C2934D; }
+.grid > .item .body .buy, .grid > .item .body .share { color: #EAF2F1; border-color: rgba(234,242,241,.45); }
+.grid > .item .body .buy:hover { background: #EAF2F1; color: #0E3238; }
+.grid > .item .body .share:hover { color: #C2934D; border-color: #C2934D; }
