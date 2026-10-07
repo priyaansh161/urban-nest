@@ -35,3 +35,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-07 | 09:53 | 6fd1a23 | About page header matches the others (grid, two-line title on the left); phone sections aligned | https://f36a71a5.storeurbannest.pages.dev |
 | 2026-10-07 | 11:16 | c47514c | Quote bands: warm on-palette photos matched to each shloka (tea, teal plaster, teal sconce, lantern) | https://11c19013.storeurbannest.pages.dev |
 | 2026-10-07 | 11:30 | f59b3cc | Quote bands become narrower centred panels (rounded, with shadow) | https://6b44ee07.storeurbannest.pages.dev |
+| 2026-10-07 | 11:50 | 3ada325 | Quote bands: square, no shadow, narrower and shorter, tighter lines | https://ec7075fd.storeurbannest.pages.dev |
