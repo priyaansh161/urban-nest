@@ -36,3 +36,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-07 | 11:16 | c47514c | Quote bands: warm on-palette photos matched to each shloka (tea, teal plaster, teal sconce, lantern) | https://11c19013.storeurbannest.pages.dev |
 | 2026-10-07 | 11:30 | f59b3cc | Quote bands become narrower centred panels (rounded, with shadow) | https://6b44ee07.storeurbannest.pages.dev |
 | 2026-10-07 | 11:50 | 3ada325 | Quote bands: square, no shadow, narrower and shorter, tighter lines | https://ec7075fd.storeurbannest.pages.dev |
+| 2026-10-07 | 11:54 | a190d20 | Version-stamped asset URLs so changes show immediately (no stale theme.css or photos); service worker v3 | https://6f15f40a.storeurbannest.pages.dev |
