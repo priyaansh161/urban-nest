@@ -150,3 +150,19 @@ select, textarea, .comment-input, .newsletter-input
 .grid > .item .body .buy, .grid > .item .body .share { color: #EAF2F1; border-color: rgba(234,242,241,.45); }
 .grid > .item .body .buy:hover { background: #EAF2F1; color: #0E3238; }
 .grid > .item .body .share:hover { color: #C2934D; border-color: #C2934D; }
+
+/* ═══ QUOTE BANDS: a panel, not a strip (7 Oct 2026) ═══
+   The Sanskrit quote bands on Home (.band), About (.wband) and The Nest
+   Edit (.nband) ran the full width of the page. They now sit centred,
+   narrower, rounded, with the same depth as every other photo tile.
+   Policies' bands already sit inside its text column and are left alone. */
+.band, .nband, .wband:not(.inline-band):not(.closing-band) {
+  width: min(1100px, calc(100% - 96px)) !important;
+  margin-inline: auto !important;
+  border-radius: var(--r) !important;
+  overflow: hidden !important;
+  box-shadow: var(--depth) !important;
+}
+@media (max-width: 768px) {
+  .band, .nband, .wband:not(.inline-band):not(.closing-band) { width: calc(100% - 40px) !important; }
+}
