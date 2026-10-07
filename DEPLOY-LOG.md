@@ -33,3 +33,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-05 | 23:17 | d76c4bb | Flip card 1: answer stays with the sofa, not the bathroom | https://9468639f.storeurbannest.pages.dev |
 | 2026-10-05 | 23:28 | 98427f8 | Warm hero and spaces photos, no thin white lines, panels on listings, rail arrows fixed | https://bcf80775.storeurbannest.pages.dev |
 | 2026-10-07 | 09:53 | 6fd1a23 | About page header matches the others (grid, two-line title on the left); phone sections aligned | https://f36a71a5.storeurbannest.pages.dev |
+| 2026-10-07 | 11:16 | c47514c | Quote bands: warm on-palette photos matched to each shloka (tea, teal plaster, teal sconce, lantern) | https://11c19013.storeurbannest.pages.dev |
