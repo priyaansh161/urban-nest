@@ -32,3 +32,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-05 | 23:12 | ae5c5a3 | Flip card copy: card 2 is now a real question and answer; card 1's answer says why | https://9fb5a253.storeurbannest.pages.dev |
 | 2026-10-05 | 23:17 | d76c4bb | Flip card 1: answer stays with the sofa, not the bathroom | https://9468639f.storeurbannest.pages.dev |
 | 2026-10-05 | 23:28 | 98427f8 | Warm hero and spaces photos, no thin white lines, panels on listings, rail arrows fixed | https://bcf80775.storeurbannest.pages.dev |
+| 2026-10-07 | 09:53 | 6fd1a23 | About page header matches the others (grid, two-line title on the left); phone sections aligned | https://f36a71a5.storeurbannest.pages.dev |
