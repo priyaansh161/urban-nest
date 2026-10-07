@@ -31,7 +31,6 @@ a.room, .room-media,                                 /* spaces */
 { border-radius: var(--r) !important; }
 .pillars-grid, .contact-grid { overflow: hidden; }   /* not .sheet or #articleModal: they scroll on a phone */
 #articleModal .modal-hero { border-radius: var(--r) var(--r) 0 0 !important; }
-.wband { border-radius: var(--r) !important; }                     /* policies: already clips */
 .rail .piece { border-radius: var(--r) !important; overflow: hidden; } /* /nest */
 .rail .piece .piece-img { border-radius: 0 !important; }
 main.card .logo, main.card .logo img { border-radius: 50% !important; }
@@ -151,18 +150,24 @@ select, textarea, .comment-input, .newsletter-input
 .grid > .item .body .buy:hover { background: #EAF2F1; color: #0E3238; }
 .grid > .item .body .share:hover { color: #C2934D; border-color: #C2934D; }
 
-/* ═══ QUOTE BANDS: a panel, not a strip (7 Oct 2026) ═══
-   The Sanskrit quote bands on Home (.band), About (.wband) and The Nest
-   Edit (.nband) ran the full width of the page. They now sit centred,
-   narrower, rounded, with the same depth as every other photo tile.
-   Policies' bands already sit inside its text column and are left alone. */
-.band, .nband, .wband:not(.inline-band):not(.closing-band) {
-  width: min(1100px, calc(100% - 96px)) !important;
-  margin-inline: auto !important;
-  border-radius: var(--r) !important;
-  overflow: hidden !important;
-  box-shadow: var(--depth) !important;
+/* ═══ QUOTE BANDS: part of the page, not a card (7 Oct 2026) ═══
+   The Sanskrit bands on Home (.band), About (.wband), The Nest Edit (.nband)
+   and Policies: square, no shadow, nothing to suggest they can be touched.
+   About as wide as the words, only as tall as the quote and its source,
+   with the three lines set close together. */
+.band, .nband, .wband {
+  border-radius: 0 !important; box-shadow: none !important;
+  min-height: 0 !important; padding: 26px 32px !important;
 }
+.band, .nband, .wband:not(.inline-band):not(.closing-band) {
+  width: min(780px, calc(100% - 96px)) !important; margin-inline: auto !important; overflow: hidden !important;
+}
+.band-shloka, .nband-shloka, .wband-shloka { font-size: clamp(20px, 2.3vw, 32px) !important; line-height: 1.45 !important; }
+.band-sense, .nband-sense, .wband-sense { margin-top: 4px !important; font-size: clamp(14px, 1.3vw, 18px) !important; line-height: 1.35 !important; }
+.band-attr, .nband-attr, .wband-attr { margin-top: 8px !important; }
+/* The Nest Edit's band is followed straight by the comments panel, which touched it */
+.nband { margin-bottom: clamp(32px, 5vw, 56px) !important; }
 @media (max-width: 768px) {
   .band, .nband, .wband:not(.inline-band):not(.closing-band) { width: calc(100% - 40px) !important; }
+  .band, .nband, .wband { padding: 20px 16px !important; }
 }
