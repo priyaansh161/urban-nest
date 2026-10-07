@@ -63,7 +63,7 @@
       background: var(--panel);
       position: relative; overflow: hidden;
     }
-    .page-hero-bg {
+    .page-hero-grid {
       position: absolute; inset: 0;
       /* Drawn for a light ground originally; on the teal band it needs a
          light hairline instead, or it disappears. */
@@ -166,7 +166,9 @@
       .hamburger { display: flex; }
 
       .page-hero { padding: 100px 20px 48px; }
-      .section { padding: 60px 20px; }
+      /* was ".section", which nothing on this page is called, so on a phone
+         the sections kept their 48px laptop gutters beside a 20px header */
+      .about-section { padding: 60px 20px; }
       .section-inner { grid-template-columns: 1fr; gap: 32px; }
       .pillars-grid { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; }
@@ -518,6 +520,11 @@
     .page-hero { padding: 100px 20px 44px; min-height: 372px; }
     .page-hero .page-title { font-size: 40px; }
   }
+  /* About only: its title is a sentence, not two words like the other
+     pages'. Unlimited it ran the full width of the band; held to about
+     20 letters a line it breaks into two lines on the left and leaves
+     the right free, like every other page header. */
+  .page-hero .page-title { max-width: 20ch; }
 
   /* ── LIGHT PALETTE · SHARED ──
      Light mode only. Dark mode is deliberately untouched: nothing below can
@@ -627,7 +634,7 @@
   </nav>
 
   <div class="page-hero">
-    <div class="page-hero-bg"></div>
+    <div class="page-hero-grid"></div>
     <div class="hero-inner">
       <div class="page-tag">WHO WE ARE</div>
       <h1 class="page-title">We believe your home should feel like <em>you.</em></h1>
