@@ -17,7 +17,7 @@
  * the new worker takes over. netlify.toml serves this file with no-cache so
  * phones pick up a new one on their next visit.
  */
-const VERSION = 'v2';
+const VERSION = 'v3';   // v3: asset URLs are version-stamped now; drop the old unstamped copies
 const CACHE = `un-${VERSION}`;
 const PRECACHE = ['/offline.html', '/favicon.png', '/images/app-icon-192.png'];
 

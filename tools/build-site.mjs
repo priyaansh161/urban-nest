@@ -71,6 +71,54 @@ for (const rule of RULES) {
     wanted(rule, e.name)).length).padStart(3)} files${rule.names ? '  (' + rule.names.join(', ') + ')' : ''}`);
 }
 
+/* ── VERSION STAMPS ──
+   Browsers keep theme.css and the photos for hours (Cloudflare's default
+   cache), and the service worker serves photos from its own copy first. So a
+   file replaced under the same name, a band photo or the stylesheet, kept
+   showing the old one for a while after a deploy. Every reference to a local
+   photo, stylesheet or script in the built pages now carries a short hash of
+   that file's contents (theme.css?v=3f9a1c2e): a changed file gets a new
+   address and is fetched at once, an unchanged one stays cached. Only dist/
+   is rewritten; the source files are untouched. */
+const { createHash } = await import('node:crypto');
+const { readFile, writeFile } = await import('node:fs/promises');
+const hashes = new Map();
+async function stamp(file) {
+  if (!hashes.has(file)) {
+    try { hashes.set(file, createHash('sha1').update(await readFile(file)).digest('hex').slice(0, 8)); }
+    catch { hashes.set(file, null); }               // not in dist: leave the reference alone
+  }
+  return hashes.get(file);
+}
+async function stampHtml(htmlPath) {
+  const html = await readFile(htmlPath, 'utf8');
+  const base = dirname(htmlPath);
+  // a quoted or url()-wrapped reference to a local photo, stylesheet or script
+  const RE = /(["'(])(\/?)((?:[\w.-]+\/)*[\w.()% -]+\.(?:webp|png|jpe?g|svg|css|js))(?=["')])/g;
+  const jobs = [];
+  html.replace(RE, (m, open, slash, path, at) => { jobs.push({ m, open, slash, path, at }); return m; });
+  let out = html, shift = 0, stamped = 0;
+  for (const j of jobs) {
+    if (/^(https?:)?\/\//.test(j.path) || j.path === 'sw.js') continue;
+    const file = j.slash ? join(DIST, j.path) : join(base, j.path);
+    const h = await stamp(file);
+    if (!h) continue;
+    const rep = j.open + j.slash + j.path + '?v=' + h;
+    out = out.slice(0, j.at + shift) + rep + out.slice(j.at + shift + j.m.length);
+    shift += rep.length - j.m.length;
+    stamped++;
+  }
+  if (stamped) await writeFile(htmlPath, out);
+  return stamped;
+}
+let stampedRefs = 0;
+for (const dir of [DIST, join(DIST, 'admin'), join(DIST, 'studio')]) {
+  let names = [];
+  try { names = await readdir(dir); } catch { continue; }
+  for (const n of names) if (n.endsWith('.html')) stampedRefs += await stampHtml(join(dir, n));
+}
+console.log(`  version stamps: ${stampedRefs} references`);
+
 console.log(`\n  dist/ — ${count} files, ${(bytes / 1048576).toFixed(1)} MB`);
 console.log('  Deploy it with:  npx wrangler pages deploy\n');
 
