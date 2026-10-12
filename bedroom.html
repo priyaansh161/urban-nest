@@ -602,6 +602,12 @@
   </div>
 
   <script>
+    /* Visitors see the Display Name set in Admin → Spline Scenes; until one is
+       set, the same stand-ins the homepage uses, never the working name. */
+    const SCENE_NAME_FALLBACK = { 'bathroom mk1': 'The Quiet Bath', 'bathroom mk2': 'The Marble Bath', 'kitchen mk1': 'The Stone Kitchen', 'kitchen mk2': 'The Open Kitchen', 'bedroom mk1': 'The Still Bedroom' };
+    function sceneLabel(s, i) {
+      return (s.display_name || '').trim() || SCENE_NAME_FALLBACK[(s.name || '').trim().toLowerCase()] || s.name || ('View ' + (i + 1));
+    }
     const ROOM = 'bed';
     const LOADING_TEXT = 'ENTERING THE BEDROOM';
     // On touch devices the scene needs a two-finger gesture (one finger scrolls the page)
@@ -636,7 +642,7 @@
 
     (async () => {
       const [sceneRes, prodRes] = await Promise.all([
-        db.from('spline_scenes').select('id,name,url,description')
+        db.from('spline_scenes').select('id,name,display_name,url,description')
           .eq('page_placement', ROOM).eq('active', true)
           .order('created_at').then(r => r.data, () => null),
         db.from('room_products').select('*')
@@ -683,7 +689,7 @@
     function renderLobby() {
       document.getElementById('lobbyGrid').innerHTML = scenes.map((s, i) => `
         <button class="lobby-card" onclick="pickScene(${i})">
-          <div class="lobby-card-name">${s.name || ('View ' + (i + 1))}</div>
+          <div class="lobby-card-name">${sceneLabel(s, i)}</div>
           ${s.description ? `<div class="lobby-card-desc">${s.description}</div>` : ''}
           <div class="lobby-card-cta">ENTER →</div>
         </button>`).join('');
