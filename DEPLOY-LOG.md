@@ -39,3 +39,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-07 | 11:54 | a190d20 | Version-stamped asset URLs so changes show immediately (no stale theme.css or photos); service worker v3 | https://6f15f40a.storeurbannest.pages.dev |
 | 2026-10-07 | 12:02 | 1c2a889 | Quote bands: new close-up photos matched to each shloka (chandelier, amber jars, sunlit vase, teal vases, candle) | https://a7b090f4.storeurbannest.pages.dev |
 | 2026-10-12 | 11:04 | 32476ea | Photo galleries for no-3D pieces (festive category); admin More Photos strip; footer 3D wording | https://ef943ecc.storeurbannest.pages.dev |
+| 2026-10-12 | 11:23 | 0f1c5c2 | Redeploy to switch on Cloudflare Web Analytics (no site changes) | https://fee6f65c.storeurbannest.pages.dev |
