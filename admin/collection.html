@@ -91,6 +91,16 @@
               text-transform: uppercase; transition: color 0.2s, background 0.2s; }
   .cmd-copy:hover { color: var(--gold); background: var(--gold-light); }
 
+  /* the extra photographs: thumbnails in the order the visitor sees them */
+  .gallery { display: flex; flex-wrap: wrap; gap: 8px; }
+  .gallery:empty { display: none; }
+  .g-thumb { position: relative; width: 96px; height: 96px; border: 0.5px solid var(--border); background: var(--bg); overflow: hidden; }
+  .g-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .g-n { position: absolute; top: 4px; left: 4px; font-size: 10px; background: rgba(255,255,255,.9); padding: 1px 5px; color: var(--black); }
+  .g-acts { position: absolute; left: 0; right: 0; bottom: 0; display: flex; background: rgba(255,255,255,.92); }
+  .g-acts button { flex: 1; border: none; background: none; cursor: pointer; font-size: 12px; padding: 3px 0; color: var(--grey); }
+  .g-acts button:hover:not(:disabled) { color: var(--gold); }
+  .g-acts button:disabled { opacity: .3; cursor: default; }
   .field-row { display: flex; gap: 10px; align-items: stretch; }
   .field-row input { flex: 1; min-width: 0; }
   .field-row .btn { white-space: nowrap; padding: 11px 20px; border: 0.5px solid var(--border); }
@@ -310,6 +320,19 @@
         <span class="hint" id="imageHint">Choose a photograph and it goes to Supabase Storage &mdash; no dashboard, no copying URLs. Shrunk to 1600px and saved as WebP on the way, because a tile is 374px wide and a 3&nbsp;MB photograph in it is the slowest thing on the site.</span>
       </div>
       <div class="form-group full">
+        <label>More Photos (for pieces without a 3D model)</label>
+        <div class="gallery" id="galleryList"></div>
+        <div class="field-row">
+          <input type="url" id="galleryUrl" placeholder="Paste a photo URL, or upload several at once →"
+                 onkeydown="if(event.key==='Enter'){event.preventDefault();addGalleryUrl()}"/>
+          <button type="button" class="btn btn-secondary" onclick="addGalleryUrl()">Add URL</button>
+          <button type="button" class="btn btn-secondary" id="galleryUploadBtn"
+                  onclick="document.getElementById('galleryFiles').click()">Upload photos</button>
+        </div>
+        <input type="file" id="galleryFiles" accept="image/*" multiple style="display:none" onchange="uploadGallery(this)"/>
+        <span class="hint">The image above is the cover; these follow it on the piece&rsquo;s page, where the visitor swipes through them. Use the arrows to reorder. Ignored when the piece has a 3D model.</span>
+      </div>
+      <div class="form-group full">
         <label for="itemModel">3D Model URL (optional)</label>
         <div class="field-row">
           <input type="url" id="itemModel" placeholder="https://…/storage/v1/object/public/models/chandelier.glb"/>
@@ -497,6 +520,7 @@ function editItem(id) {
   document.getElementById('itemComingSoon').checked = !!item.coming_soon;
   document.getElementById('specRows').innerHTML = '';
   (Array.isArray(item.specs) ? item.specs : []).forEach(([k, v]) => addSpecRow(k, v));
+  setGallery(item.gallery);
   document.getElementById('formTitle').textContent = 'Edit Item';
   document.getElementById('resetBtn').style.display = '';
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -617,6 +641,85 @@ function resetForm() {
   document.getElementById('resetBtn').style.display = 'none';
   document.getElementById('modelHint').innerHTML = MODEL_HINT;
   document.getElementById('specRows').innerHTML = '';
+  setGallery([]);
+}
+
+/* ── MORE PHOTOGRAPHS ────────────────────────────────────────────────
+   Held as a plain array and repainted on every change; the form has no
+   other state worth syncing with. Uploads go through shrinkImage and the
+   same bucket as the cover (admin/image-upload.js), one after another so
+   the order picked is the order saved.                               */
+let galleryUrls = [];
+
+function setGallery(list) {
+  galleryUrls = Array.isArray(list) ? list.filter(Boolean) : [];
+  paintGallery();
+}
+
+function paintGallery() {
+  const n = galleryUrls.length;
+  document.getElementById('galleryList').innerHTML = galleryUrls.map((u, i) => `
+    <div class="g-thumb">
+      <img src="${escAttr(u)}" alt="" onerror="this.style.opacity=.2">
+      <span class="g-n">${i + 2}</span>
+      <div class="g-acts">
+        <button type="button" title="Move earlier" ${i === 0 ? 'disabled' : ''} onclick="moveGallery(${i},-1)">←</button>
+        <button type="button" title="Remove" onclick="removeGallery(${i})">×</button>
+        <button type="button" title="Move later" ${i === n - 1 ? 'disabled' : ''} onclick="moveGallery(${i},1)">→</button>
+      </div>
+    </div>`).join('');
+}
+
+function moveGallery(i, by) {
+  const j = i + by;
+  if (j < 0 || j >= galleryUrls.length) return;
+  [galleryUrls[i], galleryUrls[j]] = [galleryUrls[j], galleryUrls[i]];
+  paintGallery();
+}
+
+function removeGallery(i) {
+  galleryUrls.splice(i, 1);
+  paintGallery();
+}
+
+function addGalleryUrl() {
+  const f = document.getElementById('galleryUrl');
+  const u = f.value.trim();
+  if (!/^https?:\/\//i.test(u)) { showToast('Paste a full https:// photo URL', 'error'); return; }
+  galleryUrls.push(u);
+  f.value = '';
+  paintGallery();
+}
+
+async function uploadGallery(input) {
+  const files = Array.from(input.files || []);
+  input.value = '';
+  if (!files.length) return;
+  const btn = document.getElementById('galleryUploadBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  const base = imgSlugify(document.getElementById('itemName').value) || 'piece';
+  let done = 0, failed = 0;
+  for (const file of files) {
+    btn.textContent = `Uploading ${done + failed + 1} of ${files.length}…`;
+    try {
+      const shrunk = await shrinkImage(file);
+      const path = base + '-' + Date.now().toString(36) + '.' + shrunk.ext;
+      const body = new Blob([shrunk.blob], { type: shrunk.type });
+      const { error } = await db.storage.from(IMG_BUCKET).upload(path, body, {
+        contentType: shrunk.type, cacheControl: '31536000', upsert: false,
+      });
+      if (error) throw new Error(imgStorageError(error));
+      galleryUrls.push(db.storage.from(IMG_BUCKET).getPublicUrl(path).data.publicUrl);
+      done++;
+      paintGallery();
+    } catch (e) {
+      failed++;
+      showToast(e.message, 'error');
+    }
+  }
+  btn.disabled = false; btn.textContent = label;
+  if (done) showToast(done + ' photo' + (done > 1 ? 's' : '') + ' added' + (failed ? ', ' + failed + ' failed' : '') + ' — save the piece to keep them');
 }
 
 /* ── CATEGORIES ──────────────────────────────────────────────────────
@@ -973,6 +1076,7 @@ async function saveItem(publish) {
     primary_cta: document.getElementById('itemPrimaryCta').value,
     in_stock: document.getElementById('itemInStock').checked,
     specs: collectSpecs(),
+    gallery: galleryUrls.slice(),
     coming_soon: document.getElementById('itemComingSoon').checked,
     published: publish,
     section: currentSection,
@@ -983,11 +1087,11 @@ async function saveItem(publish) {
   let { error } = await write(payload);
   // These columns arrive in separate migrations. If one has not been run,
   // save what the table does have rather than losing the whole edit.
-  if (error && /model_url|buy_link|specs|seller_id|price_paise|primary_cta|in_stock/.test(error.message || '')) {
+  if (error && /model_url|buy_link|specs|seller_id|price_paise|primary_cta|in_stock|gallery/.test(error.message || '')) {
     const { model_url, buy_link, specs, seller_id, affiliate_seller_id,
-            price_paise, primary_cta, in_stock, ...rest } = payload;
+            price_paise, primary_cta, in_stock, gallery, ...rest } = payload;
     ({ error } = await write(rest));
-    if (!error) showToast('Saved, but some fields were dropped — run add-collection-3d.sql, add-collection-specs.sql and setup-commerce.sql');
+    if (!error) showToast('Saved, but some fields were dropped — run add-collection-3d.sql, add-collection-specs.sql, setup-commerce.sql and add-collection-gallery.sql');
   }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
   showToast(publish ? 'Item published!' : 'Draft saved');
