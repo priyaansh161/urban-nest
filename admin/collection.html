@@ -95,7 +95,22 @@
   .gallery { display: flex; flex-wrap: wrap; gap: 8px; }
   .gallery:empty { display: none; }
   .g-thumb { position: relative; width: 96px; height: 96px; border: 0.5px solid var(--border); background: var(--bg); overflow: hidden; }
-  .g-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .g-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; cursor: zoom-in; }
+  .g-cover { border-color: var(--gold); }
+  /* the full-size viewer */
+  .viewer { position: fixed; inset: 0; z-index: 1000; background: rgba(10,14,15,.92); display: none;
+            align-items: center; justify-content: center; }
+  .viewer.open { display: flex; }
+  .viewer img { max-width: calc(100vw - 140px); max-height: calc(100vh - 110px); object-fit: contain; background: #fff; }
+  .v-btn { position: absolute; border: none; background: rgba(255,255,255,.12); color: #fff; cursor: pointer;
+           width: 48px; height: 48px; border-radius: 50%; font-size: 24px; line-height: 1; transition: background .2s; }
+  .v-btn:hover { background: rgba(255,255,255,.25); }
+  .v-prev { left: 24px; top: 50%; transform: translateY(-50%); }
+  .v-next { right: 24px; top: 50%; transform: translateY(-50%); }
+  .v-close { right: 24px; top: 20px; }
+  .v-bar { position: absolute; bottom: 22px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.75);
+           font-size: 12px; letter-spacing: .06em; }
+  .v-bar a { color: var(--gold); margin-left: 14px; }
   .g-n { position: absolute; top: 4px; left: 4px; font-size: 10px; background: rgba(255,255,255,.9); padding: 1px 5px; color: var(--black); }
   .g-acts { position: absolute; left: 0; right: 0; bottom: 0; display: flex; background: rgba(255,255,255,.92); }
   .g-acts button { flex: 1; border: none; background: none; cursor: pointer; font-size: 12px; padding: 3px 0; color: var(--grey); }
@@ -411,6 +426,14 @@
   </div>
 </main>
 
+<div class="viewer" id="viewer" onclick="if(event.target===this)closeViewer()">
+  <img id="viewerImg" alt=""/>
+  <button type="button" class="v-btn v-prev" onclick="stepViewer(-1)" aria-label="Previous photo">‹</button>
+  <button type="button" class="v-btn v-next" onclick="stepViewer(1)" aria-label="Next photo">›</button>
+  <button type="button" class="v-btn v-close" onclick="closeViewer()" aria-label="Close">×</button>
+  <div class="v-bar"><span id="viewerInfo"></span><a id="viewerOpen" href="#" target="_blank" rel="noopener">Open original ↗</a></div>
+</div>
+
 <script>
 let items = [];
 let categories = [];
@@ -656,11 +679,21 @@ function setGallery(list) {
   paintGallery();
 }
 
+function coverUrl() { return document.getElementById('itemImage').value.trim(); }
+
+/* The cover leads the strip, unmovable, so the row reads as the exact
+   order the visitor swipes through. Every thumbnail opens the viewer. */
 function paintGallery() {
   const n = galleryUrls.length;
-  document.getElementById('galleryList').innerHTML = galleryUrls.map((u, i) => `
+  const cover = coverUrl();
+  const off = cover ? 1 : 0;
+  document.getElementById('galleryList').innerHTML = (cover ? `
+    <div class="g-thumb g-cover">
+      <img src="${escAttr(cover)}" alt="" title="Click to enlarge" onclick="openViewer(0)" onerror="this.style.opacity=.2">
+      <span class="g-n">1 · Cover</span>
+    </div>` : '') + galleryUrls.map((u, i) => `
     <div class="g-thumb">
-      <img src="${escAttr(u)}" alt="" onerror="this.style.opacity=.2">
+      <img src="${escAttr(u)}" alt="" title="Click to enlarge" onclick="openViewer(${i + off})" onerror="this.style.opacity=.2">
       <span class="g-n">${i + 2}</span>
       <div class="g-acts">
         <button type="button" title="Move earlier" ${i === 0 ? 'disabled' : ''} onclick="moveGallery(${i},-1)">←</button>
@@ -669,6 +702,41 @@ function paintGallery() {
       </div>
     </div>`).join('');
 }
+
+/* Full-size look at a photograph, for checking a crop or a watermark
+   before publishing. Arrows / ← → step through cover + gallery, Esc closes. */
+let viewerAt = 0;
+function viewerList() { return (coverUrl() ? [coverUrl()] : []).concat(galleryUrls); }
+function openViewer(i) {
+  viewerAt = i;
+  document.getElementById('viewer').classList.add('open');
+  paintViewer();
+}
+function closeViewer() { document.getElementById('viewer').classList.remove('open'); }
+function stepViewer(by) {
+  const n = viewerList().length;
+  if (!n) return;
+  viewerAt = (viewerAt + by + n) % n;
+  paintViewer();
+}
+function paintViewer() {
+  const list = viewerList();
+  const u = list[viewerAt] || '';
+  document.getElementById('viewerImg').src = u;
+  document.getElementById('viewerInfo').textContent =
+    (viewerAt === 0 && coverUrl() ? 'Cover · ' : 'Photo ') + (viewerAt + 1) + ' of ' + list.length;
+  document.getElementById('viewerOpen').href = u;
+}
+document.getElementById('viewerImg').addEventListener('load', function () {
+  document.getElementById('viewerInfo').textContent += ' · ' + this.naturalWidth + '×' + this.naturalHeight + 'px';
+});
+document.addEventListener('keydown', function (e) {
+  if (!document.getElementById('viewer').classList.contains('open')) return;
+  if (e.key === 'Escape') closeViewer();
+  if (e.key === 'ArrowLeft') stepViewer(-1);
+  if (e.key === 'ArrowRight') stepViewer(1);
+});
+document.getElementById('itemImage').addEventListener('input', paintGallery);
 
 function moveGallery(i, by) {
   const j = i + by;
