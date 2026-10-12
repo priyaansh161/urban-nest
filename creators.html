@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Join the Creator Studio · Urban Nest</title>
+  <meta name="description" content="For interior designers: write for The Nest Edit, get your own portfolio page on Urban Nest, and receive client enquiries. Apply to join the Creator Studio."/>
+  <!-- The WhatsApp preview: logo, title and one line. Same square logo card as the homepage. -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Urban Nest"/>
+  <meta property="og:title" content="Join the Creator Studio · Urban Nest"/>
+  <meta property="og:description" content="For interior designers: write for The Nest Edit, get a portfolio page on Urban Nest and receive client enquiries."/>
+  <meta property="og:url" content="https://storeurbannest.in/creators"/>
+  <meta property="og:image" content="https://storeurbannest.in/images/share-card.jpg"/>
+  <meta property="og:image:secure_url" content="https://storeurbannest.in/images/share-card.jpg"/>
+  <meta property="og:image:type" content="image/jpeg"/>
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="1200"/>
+  <meta property="og:image:alt" content="Urban Nest logo"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="icon" type="image/png" href="/favicon.png"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
+  <meta name="theme-color" content="#0E3238"/>
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png"/>
+  <script src="/pwa.js" defer></script>
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('un-theme');
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  })();
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       JOIN THE CREATOR STUDIO — storeurbannest.in/creators
+       The designer's twin of /nest: one page for Instagram, WhatsApp and
+       the QR, aimed at interior designers instead of shoppers. What Urban
+       Nest offers a designer in a line, recent Nest Edit articles as proof,
+       and a short application. No menu on purpose, as on /nest.
+
+       Applications go through apply_to_creator_studio()
+       (admin/setup-creator-applications.sql) into creator_applications,
+       with source "creators-page" or "creators-page:<src>" from ?src=.
+       Priyaansh reviews them in Admin → Contributors.
+       ═══════════════════════════════════════════════════════════════ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --teal: #0E3238; --gold: #A37B3F; --gold-lift: #C2934D;
+      --ground: #E6EFED; --card: #FFFFFF; --ink: #0F1F22; --grey: #586366; --line: #CFDCD9;
+      --field: #FFFFFF; --small-gold: #735427;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --ground: #061E23; --card: #0A2429; --ink: #EAF2F1; --grey: #8FA2A5; --line: #16363D; --field: #061E23; --gold: #C2934D; --small-gold: #C2934D; }
+    }
+    :root[data-theme="dark"] { --ground: #061E23; --card: #0A2429; --ink: #EAF2F1; --grey: #8FA2A5; --line: #16363D; --field: #061E23; --gold: #C2934D; --small-gold: #C2934D; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--ground); color: var(--ink); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    a { color: inherit; }
+
+    /* ── HERO ── */
+    .hero { background: var(--teal); color: #F5F7F6; position: relative; overflow: hidden; padding: 28px 20px 56px; text-align: center; }
+    .hero::before { content: ''; position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(rgba(234,242,241,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(234,242,241,0.035) 1px, transparent 1px); background-size: 64px 64px; }
+    .hero > * { position: relative; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .brand img { width: 30px; height: 30px; border-radius: 50%; display: block; }
+    .brand span { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.2em; }
+    .tag { font-size: 10px; letter-spacing: 0.32em; color: var(--gold-lift); margin: 44px 0 16px; font-weight: 500; }
+    h1 { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: clamp(36px, 8.5vw, 64px); line-height: 1.04; max-width: 760px; margin: 0 auto; }
+    h1 em { color: var(--gold-lift); }
+    .lead { font-size: 15.5px; line-height: 1.75; color: rgba(245,247,246,0.74); max-width: 540px; margin: 20px auto 0; }
+    .cta { display: inline-flex; align-items: center; gap: 10px; margin-top: 30px; padding: 15px 34px; border-radius: 100px; background: #F5F7F6; color: var(--teal); text-decoration: none; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; transition: background .25s, color .25s; }
+    .cta:hover { background: var(--gold-lift); }
+    .proof { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 22px; margin-top: 28px; font-size: 11px; letter-spacing: 0.1em; color: rgba(245,247,246,0.55); }
+    .proof span::before { content: '◈ '; color: var(--gold-lift); }
+    .signin { display: block; margin-top: 22px; font-size: 11.5px; letter-spacing: 0.06em; color: rgba(245,247,246,0.6); }
+    .signin a { color: var(--gold-lift); text-decoration: none; }
+
+    /* ── ARTICLES ── */
+    .reads { padding: 52px 0 12px; }
+    .sec-head { max-width: 1080px; margin: 0 auto; padding: 0 20px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+    .sec-k { font-size: 10px; letter-spacing: 0.3em; color: var(--small-gold); font-weight: 500; }
+    .sec-t { font-family: 'Bodoni Moda', serif; font-size: clamp(26px, 5vw, 36px); font-weight: 400; margin-top: 8px; line-height: 1.1; }
+    .sec-all { font-size: 11px; letter-spacing: 0.14em; color: var(--small-gold); text-decoration: none; white-space: nowrap; padding-bottom: 4px; }
+    .rail { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 20px; padding: 22px 20px 26px; scrollbar-width: none; max-width: 1080px; margin: 0 auto; }
+    .rail::-webkit-scrollbar { display: none; }
+    .art { flex: 0 0 74%; max-width: 300px; scroll-snap-align: start; background: var(--card); text-decoration: none; color: inherit; box-shadow: 0 2px 6px rgba(8,8,7,.07), 0 14px 30px rgba(8,8,7,.10); display: flex; flex-direction: column; }
+    .art-img { aspect-ratio: 4 / 3; width: 100%; object-fit: cover; display: block; background: #D9E3E1; }
+    .art-ph { aspect-ratio: 4 / 3; background: var(--teal); display: flex; align-items: center; justify-content: center; }
+    .art-ph img { width: 44px; height: 44px; border-radius: 50%; opacity: .9; }
+    .art-b { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
+    .art-c { font-size: 9.5px; letter-spacing: 0.22em; color: var(--small-gold); font-weight: 500; text-transform: uppercase; }
+    .art-t { font-family: 'Bodoni Moda', serif; font-size: 18px; line-height: 1.28; margin-top: 7px; }
+    .art-m { font-size: 11.5px; color: var(--grey); margin-top: auto; padding-top: 12px; }
+    .rail-skel .art { min-height: 330px; }
+    @media (min-width: 760px) { .rail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; overflow: visible; padding: 26px 20px 30px; } .art { max-width: none; } }
+
+    /* ── APPLY ── */
+    .join { padding: 30px 20px 64px; }
+    .card { max-width: 560px; margin: 0 auto; background: var(--card); padding: 34px 26px 30px; box-shadow: 0 2px 6px rgba(8,8,7,.07), 0 18px 40px rgba(8,8,7,.12); }
+    .card .sec-t { margin-top: 8px; }
+    .perks { list-style: none; margin: 18px 0 24px; display: grid; gap: 10px; }
+    .perks li { font-size: 14px; line-height: 1.55; color: var(--grey); padding-left: 24px; position: relative; }
+    .perks li::before { content: '✦'; position: absolute; left: 0; top: 0; color: var(--gold); font-size: 12px; }
+    .perks strong { color: var(--ink); font-weight: 500; }
+    .f { display: grid; gap: 14px; }
+    .two { display: grid; gap: 14px; }
+    @media (min-width: 560px) { .two { grid-template-columns: 1fr 1fr; } }
+    .fl label { display: block; font-size: 10px; letter-spacing: 0.2em; color: var(--grey); margin-bottom: 7px; }
+    .fl label i { font-style: normal; letter-spacing: 0.06em; opacity: .8; }
+    .fl input, .fl select, .fl textarea { width: 100%; padding: 13px 14px; font: inherit; font-size: 16px; color: var(--ink); background: var(--field); border: 1px solid var(--line); border-radius: 0; outline: none; transition: border-color .2s; }
+    .fl select { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--grey) 50%), linear-gradient(135deg, var(--grey) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 40px; }
+    .fl textarea { min-height: 96px; resize: vertical; line-height: 1.6; }
+    .fl input:focus, .fl select:focus, .fl textarea:focus { border-color: var(--gold); }
+    .hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+    .go { margin-top: 6px; width: 100%; padding: 16px; border: none; border-radius: 100px; background: var(--teal); color: #F5F7F6; font: inherit; font-size: 11px; font-weight: 500; letter-spacing: 0.2em; cursor: pointer; transition: background .25s; }
+    :root[data-theme="dark"] .go { background: var(--gold); color: #061E23; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .go { background: var(--gold); color: #061E23; } }
+    .go:hover { background: var(--gold); }
+    .go:disabled { opacity: .55; cursor: wait; }
+    .msg { font-size: 13px; color: #B03A2E; text-align: center; }
+    .msg:empty { display: none; }
+    .fine { font-size: 11.5px; line-height: 1.65; color: var(--grey); text-align: center; margin-top: 12px; }
+    .fine a { color: var(--small-gold); }
+    .done { text-align: center; padding: 10px 0 4px; }
+    .done-mark { width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 16px; background: var(--teal); color: var(--gold-lift); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .done h3 { font-family: 'Bodoni Moda', serif; font-weight: 400; font-size: 30px; }
+    .done p { font-size: 14.5px; line-height: 1.75; color: var(--grey); margin: 10px 0 24px; }
+    .done .go { display: inline-block; width: auto; padding: 15px 30px; text-decoration: none; }
+    .after { text-align: center; margin-top: 18px; font-size: 12.5px; color: var(--grey); }
+    .after a { color: var(--small-gold); text-decoration: none; letter-spacing: 0.04em; }
+
+    /* ── FOOT ── */
+    .foot { background: var(--teal); color: rgba(234,242,241,0.45); text-align: center; padding: 30px 20px 36px; font-size: 11.5px; line-height: 1.8; }
+    .foot a { color: var(--gold-lift); text-decoration: none; }
+    .foot .links { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; letter-spacing: 0.12em; font-size: 10.5px; }
+    .foot .links a { color: rgba(234,242,241,0.72); }
+
+    @media (min-width: 760px) {
+      .hero { padding: 34px 40px 80px; }
+      .tag { margin-top: 70px; }
+      .card { padding: 44px 44px 38px; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/supabase.js"></script>
+  <link rel="stylesheet" href="/theme.css"/>
+</head>
+<body>
+
+  <header class="hero">
+    <a class="brand" href="/"><img src="/logo-icon.png" alt=""/><span>URBAN NEST</span></a>
+    <div class="tag">THE CREATOR STUDIO · FOR DESIGNERS</div>
+    <h1>Your eye, <em>in more Indian homes.</em></h1>
+    <p class="lead">The Nest Edit is where interior designers share what makes a house feel like home. Write for it, show your projects, and meet clients who already care about good design.</p>
+    <a class="cta" href="#join">JOIN THE CREATOR STUDIO ↓</a>
+    <div class="proof"><span>Your name on every article</span><span>A portfolio page of your own</span><span>Client enquiries to you</span></div>
+    <span class="signin">Already a creator? <a href="/studio/">Sign in →</a></span>
+  </header>
+
+  <section class="reads" aria-labelledby="readsTitle">
+    <div class="sec-head">
+      <div>
+        <div class="sec-k">FROM THE NEST EDIT</div>
+        <h2 class="sec-t" id="readsTitle">Recent articles</h2>
+      </div>
+      <a class="sec-all" href="/community.html">READ ALL →</a>
+    </div>
+    <div class="rail rail-skel" id="rail" aria-live="polite">
+      <div class="art"></div><div class="art"></div><div class="art"></div>
+    </div>
+  </section>
+
+  <section class="join" id="join">
+    <div class="card">
+      <div id="joinForm">
+        <div class="sec-k">FOR INTERIOR DESIGNERS &amp; CREATORS</div>
+        <h2 class="sec-t">Join the Creator Studio.</h2>
+        <ul class="perks">
+          <li><strong>Write for The Nest Edit</strong>: publish articles under your own name, with an author card that links to your work.</li>
+          <li><strong>Your portfolio page</strong> on Urban Nest, with your projects, your story and your Instagram.</li>
+          <li><strong>Client enquiries</strong> from readers who like your work, straight to your studio.</li>
+        </ul>
+        <form class="f" id="f" novalidate>
+          <div class="fl"><label for="n">YOUR NAME</label><input id="n" autocomplete="name" maxlength="80" required/></div>
+          <div class="two">
+            <div class="fl"><label for="e">EMAIL</label><input id="e" type="email" autocomplete="email" inputmode="email" maxlength="120" required/></div>
+            <div class="fl"><label for="p">WHATSAPP <i>(optional)</i></label><input id="p" type="tel" autocomplete="tel" inputmode="tel" maxlength="20"/></div>
+          </div>
+          <div class="two">
+            <div class="fl"><label for="c">CITY</label><input id="c" autocomplete="address-level2" maxlength="60" list="cities" required/></div>
+            <div class="fl"><label for="k">WHAT YOU DO</label>
+              <select id="k" required>
+                <option value="">Choose one</option>
+                <option>Interior designer</option>
+                <option>Architect</option>
+                <option>Stylist / décor consultant</option>
+                <option>Design student</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+          <datalist id="cities">
+            <option value="New Delhi"/><option value="Gurugram"/><option value="Noida"/><option value="Ghaziabad"/><option value="Faridabad"/>
+            <option value="Mumbai"/><option value="Pune"/><option value="Bangalore"/><option value="Hyderabad"/><option value="Chennai"/>
+            <option value="Kolkata"/><option value="Jaipur"/><option value="Lucknow"/><option value="Chandigarh"/>
+          </datalist>
+          <div class="fl"><label for="l">INSTAGRAM OR PORTFOLIO <i>(optional)</i></label><input id="l" maxlength="200" placeholder="@yourstudio or a link"/></div>
+          <div class="fl"><label for="m">WHAT WOULD YOU WRITE ABOUT? <i>(optional)</i></label><textarea id="m" maxlength="1000" placeholder="A topic or two you know well — small kitchens, lighting, rental makeovers…"></textarea></div>
+          <div class="hp" aria-hidden="true"><label for="w">Leave this empty</label><input id="w" tabindex="-1" autocomplete="off"/></div>
+          <p class="msg" id="msg" role="alert"></p>
+          <button class="go" type="submit" id="go">APPLY TO JOIN</button>
+        </form>
+        <p class="fine">We read every application and reply by email. Your details are used only to review it and are never shared. <a href="/policies.html">Policies</a></p>
+      </div>
+      <div class="done" id="done" hidden>
+        <div class="done-mark">✦</div>
+        <h3 id="doneTitle">Application received.</h3>
+        <p id="doneText"></p>
+        <a class="go" href="/community.html">READ THE NEST EDIT →</a>
+      </div>
+    </div>
+    <p class="after">Already a creator? <a href="/studio/">Sign in to your studio →</a></p>
+  </section>
+
+  <footer class="foot">
+    <div class="links"><a href="/">HOME</a><a href="/collection.html">COLLECTION</a><a href="/spaces.html">SPACES</a><a href="/community.html">THE NEST EDIT</a><a href="/about.html">ABOUT</a></div>
+    Urban Nest · hand-picked home décor from across India, shown in 3D.<br/>
+    © 2026 Urban Nest
+  </footer>
+
+<script>
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var CATS = { general: 'General', announcement: 'Announcement', collection: 'Collection', community: 'Community',
+    'behind-the-scenes': 'Behind the Scenes', trends: 'Trends', tips: 'Tips & Guides', inspiration: 'Inspiration' };
+
+  /* The six newest published Nest Edit articles, as proof of what a writer
+     joins. Each opens in the Nest Edit reader (community?a=<id>). */
+  (function reads() {
+    var rail = document.getElementById('rail');
+    if (typeof db === 'undefined') { rail.parentNode.hidden = true; return; }
+    db.from('nest_posts').select('id,title,category,image_url,author,read_time,created_at')
+      .eq('published', true)
+      .order('created_at', { ascending: false }).limit(6)
+      .then(function (r) {
+        var posts = (r && r.data) || [];
+        if (!posts.length) { rail.parentNode.hidden = true; return; }
+        rail.classList.remove('rail-skel');
+        rail.innerHTML = posts.map(function (p) {
+          var media = p.image_url
+            ? '<img class="art-img" src="' + esc(p.image_url) + '" alt="" loading="lazy" decoding="async"/>'
+            : '<span class="art-ph"><img src="/logo-icon.png" alt=""/></span>';
+          var meta = [p.author || 'Urban Nest', p.read_time].filter(Boolean).join(' · ');
+          return '<a class="art" href="/community.html?a=' + encodeURIComponent(p.id) + '">' + media
+            + '<span class="art-b"><span class="art-c">' + esc(CATS[p.category] || p.category || 'The Nest Edit') + '</span>'
+            + '<span class="art-t">' + esc(p.title) + '</span>'
+            + '<span class="art-m">' + esc(meta) + '</span></span></a>';
+        }).join('');
+      }, function () { rail.parentNode.hidden = true; });
+  })();
+
+  /* Where the visitor came from: ?src=instagram, ?src=qr, ?src=whatsapp … */
+  var SRC = (function () {
+    var s = (new URLSearchParams(location.search).get('src') || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 20);
+    return s ? 'creators-page:' + s : 'creators-page';
+  })();
+
+  var val = function (id) { return document.getElementById(id).value.trim(); };
+
+  document.getElementById('f').addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    var msg = document.getElementById('msg');
+    var name = val('n'), email = val('e'), phone = val('p'), city = val('c'), work = val('k'), link = val('l'), note = val('m');
+    msg.textContent = '';
+    if (document.getElementById('w').value) return;                       // a bot filled the hidden field
+    if (name.length < 2) { msg.textContent = 'Add your name.'; document.getElementById('n').focus(); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = 'That email doesn\'t look right.'; document.getElementById('e').focus(); return; }
+    var digits = phone.replace(/\D/g, '');
+    if (phone && (digits.length < 10 || digits.length > 15)) { msg.textContent = 'That WhatsApp number doesn\'t look right — or leave it empty.'; document.getElementById('p').focus(); return; }
+    if (city.length < 2) { msg.textContent = 'Add your city.'; document.getElementById('c').focus(); return; }
+    if (!work) { msg.textContent = 'Tell us what you do.'; document.getElementById('k').focus(); return; }
+
+    var btn = document.getElementById('go');
+    btn.disabled = true; btn.textContent = 'SENDING…';
+    var res = null, error = null;
+    try {
+      res = await db.rpc('apply_to_creator_studio', { p_name: name, p_email: email, p_phone: phone || null, p_city: city,
+        p_work: work, p_link: link || null, p_message: note || null, p_source: SRC });
+      error = res.error;
+    } catch (e) { error = e; }
+    btn.disabled = false; btn.textContent = 'APPLY TO JOIN';
+
+    if (error) {
+      msg.textContent = /too many/i.test(error.message || '')
+        ? 'A few applications have just come from this network. Please try again in an hour.'
+        : 'That didn\'t go through. Check your connection and try again.';
+      return;
+    }
+    var first = name.split(' ')[0];
+    var already = res && res.data && res.data.already;
+    document.getElementById('doneTitle').textContent = already === 'contributor' ? 'You\'re already in.' : 'Application received.';
+    document.getElementById('doneText').textContent =
+      already === 'contributor' ? 'You already have a Creator Studio, ' + first + '. Sign in any time from the link below.'
+      : already === 'applied'   ? 'We already have your application, ' + first + ', and we\'ll reply to ' + email + ' soon.'
+      : 'Thank you, ' + first + '. We\'ll review it and reply to ' + email + '. If you\'re in, your studio invite comes to that same address.';
+    document.getElementById('joinForm').hidden = true;
+    document.getElementById('done').hidden = false;
+    document.getElementById('join').scrollIntoView({ block: 'start' });
+  });
+</script>
+</body>
+</html>

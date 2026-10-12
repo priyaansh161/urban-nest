@@ -124,7 +124,16 @@
 <main class="main">
   <div class="page-header">
     <h1>Contributors</h1>
-    <p>Designers who write for The Nest Edit from their own studio at <strong>/studio/</strong>.</p>
+    <p>Designers who write for The Nest Edit from their own studio at <strong>/studio/</strong>. New ones apply at <strong>/creators</strong>.</p>
+  </div>
+
+  <!-- Applications from storeurbannest.in/creators (setup-creator-applications.sql) -->
+  <div class="panel" id="appsPanel">
+    <div class="panel-title" style="padding:20px 24px 16px;margin:0">
+      <span>Applications · <span id="appsCount">…</span></span>
+      <button class="btn btn-secondary" id="appsToggle" onclick="showAllApps = !showAllApps; renderApps()">Show all</button>
+    </div>
+    <div id="apps"><div class="empty-state">Loading…</div></div>
   </div>
 
   <div class="panel panel-pad">
@@ -233,6 +242,84 @@ async function load() {
   (prs || []).forEach(p => { if (p.published) { const s = stat(p.contributor_id); s.proj = (s.proj || 0) + 1; } });
   render();
   loadLoginStatus();
+  loadApplications();
+}
+
+// ── Applications from /creators ──
+let applications = [], showAllApps = false, pendingApp = null;
+
+async function loadApplications() {
+  const { data, error } = await db.from('creator_applications').select('*').order('created_at', { ascending: false });
+  if (error) {
+    $('appsCount').textContent = 'not switched on';
+    $('appsToggle').hidden = true;
+    $('apps').innerHTML = '<div class="empty-state">' + (/relation|does not exist|schema cache/i.test(error.message)
+      ? 'Run <strong>admin/setup-creator-applications.sql</strong> in the Supabase SQL editor to switch on the <strong>/creators</strong> application form.'
+      : 'Could not load applications: ' + esc(error.message)) + '</div>';
+    return;
+  }
+  applications = data || [];
+  $('appsToggle').hidden = false;
+  renderApps();
+}
+
+const appLink = v => /^https?:\/\//i.test(v) ? v : /^@?[A-Za-z0-9._]{1,30}$/.test(v) ? 'https://instagram.com/' + v.replace(/^@/, '') : 'https://' + v;
+const appSource = s => { const m = /^creators-page:?(.*)$/.exec(s || ''); return m ? (m[1] ? 'via ' + m[1] : 'via /creators') : (s || ''); };
+const appWhatsApp = p => { const d = String(p || '').replace(/\D/g, ''); return d ? 'https://wa.me/' + (d.length === 10 ? '91' + d : d) : null; };
+
+function renderApps() {
+  const waiting = applications.filter(a => a.status === 'new');
+  const list = showAllApps ? applications : waiting;
+  $('appsCount').textContent = waiting.length ? waiting.length + ' waiting' : 'none waiting';
+  $('appsToggle').textContent = showAllApps ? 'Show waiting only' : 'Show all';
+  if (!list.length) {
+    $('apps').innerHTML = '<div class="empty-state">' + (applications.length ? 'Nothing waiting. ' : 'No applications yet. ')
+      + 'Share <strong>storeurbannest.in/creators</strong> with designers — add <strong>?src=instagram</strong> (or whatsapp, qr) to see where they came from.</div>';
+    return;
+  }
+  $('apps').innerHTML = '<table><thead><tr><th>Applicant</th><th>What they do</th><th>Work</th><th>What they\'d write about</th><th>Applied</th><th></th></tr></thead><tbody>'
+    + list.map(a => {
+      const wa = appWhatsApp(a.phone);
+      return '<tr' + (a.status !== 'new' ? ' style="opacity:.55"' : '') + '>'
+        + '<td><div>' + esc(a.name) + '</div><div class="sub">' + esc(a.email) + '</div>'
+        + '<div class="sub">' + esc([a.city, a.phone].filter(Boolean).join(' · ')) + (wa ? ' · <a href="' + esc(wa) + '" target="_blank" rel="noopener" style="color:inherit">WhatsApp ↗</a>' : '') + '</div></td>'
+        + '<td>' + esc(a.work || '—') + '</td>'
+        + '<td>' + (a.link ? '<a class="row-btn" style="text-decoration:none;white-space:nowrap" href="' + esc(appLink(a.link)) + '" target="_blank" rel="noopener">Open ↗</a>' : '<span class="sub">—</span>') + '</td>'
+        + '<td style="max-width:320px;font-size:12.5px;line-height:1.6">' + esc(a.message || '—') + '</td>'
+        + '<td><div>' + ago(a.created_at) + '</div><div class="sub">' + esc(appSource(a.source)) + '</div></td>'
+        + '<td>' + (a.status === 'new'
+          ? '<div class="row-actions"><button class="row-btn" onclick="addFromApplication(\'' + esc(a.id) + '\')">Add as contributor</button>'
+            + '<button class="row-btn" onclick="declineApplication(\'' + esc(a.id) + '\')">Decline</button></div>'
+          : '<span class="badge ' + (a.status === 'added' ? 'badge-gold">Added' : 'badge-grey">Declined') + '</span>') + '</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+// Fills the Add form from the application; pressing Add sends their invite as usual.
+function addFromApplication(id) {
+  const a = applications.find(x => x.id === id);
+  if (!a) return;
+  resetForm();
+  pendingApp = a.id;
+  $('cEmail').value = a.email;
+  $('cName').value = a.name;
+  $('cTitle').value = a.work || '';
+  $('cCity').value = a.city || '';
+  if (a.link && /instagram\.com\/|^@?[A-Za-z0-9._]{1,30}$/i.test(a.link)) {
+    $('cInstagram').value = '@' + a.link.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/^@/, '').replace(/[/?].*$/, '');
+  }
+  $('formTitle').textContent = 'Add ' + a.name.split(' ')[0] + ' from their application';
+  $('cancelBtn').hidden = false;
+  $('formTitle').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  showToast('Check the details, then press Add contributor — their studio invite goes out straight away');
+}
+
+async function declineApplication(id) {
+  const a = applications.find(x => x.id === id);
+  if (!a || !confirm('Decline ' + a.name + '\'s application? It stays in "Show all". No email is sent.')) return;
+  const { error } = await db.from('creator_applications').update({ status: 'declined' }).eq('id', id);
+  if (error) { showToast('Could not update: ' + error.message, 'error'); return; }
+  showToast('Application declined');
+  loadApplications();
 }
 
 // ── Their login: sent from here, through functions/api/contributor-login.js ──
@@ -330,6 +417,7 @@ function editContributor(id) {
 }
 
 function resetForm() {
+  pendingApp = null;
   $('editingId').value = '';
   Object.values(F).forEach(fid => { $(fid).value = ''; });
   $('cActive').checked = true;
@@ -345,11 +433,16 @@ async function saveContributor() {
   if (!row.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(row.email)) { showToast('Enter a valid email', 'error'); return; }
   if (!row.display_name) { showToast('Enter their name', 'error'); return; }
   const id = $('editingId').value;
+  const fromApp = id ? null : pendingApp;
   $('saveBtn').disabled = true;
-  const { error } = id
+  const { data: saved, error } = id
     ? await db.from('contributors').update(row).eq('id', id)
-    : await db.from('contributors').insert(row);
+    : await db.from('contributors').insert(row).select().single();
   $('saveBtn').disabled = false;
+  // Came from an application: mark it added and link it to the new writer.
+  if (!error && fromApp) {
+    await db.from('creator_applications').update({ status: 'added', contributor_id: saved ? saved.id : null }).eq('id', fromApp);
+  }
   if (error) {
     showToast(/duplicate|unique/i.test(error.message) ? 'That email is already a contributor' : 'Save failed: ' + error.message, 'error');
     return;
