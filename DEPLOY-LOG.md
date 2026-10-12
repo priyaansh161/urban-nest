@@ -42,3 +42,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-12 | 11:23 | 0f1c5c2 | Redeploy to switch on Cloudflare Web Analytics (no site changes) | https://fee6f65c.storeurbannest.pages.dev |
 | 2026-10-12 | 12:52 | b12711a | Admin: full-size photo viewer in the Collection item form | https://e150f1b6.storeurbannest.pages.dev |
 | 2026-10-12 | 15:02 | 853bf3c | Admin Collection: cover photo preview under the Image URL field | https://cdf8f7f1.storeurbannest.pages.dev |
+| 2026-10-12 | 15:07 | 642b44d | Quote bands: option B (rounded corners + soft shadow) | https://9ee068e0.storeurbannest.pages.dev |
