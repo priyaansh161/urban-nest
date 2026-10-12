@@ -150,13 +150,14 @@ select, textarea, .comment-input, .newsletter-input
 .grid > .item .body .buy:hover { background: #EAF2F1; color: #0E3238; }
 .grid > .item .body .share:hover { color: #C2934D; border-color: #C2934D; }
 
-/* ═══ QUOTE BANDS: part of the page, not a card (7 Oct 2026) ═══
+/* ═══ QUOTE BANDS (7 Oct 2026; option B chosen 12 Oct) ═══
    The Sanskrit bands on Home (.band), About (.wband), The Nest Edit (.nband)
-   and Policies: square, no shadow, nothing to suggest they can be touched.
-   About as wide as the words, only as tall as the quote and its source,
-   with the three lines set close together. */
+   and Policies: about as wide as the words, only as tall as the quote and
+   its source, the three lines set close together, with rounded corners and
+   the same soft shadow as the photo tiles. (Option A, square and edge to
+   edge, was shown and not chosen.) */
 .band, .nband, .wband {
-  border-radius: 0 !important; box-shadow: none !important;
+  border-radius: var(--r) !important; box-shadow: var(--depth) !important;
   min-height: 0 !important; padding: 26px 32px !important;
 }
 .band, .nband, .wband:not(.inline-band):not(.closing-band) {
