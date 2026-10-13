@@ -1,0 +1,102 @@
+
+/* ═══ SHOPPABLE ROOMS HERO (mock; palette and type are the site's own) ═══ */
+.mockbar { position: fixed; z-index: 9999; right: 14px; top: 84px; padding: 8px 16px; border-radius: 100px;
+  background: #151515; color: #ddd; font: 400 11.5px/1 'DM Sans', sans-serif; letter-spacing: .04em; box-shadow: 0 6px 24px rgba(0,0,0,.35); white-space: nowrap; }
+.mockbar b { color: #E9C46A; font-weight: 500; }
+@media (max-width: 700px) { .mockbar { top: auto; bottom: 12px; right: 50%; transform: translateX(50%); } }
+
+.hero.shop { min-height: calc(100svh - 71px) !important; height: calc(100svh - 71px); touch-action: pan-y; }
+.hero.shop .hero-scroll { display: none !important; }
+
+/* each room is a frame the size of the photo, scaled to cover the hero;
+   the dots sit on the frame in percent, so they stay on their pieces */
+.sh-room { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 1400ms ease, visibility 0s linear 1400ms; }
+.sh-room.on { opacity: 1; visibility: visible; transition: opacity 1400ms ease, visibility 0s; }
+.sh-frame { position: absolute; left: 0; top: 0; will-change: transform; }
+.sh-frame img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.sh-room.on .sh-zoom { animation: shZoom 11s ease-out both; }
+.sh-zoom { position: absolute; inset: 0; transform-origin: 50% 40%; }
+@keyframes shZoom { from { transform: scale(1.045); } to { transform: scale(1); } }
+
+/* the scrim is lighter than the old hero's: the pieces must stay visible */
+.hero.shop .hero-scrim { z-index: 1;
+  background: linear-gradient(to top, rgba(8,8,7,.78) 0%, rgba(8,8,7,.30) 24%, rgba(8,8,7,0) 42%),
+              linear-gradient(to bottom, rgba(8,8,7,.30) 0%, transparent 16%) !important; }
+
+/* the spotlight: the room dims a little away from the cursor */
+.sh-spot { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity .6s ease;
+  background: radial-gradient(circle 300px at var(--sx, 50%) var(--sy, 45%), rgba(8,8,7,0) 0%, rgba(8,8,7,0) 35%, rgba(8,8,7,.42) 100%); }
+.hero.shop.lit .sh-spot { opacity: 1; }
+
+/* ── the dots ── */
+.sh-dot { position: absolute; z-index: 2; width: 30px; height: 30px; margin: -15px 0 0 -15px; padding: 0; border: 0; border-radius: 50%;
+  background: rgba(14,50,56,.45); cursor: pointer;
+  box-shadow: 0 0 0 1.5px rgba(244,242,233,.9), 0 4px 14px rgba(0,0,0,.35);
+  transition: transform .35s cubic-bezier(.22,1,.36,1), background .35s, box-shadow .35s; }
+.sh-dot::before { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: #F4F2E9; transition: background .35s, inset .35s; }
+.sh-dot::after { content: ''; position: absolute; inset: -1px; border-radius: 50%; border: 1.5px solid rgba(244,242,233,.8); animation: shPulse 2.6s ease-out infinite; animation-delay: var(--dl, 0s); }
+@keyframes shPulse { 0% { transform: scale(1); opacity: .9; } 70%, 100% { transform: scale(2.1); opacity: 0; } }
+.sh-dot.near, .sh-dot:hover, .sh-dot:focus-visible, .sh-dot.open { transform: scale(1.28); background: rgba(194,147,77,.38);
+  box-shadow: 0 0 0 1.5px #C2934D, 0 0 26px 6px rgba(194,147,77,.55); outline: none; }
+.sh-dot.near::before, .sh-dot:hover::before, .sh-dot.open::before { background: #C2934D; inset: 8px; }
+.hero.shop.lit .sh-dot:not(.near):not(.open)::after { animation: none; opacity: 0; }
+/* dots arrive a moment after their room, one after another */
+.sh-room .sh-dot { opacity: 0; transform: scale(.4); }
+.sh-room.on.ready .sh-dot { opacity: 1; transform: scale(1); transition: opacity .5s ease calc(var(--i) * 90ms), transform .6s cubic-bezier(.22,1,.36,1) calc(var(--i) * 90ms), background .35s, box-shadow .35s; }
+.sh-room.on.ready .sh-dot.near, .sh-room.on.ready .sh-dot:hover, .sh-room.on.ready .sh-dot.open { transform: scale(1.28); transition-delay: 0s; }
+
+/* ── the card a dot opens ── */
+.sh-card { position: absolute; z-index: 4; width: 280px; display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center;
+  padding: 10px 12px 10px 10px; border-radius: 16px; background: #0E3238; color: #EAF2F1; text-decoration: none;
+  box-shadow: 0 18px 50px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.25);
+  opacity: 0; transform: translateY(8px) scale(.97); pointer-events: none; transition: opacity .3s ease, transform .35s cubic-bezier(.22,1,.36,1); }
+.sh-card.show { opacity: 1; transform: none; pointer-events: auto; }
+.sh-card img { width: 84px; height: 84px; object-fit: cover; border-radius: 10px; background: #F4F2E9; display: block; }
+.sh-card .k, .sh-card .n, .sh-card .p, .sh-card .go { display: block; }
+.sh-card .go { display: inline-flex; }
+.sh-card .k { font: 500 9.5px/1 'DM Sans', sans-serif; letter-spacing: .22em; text-transform: uppercase; color: #C2934D; }
+.sh-card .n { margin-top: 6px; font: 400 15px/1.25 'Bodoni Moda', Georgia, serif; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.sh-card .p { margin-top: 6px; font: 500 13px/1 'DM Sans', sans-serif; color: rgba(234,242,241,.85); }
+.sh-card .go { margin-top: 8px; display: inline-flex; gap: 6px; align-items: center; font: 500 11px/1 'DM Sans', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #F4F2E9; }
+.sh-card .go svg { width: 14px; height: 14px; transition: transform .3s; }
+.sh-card:hover .go svg { transform: translateX(4px); }
+
+/* ── the words: small, bottom left, out of the pieces' way ── */
+.hero.shop .hero-inner { z-index: 3; pointer-events: none; padding: 0 0 clamp(30px, 4.4vw, 62px) !important; }
+.hero.shop .hero-inner a, .hero.shop .hero-inner button { pointer-events: auto; }
+.hero.shop .hero-type { font-size: clamp(34px, 4.6vw, 70px) !important; max-width: none; }
+.sh-eyebrow { display: block; min-height: 1em; transition: opacity .5s ease; }
+.sh-eyebrow.swap { opacity: 0; }
+.sh-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-top: clamp(16px, 2vw, 26px); }
+.sh-hint { font: 400 13px/1.4 'DM Sans', sans-serif; color: rgba(244,242,233,.88); display: flex; align-items: center; gap: 10px;
+  text-shadow: 0 1px 12px rgba(8,8,7,.7); }
+.sh-hint i { width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 1.5px #F4F2E9; position: relative; flex: none; }
+.sh-hint i::before { content: ''; position: absolute; inset: 4px; border-radius: 50%; background: #F4F2E9; }
+
+/* the rooms: their names, with a thin gold line that fills while each is on */
+.sh-tabs { display: flex; gap: 22px; }
+.sh-tab { background: none; border: 0; padding: 0 0 8px; cursor: pointer; position: relative;
+  font: 500 10.5px/1 'DM Sans', sans-serif; letter-spacing: .26em; text-transform: uppercase; color: rgba(244,242,233,.55); transition: color .3s; }
+.sh-tab::before, .sh-tab::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1.5px; border-radius: 2px; }
+.sh-tab::before { background: rgba(14,50,56,.45); }
+.sh-tab::after { background: #C2934D; transform-origin: left; transform: scaleX(var(--p, 0)); }
+.sh-tab.on, .sh-tab:hover { color: #F4F2E9; }
+.sh-tab:focus-visible { outline: 1px solid #C2934D; outline-offset: 5px; }
+
+@media (max-width: 700px) {
+  .hero.shop { min-height: 0 !important; height: calc(100svh - 72px); }
+  .hero.shop .hero-type { font-size: 34px !important; }
+  .sh-row { flex-direction: column-reverse; align-items: flex-start; gap: 14px; }
+  .sh-tabs { gap: 16px; }
+  .sh-tab { font-size: 9.5px; letter-spacing: .2em; }
+  /* the card becomes a sheet along the bottom of the room */
+  .sh-card { left: 12px !important; right: 12px; top: auto !important; bottom: 12px; width: auto; }
+  .sh-dot { width: 34px; height: 34px; margin: -17px 0 0 -17px; }
+  .sh-dot::before { inset: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-room, .sh-room.on { transition: none; }
+  .sh-room.on .sh-zoom { animation: none; }
+  .sh-dot::after { animation: none; }
+}

@@ -1,0 +1,6 @@
+1-soap-dispenser | essentials | bath-essentials | ac866c8f-ac30-4c44-81b8-fa8ab784ef67 | Multi-Purpose Soap Sanitizer Dispenser for Bathroom or Kitchen
+6-toilet-brush | essentials | bath-essentials | 71be9a23-33ab-498e-b517-61f0352b4997 | HmiL-U Wall Mounted No Scratch Soft Silicone Toilet Cleaner Bowl Brush with Holder Set for Bathroom (Black)
+2-towel-ring | essentials | bath-essentials | 3209fdd3-7fbf-43d1-8cc2-0fa6858b0971 | USF Orizon Towel Ring Holder for Bathroom
+3-bath-mat-memory-foam | essentials | bath-essentials | a88c6f8c-08da-43df-9e88-3ef913f7e8ac | HomeCloud Memory Foam Bath Mat, Cobblestone Bathroom Rectangular Rugs Floor Mats
+4-toilet-paper-holder | essentials | bath-essentials | df0e3f6a-e390-4bf0-a6c6-53d834930869 | ACHRO Self Adhesive and Wall Mount Stainless Steel Toilet Paper Holder with Mobile Stand, Wall Mounted Tissue Paper Holder with Shelf
+5-wall-shelf-organiser | essentials | bath-essentials | f209aed3-b6f6-4754-a417-84d24fb7965f | Wall Shelf Organiser
