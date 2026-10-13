@@ -39,3 +39,6 @@ tools/regression/
 # Local Cloudflare settings for `wrangler pages dev`. Placeholders only; never real keys.
 .dev.vars
 .wrangler/
+
+# Instagram API credentials for tools/ig-insights.mjs. Real token, never committed.
+tools/.ig-credentials.json
