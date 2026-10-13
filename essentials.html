@@ -324,6 +324,32 @@
     .d-stage.light .d-status,
     .d-stage.light .d-hint { color: rgba(16,16,16,.42); }
 
+    /* ── PHOTOGRAPHS, FOR PIECES WITH NO MODEL ──
+       The ordinary shop gallery: swipe, or the arrows, or the dots. Shown
+       whole (contain, not cover) on a pale ground, because product
+       photographs are shot on white and cropping a gift box's lid off is
+       worse than a margin. The background swatches are for the 3D view, so
+       they step aside here. */
+    .d-stage.photo { --stage-bg: #F2F0EB; }
+    .d-stage.photo .d-bg { display: none; }
+    .d-gal { position: absolute; inset: 0; }
+    .d-track { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+               scrollbar-width: none; overscroll-behavior-x: contain; }
+    .d-track::-webkit-scrollbar { display: none; }
+    .d-track img { flex: 0 0 100%; width: 100%; height: 100%; object-fit: contain; scroll-snap-align: center; user-select: none; }
+    .d-arr { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%;
+             border: none; background: rgba(255,255,255,.88); color: #101010; font-size: 20px; line-height: 1; cursor: pointer;
+             box-shadow: 0 2px 10px rgba(0,0,0,.12); transition: opacity .25s, transform .25s var(--ease); z-index: 3; }
+    .d-arr:hover { transform: translateY(-50%) scale(1.08); }
+    .d-arr.prev { left: 14px; } .d-arr.next { right: 14px; }
+    .d-arr:disabled { opacity: 0; pointer-events: none; }
+    .d-dots { position: absolute; bottom: 14px; left: 0; right: 0; display: flex; justify-content: center; gap: 7px; z-index: 3; }
+    .d-dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; border: none; cursor: pointer;
+             background: rgba(16,16,16,.22); transition: background .25s, transform .25s; }
+    .d-dot[aria-current="true"] { background: var(--gold); transform: scale(1.25); }
+    @media (pointer: coarse) { .d-arr { display: none; } }
+
+
     /* ── STAGE BACKGROUND SWATCHES ──
        Two dots rather than a labelled switch: the choice is a colour, so the
        control may as well be the colour. The pick is remembered, because a
@@ -921,7 +947,7 @@
   function stage(item) {
     // Either kind of model earns the badge — a visitor does not care
     // which file format is behind it.
-    var has3d = item.model_url || item.spline_url;
+    var has3d = item.model_url;
     if (item.image_url) {
       return '<div class="stage">' +
         (has3d ? '<span class="badge3d">3D</span>' : '') +
@@ -1190,22 +1216,6 @@
     second.innerHTML = secondHtml;
     second.style.display = secondHtml ? '' : 'none';
 
-    /* The Spline runtime, fetched the first time a piece actually needs
-       it and never again. Same version the room pages use. */
-    var splineReady = null;
-    function loadSpline() {
-      if (splineReady) return splineReady;
-      splineReady = new Promise(function (resolve, reject) {
-        var t = document.createElement('script');
-        t.type = 'module';
-        t.src = 'https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js';
-        t.onload = resolve;
-        t.onerror = reject;
-        document.head.appendChild(t);
-      });
-      return splineReady;
-    }
-
     var line = soldByLine(it);
     soldBy.textContent = line;
     soldBy.style.display = line ? '' : 'none';
@@ -1226,56 +1236,18 @@
     document.getElementById('detail').classList.add('open');
     document.body.style.overflow = 'hidden';
 
-    /* A Spline close-up, straight from the dot this piece came from. The
-       room shows the same scene; nothing is duplicated but the URL. */
-    if (!it.model_url && it.spline_url) {
-      status.textContent = 'Preparing the 3D view';
-      loadSpline().then(function () {
-        // The sheet may have been closed, or another piece opened, while
-        // the runtime was downloading.
-        if (!document.getElementById('detail').classList.contains('open')) return;
-        var sv = document.createElement('spline-viewer');
-        sv.setAttribute('url', it.spline_url);
-        // Set before it is in the page, so a piece opened in light mode never
-        // shows the scene's own dark ground on the way in.
-        sv.setAttribute('background', stageBg());
-        sv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
-        stageEl.insertBefore(sv, poster);
-        dViewer = sv;
-
-        /* spline-viewer fires no load event — not 'load', 'load-complete',
-           'ready' or any other name; the room pages do not listen for one
-           either. So the poster is held until the viewer has actually put a
-           canvas in its shadow root, and a beat longer for the first frame.
-           Dropping it when the runtime finished downloading, as this used to,
-           showed an empty stage while the scene was still coming down. */
-        var waited = 0;
-        var settle = setInterval(function () {
-          waited += 150;
-          var drawn = sv.shadowRoot && sv.shadowRoot.querySelector('canvas');
-          if (!drawn && waited < 9000) return;
-          clearInterval(settle);
-          setTimeout(function () {
-            if (dViewer !== sv) return;   // another piece was opened meanwhile
-            poster.classList.add('gone');
-            hint.classList.add('show');
-            status.textContent = drawn ? '' : 'The 3D view is taking a while';
-          }, drawn ? 400 : 0);
-        }, 150);
-      }, function () {
-        status.textContent = 'The 3D view could not be loaded';
-      });
-      return;
-    }
-
+    /* Essentials are shown in photographs (13 Oct 2026): the cover, then the
+       photo set from the piece's own listing. 3D is kept for the Collection,
+       so a Spline scene on an Essentials piece is no longer opened here. */
+    stageEl.classList.remove('photo');
     if (!it.model_url) {
-      status.textContent = it.image_url ? 'Photograph only' : 'No 3D view yet';
-      if (it.image_url) {
-        var img = document.createElement('img');
-        img.src = unImg(it.image_url, 900); img.alt = it.name || '';
-        img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
-        stageEl.insertBefore(img, poster);
-        dViewer = img;
+      var photos = [it.image_url].concat(Array.isArray(it.gallery) ? it.gallery : [])
+        .filter(function (u, i, a) { return u && a.indexOf(u) === i; });
+      status.textContent = photos.length ? '' : 'No photograph yet';
+      if (photos.length) {
+        stageEl.classList.add('photo');
+        dViewer = photoGallery(photos, it.name || '');
+        stageEl.insertBefore(dViewer, poster);
         poster.classList.add('gone');
       }
       return;
@@ -1314,6 +1286,53 @@
     var v = getComputedStyle(document.getElementById('dStage')).getPropertyValue('--stage-bg');
     return (v || '').trim() || '#0F1F22';
   }
+
+  /* A scroll-snap strip does the swiping, so a phone gets native momentum
+     for free; the arrows and dots only scroll it. Which photo is showing is
+     read back from the scroll position, whatever moved it. */
+  function photoGallery(photos, name) {
+    var gal = document.createElement('div');
+    gal.className = 'd-gal';
+    var many = photos.length > 1;
+    gal.innerHTML =
+      '<div class="d-track">' + photos.map(function (u, i) {
+        return '<img src="' + esc(unImg(u, 1000)) + '" alt="' + esc(name) +
+               (many ? ' — photo ' + (i + 1) + ' of ' + photos.length : '') + '"' +
+               (i ? ' loading="lazy"' : '') + ' decoding="async" draggable="false"/>';
+      }).join('') + '</div>' +
+      (many
+        ? '<button type="button" class="d-arr prev" aria-label="Previous photo" disabled>‹</button>' +
+          '<button type="button" class="d-arr next" aria-label="Next photo">›</button>' +
+          '<div class="d-dots">' + photos.map(function (_, i) {
+            return '<button type="button" class="d-dot" aria-label="Photo ' + (i + 1) + '"' +
+                   (i ? '' : ' aria-current="true"') + ' data-i="' + i + '"></button>';
+          }).join('') + '</div>'
+        : '');
+    if (!many) return gal;
+
+    var track = gal.querySelector('.d-track');
+    var prev = gal.querySelector('.prev'), next = gal.querySelector('.next');
+    var dots = gal.querySelectorAll('.d-dot');
+    function at() { return Math.round(track.scrollLeft / (track.clientWidth || 1)); }
+    function go(i) { track.scrollTo({ left: Math.max(0, Math.min(photos.length - 1, i)) * track.clientWidth }); }
+    track.addEventListener('scroll', function () {
+      var i = at();
+      prev.disabled = i === 0;
+      next.disabled = i === photos.length - 1;
+      for (var k = 0; k < dots.length; k++) dots[k].setAttribute('aria-current', String(k === i));
+    }, { passive: true });
+    prev.onclick = function () { go(at() - 1); };
+    next.onclick = function () { go(at() + 1); };
+    for (var k = 0; k < dots.length; k++)
+      dots[k].onclick = function () { go(+this.getAttribute('data-i')); };
+    gal.step = function (by) { go(at() + by); };
+    return gal;
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!dViewer || !dViewer.step || !document.getElementById('detail').classList.contains('open')) return;
+    if (e.key === 'ArrowLeft')  dViewer.step(-1);
+    if (e.key === 'ArrowRight') dViewer.step(1);
+  });
 
   function setStageBg(mode) {
     document.getElementById('dStage').classList.toggle('light', mode === 'light');
@@ -1551,7 +1570,7 @@
         console.warn('The Essentials needs admin/add-essentials-section.sql to be run.');
         return { data: [] };
       }
-      return askItems('id,name,category,price,image_url,description,coming_soon,spline_url');
+      return askItems('id,name,category,price,image_url,description,coming_soon,gallery');
     });
     // Categories are optional in the same way: before
     // setup-collection-categories.sql is run there is no table, and the page
