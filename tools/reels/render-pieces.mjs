@@ -8,7 +8,7 @@ import { readFileSync, mkdirSync } from 'node:fs';
 
 const [,, modelsPath, outDir, orbit = '0'] = process.argv;
 const models = JSON.parse(readFileSync(modelsPath, 'utf8'));
-const OUT = outDir.replace(/\/g, '/').replace(/\/?$/, '/');
+const OUT = outDir.split(String.fromCharCode(92)).join("/").replace(new RegExp("/?$"), "/");
 mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({ channel: 'msedge', headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 const tab = await browser.newPage({ viewport: { width: 1200, height: 1200 }, deviceScaleFactor: 1 });
