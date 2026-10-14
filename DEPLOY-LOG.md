@@ -45,3 +45,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-12 | 15:07 | 642b44d | Quote bands: option B (rounded corners + soft shadow) | https://9ee068e0.storeurbannest.pages.dev |
 | 2026-10-12 | 15:32 | abf829d | Creators page live (/creators application form, links from Nest Edit and studio, applications in admin) | https://93dcb22e.storeurbannest.pages.dev |
 | 2026-10-12 | 15:57 | 74e89f1 | Rooms: view chooser shows display names, not MK working names | https://c21cd94e.storeurbannest.pages.dev |
+| 2026-10-13 | 14:37 | 4832923 | photo gallery for pieces with no 3D model | https://d91feb56.storeurbannest.pages.dev |
