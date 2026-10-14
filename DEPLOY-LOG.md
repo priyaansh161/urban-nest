@@ -48,3 +48,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-13 | 14:37 | 4832923 | photo gallery for pieces with no 3D model | https://d91feb56.storeurbannest.pages.dev |
 | 2026-10-14 | 09:00 | 50eee17 | Link previews on every public page | https://135925b1.storeurbannest.pages.dev |
 | 2026-10-14 | 09:36 | 6298384 (+ uncommitted changes) | Homepage hero: shoppable rooms (living room + bedroom) | https://a356ee7e.storeurbannest.pages.dev |
+| 2026-10-14 | 09:47 | 6727c77 (+ uncommitted changes) | Homepage hero: third room, the kitchen (Essentials) | https://ffd35063.storeurbannest.pages.dev |
