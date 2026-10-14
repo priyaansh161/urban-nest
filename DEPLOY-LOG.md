@@ -50,3 +50,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-14 | 09:36 | 6298384 (+ uncommitted changes) | Homepage hero: shoppable rooms (living room + bedroom) | https://a356ee7e.storeurbannest.pages.dev |
 | 2026-10-14 | 09:47 | 6727c77 (+ uncommitted changes) | Homepage hero: third room, the kitchen (Essentials) | https://ffd35063.storeurbannest.pages.dev |
 | 2026-10-14 | 09:56 | c44d228 (+ uncommitted changes) | Homepage hero: fourth room, the bath (Essentials) | https://2f53898c.storeurbannest.pages.dev |
+| 2026-10-14 | 10:06 | 62bd85e (+ uncommitted changes) | Homepage hero: fifth room, the lounge | https://ff441a8e.storeurbannest.pages.dev |
