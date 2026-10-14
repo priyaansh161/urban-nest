@@ -47,3 +47,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-12 | 15:57 | 74e89f1 | Rooms: view chooser shows display names, not MK working names | https://c21cd94e.storeurbannest.pages.dev |
 | 2026-10-13 | 14:37 | 4832923 | photo gallery for pieces with no 3D model | https://d91feb56.storeurbannest.pages.dev |
 | 2026-10-14 | 09:00 | 50eee17 | Link previews on every public page | https://135925b1.storeurbannest.pages.dev |
+| 2026-10-14 | 09:36 | 6298384 (+ uncommitted changes) | Homepage hero: shoppable rooms (living room + bedroom) | https://a356ee7e.storeurbannest.pages.dev |
