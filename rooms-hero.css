@@ -82,7 +82,7 @@
   .hero.shop { min-height: 0 !important; height: calc(100svh - 72px); }
   .hero.shop .hero-type { font-size: 34px !important; }
   .sh-row { flex-direction: column-reverse; align-items: flex-start; gap: 14px; }
-  .sh-tabs { gap: 16px; }
+  .sh-tabs { flex-wrap: wrap; gap: 12px 16px; }
   .sh-tab { font-size: 9.5px; letter-spacing: .2em; }
   /* the card becomes a sheet along the bottom of the room */
   .sh-card { left: 12px !important; right: 12px; top: auto !important; bottom: 12px; width: auto; }
