@@ -53,3 +53,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-14 | 10:06 | 62bd85e (+ uncommitted changes) | Homepage hero: fifth room, the lounge | https://ff441a8e.storeurbannest.pages.dev |
 | 2026-10-14 | 10:15 | 50a2331 (+ uncommitted changes) | Homepage hero: sixth room, the guest room; tabs wrap on phones | https://18468c0e.storeurbannest.pages.dev |
 | 2026-10-14 | 10:30 | f798090 (+ uncommitted changes) | Homepage hero: stronger cursor spotlight (warm glow, room dims) | https://2d78c003.storeurbannest.pages.dev |
+| 2026-10-14 | 10:33 | 1f28a81 (+ uncommitted changes) | Homepage hero: lighter shadow outside the spotlight | https://e99308c9.storeurbannest.pages.dev |
