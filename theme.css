@@ -172,3 +172,27 @@ select, textarea, .comment-input, .newsletter-input
   .band, .nband, .wband:not(.inline-band):not(.closing-band) { width: calc(100% - 40px) !important; }
   .band, .nband, .wband { padding: 20px 16px !important; }
 }
+
+/* ═══ TIGHTER SPACING (14 Oct 2026) ═══
+   Sections carried up to 100px of padding above AND below, so two of them
+   side by side left 150-200px of empty page. Roughly a third less, everywhere.
+   Home: its rhythm is two variables, so they are lowered here. */
+:root { --sec: clamp(36px, 4.2cqw, 64px) !important; --sec-tight: clamp(22px, 2.6cqw, 38px) !important; }
+@media (max-width: 820px) { :root { --sec: clamp(30px, 7vw, 44px) !important; --sec-tight: clamp(18px, 4.4vw, 28px) !important; } }
+.philosophy { padding: var(--sec) 0 !important; }
+/* the scroll rails keep room under their cards for the shadow, and gave all of it back as gap */
+.un-rail { padding-bottom: 38px !important; margin-bottom: -30px !important; }
+/* About */
+.about-section { padding-top: 52px !important; padding-bottom: 52px !important; }
+@media (max-width: 768px) { .about-section { padding-top: 40px !important; padding-bottom: 40px !important; } }
+/* The Nest Edit */
+section.nest { padding-bottom: 52px !important; }
+.nband { margin-bottom: clamp(20px, 3vw, 36px) !important; }
+.comments-section { padding-top: 40px !important; padding-bottom: 48px !important; }
+/* Policies */
+body:has(.toc) main { padding-bottom: 56px !important; }
+.wband.inline-band { margin-bottom: 40px !important; }
+.wband.closing-band { margin-top: 40px !important; }
+/* /nest and /creators */
+header.hero:not(.shop) { padding-bottom: 48px !important; }
+section.join { padding-bottom: 44px !important; }
