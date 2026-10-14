@@ -23,7 +23,7 @@
    (14 Oct 2026: the first version only dimmed the edges by 42% and read
    as nothing at all on a bright room.) */
 .sh-spot { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity .6s ease;
-  background: radial-gradient(circle 280px at var(--sx, 50%) var(--sy, 45%), rgba(8,8,7,0) 0%, rgba(8,8,7,0) 30%, rgba(8,8,7,.38) 62%, rgba(8,8,7,.66) 100%); }
+  background: radial-gradient(circle 280px at var(--sx, 50%) var(--sy, 45%), rgba(8,8,7,0) 0%, rgba(8,8,7,0) 30%, rgba(8,8,7,.2) 62%, rgba(8,8,7,.38) 100%); }
 .sh-spot::after { content: ''; position: absolute; inset: 0; mix-blend-mode: screen;
   background: radial-gradient(circle 190px at var(--sx, 50%) var(--sy, 45%), rgba(255,214,150,.30) 0%, rgba(255,200,130,.12) 45%, rgba(255,200,130,0) 100%); }
 .hero.shop.lit .sh-spot { opacity: 1; }
