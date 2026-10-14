@@ -55,3 +55,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-14 | 10:30 | f798090 (+ uncommitted changes) | Homepage hero: stronger cursor spotlight (warm glow, room dims) | https://2d78c003.storeurbannest.pages.dev |
 | 2026-10-14 | 10:33 | 1f28a81 (+ uncommitted changes) | Homepage hero: lighter shadow outside the spotlight | https://e99308c9.storeurbannest.pages.dev |
 | 2026-10-14 | 10:43 | 969cca8 (+ uncommitted changes) | Live /look page (Diwali edition); phone room drift resumes after 4s | https://0e45528b.storeurbannest.pages.dev |
+| 2026-10-14 | 10:57 | 14b81f1 (+ uncommitted changes) | Tighter spacing between sections, site-wide | https://4ddc4416.storeurbannest.pages.dev |
