@@ -10,6 +10,7 @@
     "@gltf-transform/cli": "^4.4.2",
     "@gltf-transform/core": "^4.4.2",
     "@gltf-transform/extensions": "^4.4.2",
+    "@imgly/background-removal-node": "^1.4.5",
     "playwright-core": "^1.63.0",
     "sharp": "^0.35.3"
   }

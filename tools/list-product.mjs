@@ -49,7 +49,7 @@ const DRY = !!flag('dry'), WANT_3D = !!flag('3d'), PUBLISH = !!flag('publish');
 const SECTION = flag('section') || 'collection';
 const FORCE_CAT = flag('category');
 const MODEL_FOR = flag('3d-for');
-if (!links.length && !MODEL_FOR && !flag('check-render')) { console.error('usage: node tools/list-product.mjs <amazon link> [...] [--3d] [--section=essentials] [--category=slug] [--publish] [--dry]\n       node tools/list-product.mjs --3d-for=<item id>'); process.exit(1); }
+if (!links.length && !MODEL_FOR && !flag('check-render') && !flag('prep-for')) { console.error('usage: node tools/list-product.mjs <amazon link> [...] [--3d] [--section=essentials] [--category=slug] [--publish] [--dry]\n       node tools/list-product.mjs --3d-for=<item id>'); process.exit(1); }
 
 // ─────────────────────────────────────────────────────────── keys
 const env = {};
@@ -181,12 +181,84 @@ async function plainestPhoto(urls) {
   return best ? best.url : urls[0];
 }
 
+/* Meshy is "not the brightest": a lifestyle scene, a text banner or a prop
+   gets built into the model. So, when it can, the photo is cleaned first:
+     1. every photo has its background cut out (a local AI model, ~8 s each)
+     2. only the largest connected shape is kept — a text strip or a loose
+        prop that does not touch the piece goes with the background
+     3. photos where the piece runs off the edge (cropped) are passed over;
+        of the rest, the fullest view of the piece wins
+     4. it is centred on plain white with a margin and sent as the image
+   Anything touching the piece itself (a hand, a candle in it) stays: those
+   need a person, or a better photo. If the cut-out tool is missing, the
+   plainest original photo is used instead. (His rule, 21 Oct 2026.) */
+async function preparedPhoto(urls) {
+  urls = urls.filter(Boolean);
+  // the cut-outs run in their own process (tools/cutout.mjs: two libvips copies crash in one)
+  const tmp = join(ROOT, 'models', 'source', '.cutouts');
+  mkdirSync(tmp, { recursive: true });
+  const outs = urls.map((_, i) => join(tmp, `cut-${Date.now().toString(36)}-${i}.png`));
+  const run = spawnSync(process.execPath, [join(HERE, 'cutout.mjs'), ...urls.flatMap((u, i) => [u, outs[i]])], { cwd: HERE, encoding: 'utf8', timeout: 600000 });
+  if (run.error || !outs.some((o) => existsSync(o))) return { url: await plainestPhoto(urls), note: 'the plainest photo (the cut-out step could not run)' };
+  let best = null;
+  for (const [i] of urls.entries()) {
+    try {
+      if (!existsSync(outs[i])) continue;
+      const cut = readFileSync(outs[i]);
+      // the mask, small enough to label its pieces quickly
+      const N = 160;
+      const { data: a } = await sharp(cut).ensureAlpha().extractChannel(3).resize(N, N, { fit: 'fill' }).raw().toBuffer({ resolveWithObject: true });
+      const on = (k) => a[k] > 128, lab = new Int32Array(N * N).fill(-1), sizes = [];
+      for (let k = 0; k < N * N; k++) {
+        if (!on(k) || lab[k] >= 0) continue;
+        const id = sizes.length, stack = [k]; lab[k] = id; let n = 0;
+        while (stack.length) { const p = stack.pop(); n++; const x = p % N, y = (p / N) | 0;
+          for (const q of [x > 0 && p - 1, x < N - 1 && p + 1, y > 0 && p - N, y < N - 1 && p + N]) if (q !== false && on(q) && lab[q] < 0) { lab[q] = id; stack.push(q); } }
+        sizes.push(n);
+      }
+      if (!sizes.length) continue;
+      const main = sizes.indexOf(Math.max(...sizes)), area = sizes[main] / (N * N), stray = (sizes.reduce((s, v) => s + v, 0) - sizes[main]) / (N * N);
+      let x0 = N, y0 = N, x1 = 0, y1 = 0;
+      for (let k = 0; k < N * N; k++) if (lab[k] === main) { const x = k % N, y = (k / N) | 0; x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+      const touches = (x0 <= 1) + (y0 <= 1) + (x1 >= N - 2) + (y1 >= N - 2);
+      /* Big enough is enough (a top-down shot fills the frame and still makes a
+         poor model), so size counts only up to a quarter of the frame; then a
+         clean, uncropped cut-out; then the seller's order — the first photos
+         are nearly always the main side or three-quarter view. */
+      const score = Math.min(area, 0.25) * 4 - stray * 2 - touches * 0.5 - i * 0.08;
+      if (!best || score > best.score) best = { i, score, cut, lab, main, N, box: [x0, y0, x1, y1], touches };
+    } catch {}
+  }
+  if (!best) return { url: await plainestPhoto(urls), note: 'the plainest photo (no cut-out worked)' };
+  // keep only the main shape, crop to it, centre it on white with a margin
+  const meta = await sharp(best.cut).metadata(), W = meta.width, H = meta.height, { N, lab, main } = best;
+  const rgba = await sharp(best.cut).ensureAlpha().raw().toBuffer();
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const k = ((y * N / H) | 0) * N + ((x * N / W) | 0);
+    if (lab[k] !== main) rgba[(y * W + x) * 4 + 3] = 0;
+  }
+  const [x0, y0, x1, y1] = best.box, cx = Math.floor(x0 * W / N), cy = Math.floor(y0 * H / N);
+  const cw = Math.min(W - cx, Math.ceil((x1 - x0 + 1) * W / N)), ch = Math.min(H - cy, Math.ceil((y1 - y0 + 1) * H / N));
+  const piece = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } }).extract({ left: cx, top: cy, width: cw, height: ch }).png().toBuffer();
+  const side = Math.round(Math.max(cw, ch) * 1.25);
+  // two steps: sharp resizes before it composites, whatever order they are written in
+  const placed = await sharp({ create: { width: side, height: side, channels: 3, background: '#ffffff' } })
+    .composite([{ input: piece, left: Math.round((side - cw) / 2), top: Math.round((side - ch) / 2) }])
+    .png().toBuffer();
+  const square = await sharp(placed).resize(1024, 1024).jpeg({ quality: 92 }).toBuffer();
+  mkdirSync(join(ROOT, 'models', 'source'), { recursive: true });
+  return { url: 'data:image/jpeg;base64,' + square.toString('base64'), jpg: square,
+    note: `photo ${best.i + 1} of ${urls.length}, background removed${best.touches ? ' (piece touches the frame edge)' : ''}` };
+}
+
 async function makeModel(item) {
   if (!MESHY_KEY) throw new Error('No MESHY_API_KEY in .env');
   const slug = slugify(item.name) || 'piece';
   const photos = [item.image_url].concat(Array.isArray(item.gallery) ? item.gallery : []);
-  const source = await plainestPhoto(photos);
-  console.log(`   3D · building from photo ${photos.indexOf(source) + 1} of ${photos.length} (the plainest)`);
+  const prep = await preparedPhoto(photos);
+  const source = prep.url;
+  if (prep.jpg) writeFileSync(join(ROOT, 'models', 'source', slug + '-meshy-input.jpg'), prep.jpg);   // what Meshy saw, to check
+  console.log(`   3D · building from ${prep.note}`);
   console.log(`   3D · asking Meshy to build "${item.name.slice(0, 50)}…"`);
   const mr = await fetch('https://api.meshy.ai/openapi/v1/image-to-3d', {
     method: 'POST', headers: { Authorization: 'Bearer ' + MESHY_KEY, 'Content-Type': 'application/json' },
@@ -254,6 +326,16 @@ async function renderCheck(file) {
 // node tools/list-product.mjs --check-render=models/x.glb   (the render check on its own)
 if (flag('check-render')) { console.log('renders: ' + await renderCheck(flag('check-render'))); process.exit(0); }
 if (!DRY) await checkSupabase();
+
+// node tools/list-product.mjs --prep-for=<item id>   (shows the photo Meshy would get; spends no credits)
+if (flag('prep-for')) {
+  const [item] = await sb('/rest/v1/collection_items?id=eq.' + flag('prep-for') + '&select=name,image_url,gallery');
+  const prep = await preparedPhoto([item.image_url].concat(item.gallery || []));
+  const out = join(ROOT, 'models', 'source', (slugify(item.name) || 'piece') + '-meshy-input.jpg');
+  if (prep.jpg) writeFileSync(out, prep.jpg);
+  console.log('would build from ' + prep.note + (prep.jpg ? '\nsaved: ' + out : ''));
+  process.exit(0);
+}
 
 if (MODEL_FOR) {
   const [item] = await sb(`/rest/v1/collection_items?id=eq.${MODEL_FOR}&select=id,name,image_url,gallery,model_url`);
