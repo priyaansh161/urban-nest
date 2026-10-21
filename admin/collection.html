@@ -157,7 +157,7 @@
 
   /* ITEMS GRID */
   .items-panel { background: var(--white); border: 0.5px solid var(--border); }
-  .items-header { padding: 20px 24px; border-bottom: 0.5px solid var(--border); }
+  .items-header { padding: 20px 24px; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 16px; }
   .items-header-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
   .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0; }
   .item-card { border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); padding: 24px; }
@@ -174,6 +174,13 @@
   .badge-gold { background: var(--gold-light); color: var(--gold); }
   .badge-grey { background: #eee; color: var(--grey); }
   .badge-blue { background: rgba(41,128,185,0.1); color: #2980b9; }
+  /* Drafts waiting to be checked and published (21 Oct 2026): listings now arrive
+     automatically as drafts, so they are tinted red and listed first. */
+  .item-card.is-draft { background: #FDECEC; box-shadow: inset 4px 0 0 #C0392B, inset 0 0 0 1px rgba(192,57,43,.35); }
+  .item-card.is-draft:hover { background: #FBE2E2; }
+  .item-card.is-draft .badge-grey { background: #C0392B; color: #fff; }
+  .item-card.is-draft .row-btn.publish { background: #C0392B; border-color: #C0392B; color: #fff; }
+  .item-card.is-draft .row-btn.publish:hover { background: #A93226; border-color: #A93226; }
   .item-actions { display: flex; gap: 8px; }
   .row-btn { padding: 5px 12px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
   .row-btn:hover { border-color: var(--black); color: var(--black); }
@@ -203,6 +210,7 @@
     <a href="collection.html" class="nav-item active"><span class="icon">◻</span> Collection</a>
     <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
     <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <a href="amazon-links.html" class="nav-item"><span class="icon">⛓</span> Amazon Links</a>
     <div class="nav-group-label">Commerce</div>
     <a href="sellers.html" class="nav-item"><span class="icon">⬢</span> Sellers</a>
     <a href="orders.html" class="nav-item"><span class="icon">▦</span> Orders</a>
@@ -414,6 +422,26 @@
         <button type="button" class="add-spec" onclick="addSpecRow()">+ Add specification</button>
         <span class="hint">Material, dimensions, bulb type, finish. Shown as a list on the piece's detail view.</span>
       </div>
+<div class="form-group full" id="unTakeBox" style="display:flex;flex-direction:column;gap:8px">
+  <label>Our take <span style="opacity:.6;text-transform:none;letter-spacing:0">— your own rating &amp; verdict, shown on the product</span></label>
+  <select id="unRating">
+    <option value="">No rating yet</option>
+    <option value="5">5.0 / 5</option>
+    <option value="4.5">4.5 / 5</option>
+    <option value="4">4.0 / 5</option>
+    <option value="3.5">3.5 / 5</option>
+    <option value="3">3.0 / 5</option>
+    <option value="2.5">2.5 / 5</option>
+    <option value="2">2.0 / 5</option>
+    <option value="1.5">1.5 / 5</option>
+    <option value="1">1.0 / 5</option>
+    <option value="0.5">0.5 / 5</option>
+  </select>
+  <textarea id="unTake" placeholder="How is it really? Build, finish, how it looks in a room vs the photos, who it suits…"></textarea>
+  <textarea id="unPros" placeholder="What's good — one point per line"></textarea>
+  <textarea id="unCons" placeholder="What to watch for — one point per line"></textarea>
+  <span class="hint form-hint">Your opinion, not copied from any store's reviews. Leave it all blank to show nothing.</span>
+</div>
     </div>
     <div class="form-actions">
       <button class="btn btn-secondary" onclick="saveItem(false)">Save as Draft</button>
@@ -427,6 +455,7 @@
   <div class="items-panel">
     <div class="items-header">
       <span class="items-header-title">All Items</span>
+      <input type="search" id="itemSearch" placeholder="Search by name…" oninput="renderGrid()" style="max-width:260px;margin-left:auto"/>
     </div>
     <div id="itemsGrid" class="items-grid"></div>
   </div>
@@ -506,8 +535,16 @@ function renderGrid() {
     el.innerHTML = '<div class="empty-state">No items yet. Add your first collection piece above.</div>';
     return;
   }
-  el.innerHTML = items.map(item => `
-    <div class="item-card">
+  const q = (document.getElementById('itemSearch').value || '').trim().toLowerCase();
+  const found = q ? items.filter(i => (i.name || '').toLowerCase().includes(q)) : items;
+  // drafts first, so the ones waiting to be checked are always at the top
+  const shown = found.filter(i => !i.published).concat(found.filter(i => i.published));
+  if (!shown.length) {
+    el.innerHTML = '<div class="empty-state">No item matches "' + q.replace(/[<>&"]/g, '') + '".</div>';
+    return;
+  }
+  el.innerHTML = shown.map(item => `
+    <div class="item-card${item.published ? '' : ' is-draft'}">
       <div class="item-image">
         ${item.image_url
           ? `<img src="${item.image_url}" alt="${item.name}" onerror="this.parentElement.innerHTML='<span class=item-image-placeholder>No Image</span>'">`
@@ -523,7 +560,7 @@ function renderGrid() {
       </div>
       <div class="item-actions">
         <button class="row-btn" onclick="editItem('${item.id}')">Edit</button>
-        <button class="row-btn" onclick="toggleItemPublish('${item.id}', ${item.published})">${item.published ? 'Unpublish' : 'Publish'}</button>
+        <button class="row-btn publish" onclick="toggleItemPublish('${item.id}', ${item.published})">${item.published ? 'Unpublish' : 'Publish'}</button>
         <button class="row-btn danger" onclick="deleteItem('${item.id}')">Delete</button>
       </div>
     </div>`).join('');
@@ -547,6 +584,11 @@ function editItem(id) {
   document.getElementById('itemInStock').checked = item.in_stock !== false;
   fillSellerSelects(item.seller_id || '', item.affiliate_seller_id || '');
   document.getElementById('itemComingSoon').checked = !!item.coming_soon;
+
+  document.getElementById('unRating').value = item.un_rating == null ? '' : String(Number(item.un_rating));
+  document.getElementById('unTake').value = item.un_take || '';
+  document.getElementById('unPros').value = item.un_pros || '';
+  document.getElementById('unCons').value = item.un_cons || '';
   document.getElementById('specRows').innerHTML = '';
   (Array.isArray(item.specs) ? item.specs : []).forEach(([k, v]) => addSpecRow(k, v));
   setGallery(item.gallery);
@@ -670,6 +712,7 @@ function resetForm() {
   document.getElementById('resetBtn').style.display = 'none';
   document.getElementById('modelHint').innerHTML = MODEL_HINT;
   document.getElementById('specRows').innerHTML = '';
+  ['unRating','unTake','unPros','unCons'].forEach(id => document.getElementById(id).value = '');
   setGallery([]);
 }
 
@@ -1166,6 +1209,10 @@ async function saveItem(publish) {
     primary_cta: document.getElementById('itemPrimaryCta').value,
     in_stock: document.getElementById('itemInStock').checked,
     specs: collectSpecs(),
+    un_rating: document.getElementById('unRating').value ? Number(document.getElementById('unRating').value) : null,
+    un_take: document.getElementById('unTake').value.trim() || null,
+    un_pros: document.getElementById('unPros').value.trim() || null,
+    un_cons: document.getElementById('unCons').value.trim() || null,
     gallery: galleryUrls.slice(),
     coming_soon: document.getElementById('itemComingSoon').checked,
     published: publish,
@@ -1177,11 +1224,12 @@ async function saveItem(publish) {
   let { error } = await write(payload);
   // These columns arrive in separate migrations. If one has not been run,
   // save what the table does have rather than losing the whole edit.
-  if (error && /model_url|buy_link|specs|seller_id|price_paise|primary_cta|in_stock|gallery/.test(error.message || '')) {
+  if (error && /model_url|buy_link|specs|seller_id|price_paise|primary_cta|in_stock|gallery|un_rating|un_take|un_pros|un_cons/.test(error.message || '')) {
     const { model_url, buy_link, specs, seller_id, affiliate_seller_id,
-            price_paise, primary_cta, in_stock, gallery, ...rest } = payload;
+            price_paise, primary_cta, in_stock, gallery,
+            un_rating, un_take, un_pros, un_cons, ...rest } = payload;
     ({ error } = await write(rest));
-    if (!error) showToast('Saved, but some fields were dropped — run add-collection-3d.sql, add-collection-specs.sql, setup-commerce.sql and add-collection-gallery.sql');
+    if (!error) showToast('Saved, but some fields were dropped — run add-collection-3d.sql, add-collection-specs.sql, add-product-ratings.sql, setup-commerce.sql and add-collection-gallery.sql');
   }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
   showToast(publish ? 'Item published!' : 'Draft saved');
