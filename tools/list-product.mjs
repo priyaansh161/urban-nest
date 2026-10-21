@@ -157,13 +157,40 @@ async function photoToWebp(url) {
 /* Meshy (image → 3D, from the cover photo) → download the GLB → Draco
    compression (tools/compress-model.mjs, the recipe that renders) → load it in
    a real model-viewer and wait for its load event → upload → model_url. */
+/* Meshy builds best from the plainest photo: the piece alone on an even
+   background, no hands, props or lifestyle scene. Each photo is scored by how
+   much its outer border varies (a plain backdrop barely changes at the edges)
+   plus how much a text banner or busy scene adds across the whole frame;
+   the lowest score is sent. (His rule, 21 Oct 2026.) */
+async function plainestPhoto(urls) {
+  let best = null;
+  for (const u of urls.filter(Boolean)) {
+    try {
+      const buf = Buffer.from(await (await fetch(u, { headers: { 'User-Agent': UA } })).arrayBuffer());
+      const N = 48, { data, info } = await sharp(buf).resize(N, N, { fit: 'fill' }).removeAlpha().greyscale().raw().toBuffer({ resolveWithObject: true });
+      const px = (x, y) => data[y * info.width + x];
+      const ring = [], all = [];
+      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { all.push(px(x, y)); if (x < 4 || y < 4 || x >= N - 4 || y >= N - 4) ring.push(px(x, y)); }
+      const sd = (a) => { const m = a.reduce((s, v) => s + v, 0) / a.length; return Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / a.length); };
+      // neighbouring-pixel jumps: high for clutter, lifestyle scenes and text
+      let busy = 0; for (let y = 0; y < N; y++) for (let x = 1; x < N; x++) busy += Math.abs(px(x, y) - px(x - 1, y));
+      const score = sd(ring) * 2 + busy / (N * N);
+      if (!best || score < best.score) best = { url: u, score };
+    } catch {}
+  }
+  return best ? best.url : urls[0];
+}
+
 async function makeModel(item) {
   if (!MESHY_KEY) throw new Error('No MESHY_API_KEY in .env');
   const slug = slugify(item.name) || 'piece';
+  const photos = [item.image_url].concat(Array.isArray(item.gallery) ? item.gallery : []);
+  const source = await plainestPhoto(photos);
+  console.log(`   3D · building from photo ${photos.indexOf(source) + 1} of ${photos.length} (the plainest)`);
   console.log(`   3D · asking Meshy to build "${item.name.slice(0, 50)}…"`);
   const mr = await fetch('https://api.meshy.ai/openapi/v1/image-to-3d', {
     method: 'POST', headers: { Authorization: 'Bearer ' + MESHY_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image_url: item.image_url, ai_model: 'latest', should_texture: true, enable_pbr: true, should_remesh: true, target_polycount: 60000, target_formats: ['glb'] }),
+    body: JSON.stringify({ image_url: source, ai_model: 'latest', should_texture: true, enable_pbr: true, should_remesh: true, target_polycount: 60000, target_formats: ['glb'] }),
   });
   const mj = await mr.json();
   if (!mr.ok || !mj.result) throw new Error('Meshy refused the task: ' + JSON.stringify(mj).slice(0, 200));
@@ -229,7 +256,7 @@ if (flag('check-render')) { console.log('renders: ' + await renderCheck(flag('ch
 if (!DRY) await checkSupabase();
 
 if (MODEL_FOR) {
-  const [item] = await sb(`/rest/v1/collection_items?id=eq.${MODEL_FOR}&select=id,name,image_url,model_url`);
+  const [item] = await sb(`/rest/v1/collection_items?id=eq.${MODEL_FOR}&select=id,name,image_url,gallery,model_url`);
   if (!item) { console.error('No listing with id ' + MODEL_FOR); process.exit(1); }
   if (item.model_url) console.log('   (it already has a 3D model; this replaces it)');
   await makeModel(item);
