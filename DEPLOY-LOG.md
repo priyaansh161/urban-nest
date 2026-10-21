@@ -56,3 +56,7 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-14 | 10:33 | 1f28a81 (+ uncommitted changes) | Homepage hero: lighter shadow outside the spotlight | https://e99308c9.storeurbannest.pages.dev |
 | 2026-10-14 | 10:43 | 969cca8 (+ uncommitted changes) | Live /look page (Diwali edition); phone room drift resumes after 4s | https://0e45528b.storeurbannest.pages.dev |
 | 2026-10-14 | 10:57 | 14b81f1 (+ uncommitted changes) | Tighter spacing between sections, site-wide | https://4ddc4416.storeurbannest.pages.dev |
+| 2026-10-16 | 17:58 | 8676d10 (+ uncommitted changes) | Amazon link checker in admin + hide Amazon button for gone products | https://5e768639.storeurbannest.pages.dev |
+| 2026-10-20 | 10:46 | 8676d10 (+ uncommitted changes) | Our take: Priyaansh's own rating + verdict on every product (admin forms, collection/essentials/room display) | https://c15e27a5.storeurbannest.pages.dev |
+| 2026-10-20 | 10:54 | 8676d10 (+ uncommitted changes) | Admin: search products by name in Collection and room Products lists | https://007ee5db.storeurbannest.pages.dev |
+| 2026-10-21 | 14:19 | 7111491 (+ uncommitted changes) | Squircle (Apple-style) corners, site-wide | https://09338456.storeurbannest.pages.dev |
