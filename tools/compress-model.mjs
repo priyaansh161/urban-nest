@@ -57,7 +57,13 @@ console.log(`\n  ${basename(inPath)} — ${MB(sourceBytes)} MB\n`);
 
 // ------------------------------------------------------- 1. textures (sharp)
 
-const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
+// The Draco codec is registered so a file that is already Draco-compressed
+// (an earlier pass that left its textures large) can be read and redone.
+const draco3d = (await import('draco3dgltf')).default;
+const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({
+  'draco3d.decoder': await draco3d.createDecoderModule(),
+  'draco3d.encoder': await draco3d.createEncoderModule(),
+});
 const doc = await io.read(inPath);
 
 doc.createExtension(EXTTextureWebP).setRequired(true);
