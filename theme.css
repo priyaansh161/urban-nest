@@ -196,3 +196,38 @@ body:has(.toc) main { padding-bottom: 56px !important; }
 /* /nest and /creators */
 header.hero:not(.shop) { padding-bottom: 48px !important; }
 section.join { padding-bottom: 44px !important; }
+
+/* ═══ SQUIRCLE CORNERS (21 Oct 2026) ═══
+   Every rounded corner on the site becomes a squircle: the continuous-
+   curvature corner Apple uses, where the edge starts bending earlier and eases
+   into the turn instead of meeting a quarter circle. A squircle looks tighter
+   than a circle of the same size, so the radii go up (20 → 32, 12 → 20) to
+   keep the same softness. Browsers without corner-shape (Safari, Firefox for
+   now) skip this whole block and keep the round corners above.
+   Circles and pill buttons are left alone: a full curve has nothing to smooth. */
+@supports (corner-shape: squircle) {
+  :root { --r: 32px; --r-sm: 20px; }
+
+  /* everything the round-corner rules above set with --r / --r-sm */
+  .sp, .ct, .wstrip figure, .room-fig, a.room, .room-media, .cat-tile, .item, .cat-hero-media,
+  .na-media, .na-card .na-media, .nf-card, .cat-tile-media, .item .stage,
+  .form-card, main.card, .card, .gate-card, .callout, .pillars-grid, .contact-grid,
+  #articleModal, .sheet, .lobby-card, .comments-section, #articleModal .modal-hero,
+  .rail .piece, .sheet .d-stage, .sheet .d-poster, #panel,
+  input[type="text"], input[type="email"], input[type="tel"], input[type="password"], input[type="search"], input[type="url"], input[type="number"], input:not([type]),
+  select, textarea, .comment-input, .newsletter-input,
+  #viewApp .panel, #viewApp .stats, #viewApp .stat, #viewApp .page-strip, #viewApp .fmt-toolbar, #viewApp .slug-row, #viewApp .author-card, #viewApp img.cover-prev,
+  .grid > .item .stage, .grid > .item .body, .band, .nband, .wband,
+  /* and the ones that set their own sizes */
+  .sh-card, .sh-card img, .flip-face, a.pc, .pc-frame, .pc-body, a.ed, .ed-ph, .ed-panel,
+  .dcard, .reach > a, .lk-feed .pc, .door
+  { corner-shape: squircle; }
+
+  a.pc, a.ed, .flip-face, .lk-feed .pc { border-radius: var(--r) !important; }
+  .pc-frame, .pc-body, .ed-ph, .ed-panel { border-radius: var(--r-sm) !important; }
+  .sh-card { border-radius: 26px !important; }
+  .sh-card img { border-radius: 16px !important; }
+  .dcard { border-radius: 36px !important; }
+  .reach > a { border-radius: 22px !important; }
+  .door { border-radius: 26px !important; }
+}
