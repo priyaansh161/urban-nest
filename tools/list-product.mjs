@@ -58,8 +58,11 @@ const SB_URL = env.SUPABASE_URL || 'https://ifwxgwvsyispkaxzbstg.supabase.co';
 const SB_KEY = env.SUPABASE_SERVICE_ROLE_KEY;
 const MESHY_KEY = env.MESHY_API_KEY;
 
+/* Supabase's newer secret keys (sb_secret_…) go in the apikey header only; the
+   older service_role key (a JWT, eyJ…) also goes in Authorization. */
+const AUTH = SB_KEY && SB_KEY.startsWith('sb_') ? { apikey: SB_KEY } : { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY };
 const sb = async (path, opts = {}) => {
-  const r = await fetch(SB_URL + path, { ...opts, headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, ...(opts.headers || {}) } });
+  const r = await fetch(SB_URL + path, { ...opts, headers: { ...AUTH, ...(opts.headers || {}) } });
   const text = await r.text();
   if (!r.ok) throw new Error(`Supabase ${r.status} on ${path.split('?')[0]}: ${text.slice(0, 200)}`);
   return text ? JSON.parse(text) : null;
@@ -72,7 +75,7 @@ async function checkSupabase() {
 async function upload(bucket, path, body, type) {
   const r = await fetch(`${SB_URL}/storage/v1/object/${encodeURIComponent(bucket)}/${path}`, {
     method: 'POST', body,
-    headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': type, 'Cache-Control': 'max-age=31536000', 'x-upsert': 'false' },
+    headers: { ...AUTH, 'Content-Type': type, 'Cache-Control': 'max-age=31536000', 'x-upsert': 'false' },
   });
   if (!r.ok) throw new Error(`upload to ${bucket} failed ${r.status}: ${(await r.text()).slice(0, 200)}`);
   return `${SB_URL}/storage/v1/object/public/${encodeURIComponent(bucket)}/${path}`;
