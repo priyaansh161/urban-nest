@@ -60,3 +60,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-20 | 10:46 | 8676d10 (+ uncommitted changes) | Our take: Priyaansh's own rating + verdict on every product (admin forms, collection/essentials/room display) | https://c15e27a5.storeurbannest.pages.dev |
 | 2026-10-20 | 10:54 | 8676d10 (+ uncommitted changes) | Admin: search products by name in Collection and room Products lists | https://007ee5db.storeurbannest.pages.dev |
 | 2026-10-21 | 14:19 | 7111491 (+ uncommitted changes) | Squircle (Apple-style) corners, site-wide | https://09338456.storeurbannest.pages.dev |
+| 2026-10-21 | 16:43 | e65850d (+ uncommitted changes) | Admin Collection: drafts tinted red and listed first | https://4bc21c31.storeurbannest.pages.dev |
