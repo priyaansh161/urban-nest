@@ -273,7 +273,10 @@ async function makeModel(item) {
   console.log(`   3D · asking Meshy to build "${item.name.slice(0, 50)}…"`);
   const mr = await fetch('https://api.meshy.ai/openapi/v1/image-to-3d', {
     method: 'POST', headers: { Authorization: 'Bearer ' + MESHY_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image_url: source, ai_model: 'latest', should_texture: true, enable_pbr: true, should_remesh: true, target_polycount: 60000, target_formats: ['glb'] }),
+    /* Meshy's best (his call, 22 Oct 2026): 7.1 with Ultra 4K geometry and 4K
+       textures, and no Meshy remesh (its docs: off = highest quality). ~35
+       credits. The raw model is heavy; shrink-model.mjs below brings it to web size. */
+    body: JSON.stringify({ image_url: source, ai_model: 'meshy-7.1', geometry_resolution: '4k', texture_resolution: '4k', should_texture: true, enable_pbr: true, should_remesh: false, target_formats: ['glb'] }),
   });
   const mj = await mr.json();
   if (!mr.ok || !mj.result) throw new Error('Meshy refused the task: ' + JSON.stringify(mj).slice(0, 200));
@@ -293,7 +296,7 @@ async function makeModel(item) {
   const raw = join(ROOT, 'models', 'source', slug + '-raw.glb');
   const out = join(ROOT, 'models', slug + '.glb');
   writeFileSync(raw, Buffer.from(await (await fetch(task.model_urls.glb)).arrayBuffer()));
-  const c = spawnSync(process.execPath, [join(HERE, 'compress-model.mjs'), raw, out], { cwd: HERE, stdio: 'inherit' });
+  const c = spawnSync(process.execPath, [join(HERE, 'shrink-model.mjs'), raw, out], { cwd: HERE, stdio: 'inherit' });
   if (c.status !== 0 || !existsSync(out)) throw new Error('compression failed');
   const mb = (statSync(out).size / 1048576).toFixed(2);
   const dims = await renderCheck(out);
