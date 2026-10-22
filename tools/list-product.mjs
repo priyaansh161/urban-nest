@@ -6,6 +6,8 @@
  *                        → Draco compression → a real render check → upload
  *                        → attached to the listing
  *   --3d-for=<item id>   make the 3D model for a listing that already exists
+ *   --photo=<n>          with --3d-for / --prep-for: build from photo n (1 = cover)
+ *                        instead of letting the script choose
  *   --section=essentials list into Essentials (default: collection)
  *   --category=<slug>    category slug, when the guess from the title is wrong
  *   --publish            go live at once (default: saved as a draft to check in admin)
@@ -233,9 +235,15 @@ async function preparedPhoto(urls) {
   // keep only the main shape, crop to it, centre it on white with a margin
   const meta = await sharp(best.cut).metadata(), W = meta.width, H = meta.height, { N, lab, main } = best;
   const rgba = await sharp(best.cut).ensureAlpha().raw().toBuffer();
+  /* Erase by the coarse labels without stepping the outline: a pixel goes only
+     if it belongs to another shape, or to background with no main-shape cell
+     beside it. Zeroing every non-main cell cut the piece's soft edge into
+     160-px stairs, which Meshy then built as jagged geometry. */
+  const nearMain = (cx, cy) => { for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const x = cx + dx, y = cy + dy; if (x >= 0 && y >= 0 && x < N && y < N && lab[y * N + x] === main) return true; } return false; };
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-    const k = ((y * N / H) | 0) * N + ((x * N / W) | 0);
-    if (lab[k] !== main) rgba[(y * W + x) * 4 + 3] = 0;
+    const cx = (x * N / W) | 0, cy = (y * N / H) | 0, l = lab[cy * N + cx];
+    if (l === main) continue;
+    if (l >= 0 || !nearMain(cx, cy)) rgba[(y * W + x) * 4 + 3] = 0;
   }
   const [x0, y0, x1, y1] = best.box, cx = Math.floor(x0 * W / N), cy = Math.floor(y0 * H / N);
   const cw = Math.min(W - cx, Math.ceil((x1 - x0 + 1) * W / N)), ch = Math.min(H - cy, Math.ceil((y1 - y0 + 1) * H / N));
@@ -251,11 +259,14 @@ async function preparedPhoto(urls) {
     note: `photo ${best.i + 1} of ${urls.length}, background removed${best.touches ? ' (piece touches the frame edge)' : ''}` };
 }
 
+// --photo=n: the photo was chosen by eye; the scorer above only guesses
+const pickPhoto = (photos) => (flag('photo') ? [photos[Number(flag('photo')) - 1]].filter(Boolean) : photos);
+
 async function makeModel(item) {
   if (!MESHY_KEY) throw new Error('No MESHY_API_KEY in .env');
   const slug = slugify(item.name) || 'piece';
   const photos = [item.image_url].concat(Array.isArray(item.gallery) ? item.gallery : []);
-  const prep = await preparedPhoto(photos);
+  const prep = await preparedPhoto(pickPhoto(photos));
   const source = prep.url;
   if (prep.jpg) writeFileSync(join(ROOT, 'models', 'source', slug + '-meshy-input.jpg'), prep.jpg);   // what Meshy saw, to check
   console.log(`   3D · building from ${prep.note}`);
@@ -330,7 +341,7 @@ if (!DRY) await checkSupabase();
 // node tools/list-product.mjs --prep-for=<item id>   (shows the photo Meshy would get; spends no credits)
 if (flag('prep-for')) {
   const [item] = await sb('/rest/v1/collection_items?id=eq.' + flag('prep-for') + '&select=name,image_url,gallery');
-  const prep = await preparedPhoto([item.image_url].concat(item.gallery || []));
+  const prep = await preparedPhoto(pickPhoto([item.image_url].concat(item.gallery || [])));
   const out = join(ROOT, 'models', 'source', (slugify(item.name) || 'piece') + '-meshy-input.jpg');
   if (prep.jpg) writeFileSync(out, prep.jpg);
   console.log('would build from ' + prep.note + (prep.jpg ? '\nsaved: ' + out : ''));
