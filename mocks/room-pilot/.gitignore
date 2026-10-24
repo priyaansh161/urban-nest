@@ -1,0 +1,15 @@
+# Working files the build scripts regenerate; too big for git (the folder is ~280 MB with them).
+
+# Blender saves from every build
+*.blend
+*.blend1
+
+# raw Meshy downloads and the photos they were made from (as models/source/ at the root)
+source/
+
+# the uncompressed export: bath_v7-web.glb (tools/compress-model.mjs --size=1024) is what the viewer loads
+bath_v7.glb
+
+# CC0 scans, 2K JPG: ambientCG Marble019 + Marble021, Poly Haven granite_tile + walnut_veneer.
+# Re-download into textures/<id>/ to rebuild (file names as build_bath_v7.py reads them).
+textures/

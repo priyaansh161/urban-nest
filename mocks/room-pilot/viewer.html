@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Room Viewer Pilot — Urban Nest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- TEST PAGE. Not linked from the site. Loads the Blender-built pilot room (bathroom_pilot.glb)
+     with real-scale products and dots that follow the objects, with no Spline anywhere. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+  :root { --bg:#0e2a2a; --ink:#f8f7f4; --gold:#c9a45c; --teal:#1f6f6b; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink); font-family:'Inter',system-ui,sans-serif; overflow:hidden; touch-action:none; }
+  #stage { position:fixed; inset:0; }
+  canvas { display:block; width:100%; height:100%; outline:none; }
+  #dots { position:fixed; inset:0; pointer-events:none; }
+  .dot { position:absolute; width:30px; height:30px; margin:-15px 0 0 -15px; border-radius:50%; pointer-events:auto; cursor:pointer;
+         display:flex; align-items:center; justify-content:center; transition:opacity .25s; }
+  .dot::before { content:''; width:11px; height:11px; border-radius:50%; background:#fff; box-shadow:0 0 0 3px rgba(201,164,92,.9), 0 2px 8px rgba(0,0,0,.5); }
+  .dot::after { content:''; position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(255,255,255,.7); animation:pulse 2s ease-out infinite; }
+  .dot.hidden { opacity:0; pointer-events:none; }
+  .dot .tip { position:absolute; left:34px; top:50%; transform:translateY(-50%); white-space:nowrap; font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+              background:rgba(14,42,42,.82); padding:5px 9px; border-radius:6px; opacity:0; transition:opacity .2s; pointer-events:none; }
+  .dot:hover .tip { opacity:1; }
+  @keyframes pulse { 0%{transform:scale(.6);opacity:.9} 100%{transform:scale(1.6);opacity:0} }
+
+  header { position:fixed; top:0; left:0; right:0; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; pointer-events:none; z-index:5;
+           background:linear-gradient(rgba(14,42,42,.7), transparent); }
+  header h1 { font-family:'Bodoni Moda',serif; font-weight:400; font-size:20px; margin:0; }
+  header small { display:block; font-size:10px; letter-spacing:.22em; color:var(--gold); text-transform:uppercase; margin-top:2px; }
+  .pill { pointer-events:auto; }
+  #bar { position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom)); transform:translateX(-50%); display:flex; gap:8px; z-index:5; flex-wrap:wrap; justify-content:center; width:calc(100% - 24px); }
+  button { font:inherit; font-size:12px; letter-spacing:.08em; color:var(--ink); background:rgba(14,42,42,.78); border:1px solid rgba(248,247,244,.25); padding:9px 14px;
+           border-radius:999px; cursor:pointer; backdrop-filter:blur(6px); }
+  button:hover, button.on { background:var(--gold); color:#10201f; border-color:var(--gold); }
+
+  /* Tall side panel on the right; on phones it becomes a bottom sheet */
+  /* On desktop the card is positioned by JS right beside the product (placeCard); it fades in as the camera arrives */
+  #card { position:fixed; left:0; top:0; width:290px; transform:translateX(-14px); z-index:6;
+          background:rgba(248,247,244,.97); color:#14302f; border-radius:18px; padding:26px 22px 22px; opacity:0; pointer-events:none; transition:opacity .3s, transform .35s;
+          box-shadow:0 18px 50px rgba(0,0,0,.45); display:flex; flex-direction:column; }
+  #card.open { opacity:1; transform:none; pointer-events:auto; transition-delay:.45s; }
+  #card .specs { flex-direction:column; gap:10px; margin:6px 0 20px; }
+  #card a.buy { text-align:center; }
+  #card button.back { margin:10px 0 0 !important; }
+  @media (max-width: 700px) {
+    #card { left:50% !important; top:auto !important; bottom:calc(128px + env(safe-area-inset-bottom)); width:calc(100% - 24px); max-width:420px;
+            transform:translate(-50%, 24px); padding:18px; }
+    #card.open { transform:translate(-50%, 0); }
+    #card .specs { flex-direction:row; gap:14px; margin:0 0 12px; }
+  }
+  #card .tag { font-size:10px; letter-spacing:.2em; color:var(--teal); text-transform:uppercase; }
+  #card h2 { font-family:'Bodoni Moda',serif; font-weight:500; font-size:22px; margin:4px 0 6px; }
+  #card p { font-size:13px; line-height:1.5; margin:0 0 10px; color:#3b5958; }
+  #card .specs { display:flex; gap:14px; font-size:12px; margin-bottom:12px; color:#14302f; }
+  #card .specs b { display:block; font-weight:500; color:#6b8583; font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  #card a.buy { display:inline-block; background:var(--teal); color:#fff; text-decoration:none; padding:10px 18px; border-radius:999px; font-size:12px; letter-spacing:.1em; }
+  #card button.back { margin-left:8px; background:none; color:#14302f; border:1px solid rgba(20,48,47,.3); backdrop-filter:none; padding:9px 14px; }
+  #card button.back:hover { background:#14302f; color:#fff; border-color:#14302f; }
+  #card .x { position:absolute; top:10px; right:12px; background:none; border:none; color:#14302f; font-size:20px; padding:2px 6px; cursor:pointer; }
+
+  #loader { position:fixed; inset:0; z-index:20; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; transition:opacity .9s; }
+  #loader.gone { opacity:0; pointer-events:none; }
+  #loader .ring { width:54px; height:54px; border-radius:50%; border:2px solid rgba(201,164,92,.25); border-top-color:var(--gold); animation:spin 1.1s linear infinite; }
+  #loader p { font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(248,247,244,.6); margin:0; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  #stats { position:fixed; right:12px; bottom:calc(70px + env(safe-area-inset-bottom)); font-size:10px; color:rgba(248,247,244,.45); z-index:4; text-align:right; pointer-events:none; line-height:1.5; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="dots"></div>
+
+<header>
+  <div><h1>The Quiet Bath <span style="font-size:12px;color:var(--gold)">· pilot</span></h1><small>Built in Blender · no Spline</small></div>
+</header>
+
+<div id="card">
+  <button class="x" id="cardX" aria-label="Close">&times;</button>
+  <div class="tag" id="cTag"></div>
+  <h2 id="cName"></h2>
+  <p id="cDesc"></p>
+  <div class="specs" id="cSpecs"></div>
+  <a class="buy" id="cBuy" href="#" target="_blank" rel="noopener">View on Amazon</a>
+  <button class="back" id="cBack">&larr; Back to room</button>
+</div>
+
+<div id="bar">
+  <button data-view="wide" class="on">Wide</button>
+  <button data-view="vanity">Vanity</button>
+  <button data-view="shower">Shower</button>
+  <button data-view="toilet">Toilet</button>
+  <button id="humanBtn">Scale check</button>
+  <button id="dotsBtn" class="on">Dots</button>
+</div>
+<div id="stats"></div>
+
+<div id="loader"><div class="ring"></div><p id="loadMsg">Building the room</p></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// glTF is Y-up. Room is 3.2 (x) x 2.6 (z) x 2.7 (y) metres. Back wall z=-1.3, open front at z=+1.3.
+// Products are sized by REAL height in metres, so scale can never drift.
+// Room is 3.6 (x) x 2.6 (z) x 2.7 (y). Vanity zone left, shower middle, toilet right, window on the right wall.
+// Products (dots + cards) and staging (dress the room, no dots) live in placements.json, which the Blender
+// build reads too, so their shadows are baked into the room exactly where they stand here.
+const PLACEMENTS = await (await fetch('placements.json')).json();
+const PRODUCTS = PLACEMENTS.products;
+const STAGING = PLACEMENTS.staging.filter(d => !d.inRoom);   // inRoom items (the toilet) are part of bath_v6.glb
+
+const BARE = !!new URLSearchParams(location.search).get('bare');
+
+const VIEWS = {
+  wide:   { pos:[0.0, 1.45, 1.6], target:[0.0, 1.15, -1.4] },
+  vanity: { pos:[-1.35, 1.35, 0.2], target:[-1.35, 1.0, -1.4] },
+  shower: { pos:[1.0, 1.5, 0.9], target:[1.65, 1.2, -1.4] },
+  toilet: { pos:[0.3, 1.3, 0.5], target:[0.1, 0.55, -1.4] },
+};
+
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;   // same tone curve as the Blender renders
+renderer.toneMappingExposure = 1.7;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0e2a2a);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+
+const camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.05, 30);
+// Tall (phone) screens get a wider vertical field of view so the room is not cropped to a narrow slice.
+function fitFov() { camera.fov = camera.aspect < 1 ? Math.min(96, 62 + (1 - camera.aspect) * 62) : 62; camera.updateProjectionMatrix(); }
+fitFov();
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 0.3; controls.maxDistance = 3.4;
+controls.maxPolarAngle = Math.PI * 0.62;
+controls.rotateSpeed = 0.7; controls.zoomSpeed = 0.7; controls.panSpeed = 0.6;
+controls.screenSpacePanning = true;
+
+// light
+scene.add(new THREE.HemisphereLight(0xfff1de, 0x4a443c, 0.75));   // fixtures are lit live; the baked room is brighter than the default
+const warm = new THREE.PointLight(0xffd9a8, 2.2, 4, 2); warm.position.set(-1.35, 1.5, -1.0); scene.add(warm);
+const warm2 = new THREE.PointLight(0xffd9a8, 1.4, 4, 2); warm2.position.set(0.6, 1.6, -0.8); scene.add(warm2);
+const day = new THREE.DirectionalLight(0xfff0dc, 0.5);   // no window in this room: a soft key from the front
+day.position.set(0.5, 2.4, 2.5); day.target.position.set(0, 0.6, -1.2);
+scene.add(day, day.target);   // no realtime shadows: the room's shadows are baked, products get contact shadows
+
+let tweenId = 0, focused = null, returnView = null;
+function tweenTo(pos, tgt, dur = 1100) {
+  const id = ++tweenId;
+  const from = { p: camera.position.clone(), t: controls.target.clone() };
+  const t0 = performance.now();
+  (function step(now) {
+    if (id !== tweenId) return;                       // a newer move replaced this one
+    const k = Math.min(1, (now - t0) / dur), e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2) / 2;
+    camera.position.lerpVectors(from.p, pos, e); controls.target.lerpVectors(from.t, tgt, e);
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+function setView(name, instant) {
+  const v = VIEWS[name]; if (!v) return;
+  focused = null; returnView = null; card.classList.remove('open');
+  tweenTo(new THREE.Vector3(...v.pos), new THREE.Vector3(...v.target), instant ? 1 : 1100);
+  document.querySelectorAll('#bar [data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === name));
+}
+// Clicking a dot flies the camera in on that product and opens its card.
+function focusProduct(p) {
+  if (!focused) returnView = { pos: camera.position.clone(), target: controls.target.clone() };
+  focused = p;
+  const b = new THREE.Box3().setFromObject(p.obj), c = b.getCenter(new THREE.Vector3()), s = b.getSize(new THREE.Vector3());
+  const dir = camera.position.clone().sub(c); dir.y = 0;
+  if (dir.lengthSq() < 1e-4) dir.set(0, 0, 1);
+  dir.normalize();
+  const dist = THREE.MathUtils.clamp(Math.max(s.x, s.y, s.z) * 2.1 + 0.15, 0.5, 1.1);
+  const pos = c.clone().addScaledVector(dir, dist); pos.y = c.y;
+  // Product stays dead centre on desktop (the card sits beside it); on a phone the card is a bottom
+  // sheet, so aim a little low to lift the product above it.
+  const halfH = dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  const aim = c.clone();
+  if (innerWidth <= 700) aim.y -= halfH * 0.45;
+  tweenTo(pos, aim, 1000);
+  document.querySelectorAll('#bar [data-view]').forEach(x => x.classList.remove('on'));
+  openCard(p.def);
+}
+function closeCard() {
+  card.classList.remove('open');
+  if (focused && returnView) tweenTo(returnView.pos, returnView.target, 900);
+  focused = null; returnView = null;
+}
+camera.position.set(...VIEWS.wide.pos); controls.target.set(...VIEWS.wide.target); controls.update();
+
+// loaders
+const draco = new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/gltf/');
+const loader = new GLTFLoader().setDRACOLoader(draco);
+const load = url => new Promise((res, rej) => loader.load(url, res, undefined, rej));
+
+const room = new THREE.Group(); room.name = 'Room'; scene.add(room);
+const placed = [];   // { def, obj, box, dot }
+const dotsEl = document.getElementById('dots');
+let tris = 0;
+
+function markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true; tris += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3; } }); }
+
+async function loadRoom() {
+  const g = await load('bath_v7-web.glb');   // bath_v7.glb run through tools/compress-model.mjs --size=1024 (15.5 MB -> 1.4 MB)
+  room.add(g.scene);
+  markShadows(g.scene);
+  // Walls, floor and ceiling carry their lighting baked into vertex colours (done in Blender), so they
+  // are drawn unlit: texture x baked light. The mirror shows a baked render of the room itself.
+  g.scene.traverse(m => {
+    if (!m.isMesh) return;
+    const nm = (m.name || '') + ' ' + (m.parent ? m.parent.name : '');
+    if (/Vessel_Basin/.test(nm)) { m.visible = false; return; }   // replaced by the Meshy basin (staging/basin.glb)
+    // ?bare=1: hide the placeholder accessories that real products will replace (for the Gemini placement shot)
+    if (BARE && /Tumbler|Soap_Bottle|Soap_Pump|Holder_|Paper_Roll|Toilet_Mat/.test(nm)) { m.visible = false; return; }
+    if (/Shell_|LM_/.test(nm) && m.material.emissiveMap) {
+      // Lightmapped (walls, floor, ceiling, vanity, toilet): Blender baked their light, shadows included, into the
+      // emissive slot on their lightmap UV. Wall marble is laid as book-matched (mirrored) slabs.
+      m.material = bakedMaterial(m.material);
+      if (/Wall/.test(nm)) for (const t of [m.material.map, m.material.normalMap, m.material.roughnessMap])
+        if (t) { t.wrapS = t.wrapT = THREE.MirroredRepeatWrapping; t.needsUpdate = true; }
+    } else if (/Mirror_Reflection/.test(nm)) {
+      m.material = new THREE.MeshBasicMaterial({ map: m.material.map || null });
+    }
+  });
+}
+
+// Baked surfaces: all their diffuse light comes from the lightmap (so the live lights must not add to it), but
+// they keep a real specular layer, the scanned roughness + normal maps catching a reflection of the room itself
+// (roomEnv, captured once everything is placed). lights_fragment_begin is kept, with every live light switched off.
+const BAKED_LIGHTS = THREE.ShaderChunk.lights_fragment_begin
+  .replace(/NUM_(POINT|SPOT|DIR|RECT_AREA|HEMI)_LIGHTS > 0/g, '0 > 1')
+  .replace('getAmbientLightIrradiance( ambientLightColor )', 'vec3( 0.0 )')
+  .replace(/defined\( USE_LIGHT_PROBES \)/g, 'defined( BAKED_NO_PROBES )');
+const bakedMats = [];
+const BAKED_EXPOSURE = 1.3;   // the bake's gain is set by the bright downlight scallops; lifted so the marble reads white
+function bakedMaterial(src, lift = 1) {
+  lift *= BAKED_EXPOSURE;
+  const m = new THREE.MeshStandardMaterial({
+    map: src.map || null, color: src.color, normalMap: src.normalMap || null, normalScale: src.normalScale,
+    roughnessMap: src.roughnessMap || null, roughness: src.roughness, metalness: 0,
+    lightMap: src.emissiveMap, lightMapIntensity: Math.PI * lift, envMapIntensity: 1,
+  });
+  m.onBeforeCompile = sh => {
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <lights_fragment_begin>', BAKED_LIGHTS)
+      .replace('#include <lights_fragment_maps>', '#include <lights_fragment_maps>\n\tiblIrradiance = vec3( 0.0 );');   // env adds gloss, never diffuse
+  };
+  m.customProgramCacheKey = () => 'baked';
+  bakedMats.push(m); return m;
+}
+// The room's own reflection: a cube render from the middle of the room (with a stand-in wall closing the open
+// front), blurred by roughness through PMREM. Until it exists the baked surfaces show no gloss.
+function captureRoomEnv() {
+  const front = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.7), new THREE.MeshBasicMaterial({ color: 0x8c877f }));
+  front.position.set(0, 1.35, 1.4); front.rotation.y = Math.PI; scene.add(front);
+  const rt = new THREE.WebGLCubeRenderTarget(256, { type: THREE.HalfFloatType });
+  const cam = new THREE.CubeCamera(0.05, 20, rt); cam.position.set(0, 1.3, -0.1);
+  cam.update(renderer, scene);
+  scene.remove(front);
+  const env = pmrem.fromCubemap(rt.texture).texture; rt.dispose();
+  for (const m of bakedMats) { m.envMap = env; m.needsUpdate = true; }
+}
+
+// A soft blob under an item so it sits on its surface instead of floating.
+function contactShadow(holder) {
+  const fs = new THREE.Box3().setFromObject(holder).getSize(new THREE.Vector3());
+  const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+  const cx = cv.getContext('2d'), gr = cx.createRadialGradient(64, 64, 4, 64, 64, 62);
+  gr.addColorStop(0, 'rgba(0,0,0,0.55)'); gr.addColorStop(0.55, 'rgba(0,0,0,0.25)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  cx.fillStyle = gr; cx.fillRect(0, 0, 128, 128);
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false }));
+  // kept just wider than the item's own footprint: a big blob hung past counter edges like a floating shelf
+  sh.rotation.x = -Math.PI / 2; sh.position.y = 0.003; sh.scale.set(Math.min(fs.x, fs.z) * 1.35, Math.min(fs.x, fs.z) * 1.35, 1);
+  sh.raycast = () => {}; sh.renderOrder = 1; holder.add(sh);
+}
+const flowerCache = {};
+const getFlowers = file => flowerCache[file] || (flowerCache[file] = load('staging/' + file));
+
+// Places one model at real size. Products (folder 'products') get a dot and a card; staging items
+// (folder 'staging': toilet, shower, rug, flowers) are only there to dress the room, so no dot.
+async function placeItem(def, folder, withDot) {
+  const g = await load(folder + '/' + encodeURIComponent(def.file));
+  const obj = g.scene;
+  if (def.flat) obj.rotation.x = -Math.PI / 2;          // Meshy rugs come out standing up: lay them down
+  let box = new THREE.Box3().setFromObject(obj);
+  const size = box.getSize(new THREE.Vector3());
+  obj.scale.setScalar(def.length ? def.length / Math.max(size.x, size.z) : def.height / size.y);
+  box.setFromObject(obj);
+  const c = box.getCenter(new THREE.Vector3());
+  const bodyH = box.max.y - box.min.y;                           // measured now, before the item is moved into the room
+  const holder = new THREE.Group(); holder.name = def.name;      // named objects, like Spline
+  obj.position.sub(new THREE.Vector3(c.x, def.anchor === 'center' ? c.y : box.min.y, c.z));
+  holder.add(obj);
+  holder.position.set(...def.pos); holder.rotation.y = def.rotY || 0;
+  if (def.alignBack !== undefined) {                     // push the item flush against the back wall
+    holder.updateMatrixWorld(true);
+    holder.position.z += def.alignBack - new THREE.Box3().setFromObject(holder).min.z;
+  }
+  if (def.alignLeft !== undefined) {                     // flush against the left wall
+    holder.updateMatrixWorld(true);
+    holder.position.x += def.alignLeft - new THREE.Box3().setFromObject(holder).min.x;
+  }
+  markShadows(holder);
+  // tint: Meshy bakes its textures lighter than the real product (a grey stone mat came out near white);
+  // placements.json can darken one back toward its photo
+  if (def.tint) obj.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.color.multiplyScalar(def.tint); } });
+  if (def.flowers) {                                     // a vase is never shown empty
+    const topLocal = bodyH;
+    const fg = (await getFlowers(typeof def.flowers === 'string' ? def.flowers : 'flowers.glb')).scene.clone(true);
+    fg.traverse(m => { if (m.isMesh) m.raycast = () => {}; });
+    fg.scale.setScalar((def.flowerHeight || 0.36) / 0.44);
+    fg.position.set(0, topLocal - 0.03, 0); fg.rotation.y = (def.rotY || 0) * -1;
+    holder.add(fg);
+  }
+  if (def.anchor !== 'center' && !def.noShadow) contactShadow(holder);
+  scene.add(holder);
+  if (!withDot) return;
+  const dot = document.createElement('div'); dot.className = 'dot';
+  dot.innerHTML = '<span class="tip">' + def.name + '</span>';
+  const entry = { def, obj: holder, body: obj, dot, size: new THREE.Box3().setFromObject(holder).getSize(new THREE.Vector3()) };
+  dot.addEventListener('click', e => { e.stopPropagation(); focusProduct(entry); });
+  dotsEl.appendChild(dot);
+  placed.push(entry);
+}
+
+// scale-check figure: 1.70 m
+const human = new THREE.Group();
+{ const m = new THREE.MeshStandardMaterial({ color:0xc9a45c, roughness:.8, transparent:true, opacity:.85 });
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 1.2, 6, 16), m); body.position.y = 0.6 + 0.17 + 0.0; body.scale.set(1, 1, .7);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.11, 24, 16), m); head.position.y = 1.59;
+  human.add(body, head); human.position.set(-0.7, 0, 0.1); human.visible = false; scene.add(human); }
+
+// card
+const card = document.getElementById('card');
+function openCard(d) {
+  document.getElementById('cTag').textContent = d.tag;
+  document.getElementById('cName').textContent = d.name;
+  document.getElementById('cDesc').textContent = d.desc;
+  document.getElementById('cSpecs').innerHTML = d.specs.map(s => '<div><b>' + s[0] + '</b>' + s[1] + '</div>').join('');
+  document.getElementById('cBuy').href = d.link;
+  card.classList.add('open');
+}
+document.getElementById('cardX').onclick = closeCard;
+document.getElementById('cBack').onclick = closeCard;
+addEventListener('keydown', e => { if (e.key === 'Escape') closeCard(); });
+
+// dots follow the objects every frame; hidden when something is in front
+const ray = new THREE.Raycaster();
+const tgt = new THREE.Vector3(), dir = new THREE.Vector3(), ndc = new THREE.Vector3();
+let dotsOn = true, frame = 0;
+function updateDots() {
+  frame++;
+  const w = innerWidth, h = innerHeight;
+  for (const p of placed) {
+    const b = new THREE.Box3().setFromObject(p.body || p.obj);   // dot sits on the product itself, not on the flowers
+    b.getCenter(tgt); tgt.y = b.max.y + 0.025;
+    ndc.copy(tgt).project(camera);
+    const onScreen = dotsOn && ndc.z < 1 && Math.abs(ndc.x) < 1.05 && Math.abs(ndc.y) < 1.05;
+    let visible = onScreen;
+    if (visible && frame % 3 === 0) {          // occlusion test every 3rd frame
+      dir.copy(tgt).sub(camera.position); const dist = dir.length(); dir.normalize();
+      ray.set(camera.position, dir); ray.far = dist;
+      const hits = ray.intersectObjects([room, ...placed.map(q => q.obj)], true);
+      const first = hits.find(hh => hh.object.isMesh && !/Window Sky/.test(hh.object.name));
+      p.blocked = !!first && first.distance < dist - 0.06 && !p.obj.getObjectById(first.object.id);
+    }
+    p.dot.classList.toggle('hidden', !visible || p.blocked);
+    p.dot.style.left = ((ndc.x * .5 + .5) * w) + 'px';
+    p.dot.style.top  = ((-ndc.y * .5 + .5) * h) + 'px';
+  }
+}
+
+// keep the camera inside a sensible box around the room
+function clampCamera() {
+  camera.position.x = THREE.MathUtils.clamp(camera.position.x, -2.1, 2.1);
+  camera.position.y = THREE.MathUtils.clamp(camera.position.y, 0.25, 2.55);
+  camera.position.z = THREE.MathUtils.clamp(camera.position.z, -1.3, 2.3);
+}
+
+// Desktop: keep the card just beside the focused product (not too close, not too far), flipping to its left near the screen edge.
+const _v = new THREE.Vector3();
+function placeCard() {
+  if (!focused || innerWidth <= 700) return;
+  const b = new THREE.Box3().setFromObject(focused.obj);
+  let minX = 1e9, maxX = -1e9;
+  for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) {
+    _v.set(x, y, z).project(camera);
+    const sx = (_v.x * .5 + .5) * innerWidth; minX = Math.min(minX, sx); maxX = Math.max(maxX, sx);
+  }
+  b.getCenter(_v); _v.project(camera);
+  const cy = (-_v.y * .5 + .5) * innerHeight, cw = card.offsetWidth, ch = card.offsetHeight, gap = 56;
+  let left = maxX + gap;
+  if (left + cw > innerWidth - 16) left = minX - gap - cw;
+  left = THREE.MathUtils.clamp(left, 16, innerWidth - cw - 16);
+  card.style.left = left + 'px';
+  card.style.top = THREE.MathUtils.clamp(cy - ch / 2, 70, Math.max(70, innerHeight - ch - 80)) + 'px';
+}
+
+function loop() {
+  controls.update(); clampCamera();
+  renderer.render(scene, camera);
+  updateDots(); placeCard();
+  requestAnimationFrame(loop);
+}
+
+addEventListener('resize', () => { camera.aspect = innerWidth/innerHeight; fitFov(); renderer.setSize(innerWidth, innerHeight); });
+// A plain click on the scene (not a drag) while zoomed on a product steps back to the previous view.
+let downAt = null;
+renderer.domElement.addEventListener('pointerdown', e => { downAt = { x: e.clientX, y: e.clientY }; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (focused && downAt && Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) < 6) closeCard();
+  downAt = null;
+});
+document.querySelectorAll('#bar [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+document.getElementById('humanBtn').onclick = e => { human.visible = !human.visible; e.target.classList.toggle('on', human.visible); };
+document.getElementById('dotsBtn').onclick = e => { dotsOn = !dotsOn; e.target.classList.toggle('on', dotsOn); };
+
+try {
+  await loadRoom();
+  document.getElementById('loadMsg').textContent = 'Placing the pieces';
+  const staging = BARE ? STAGING.filter(d => !/Rug|Mat/.test(d.name)) : STAGING;
+  const jobs = [...staging.map(d => [d, 'staging', false]), ...PRODUCTS.map(d => [d, 'products', true])];
+  const results = await Promise.allSettled(jobs.map(j => placeItem(...j)));
+  results.forEach((r, i) => { if (r.status === 'rejected') console.warn('item failed:', jobs[i][0].name, r.reason); });
+  captureRoomEnv();
+  document.getElementById('stats').innerHTML = Math.round(tris/1000) + 'k triangles<br>' + placed.length + ' products placed';
+} catch (e) {
+  console.error(e);
+  document.getElementById('loadMsg').textContent = 'Could not load the room: ' + (e.message || e);
+}
+// ?shot=1: a clean frame for reference images (no header, buttons, dots or stats)
+if (new URLSearchParams(location.search).get('shot')) {
+  for (const sel of ['header', '#bar', '#stats', '#dots']) document.querySelector(sel).style.display = 'none';
+}
+window.__pilot = { scene, camera, controls, placed, setView, renderer };
+loop();
+setTimeout(() => document.getElementById('loader').classList.add('gone'), 400);
+</script>
+</body>
+</html>

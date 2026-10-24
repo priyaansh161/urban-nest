@@ -1,0 +1,13 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Spline Shot</title>
+<!-- Shows one Spline product scene full-window so a script can screenshot it: spline-shot.html?url=<scene.splinecode> -->
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
+<style>html,body{margin:0;height:100%;background:#f4f2ee}spline-viewer{width:100vw;height:100vh;display:block}</style>
+</head><body>
+<script>
+  const v = document.createElement('spline-viewer');
+  v.setAttribute('url', new URLSearchParams(location.search).get('url'));
+  v.setAttribute('loading-anim-type', 'none');
+  document.body.appendChild(v);
+</script>
+</body></html>

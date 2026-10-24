@@ -8,10 +8,19 @@
  *   --3d-for=<item id>   make the 3D model for a listing that already exists
  *   --photo=<n>          with --3d-for / --prep-for: build from photo n (1 = cover)
  *                        instead of letting the script choose
+ *   --photo-file=<path>  with --3d-for / --prep-for: build from a photo cropped by hand instead
+ *   --no-cutout          send the photo as it is (no background removal), for a photo already cropped clean
  *   --section=essentials list into Essentials (default: collection)
  *   --category=<slug>    category slug, when the guess from the title is wrong
  *   --publish            go live at once (default: saved as a draft to check in admin)
  *   --dry                read the page and show what would be listed; change nothing
+ *   --update=<item id>   fill an EXISTING listing (e.g. a photo-less draft) from one link instead of
+ *                        adding a new one; its published state, section and category are left as they
+ *                        are (unless --category is given)
+ *   --photos=<n>         keep only n photos: Amazon's main shot plus the plainest of the rest
+ *   --pick=1,3,5         keep exactly these photos (numbers as on the --sheet strip), chosen by eye
+ *   --sheet=<file.png>   with --dry: save a numbered strip of all the listing's photos, to pick from
+ *   --save-photos=<dir>  with --sheet: also save every photo full size (to crop one for --photo-file)
  *
  * Keys, from the project's .env (never committed):
  *   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   to upload photos and write the listing
@@ -30,7 +39,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { createServer } from 'node:http';
-import { dirname, join, basename } from 'node:path';
+import { dirname, join, basename, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
@@ -51,6 +60,10 @@ const DRY = !!flag('dry'), WANT_3D = !!flag('3d'), PUBLISH = !!flag('publish');
 const SECTION = flag('section') || 'collection';
 const FORCE_CAT = flag('category');
 const MODEL_FOR = flag('3d-for');
+const UPDATE = flag('update');
+const PHOTOS = Number(flag('photos')) || 0;
+const PICK = flag('pick') ? String(flag('pick')).split(',').map(Number).filter(Boolean) : null;
+if (UPDATE && links.length !== 1) { console.error('--update takes exactly one link'); process.exit(1); }
 if (!links.length && !MODEL_FOR && !flag('check-render') && !flag('prep-for')) { console.error('usage: node tools/list-product.mjs <amazon link> [...] [--3d] [--section=essentials] [--category=slug] [--publish] [--dry]\n       node tools/list-product.mjs --3d-for=<item id>'); process.exit(1); }
 
 // ─────────────────────────────────────────────────────────── keys
@@ -114,7 +127,7 @@ async function readAmazon(link) {
   // specification rows, from either of Amazon's two layouts
   const specs = [];
   const seen = new Set();
-  const add = (k, v) => { k = text(k).replace(/\s*:\s*$/, ''); v = text(v); if (!k || !v || seen.has(k.toLowerCase()) || k.length > 40 || v.length > 120) return; if (/customer review|best sellers rank|asin|date first available|manufacturer|packer|importer|generic name|item part number|model number|country of origin|net quantity|included components/i.test(k)) return; seen.add(k.toLowerCase()); specs.push([k, v]); };
+  const add = (k, v) => { k = text(k).replace(/\s*:\s*$/, ''); v = text(v); if (!k || !v || seen.has(k.toLowerCase()) || k.length > 40 || v.length > 120) return; if (/customer review|best sellers rank|asin|date first available|manufacturer|packer|importer|generic name|item part number|model number|country of origin|net quantity|included components|^price$|^upc$|country of publication/i.test(k)) return; seen.add(k.toLowerCase()); specs.push([k, v]); };
   for (const m of html.matchAll(/<tr[^>]*>\s*<th[^>]*>([\s\S]*?)<\/th>\s*<td[^>]*>([\s\S]*?)<\/td>/g)) add(m[1], m[2]);
   for (const m of html.matchAll(/<span class="a-text-bold">([\s\S]*?)<\/span>\s*<span[^>]*>([\s\S]*?)<\/span>/g)) add(m[1].replace(/[:‏‎\s]+$/g, ''), m[2]);
   for (const m of html.matchAll(/<tr class="a-spacing-small[^"]*">\s*<td[^>]*>([\s\S]*?)<\/td>\s*<td[^>]*>([\s\S]*?)<\/td>/g)) add(m[1], m[2]);
@@ -141,6 +154,9 @@ function longName(p) {
 }
 const description = (p) => {
   const b = p.bullets.map((x) => x
+    .normalize('NFKC')                                              // 𝗕𝗢𝗟𝗗 maths letters → plain text
+    .replace(/\p{Extended_Pictographic}️?/gu, '').replace(/^[\s\]】)]+/, '')   // emoji, and a bracket left behind
+    .trim()
     .replace(/^\d+\.\s*[^:\-–]{2,40}?\s*[:\-–]\s+/, '')            // '1. Charging Bull - '
     .replace(/^[A-Z0-9][A-Z0-9 &'.,/-]{3,70}[:\-–]\s*/, '')         // '6 INCH COMPACT BRASS URLI BOWL: '
     .replace(/^【[^】]*】\s*/, '').trim()).filter(Boolean);
@@ -164,23 +180,34 @@ async function photoToWebp(url) {
    much its outer border varies (a plain backdrop barely changes at the edges)
    plus how much a text banner or busy scene adds across the whole frame;
    the lowest score is sent. (His rule, 21 Oct 2026.) */
+async function plainScore(u) {
+  try {
+    const buf = Buffer.from(await (await fetch(u, { headers: { 'User-Agent': UA } })).arrayBuffer());
+    const N = 48, { data, info } = await sharp(buf).resize(N, N, { fit: 'fill' }).removeAlpha().greyscale().raw().toBuffer({ resolveWithObject: true });
+    const px = (x, y) => data[y * info.width + x];
+    const ring = [];
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (x < 4 || y < 4 || x >= N - 4 || y >= N - 4) ring.push(px(x, y));
+    const sd = (a) => { const m = a.reduce((s, v) => s + v, 0) / a.length; return Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / a.length); };
+    // neighbouring-pixel jumps: high for clutter, lifestyle scenes and text
+    let busy = 0; for (let y = 0; y < N; y++) for (let x = 1; x < N; x++) busy += Math.abs(px(x, y) - px(x - 1, y));
+    return sd(ring) * 2 + busy / (N * N);
+  } catch { return Infinity; }
+}
 async function plainestPhoto(urls) {
   let best = null;
   for (const u of urls.filter(Boolean)) {
-    try {
-      const buf = Buffer.from(await (await fetch(u, { headers: { 'User-Agent': UA } })).arrayBuffer());
-      const N = 48, { data, info } = await sharp(buf).resize(N, N, { fit: 'fill' }).removeAlpha().greyscale().raw().toBuffer({ resolveWithObject: true });
-      const px = (x, y) => data[y * info.width + x];
-      const ring = [], all = [];
-      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { all.push(px(x, y)); if (x < 4 || y < 4 || x >= N - 4 || y >= N - 4) ring.push(px(x, y)); }
-      const sd = (a) => { const m = a.reduce((s, v) => s + v, 0) / a.length; return Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / a.length); };
-      // neighbouring-pixel jumps: high for clutter, lifestyle scenes and text
-      let busy = 0; for (let y = 0; y < N; y++) for (let x = 1; x < N; x++) busy += Math.abs(px(x, y) - px(x - 1, y));
-      const score = sd(ring) * 2 + busy / (N * N);
-      if (!best || score < best.score) best = { url: u, score };
-    } catch {}
+    const score = await plainScore(u);
+    if (!best || score < best.score) best = { url: u, score };
   }
   return best ? best.url : urls[0];
+}
+/* --photos=n: Amazon's main shot (nearly always the piece on white) plus the
+   plainest of the rest, so infographics and busy lifestyle shots drop out. */
+async function cleanPhotos(urls, n) {
+  const [main, ...rest] = urls;
+  const scored = [];
+  for (const u of rest) scored.push({ u, s: await plainScore(u) });
+  return [main, ...scored.sort((a, b) => a.s - b.s).slice(0, n - 1).map((x) => x.u)];
 }
 
 /* Meshy is "not the brightest": a lifestyle scene, a text banner or a prop
@@ -259,14 +286,27 @@ async function preparedPhoto(urls) {
     note: `photo ${best.i + 1} of ${urls.length}, background removed${best.touches ? ' (piece touches the frame edge)' : ''}` };
 }
 
-// --photo=n: the photo was chosen by eye; the scorer above only guesses
-const pickPhoto = (photos) => (flag('photo') ? [photos[Number(flag('photo')) - 1]].filter(Boolean) : photos);
+// --photo=n: the photo was chosen by eye; the scorer above only guesses.
+// --photo-file=<path>: a photo cropped by hand (e.g. the one clean mat out of a size diagram), when none of the
+// listing's own photos shows the piece alone
+const pickPhoto = (photos) => (flag('photo-file') ? [resolve(flag('photo-file'))]
+  : flag('photo') ? [photos[Number(flag('photo')) - 1]].filter(Boolean) : photos);
+
+// --no-cutout: send the photo as it is, only squared up on white. The cut-out can mistake part of the piece for
+// background (it erased the brown slats of a shower mat and holed a stone mat), so a photo already cropped
+// clean by hand skips it.
+async function plainPhoto(src) {
+  const buf = /^https?:/.test(src) ? Buffer.from(await (await fetch(src, { headers: { 'User-Agent': UA } })).arrayBuffer()) : readFileSync(src);
+  const jpg = await sharp(buf).flatten({ background: '#ffffff' }).resize(1024, 1024, { fit: 'contain', background: '#ffffff' }).jpeg({ quality: 92 }).toBuffer();
+  return { url: 'data:image/jpeg;base64,' + jpg.toString('base64'), jpg, note: 'the photo as given (no cut-out)' };
+}
+const photoForMeshy = (photos) => (flag('no-cutout') ? plainPhoto(pickPhoto(photos)[0]) : preparedPhoto(pickPhoto(photos)));
 
 async function makeModel(item) {
   if (!MESHY_KEY) throw new Error('No MESHY_API_KEY in .env');
   const slug = slugify(item.name) || 'piece';
   const photos = [item.image_url].concat(Array.isArray(item.gallery) ? item.gallery : []);
-  const prep = await preparedPhoto(pickPhoto(photos));
+  const prep = await photoForMeshy(photos);
   const source = prep.url;
   if (prep.jpg) writeFileSync(join(ROOT, 'models', 'source', slug + '-meshy-input.jpg'), prep.jpg);   // what Meshy saw, to check
   console.log(`   3D · building from ${prep.note}`);
@@ -344,7 +384,7 @@ if (!DRY) await checkSupabase();
 // node tools/list-product.mjs --prep-for=<item id>   (shows the photo Meshy would get; spends no credits)
 if (flag('prep-for')) {
   const [item] = await sb('/rest/v1/collection_items?id=eq.' + flag('prep-for') + '&select=name,image_url,gallery');
-  const prep = await preparedPhoto(pickPhoto([item.image_url].concat(item.gallery || [])));
+  const prep = await photoForMeshy([item.image_url].concat(item.gallery || []));
   const out = join(ROOT, 'models', 'source', (slugify(item.name) || 'piece') + '-meshy-input.jpg');
   if (prep.jpg) writeFileSync(out, prep.jpg);
   console.log('would build from ' + prep.note + (prep.jpg ? '\nsaved: ' + out : ''));
@@ -367,16 +407,37 @@ for (const link of links) {
     const category = guessCategory(p.title);
     const buy = p.asin ? `https://www.amazon.in/dp/${p.asin}?tag=${AFFILIATE_TAG}` : link;
     console.log(`   ${name}\n   ${category} · ${p.price || 'no price shown'} · ${p.photos.length} photos · ${p.specs.length} specs · ASIN ${p.asin || '?'}`);
-    if (DRY) { console.log('   description: ' + (description(p) || '—')); console.log('   specs: ' + p.specs.map((s) => s.join(': ')).join(' · ')); ok++; continue; }
+    if (DRY) {
+      console.log('   description: ' + (description(p) || '—')); console.log('   specs: ' + p.specs.map((s) => s.join(': ')).join(' · '));
+      if (flag('sheet')) {                          // numbered strip of every photo, to choose from with --pick
+        const T = 300, tiles = [], keep = flag('save-photos');   // --save-photos=<dir>: the full-size photos too, to crop for --photo-file
+        if (keep) mkdirSync(keep, { recursive: true });
+        for (const [i, u] of p.photos.entries()) {
+          try {
+            const full = Buffer.from(await (await fetch(u, { headers: { 'User-Agent': UA } })).arrayBuffer());
+            if (keep) writeFileSync(join(keep, `${p.asin || 'photo'}-${i + 1}.jpg`), full);
+            const img = await sharp(full).resize(T, T, { fit: 'contain', background: '#fff' }).png().toBuffer();
+            const num = Buffer.from(`<svg width="60" height="44" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="44" fill="#14302f"/><text x="30" y="31" font-family="Arial" font-size="26" font-weight="700" fill="#fff" text-anchor="middle">${i + 1}</text></svg>`);
+            tiles.push(await sharp(img).composite([{ input: num, left: 0, top: 0 }]).png().toBuffer());
+          } catch {}
+        }
+        await sharp({ create: { width: tiles.length * (T + 8), height: T, channels: 3, background: '#ccc' } })
+          .composite(tiles.map((t, i) => ({ input: t, left: i * (T + 8), top: 0 }))).png().toFile(flag('sheet'));
+        console.log('   sheet: ' + flag('sheet'));
+      }
+      ok++; continue;
+    }
 
     if (p.asin) {
-      const dup = await sb(`/rest/v1/collection_items?select=id,name&buy_link=ilike.*${p.asin}*`);
+      const dup = await sb(`/rest/v1/collection_items?select=id,name&buy_link=ilike.*${p.asin}*` + (UPDATE ? `&id=neq.${UPDATE}` : ''));
       if (dup.length) { console.log(`   already listed as "${dup[0].name.slice(0, 60)}" (${dup[0].id}) — skipped`); continue; }
     }
     // the photos, into our own storage
     const slug = slugify(name) || 'piece';
     const urls = [];
-    for (const [i, src] of p.photos.slice(0, MAX_GALLERY + 1).entries()) {
+    const chosen = PICK ? PICK.map((n) => p.photos[n - 1]).filter(Boolean)
+      : PHOTOS ? await cleanPhotos(p.photos, PHOTOS) : p.photos.slice(0, MAX_GALLERY + 1);
+    for (const [i, src] of chosen.entries()) {
       try { urls.push(await upload(IMG_BUCKET, `${slug}-${Date.now().toString(36)}${i}.webp`, await photoToWebp(src), 'image/webp')); }
       catch (e) { console.log('   a photo was skipped: ' + e.message); }
     }
@@ -389,8 +450,17 @@ for (const link of links) {
       primary_cta: 'affiliate', affiliate_seller_id: aff?.affiliate_seller_id || null,
       in_stock: true, coming_soon: false, published: PUBLISH, sort_order: 0,
     };
-    const [item] = await sb('/rest/v1/collection_items', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(row) });
-    console.log(`   listed ${PUBLISH ? '(live)' : '(draft — publish it in admin)'} · ${urls.length} photos · id ${item.id}`);
+    let item;
+    if (UPDATE) {                                   // fill the existing listing; its published state and order stay as they are
+      delete row.published; delete row.sort_order; delete row.section;
+      if (!FORCE_CAT) delete row.category;
+      [item] = await sb('/rest/v1/collection_items?id=eq.' + UPDATE, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(row) });
+      if (!item) throw new Error('no listing with id ' + UPDATE);
+      console.log(`   updated ${item.published ? '(live)' : '(still a draft)'} · ${urls.length} photos · id ${item.id}`);
+    } else {
+      [item] = await sb('/rest/v1/collection_items', { method: 'POST', headers: { 'Content-Type': 'application/json', Prefer: 'return=representation' }, body: JSON.stringify(row) });
+      console.log(`   listed ${PUBLISH ? '(live)' : '(draft — publish it in admin)'} · ${urls.length} photos · id ${item.id}`);
+    }
     if (WANT_3D) await makeModel(item);
     ok++;
   } catch (e) { failed++; console.log('   ✗ ' + e.message); }
