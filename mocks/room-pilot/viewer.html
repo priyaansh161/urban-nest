@@ -233,8 +233,9 @@ async function loadRoom() {
     if (BARE && /Tumbler|Soap_Bottle|Soap_Pump|Holder_|Paper_Roll|Toilet_Mat/.test(nm)) { m.visible = false; return; }
     if (/Shell_|LM_/.test(nm) && m.material.emissiveMap) {
       // Lightmapped (walls, floor, ceiling, vanity, toilet): Blender baked their light, shadows included, into the
-      // emissive slot on their lightmap UV. Wall marble is laid as book-matched (mirrored) slabs.
-      m.material = bakedMaterial(m.material);
+      // emissive slot on their lightmap UV. Wall marble is laid as book-matched (mirrored) slabs. The toilet's
+      // lightmap is spread over many small UV islands and bakes dim; lifted so the white ceramic reads white.
+      m.material = bakedMaterial(m.material, /LM_Toilet/.test(nm) ? 1.7 : 1);
       if (/Wall/.test(nm)) for (const t of [m.material.map, m.material.normalMap, m.material.roughnessMap])
         if (t) { t.wrapS = t.wrapT = THREE.MirroredRepeatWrapping; t.needsUpdate = true; }
     } else if (/Mirror_Reflection/.test(nm)) {
