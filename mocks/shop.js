@@ -16,7 +16,8 @@
   var card = hero.querySelector('.sh-card');
   var fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
   var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var DUR = 10000, IDLE = 7000;
+  /* after a touch, a phone picks up again sooner than a laptop does */
+  var DUR = 10000, IDLE = fine ? 7000 : 4000;
   var cur = 0, t0 = performance.now(), held = 0, lastTouch = -1e9, visible = true;
   var items = {};
 
@@ -73,9 +74,15 @@
     var p = Math.min(1, (now - t0 - held) / DUR);
     tabs.forEach(function (t, i) { t.style.setProperty('--p', i === cur ? p : 0); t.classList.toggle('on', i === cur); });
     if (p >= 1 && rooms.length > 1) show(cur + 1);
-    /* phone: the wide room drifts slowly from one side to the other */
-    if (!fine && !reduced && !pan[cur].user && pan[cur].min < 0) {
-      pan[cur].x = pan[cur].min * (0.2 + 0.6 * p); place(cur);
+    /* phone: the wide room drifts slowly from one side to the other. After a
+       drag it waits IDLE, then eases back onto its path instead of jumping. */
+    if (!fine && !reduced && pan[cur].min < 0 && !card.classList.contains('show') && now - lastTouch >= IDLE) {
+      var target = pan[cur].min * (0.2 + 0.6 * p);
+      if (pan[cur].user) {
+        pan[cur].x += (target - pan[cur].x) * 0.04;
+        if (Math.abs(target - pan[cur].x) < 1) pan[cur].user = false;
+      } else pan[cur].x = target;
+      place(cur);
     }
     requestAnimationFrame(tick);
   })(prev);
@@ -119,7 +126,10 @@
   /* ── a dot opens its piece's card ── */
   var openDot = null;
   function shortName(n) { return (n || '').split('|')[0].replace(/\s*\(.*?\)/g, '').trim(); }
-  function price(it) { return it.price_paise ? '₹' + Math.round(it.price_paise / 100).toLocaleString('en-IN') : (it.price || ''); }
+  function price(it) {
+    if (it.price_paise) return '₹' + Math.round(it.price_paise / 100).toLocaleString('en-IN');
+    return String(it.price || '').replace(/INR\s*/g, '₹').replace(/\$/g, '₹').replace(/₹\s+/g, '₹').replace(/\s+to\s+/g, ' – ');
+  }
   var CAT = { lighting: 'Chandeliers', luminaires: 'Luminaires', 'wall-art': 'Curated Wallscapes', sculptures: 'Sculptures', amphorae: 'Amphorae', timepieces: 'Timepieces', festive: 'Festivities', 'bath-essentials': 'Bath essentials', 'kitchen-essentials': 'Kitchen essentials', bedroom: 'Bedroom essentials' };
   function openCard(dot) {
     var d = ROOMS[cur].dots[+dot.dataset.n], it = items[d.id] || {};

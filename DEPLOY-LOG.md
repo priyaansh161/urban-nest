@@ -61,3 +61,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-20 | 10:54 | 8676d10 (+ uncommitted changes) | Admin: search products by name in Collection and room Products lists | https://007ee5db.storeurbannest.pages.dev |
 | 2026-10-21 | 14:19 | 7111491 (+ uncommitted changes) | Squircle (Apple-style) corners, site-wide | https://09338456.storeurbannest.pages.dev |
 | 2026-10-21 | 16:43 | e65850d (+ uncommitted changes) | Admin Collection: drafts tinted red and listed first | https://4bc21c31.storeurbannest.pages.dev |
+| 2026-10-22 | 20:33 | e2aa902 (+ uncommitted changes) | Homepage and /look hero now opens on a random room each visit (never the same twice in a row) | https://5afb4c3f.storeurbannest.pages.dev |

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Amazon Links — Urban Nest Admin</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/admin/config.js"></script>
+<script src="/admin/auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; --ok: #2f7d5b; --bad: #c0392b; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+
+  .main { margin-left: 220px; flex: 1; padding: 48px; min-width: 0; }
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin-top: 4px; max-width: 70ch; line-height: 1.6; }
+
+  .setup-banner { display: none; background: #fff6e5; border: 0.5px solid #e6c98a; border-left: 3px solid var(--gold); padding: 18px 22px; margin-bottom: 24px; font-size: 13px; line-height: 1.7; }
+  .setup-banner code { background: rgba(0,0,0,0.06); padding: 1px 6px; font-size: 12px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+  .chip { background: var(--white); border: 0.5px solid var(--border); padding: 14px 20px; min-width: 130px; cursor: pointer; text-align: left; font-family: inherit; color: inherit; transition: border-color .2s; }
+  .chip:hover, .chip.on { border-color: var(--black); }
+  .chip b { display: block; font-family: 'Bodoni Moda', serif; font-size: 26px; font-weight: 400; }
+  .chip span { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--grey); }
+  .chip.bad b { color: var(--bad); }
+  .chip.good b { color: var(--ok); }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; align-items: center; }
+  input, select { padding: 10px 14px; border: 0.5px solid var(--border); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--black); outline: none; }
+  input:focus, select:focus { border-color: var(--gold); }
+  input[type=search] { flex: 1; min-width: 200px; }
+  .btn { padding: 11px 22px; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; transition: all 0.2s; background: var(--black); color: var(--white); }
+  .btn:hover { background: #222; }
+
+  .panel { background: var(--white); border: 0.5px solid var(--border); }
+  .row { padding: 18px 24px; border-bottom: 0.5px solid var(--border); display: grid; grid-template-columns: minmax(0,1fr) 190px auto; gap: 20px; align-items: center; }
+  .row:last-child { border-bottom: none; }
+  .row.focus { background: var(--gold-light); }
+  .row.gone { background: rgba(192,57,43,0.04); }
+  .name { font-size: 14px; font-weight: 500; }
+  .sub { font-size: 11px; color: var(--grey); margin-top: 4px; line-height: 1.5; word-break: break-all; }
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; display: inline-block; margin-right: 6px; }
+  .b-grey { background: #eee; color: var(--grey); }
+  .b-gold { background: var(--gold-light); color: var(--gold); }
+  .b-ok { background: rgba(47,125,91,0.12); color: var(--ok); }
+  .b-bad { background: rgba(192,57,43,0.12); color: var(--bad); }
+  .status small { display: block; font-size: 11px; color: var(--grey); margin-top: 6px; }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .rb { padding: 6px 12px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; border: 0.5px solid var(--border); background: transparent; cursor: pointer; color: var(--grey); font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block; transition: all 0.2s; }
+  .rb:hover { border-color: var(--black); color: var(--black); }
+  .rb.ok { color: var(--ok); border-color: rgba(47,125,91,0.4); }
+  .rb.ok:hover { background: rgba(47,125,91,0.08); }
+  .rb.bad { color: var(--bad); border-color: rgba(192,57,43,0.3); }
+  .rb.bad:hover { background: rgba(192,57,43,0.06); }
+  .empty { padding: 56px 24px; text-align: center; color: var(--grey); font-size: 13px; }
+  .how { background: var(--white); border: 0.5px solid var(--border); border-left: 2px solid var(--gold); padding: 16px 20px; font-size: 12px; line-height: 1.7; color: #444; margin-bottom: 24px; }
+  .how strong { color: var(--black); }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-error { background: var(--bad); }
+
+  @media (max-width: 900px) { .main { margin-left: 0; padding: 24px 16px; } .sidebar { display: none; } .row { grid-template-columns: 1fr; } .actions { justify-content: flex-start; } }
+</style>
+<link rel="stylesheet" href="/admin/studio-colors.css"/>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="contributors.html" class="nav-item"><span class="icon">✧</span> Contributors</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
+    <a href="products.html" class="nav-item"><span class="icon">◆</span> 3D Products</a>
+    <a href="amazon-links.html" class="nav-item active"><span class="icon">⛓</span> Amazon Links</a>
+    <div class="nav-group-label">Commerce</div>
+    <a href="sellers.html" class="nav-item"><span class="icon">⬢</span> Sellers</a>
+    <a href="orders.html" class="nav-item"><span class="icon">▦</span> Orders</a>
+    <div class="nav-group-label">Content Creation</div>
+    <a href="social.html" class="nav-item"><span class="icon">▣</span> Media Engagement</a>
+    <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
+    <a href="article-card.html" class="nav-item"><span class="icon">▤</span> Article Cards</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Amazon Links</h1>
+    <p>Which of your pieces are still listed on Amazon. Open each link, look at the Amazon page, and mark it. A piece marked <strong>Gone</strong> stays on Urban Nest but its Amazon button disappears, so nobody lands on a dead listing.</p>
+  </div>
+
+  <div class="setup-banner" id="setupBanner">
+    <strong>One-time setup needed.</strong> The database does not have the Amazon status columns yet.
+    Open Supabase → SQL Editor, paste the contents of <code>admin/add-amazon-status.sql</code> and run it, then reload this page.
+  </div>
+
+  <div class="how">
+    <strong>How a check works.</strong> Press <strong>Open ↗</strong>. If the Amazon page loads with the product and a Buy option, press <strong>Still there</strong>.
+    If it says "page not found", "currently unavailable" with no way to buy it, or shows a different product, press <strong>Gone</strong>.
+    Links are done in order of oldest check first; anything older than 30 days comes back for a re-check.
+    Links that are only <code>amazon.in</code> with no product (like the Bathroom MK1 dots) are listed separately — there is nothing to check until a real product link is pasted in.
+  </div>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="Search by product name…" oninput="render()"/>
+    <select id="srcSel" onchange="render()">
+      <option value="">Everywhere</option>
+      <option value="collection">Collection</option>
+      <option value="essentials">Essentials</option>
+      <option value="room">3D rooms</option>
+    </select>
+    <button class="btn" onclick="openNext()">Open next to check ↗</button>
+  </div>
+
+  <div class="panel" id="list"><div class="empty">Loading…</div></div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STALE_DAYS = 30;
+let rows = [];            // every product from both tables, normalised
+let view = 'check';       // which chip is selected
+let focusKey = null;      // the row opened by "Open next"
+let ready = true;         // false until the status columns exist
+
+(async () => { await requireAuth(); await load(); })();
+
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, bad) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show' + (bad ? ' toast-error' : ''); clearTimeout(t._h); t._h = setTimeout(() => t.className = 'toast', 2600); }
+
+/* What kind of link is this? Decides whether there is a product to check
+   and whether the product code can be read straight off the link. */
+function classify(link) {
+  const l = (link || '').trim();
+  if (!l) return { kind: 'none', label: 'No link' };
+  if (/^TODO-/i.test(l)) return { kind: 'todo', label: 'Placeholder' };
+  if (/^https?:\/\/(www\.)?amazon\.in\/?(\?.*)?$/i.test(l)) return { kind: 'generic', label: 'No product yet' };
+  const m = l.match(/\/(?:dp|gp\/product)\/([A-Z0-9]{10})/i);
+  if (m) {
+    const tag = (l.match(/[?&]tag=([^&#]+)/i) || [])[1] || '';
+    const clean = tag && l === 'https://www.amazon.in/dp/' + m[1].toUpperCase() + '?tag=' + tag;
+    return { kind: clean ? 'clean' : 'long', label: clean ? 'Product link' : 'Long link', asin: m[1].toUpperCase(), tag };
+  }
+  if (/amzn\.(to|in)\/|link\.amazon\//i.test(l)) return { kind: 'short', label: 'Short link' };
+  if (/amazon\./i.test(l)) return { kind: 'other', label: 'Amazon link' };
+  return { kind: 'offsite', label: 'Not Amazon' };
+}
+const CHECKABLE = k => ['clean', 'long', 'short', 'other'].includes(k);
+
+function daysSince(iso) { return iso ? (Date.now() - new Date(iso).getTime()) / 86400000 : Infinity; }
+function stateOf(r) {
+  if (!CHECKABLE(r.cls.kind)) return 'nolink';
+  if (r.status === 'gone') return 'gone';
+  if (r.status === 'ok' && daysSince(r.checkedAt) <= STALE_DAYS) return 'ok';
+  return 'check';   // never checked, or the last check has gone stale
+}
+
+async function load() {
+  const [c, p] = await Promise.all([
+    db.from('collection_items').select('*'),
+    db.from('room_products').select('*')
+  ]);
+  if (c.error || p.error) { toast('Could not load products', true); document.getElementById('list').innerHTML = '<div class="empty">Could not load products.</div>'; return; }
+  const sample = (c.data || [])[0] || (p.data || [])[0];
+  ready = !!sample && 'amazon_status' in sample;
+  document.getElementById('setupBanner').style.display = ready ? 'none' : 'block';
+
+  const ROOMS = { bath: 'Bathroom', kitchen: 'Kitchen', bed: 'Bedroom' };
+  rows = [];
+  (c.data || []).forEach(x => rows.push({
+    key: 'c' + x.id, table: 'collection_items', id: x.id, name: x.name,
+    src: x.section === 'essentials' ? 'essentials' : 'collection',
+    where: x.section === 'essentials' ? 'Essentials' : 'Collection',
+    link: x.buy_link, published: x.published, status: x.amazon_status || 'unchecked', checkedAt: x.amazon_checked_at, cls: classify(x.buy_link)
+  }));
+  (p.data || []).forEach(x => rows.push({
+    key: 'r' + x.id, table: 'room_products', id: x.id, name: x.name, src: 'room',
+    where: '3D room · ' + (ROOMS[x.room] || x.room),
+    link: x.buy_link, published: x.published, status: x.amazon_status || 'unchecked', checkedAt: x.amazon_checked_at, cls: classify(x.buy_link)
+  }));
+  // Oldest check first, never-checked at the very top.
+  rows.sort((a, b) => (a.checkedAt ? new Date(a.checkedAt).getTime() : 0) - (b.checkedAt ? new Date(b.checkedAt).getTime() : 0) || a.name.localeCompare(b.name));
+  render();
+}
+
+function counts() {
+  const n = { check: 0, ok: 0, gone: 0, nolink: 0, all: rows.length };
+  rows.forEach(r => n[stateOf(r)]++);
+  return n;
+}
+
+function render() {
+  const n = counts();
+  const chip = (k, label, cls) => '<button class="chip ' + cls + (view === k ? ' on' : '') + '" onclick="setView(\'' + k + '\')"><b>' + n[k] + '</b><span>' + label + '</span></button>';
+  document.getElementById('chips').innerHTML =
+    chip('check', 'To check', '') + chip('gone', 'Gone from Amazon', n.gone ? 'bad' : '') +
+    chip('ok', 'Still there', 'good') + chip('nolink', 'No product link', '') + chip('all', 'All products', '');
+
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const src = document.getElementById('srcSel').value;
+  const list = rows.filter(r => (view === 'all' || stateOf(r) === view) && (!src || r.src === src) && (!q || r.name.toLowerCase().includes(q)));
+
+  document.getElementById('list').innerHTML = list.length ? list.map(rowHtml).join('') :
+    '<div class="empty">' + (view === 'check' && !q && !src ? 'Nothing left to check. 🎉' : 'Nothing matches.') + '</div>';
+}
+
+function setView(v) { view = v; focusKey = null; render(); }
+
+function rowHtml(r) {
+  const s = stateOf(r);
+  const badge = s === 'ok' ? '<span class="badge b-ok">Still there</span>'
+    : s === 'gone' ? '<span class="badge b-bad">Gone</span>'
+    : s === 'nolink' ? '<span class="badge b-grey">No product link</span>'
+    : r.status === 'ok' ? '<span class="badge b-gold">Re-check due</span>' : '<span class="badge b-gold">Unchecked</span>';
+  const when = r.checkedAt ? 'Checked ' + new Date(r.checkedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Never checked';
+  const draft = r.published ? '' : '<span class="badge b-grey">Draft</span>';
+  const open = CHECKABLE(r.cls.kind) ? '<a class="rb" href="' + esc(r.link) + '" target="_blank" rel="noopener noreferrer">Open ↗</a>' : '';
+  const marks = CHECKABLE(r.cls.kind)
+    ? '<button class="rb ok" onclick="mark(\'' + r.key + '\',\'ok\')">Still there</button><button class="rb bad" onclick="mark(\'' + r.key + '\',\'gone\')">Gone</button>' +
+      (r.status !== 'unchecked' ? '<button class="rb" onclick="mark(\'' + r.key + '\',\'unchecked\')">Reset</button>' : '')
+    : '';
+  const tidy = r.cls.kind === 'long' && r.cls.tag ? '<button class="rb" title="Rewrites to a short link with the same product and your tag" onclick="tidy(\'' + r.key + '\')">Tidy link</button>' : '';
+  const hint = r.cls.kind === 'generic' ? 'Just amazon.in — paste a real product link in the editor'
+    : r.cls.kind === 'none' ? 'No buy link set'
+    : r.cls.kind === 'todo' ? 'Placeholder — replace with a SiteStripe link'
+    : r.cls.kind === 'offsite' ? 'Not an Amazon link'
+    : r.cls.asin ? 'Product code ' + r.cls.asin : '';
+  return '<div class="row ' + (s === 'gone' ? 'gone ' : '') + (focusKey === r.key ? 'focus' : '') + '" id="row-' + r.key + '">' +
+    '<div><div class="name">' + esc(r.name) + '</div>' +
+      '<div class="sub"><span class="badge b-grey">' + esc(r.where) + '</span><span class="badge b-grey">' + esc(r.cls.label) + '</span>' + draft + esc(hint) + '</div>' +
+      (r.link && CHECKABLE(r.cls.kind) ? '<div class="sub">' + esc(r.link.length > 90 ? r.link.slice(0, 90) + '…' : r.link) + '</div>' : '') + '</div>' +
+    '<div class="status">' + badge + '<small>' + esc(s === 'nolink' ? '' : when) + '</small></div>' +
+    '<div class="actions">' + open + marks + tidy + '</div></div>';
+}
+
+async function mark(key, status) {
+  if (!ready) { toast('Run the one-time setup first', true); return; }
+  const r = rows.find(x => x.key === key); if (!r) return;
+  const patch = { amazon_status: status, amazon_checked_at: status === 'unchecked' ? null : new Date().toISOString() };
+  const { error } = await db.from(r.table).update(patch).eq('id', r.id);
+  if (error) { toast('Could not save: ' + error.message, true); return; }
+  r.status = status; r.checkedAt = patch.amazon_checked_at;
+  toast(status === 'gone' ? r.name + ' — Amazon button hidden on the site' : status === 'ok' ? r.name + ' — confirmed' : 'Reset');
+  focusKey = null; render();
+}
+
+/* Rewrites a long link full of tracking parameters into
+   https://www.amazon.in/dp/<code>?tag=<your tag>. Same product, same
+   affiliate tag, none of the search-session junk. */
+async function tidy(key) {
+  const r = rows.find(x => x.key === key); if (!r || !r.cls.asin || !r.cls.tag) return;
+  const clean = 'https://www.amazon.in/dp/' + r.cls.asin + '?tag=' + r.cls.tag;
+  const { error } = await db.from(r.table).update({ buy_link: clean }).eq('id', r.id);
+  if (error) { toast('Could not save: ' + error.message, true); return; }
+  r.link = clean; r.cls = classify(clean);
+  toast('Link tidied'); render();
+}
+
+function openNext() {
+  const next = rows.find(r => stateOf(r) === 'check');
+  if (!next) { toast('Nothing left to check'); return; }
+  view = 'check'; document.getElementById('q').value = ''; document.getElementById('srcSel').value = '';
+  focusKey = next.key; render();
+  const el = document.getElementById('row-' + next.key);
+  if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  window.open(next.link, '_blank', 'noopener,noreferrer');
+}
+</script>
+</body>
+</html>

@@ -61,8 +61,25 @@
     t0 = performance.now(); held = 0;
   }
   tabs.forEach(function (t) { t.addEventListener('click', function () { show(+t.dataset.i); lastTouch = performance.now(); }); });
-  rooms[0].classList.add('on'); eyebrow.textContent = ROOMS[0].label;
-  setTimeout(function () { rooms[0].classList.add('ready'); }, 700);
+  /* every visit opens on a different room: a random one, never the same as the
+     last visit on this device. The slideshow then carries on from there. */
+  var start = Math.floor(Math.random() * rooms.length);
+  try {
+    /* keyed by room count so the homepage and the /look page keep their own memory */
+    var key = 'un-hero-room-' + rooms.length, last = parseInt(localStorage.getItem(key), 10);
+    if (rooms.length > 1 && start === last) start = (start + 1 + Math.floor(Math.random() * (rooms.length - 1))) % rooms.length;
+    localStorage.setItem(key, start);
+  } catch (e) {}
+  if (start) {
+    /* the page marks the first room as the priority photo; hand that to the one we chose */
+    var first = rooms[0].querySelector('img'), pick = rooms[start].querySelector('img');
+    first.removeAttribute('fetchpriority'); first.loading = 'lazy';
+    pick.loading = 'eager'; pick.setAttribute('fetchpriority', 'high');
+  }
+  cur = start;
+  rooms[cur].classList.add('on'); eyebrow.textContent = ROOMS[cur].label;
+  layout();
+  setTimeout(function () { rooms[cur].classList.add('ready'); }, 700);
 
   /* the clock stops while the hero is off screen, a card is open, or someone touched it lately */
   var prev = performance.now();

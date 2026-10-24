@@ -33,6 +33,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase.js"></script>
   <script src="share.js"></script>
+  <script src="rating.js"></script>
   <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -605,6 +606,7 @@
       <div class="panel-name" id="p-name"></div>
       <div class="panel-desc" id="p-desc"></div>
       <div class="divider"></div>
+      <div id="p-take"></div>
       <div class="specs" id="p-specs"></div>
       <p class="similar-note">Similar style · Available in India</p>
       <p class="panel-render-note">Shown as a 3D model built with AI assistance from the
@@ -666,6 +668,7 @@
       scenes = sceneRes || [];
       if (!scenes.length && DEFAULT_SCENE) scenes = [{ id: null, name: 'Main View', url: DEFAULT_SCENE }];
       allProducts = (prodRes && prodRes.length) ? prodRes : FALLBACK_PRODUCTS;
+      allProducts.forEach(function (p) { if (p.amazon_status === 'gone') p.buy_link = null; });   // marked in Admin → Amazon Links
 
       if (!scenes.length) {
         document.getElementById('loading').style.display = 'none';
@@ -942,6 +945,7 @@
       const buy = document.getElementById('p-buy');
       buy.style.display = p.buy_link ? '' : 'none';
       buy.href = p.buy_link || '#';
+      document.getElementById('p-take').innerHTML = UNTake.block(p);
       document.getElementById('p-specs').innerHTML = (p.specs || []).map(([l, v]) =>
         `<div class="spec-row"><span class="spec-label">${l}</span><span class="spec-val">${v}</span></div>`
       ).join('');

@@ -150,6 +150,7 @@
     <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
     <a href="spline.html" class="nav-item"><span class="icon">◉</span> Spline Scenes</a>
     <a href="products.html" class="nav-item active"><span class="icon">◆</span> 3D Products</a>
+    <a href="amazon-links.html" class="nav-item"><span class="icon">⛓</span> Amazon Links</a>
     <div class="nav-group-label">Commerce</div>
     <a href="sellers.html" class="nav-item"><span class="icon">⬢</span> Sellers</a>
     <a href="orders.html" class="nav-item"><span class="icon">▦</span> Orders</a>
@@ -250,6 +251,26 @@
           <div id="specRows"></div>
           <button class="add-spec" onclick="addSpecRow()">+ Add specification</button>
         </div>
+<div class="form-group" id="unTakeBox" style="display:flex;flex-direction:column;gap:8px">
+  <label>Our take <span style="opacity:.6;text-transform:none;letter-spacing:0">— your own rating &amp; verdict, shown on the product</span></label>
+  <select id="unRating">
+    <option value="">No rating yet</option>
+    <option value="5">5.0 / 5</option>
+    <option value="4.5">4.5 / 5</option>
+    <option value="4">4.0 / 5</option>
+    <option value="3.5">3.5 / 5</option>
+    <option value="3">3.0 / 5</option>
+    <option value="2.5">2.5 / 5</option>
+    <option value="2">2.0 / 5</option>
+    <option value="1.5">1.5 / 5</option>
+    <option value="1">1.0 / 5</option>
+    <option value="0.5">0.5 / 5</option>
+  </select>
+  <textarea id="unTake" placeholder="How is it really? Build, finish, how it looks in a room vs the photos, who it suits…"></textarea>
+  <textarea id="unPros" placeholder="What's good — one point per line"></textarea>
+  <textarea id="unCons" placeholder="What to watch for — one point per line"></textarea>
+  <span class="hint form-hint">Your opinion, not copied from any store's reviews. Leave it all blank to show nothing.</span>
+</div>
         <details class="advanced">
           <summary>Advanced</summary>
           <div class="form-group">
@@ -274,6 +295,7 @@
   <!-- LIST -->
   <div class="list-panel">
     <div class="list-header" id="listHeader">Bathroom Products</div>
+    <div style="padding:8px 14px"><input type="search" id="productSearch" placeholder="Search by name…" oninput="renderList()" style=""/></div>
     <div id="productList"><div class="empty-state">Loading…</div></div>
   </div>
 </main>
@@ -606,6 +628,10 @@ function selectProduct(pid) {
   document.getElementById('pPopupBg').value = p.popup_bg === 'light' ? 'light' : 'dark';
   document.getElementById('pObject').value = p.object_name || '';
   document.getElementById('pPublished').checked = !!p.published;
+  document.getElementById('unRating').value = p.un_rating == null ? '' : String(Number(p.un_rating));
+  document.getElementById('unTake').value = p.un_take || '';
+  document.getElementById('unPros').value = p.un_pros || '';
+  document.getElementById('unCons').value = p.un_cons || '';
   const rows = document.getElementById('specRows');
   rows.innerHTML = '';
   (p.specs || []).forEach(([k, v]) => addSpecRow(k, v));
@@ -674,6 +700,10 @@ async function saveProduct() {
     popup_bg: document.getElementById('pPopupBg').value,
     object_name: document.getElementById('pObject').value.trim() || null,
     specs: collectSpecs(),
+    un_rating: document.getElementById('unRating').value ? Number(document.getElementById('unRating').value) : null,
+    un_take: document.getElementById('unTake').value.trim() || null,
+    un_pros: document.getElementById('unPros').value.trim() || null,
+    un_cons: document.getElementById('unCons').value.trim() || null,
     published: document.getElementById('pPublished').checked,
     dot_x: editing.dot_x ?? 50,
     dot_y: editing.dot_y ?? 50,
@@ -697,6 +727,11 @@ async function saveProduct() {
     const { popup_bg, ...rest } = payload;
     ({ error } = await write(rest));
     if (!error) showToast('Saved — run admin/add-popup-bg.sql to store the backdrop choice');
+  }
+  if (error && /un_rating|un_take|un_pros|un_cons/.test(error.message || '')) {
+    const { un_rating, un_take, un_pros, un_cons, ...rest } = payload;
+    ({ error } = await write(rest));
+    if (!error) showToast('Saved, but your rating was not — run admin/add-product-ratings.sql first');
   }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
   showToast(editing.id ? 'Product updated' : 'Product added!');
@@ -748,11 +783,15 @@ function renderList() {
 
   // Match the stage: list only the products whose dots are on the current view
   // (a product with no scene_id belongs to every view).
-  const inView = products.filter(p => !p.scene_id || p.scene_id === currentSceneId);
+  const q = (document.getElementById('productSearch').value || '').trim().toLowerCase();
+  // While searching, look across every view of the room, not just the one on stage.
+  const inView = q
+    ? products.filter(p => (p.name || '').toLowerCase().includes(q))
+    : products.filter(p => !p.scene_id || p.scene_id === currentSceneId);
   // Products pinned to a scene that is no longer active can't be reached from any
   // view's dots, so surface them separately — otherwise they'd be uneditable.
   const activeIds = new Set(roomScenes.map(s => s.id).filter(Boolean));
-  const orphaned = products.filter(p => p.scene_id && p.scene_id !== currentSceneId && !activeIds.has(p.scene_id));
+  const orphaned = q ? [] : products.filter(p => p.scene_id && p.scene_id !== currentSceneId && !activeIds.has(p.scene_id));
 
   const row = p => `
     <div class="item-row">
@@ -774,7 +813,7 @@ function renderList() {
 
   let html = inView.length
     ? inView.map(row).join('')
-    : `<div class="empty-state" style="padding:28px">No products on this view yet.<br/>Press <strong>+ Add Product Dot</strong> to place one here.</div>`;
+    : q ? `<div class="empty-state" style="padding:28px">No product matches that name.</div>` : `<div class="empty-state" style="padding:28px">No products on this view yet.<br/>Press <strong>+ Add Product Dot</strong> to place one here.</div>`;
   if (orphaned.length) {
     html += `<div class="list-subhead">Not on any active scene — reassign or delete</div>` + orphaned.map(row).join('');
   }
