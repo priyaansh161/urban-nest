@@ -74,7 +74,6 @@ M = {
     'cream': mat('Cream Ceramic', (0.84, 0.80, 0.72, 1), 0.5),
     'amber': mat('Amber Glass', (0.28, 0.14, 0.05, 1), 0.2),
     'paper': mat('Paper', (0.95, 0.95, 0.93, 1), 0.9),
-    'reed': mat('Reed', (0.72, 0.55, 0.32, 1), 0.8),
     'glow': mat('Warm Glow', (1, .85, .65, 1), 0.5, 0.0, emit=((1, .78, .5, 1), 2.0)),
     'bulb': mat('Downlight', (1, .9, .75, 1), 0.3, 0.0, emit=((1, .85, .6, 1), 6.0)),
 }
@@ -180,6 +179,8 @@ def place(d, folder):
         bpy.context.view_layer.update(); mn, mx = bounds(new); root.location.y += -d['alignBack'] - mx.y
     if 'alignLeft' in d:
         bpy.context.view_layer.update(); mn, mx = bounds(new); root.location.x += d['alignLeft'] - mn.x
+    if 'alignRight' in d:
+        bpy.context.view_layer.update(); mn, mx = bounds(new); root.location.x += d['alignRight'] - mx.x
     made = new + [root, inner]
     if d.get('flowers'):
         fnew = import_glb(os.path.join(OUT, 'staging', d['flowers'] if isinstance(d['flowers'], str) else 'flowers.glb'))
@@ -289,12 +290,9 @@ cyl('Faucet Lever', (VX + 0.035, Y1 - 0.09, 0.945), 0.007, 0.07, M['chrome'], ro
 rrect('Mirror Glow', 'xz', (VX, Y1 - 0.012, 1.45), 1.00, 0.72, 0.09, M['glow'])
 mirror = rrect('Mirror_Reflection', 'xz', (VX, Y1 - 0.030, 1.45), 0.90, 0.62, 0.07, mat('Mirror', (0.96, 0.96, 0.95, 1), 0.1))   # own material: the sink shared it and showed the reflection
 
-# ---------------------------------------------------------------- ZONE 2: TOILET (the Meshy toilet, baked into the room)
-CIS = 0.80              # cistern top of the toilet (placements.json: toilet-btw.glb, 0.80 m)
-cyl('Reed Bottle', (TX - 0.10, Y1 - 0.12, CIS + 0.045), 0.03, 0.09, M['amber'])
-for i, a in enumerate(range(-2, 3)):
-    cyl('Reed', (TX - 0.10 + a * 0.012, Y1 - 0.12, CIS + 0.16), 0.0025, 0.2, M['reed'], rot=(a * 0.07, 0, a * 0.05), seg=6)
-# the paper holder is the MK2 product (placements.json)
+# ---------------------------------------------------------------- ZONE 2: TOILET
+# The toilet, paper holder and everything on the cistern are placed from placements.json; the toilet is lit live
+# in the viewer (its bake came out mottled) and only casts its shadows here. (The hand-built reed diffuser is gone.)
 
 # ---------------------------------------------------------------- GLASS PANEL + ZONE 3: SHOWER
 box('Glass Panel', (GX, 0.70, 1.02), (0.010, 1.40, 2.00), M['glass'])

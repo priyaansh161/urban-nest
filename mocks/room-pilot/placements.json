@@ -1,5 +1,5 @@
 {
- "_note": "Read by viewer.html (places them) AND build_bath_v6.py (bakes their shadows into the room). Positions are three.js: x right, y up, z toward the camera; the back wall is z = -1.4. inRoom items are baked into the room .glb itself, so the viewer skips them. alignLeft pushes an item flush to the left wall (x = -2.2). mat items lie on the floor and are left out of the bake. tint darkens a Meshy model whose texture came out lighter than the product.",
+ "_note": "Read by viewer.html (places them) AND build_bath_v6.py (bakes their shadows into the room). Positions are three.js: x right, y up, z toward the camera; the back wall is z = -1.4. inRoom items are baked into the room .glb itself, so the viewer skips them. alignLeft / alignRight push an item flush to the left / right wall (x = -2.2 / 2.2). mat items lie on the floor and are left out of the bake. tint darkens a Meshy model whose texture came out lighter than the product. built marks a product modelled in Blender (its Meshy model was poor); its listing keeps the Meshy one. footprint [w, d] fits a mat to its listed size exactly.",
  "products": [
   {
    "id": "4c8fd823-211d-4578-982b-41aab6f26906",
@@ -31,7 +31,11 @@
     ]
    ],
    "link": "https://www.amazon.in/dp/B0H4G82KDC?tag=urbannest03b-21",
-   "listing": "Weava HOME Memory Foam Bath Mat, 60cm x 40cm, Stone Grey, Rectangular, Ultra Soft Velvet Surface, Super Absorbent, Non-Slip, Fast Drying"
+   "listing": "Weava HOME Memory Foam Bath Mat, 60cm x 40cm, Stone Grey, Rectangular, Ultra Soft Velvet Surface, Super Absorbent, Non-Slip, Fast Drying",
+   "footprint": [
+    0.6,
+    0.4
+   ]
   },
   {
    "id": "fcedc362-cdd3-4857-9c91-e2f131d4730e",
@@ -62,7 +66,11 @@
     ]
    ],
    "link": "https://www.amazon.in/dp/B07HMDZDF8?tag=urbannest03b-21",
-   "listing": "SARAL HOME EASY LIVING Saral Home Cotton Anti Slip Bathmat Set with Contour | Soft & Super Absorbent Mats for Shower"
+   "listing": "SARAL HOME EASY LIVING Saral Home Cotton Anti Slip Bathmat Set with Contour | Soft & Super Absorbent Mats for Shower",
+   "footprint": [
+    0.5,
+    0.45
+   ]
   },
   {
    "id": "51237009-e242-41da-803b-35dddacb7d23",
@@ -95,40 +103,11 @@
    ],
    "link": "https://www.amazon.in/dp/B0G1Y6J2T8?tag=urbannest03b-21",
    "listing": "HOMEZE® TPE Anti-Slip Shower Mat – Elevate Your Bathing Experience | Strong Suction Grips & Drain Holes",
-   "tint": 0.62
-  },
-  {
-   "id": "93844091-76b9-4abc-b42b-af1e6e39eb4a",
-   "name": "Stone Bath Mat",
-   "tag": "BATHROOM ESSENTIALS",
-   "file": "bath-stone-mat.glb",
-   "flat": true,
-   "length": 0.6,
-   "pos": [
-    1.65,
-    0.002,
-    0.42
-   ],
-   "mat": true,
-   "noShadow": true,
-   "desc": "Instant Absorption & Quick Drying Made from highly porous material, it absorbs water within seconds and evaporates moisture rapidly, keeping floors dry and hygienic—no more soggy m",
-   "specs": [
-    [
-     "Pile Height",
-     "High Pile"
-    ],
-    [
-     "Construction Type",
-     "Machine Made"
-    ],
-    [
-     "Indoor Outdoor Usage",
-     "Indoor"
-    ]
-   ],
-   "link": "https://www.amazon.in/dp/B0CL9W6NNT?tag=urbannest03b-21",
-   "listing": "The Artment your artistic apartment Diatomite Terradry Stone Bathroom Rectangular Shower Mat, Non-Slip Super Absorbent Quick Drying",
-   "tint": 0.5
+   "tint": 0.62,
+   "footprint": [
+    0.68,
+    0.38
+   ]
   },
   {
    "id": "bc4469b7-adc4-45e4-bebd-9e66f6cf5571",
@@ -227,13 +206,12 @@
    "name": "Towel Rack",
    "tag": "BATHROOM ESSENTIALS",
    "file": "bath-towel-rack.glb",
-   "length": 0.6,
+   "length": 0.608,
    "pos": [
-    0.76,
+    2.2,
     1.32,
-    0
+    0.05
    ],
-   "alignBack": -1.4,
    "noShadow": true,
    "desc": "Premium Stainless Steel Build – Durable black matte towel holder in bathroom made from rust-resistant steel.",
    "specs": [
@@ -252,7 +230,9 @@
    ],
    "link": "https://www.amazon.in/dp/B0FLPXN37Q?tag=urbannest03b-21",
    "listing": "Gloxy Premium Towel Rack with Towel Rod & Hooks - Black Matte Finish Stainless Steel Folding Wall Mounted Towel Rod for Bathroom - Space",
-   "tint": 0.45
+   "built": "make_rack_brush.py",
+   "rotY": -1.5708,
+   "alignRight": 2.2
   },
   {
    "id": "c6b0c4a1-7032-40b0-85c2-eb62e6b4b5f0",
@@ -290,7 +270,7 @@
    "name": "Toilet Brush",
    "tag": "BATHROOM ESSENTIALS",
    "file": "bath-toilet-brush.glb",
-   "height": 0.4,
+   "height": 0.36,
    "pos": [
     -0.3,
     0,
@@ -312,7 +292,8 @@
     ]
    ],
    "link": "https://www.amazon.in/dp/B0FDPYRBQW?tag=urbannest03b-21",
-   "listing": "BonKaso Tilly Toilet Brush with Holder for Bathroom Cleaning | TPR Soft Bristles & Anti-Scratch Design"
+   "listing": "BonKaso Tilly Toilet Brush with Holder for Bathroom Cleaning | TPR Soft Bristles & Anti-Scratch Design",
+   "built": "make_rack_brush.py"
   },
   {
    "id": "p1",
@@ -356,7 +337,7 @@
    "rotY": -0.4,
    "flowers": "flowers_small.glb",
    "flowerHeight": 0.28,
-   "noShadow": true,
+   "noShadow": false,
    "desc": "A small sculptural vase with a few stems, on the toilet cistern beside the reed diffuser.",
    "specs": [
     [
@@ -383,8 +364,7 @@
    ],
    "rotY": 0,
    "alignBack": -1.4,
-   "noShadow": true,
-   "inRoom": true
+   "noShadow": true
   },
   {
    "name": "Shower",

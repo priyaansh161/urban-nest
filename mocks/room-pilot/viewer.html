@@ -36,7 +36,11 @@
   header h1 { font-family:'Bodoni Moda',serif; font-weight:400; font-size:20px; margin:0; }
   header small { display:block; font-size:10px; letter-spacing:.22em; color:var(--gold); text-transform:uppercase; margin-top:2px; }
   .pill { pointer-events:auto; }
-  #bar { position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom)); transform:translateX(-50%); display:flex; gap:8px; z-index:5; flex-wrap:wrap; justify-content:center; width:calc(100% - 24px); }
+  #bar { position:fixed; left:50%; bottom:calc(40px + env(safe-area-inset-bottom)); transform:translateX(-50%); display:flex; gap:8px; z-index:5; flex-wrap:wrap; justify-content:center; width:calc(100% - 24px); }
+  /* how to move around: mouse or touch wording, chosen by the device (set in the script). Kept quiet on purpose:
+     most people find their way; this is only there for someone who gets stuck. */
+  #hint { position:fixed; left:50%; bottom:calc(12px + env(safe-area-inset-bottom)); transform:translateX(-50%); width:calc(100% - 24px); text-align:center;
+          font-size:11px; letter-spacing:.04em; color:rgba(248,247,244,.42); text-shadow:0 1px 4px rgba(0,0,0,.35); z-index:5; pointer-events:none; }
   button { font:inherit; font-size:12px; letter-spacing:.08em; color:var(--ink); background:rgba(14,42,42,.78); border:1px solid rgba(248,247,244,.25); padding:9px 14px;
            border-radius:999px; cursor:pointer; backdrop-filter:blur(6px); }
   button:hover, button.on { background:var(--gold); color:#10201f; border-color:var(--gold); }
@@ -51,7 +55,7 @@
   #card a.buy { text-align:center; }
   #card button.back { margin:10px 0 0 !important; }
   @media (max-width: 700px) {
-    #card { left:50% !important; top:auto !important; bottom:calc(128px + env(safe-area-inset-bottom)); width:calc(100% - 24px); max-width:420px;
+    #card { left:50% !important; top:auto !important; bottom:calc(150px + env(safe-area-inset-bottom)); width:calc(100% - 24px); max-width:420px;
             transform:translate(-50%, 24px); padding:18px; }
     #card.open { transform:translate(-50%, 0); }
     #card .specs { flex-direction:row; gap:14px; margin:0 0 12px; }
@@ -72,6 +76,7 @@
   #loader p { font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(248,247,244,.6); margin:0; }
   @keyframes spin { to { transform:rotate(360deg); } }
   #stats { position:fixed; right:12px; bottom:calc(70px + env(safe-area-inset-bottom)); font-size:10px; color:rgba(248,247,244,.45); z-index:4; text-align:right; pointer-events:none; line-height:1.5; }
+  @media (max-width: 700px) { #stats { display:none; } }   /* a pilot readout; on a phone it sits on the buttons */
 </style>
 </head>
 <body>
@@ -100,6 +105,7 @@
   <button id="humanBtn">Scale check</button>
   <button id="dotsBtn" class="on">Dots</button>
 </div>
+<div id="hint"></div>
 <div id="stats"></div>
 
 <div id="loader"><div class="ring"></div><p id="loadMsg">Building the room</p></div>
@@ -116,7 +122,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 // Room is 3.6 (x) x 2.6 (z) x 2.7 (y). Vanity zone left, shower middle, toilet right, window on the right wall.
 // Products (dots + cards) and staging (dress the room, no dots) live in placements.json, which the Blender
 // build reads too, so their shadows are baked into the room exactly where they stand here.
-const PLACEMENTS = await (await fetch('placements.json')).json();
+// ?placements=other.json tries an alternative set (e.g. full-detail models) without touching the real one
+const PLACEMENTS = await (await fetch(new URLSearchParams(location.search).get('placements') || 'placements.json')).json();
 const PRODUCTS = PLACEMENTS.products;
 const STAGING = PLACEMENTS.staging.filter(d => !d.inRoom);   // inRoom items (the toilet) are part of bath_v6.glb
 
@@ -220,7 +227,7 @@ let tris = 0;
 function markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true; tris += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3; } }); }
 
 async function loadRoom() {
-  const g = await load('bath_v7-web.glb');   // bath_v7.glb run through tools/compress-model.mjs --size=1024 (15.5 MB -> 1.4 MB)
+  const g = await load('bath_v7-web.glb');   // bath_v7.glb run through tools/compress-model.mjs --size=2048 (16 MB -> 3.4 MB, 2K scans kept)
   room.add(g.scene);
   markShadows(g.scene);
   // Walls, floor and ceiling carry their lighting baked into vertex colours (done in Blender), so they
@@ -229,6 +236,7 @@ async function loadRoom() {
     if (!m.isMesh) return;
     const nm = (m.name || '') + ' ' + (m.parent ? m.parent.name : '');
     if (/Vessel_Basin/.test(nm)) { m.visible = false; return; }   // replaced by the Meshy basin (staging/basin.glb)
+    if ((PLACEMENTS.hideInRoom || []).some(h => nm.includes(h))) { m.visible = false; return; }   // baked in, but placed live now
     // ?bare=1: hide the placeholder accessories that real products will replace (for the Gemini placement shot)
     if (BARE && /Tumbler|Soap_Bottle|Soap_Pump|Holder_|Paper_Roll|Toilet_Mat/.test(nm)) { m.visible = false; return; }
     if (/Shell_|LM_/.test(nm) && m.material.emissiveMap) {
@@ -311,7 +319,13 @@ async function placeItem(def, folder, withDot) {
   const bodyH = box.max.y - box.min.y;                           // measured now, before the item is moved into the room
   const holder = new THREE.Group(); holder.name = def.name;      // named objects, like Spline
   obj.position.sub(new THREE.Vector3(c.x, def.anchor === 'center' ? c.y : box.min.y, c.z));
-  holder.add(obj);
+  if (def.footprint) {
+    // footprint [w, d] in metres: fit a mat to its listed size exactly (Meshy's proportions drift a few cm,
+    // and one length can only get one side right). Scaled in a wrapper, so it stays centred on its spot.
+    const fit = new THREE.Group(); fit.add(obj); const s = new THREE.Box3().setFromObject(obj).getSize(new THREE.Vector3());
+    fit.scale.set(def.footprint[0] / s.x, 1, def.footprint[1] / s.z);
+    holder.add(fit);
+  } else holder.add(obj);
   holder.position.set(...def.pos); holder.rotation.y = def.rotY || 0;
   if (def.alignBack !== undefined) {                     // push the item flush against the back wall
     holder.updateMatrixWorld(true);
@@ -320,6 +334,10 @@ async function placeItem(def, folder, withDot) {
   if (def.alignLeft !== undefined) {                     // flush against the left wall
     holder.updateMatrixWorld(true);
     holder.position.x += def.alignLeft - new THREE.Box3().setFromObject(holder).min.x;
+  }
+  if (def.alignRight !== undefined) {                    // flush against the right wall
+    holder.updateMatrixWorld(true);
+    holder.position.x += def.alignRight - new THREE.Box3().setFromObject(holder).max.x;
   }
   markShadows(holder);
   // tint: Meshy bakes its textures lighter than the real product (a grey stone mat came out near white);
@@ -433,6 +451,10 @@ renderer.domElement.addEventListener('pointerup', e => {
   downAt = null;
 });
 document.querySelectorAll('#bar [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+// OrbitControls' own gestures: mouse left = rotate, right = pan, wheel = zoom; one finger = rotate, two = pinch-zoom + pan
+document.getElementById('hint').textContent = matchMedia('(hover: none) and (pointer: coarse)').matches
+  ? 'Swipe with one finger to turn · Two fingers to slide · Pinch to zoom · Tap a dot for details'
+  : 'Click and drag to turn · Right-click and drag to slide · Scroll to zoom · Click a dot for details';
 document.getElementById('humanBtn').onclick = e => { human.visible = !human.visible; e.target.classList.toggle('on', human.visible); };
 document.getElementById('dotsBtn').onclick = e => { dotsOn = !dotsOn; e.target.classList.toggle('on', dotsOn); };
 
@@ -451,7 +473,7 @@ try {
 }
 // ?shot=1: a clean frame for reference images (no header, buttons, dots or stats)
 if (new URLSearchParams(location.search).get('shot')) {
-  for (const sel of ['header', '#bar', '#stats', '#dots']) document.querySelector(sel).style.display = 'none';
+  for (const sel of ['header', '#bar', '#hint', '#stats', '#dots']) document.querySelector(sel).style.display = 'none';
 }
 window.__pilot = { scene, camera, controls, placed, setView, renderer };
 loop();
