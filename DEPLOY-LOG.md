@@ -65,3 +65,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-25 | 12:09 | c5b6b92 | Spaces: old Spline rooms taken down; rebuilt Quiet Bath live at /rooms/quiet-bath/ (own viewer, faster loading, caching) | https://1ec89e7f.storeurbannest.pages.dev |
 | 2026-10-25 | 12:23 | 5d7aa12 | Quiet Bath: smaller one-line navigation hint on phones | https://daf236bd.storeurbannest.pages.dev |
 | 2026-10-25 | 12:29 | d2c7133 | Quiet Bath: logo loader; Spiral Ribbed Vase taken off the cistern | https://f237cf1b.storeurbannest.pages.dev |
+| 2026-10-25 | 23:19 | 589a98c | Sunday Bedroom 3D room live (Spaces + homepage tile, /bedroom redirect); Quiet Bath gets a fourth wall | https://e169dfe8.storeurbannest.pages.dev |
