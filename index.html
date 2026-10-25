@@ -652,6 +652,7 @@
     /* two halves, then three thirds — the pattern tiles cleanly every five */
     .sp-a { grid-column: span 3; grid-row: span 4; }
     .sp-b { grid-column: span 2; grid-row: span 3; }
+    .sp-full { grid-column: span 6; grid-row: span 4; }   /* a lone room takes the whole width */
 
     .ct-tall { grid-column: span 2; grid-row: span 4; }
     .ct-wide { grid-column: span 4; grid-row: span 4; }
@@ -913,6 +914,7 @@
       .spaces-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 84px; gap: 8px; }
       .sp-a { grid-column: span 2; grid-row: span 3; }
       .sp-b { grid-column: span 1; grid-row: span 3; }
+      .sp-full { grid-column: span 2; grid-row: span 3; }
 
       /* Every span must be re-stated: a tile still spanning 6 of 2 columns makes
          the grid invent implicit columns and collapses the real ones to zero. */
@@ -1765,17 +1767,15 @@
   </div>
 
   <!-- ── SPACES ──
-       Filled from the live scene list. The tiles below are the fallback that
-       shows if that request fails, so the section is never empty. -->
+       The rebuilt rooms, listed by hand: each is a page under /rooms/ (Blender + our own viewer), no longer a
+       Spline scene, so the old live scene list is not read here any more. Add a tile as each room is rebuilt. -->
   <section class="spaces shell" id="rooms">
     <div class="spaces-head rv">
       <span class="spaces-label spaces-title">The <em>spaces.</em></span>
       <p class="spaces-note">Every room we have built in 3D. Step into any of them.</p>
     </div>
     <div class="spaces-grid" id="spacesGrid">
-      <a class="sp sp-a" href="bathroom.html"><span class="sp-media"><img src="images/cover-bath-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bathroom</span><span class="sp-name">The Bathroom</span></span></a>
-      <a class="sp sp-a" href="kitchen.html"><span class="sp-media"><img src="images/cover-kitchen-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Kitchen</span><span class="sp-name">The Kitchen</span></span></a>
-      <a class="sp sp-b" href="bedroom.html"><span class="sp-media"><img src="images/cover-bed-1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bedroom</span><span class="sp-name">The Bedroom</span></span></a>
+      <a class="sp sp-full" href="/rooms/quiet-bath/"><span class="sp-media"><img src="images/cover-quiet-bath.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bathroom</span><span class="sp-name">The Quiet Bath</span></span></a>
     </div>
   </section>
 
@@ -2020,74 +2020,8 @@
         }, function () {});
     })();
 
-    /* ── the spaces collage, from the live scene list ──
-       Names are split in the admin: the internal one (Bathroom MK2) stays
-       there, the display one comes out here. Falls back to the room's own
-       name and a stock cover wherever those are still empty. */
-    var ROOM_LABEL = { bath: 'Bathroom', kitchen: 'Kitchen', bed: 'Bedroom' };
-    var ROOM_PAGE  = { bath: 'bathroom.html', kitchen: 'kitchen.html', bed: 'bedroom.html' };
-    // One cover per scene, cycled per room — two bathrooms should not wear the
-    // same photograph. A cover set in the admin always wins over these.
-    // Until a display name is set in the admin, these stand in for the working
-    // names — nobody visiting should read "Bathroom MK2". A name set in the
-    // admin always wins over this list.
-    var NAME_FALLBACK = {
-      'bathroom mk1': 'The Quiet Bath',
-      'bathroom mk2': 'The Marble Bath',
-      'kitchen mk1':  'The Stone Kitchen',
-      'kitchen mk2':  'The Open Kitchen',
-      'bedroom mk1':  'The Still Bedroom'
-    };
-    var ROOM_COVERS = {
-      bath:    ['images/cover-bath-1.webp', 'images/cover-bath-2.webp'],
-      kitchen: ['images/cover-kitchen-1.webp', 'images/cover-kitchen-2.webp'],
-      bed:     ['images/cover-bed-1.webp', 'images/cover-bed-2.webp']
-    };
-
-    (function loadSpaces() {
-      if (typeof db === 'undefined') return;          // keep the fallback tiles
-
-      var ask = function (cols) {
-        return db.from('spline_scenes').select(cols)
-          .eq('active', true).order('page_placement').order('created_at');
-      };
-
-      // Ask for the display columns, but fall back to the ones that have always
-      // existed if add-scene-display.sql hasn't been run — the scenes still
-      // list, just under their internal names.
-      ask('id,name,display_name,cover_url,page_placement').then(function (r) {
-        if (r.error && /display_name|cover_url/.test(r.error.message || '')) {
-          return ask('id,name,page_placement').then(paint, noop);
-        }
-        paint(r);
-      }, noop);
-
-      function noop() {}
-
-      function paint(r) {
-        var rows = r && r.data;
-        if (!rows || !rows.length) return;            // nothing active — keep the fallback
-        var grid = document.getElementById('spacesGrid');
-        if (!grid) return;
-        var seenPerRoom = {};
-        grid.innerHTML = rows.map(function (sc, i) {
-          var room  = sc.page_placement || 'bath';
-          var page  = ROOM_PAGE[room] || 'index.html';
-          var pool  = ROOM_COVERS[room] || ROOM_COVERS.bath;
-          var nth   = (seenPerRoom[room] = (seenPerRoom[room] || 0) + 1) - 1;
-          var cover = sc.cover_url || pool[nth % pool.length];
-          var label = ROOM_LABEL[room] || 'Space';
-          var title = sc.display_name || NAME_FALLBACK[String(sc.name || '').toLowerCase().trim()] || sc.name || label;
-          // a scene with no id is the built-in fallback — it has nothing to deep-link to
-          var href  = sc.id ? (page + '?scene=' + encodeURIComponent(sc.id)) : page;
-          var cls   = (i % 5 < 2) ? 'sp-a' : 'sp-b';
-          return '<a class="sp ' + cls + '" href="' + href + '">' +
-                 '<span class="sp-media"><img src="' + unImg(cover, 700) + '" alt="" loading="lazy" decoding="async"/></span>' +
-                 '<span class="sp-cap"><span class="sp-room">' + label + '</span>' +
-                 '<span class="sp-name">' + title + '</span></span></a>';
-        }).join('');
-      }
-    })();
+    /* (The spaces collage used to be filled here from the Spline scene list; the rebuilt rooms are listed by
+       hand in the SPACES section's markup now.) */
 
     /* ── images drift against the scroll ──────── */
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;

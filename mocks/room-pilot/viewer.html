@@ -2,18 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Room Viewer Pilot — Urban Nest</title>
+<title>The Quiet Bath · Urban Nest</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- TEST PAGE. Not linked from the site. Loads the Blender-built pilot room (bathroom_pilot.glb)
-     with real-scale products and dots that follow the objects, with no Spline anywhere. -->
+<meta name="description" content="Walk through the Quiet Bath in 3D: marble, walnut and soft light, with every piece in it a tap away.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#0e2a2a">
+<!-- The 3D room viewer. Source of truth: mocks/room-pilot/ (this file + placements.json); published to
+     rooms/quiet-bath/ by mocks/room-pilot/publish_room.mjs. Blender-built room, real-scale products, dots
+     that follow the objects; no Spline. three.js is served from the site (rooms/lib), not a CDN. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <script type="importmap">
 { "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    "three": "/rooms/lib/three-0.160.0/build/three.module.min.js",
+    "three/addons/": "/rooms/lib/three-0.160.0/jsm/"
 } }
 </script>
+<link rel="modulepreload" href="/rooms/lib/three-0.160.0/build/three.module.min.js">
 <style>
   :root { --bg:#0e2a2a; --ink:#f8f7f4; --gold:#c9a45c; --teal:#1f6f6b; }
   * { box-sizing: border-box; }
@@ -35,6 +40,11 @@
            background:linear-gradient(rgba(14,42,42,.7), transparent); }
   header h1 { font-family:'Bodoni Moda',serif; font-weight:400; font-size:20px; margin:0; }
   header small { display:block; font-size:10px; letter-spacing:.22em; color:var(--gold); text-transform:uppercase; margin-top:2px; }
+  header a.back { pointer-events:auto; display:inline-block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:rgba(248,247,244,.75);
+                  text-decoration:none; margin-bottom:6px; }
+  header a.back:hover { color:var(--gold); }
+  .dev-only { display:none; }
+  body.dev .dev-only { display:inline-block; }
   .pill { pointer-events:auto; }
   #bar { position:fixed; left:50%; bottom:calc(40px + env(safe-area-inset-bottom)); transform:translateX(-50%); display:flex; gap:8px; z-index:5; flex-wrap:wrap; justify-content:center; width:calc(100% - 24px); }
   /* how to move around: mouse or touch wording, chosen by the device (set in the script). Kept quiet on purpose:
@@ -76,7 +86,8 @@
   #loader p { font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(248,247,244,.6); margin:0; }
   @keyframes spin { to { transform:rotate(360deg); } }
   #stats { position:fixed; right:12px; bottom:calc(70px + env(safe-area-inset-bottom)); font-size:10px; color:rgba(248,247,244,.45); z-index:4; text-align:right; pointer-events:none; line-height:1.5; }
-  @media (max-width: 700px) { #stats { display:none; } }   /* a pilot readout; on a phone it sits on the buttons */
+  #stats { display:none; }                                  /* a build readout: ?dev=1 only */
+  @media (min-width: 701px) { body.dev #stats { display:block; } }   /* on a phone it would sit on the buttons */
 </style>
 </head>
 <body>
@@ -84,7 +95,7 @@
 <div id="dots"></div>
 
 <header>
-  <div><h1>The Quiet Bath <span style="font-size:12px;color:var(--gold)">· pilot</span></h1><small>Built in Blender · no Spline</small></div>
+  <div><a class="back" href="/spaces.html">&larr; Spaces</a><h1>The Quiet Bath</h1><small>Bathroom · in 3D</small></div>
 </header>
 
 <div id="card">
@@ -102,7 +113,7 @@
   <button data-view="vanity">Vanity</button>
   <button data-view="shower">Shower</button>
   <button data-view="toilet">Toilet</button>
-  <button id="humanBtn">Scale check</button>
+  <button id="humanBtn" class="dev-only">Scale check</button>
   <button id="dotsBtn" class="on">Dots</button>
 </div>
 <div id="hint"></div>
@@ -117,17 +128,23 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-// glTF is Y-up. Room is 3.2 (x) x 2.6 (z) x 2.7 (y) metres. Back wall z=-1.3, open front at z=+1.3.
-// Products are sized by REAL height in metres, so scale can never drift.
-// Room is 3.6 (x) x 2.6 (z) x 2.7 (y). Vanity zone left, shower middle, toilet right, window on the right wall.
+// glTF is Y-up. The room is 4.4 (x) x 2.8 (z) x 2.7 (y) metres; back wall z = -1.4, open front at z = +1.4.
+// Products are sized by REAL measurements in metres, so scale can never drift.
 // Products (dots + cards) and staging (dress the room, no dots) live in placements.json, which the Blender
 // build reads too, so their shadows are baked into the room exactly where they stand here.
 // ?placements=other.json tries an alternative set (e.g. full-detail models) without touching the real one
-const PLACEMENTS = await (await fetch(new URLSearchParams(location.search).get('placements') || 'placements.json')).json();
+const QS = new URLSearchParams(location.search);
+const PLACEMENTS = await (await fetch(QS.get('placements') || 'placements.json')).json();
 const PRODUCTS = PLACEMENTS.products;
-const STAGING = PLACEMENTS.staging.filter(d => !d.inRoom);   // inRoom items (the toilet) are part of bath_v6.glb
+const STAGING = PLACEMENTS.staging.filter(d => !d.inRoom);   // inRoom items are part of the room .glb itself
+// Where the files are: the working copy keeps products/ and staging/; the published room keeps them all in
+// models/ and stamps a version, so every file can be cached for a year and still update on a new publish.
+const ROOM_FILE = PLACEMENTS.room || 'bath_v7-web.glb';
+const DIRS = Object.assign({ products: 'products', staging: 'staging' }, PLACEMENTS.dirs);
+const V = PLACEMENTS.version ? '?v=' + PLACEMENTS.version : '';
+if (QS.get('dev')) document.body.classList.add('dev');      // Scale check + triangle count, for us
 
-const BARE = !!new URLSearchParams(location.search).get('bare');
+const BARE = !!QS.get('bare');
 
 const VIEWS = {
   wide:   { pos:[0.0, 1.45, 1.6], target:[0.0, 1.15, -1.4] },
@@ -215,19 +232,20 @@ function closeCard() {
 camera.position.set(...VIEWS.wide.pos); controls.target.set(...VIEWS.wide.target); controls.update();
 
 // loaders
-const draco = new DRACOLoader().setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/gltf/');
+const draco = new DRACOLoader().setDecoderPath('/rooms/lib/three-0.160.0/jsm/libs/draco/gltf/');
 const loader = new GLTFLoader().setDRACOLoader(draco);
 const load = url => new Promise((res, rej) => loader.load(url, res, undefined, rej));
 
 const room = new THREE.Group(); room.name = 'Room'; scene.add(room);
-const placed = [];   // { def, obj, box, dot }
+const placed = [];   // { def, obj, body, dot, anchor, blocked }
+const staged = [];   // fixtures with no dot (toilet, shower): they can still stand in front of a dot
 const dotsEl = document.getElementById('dots');
 let tris = 0;
 
 function markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true; tris += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3; } }); }
 
 async function loadRoom() {
-  const g = await load('bath_v7-web.glb');   // bath_v7.glb run through tools/compress-model.mjs --size=2048 (16 MB -> 3.4 MB, 2K scans kept)
+  const g = await load(ROOM_FILE + V);   // bath_v7.glb run through tools/compress-model.mjs --size=2048 (16 MB -> 3.1 MB, 2K scans kept)
   room.add(g.scene);
   markShadows(g.scene);
   // Walls, floor and ceiling carry their lighting baked into vertex colours (done in Blender), so they
@@ -286,7 +304,9 @@ function captureRoomEnv() {
   cam.update(renderer, scene);
   scene.remove(front);
   const env = pmrem.fromCubemap(rt.texture).texture; rt.dispose();
+  const old = bakedMats[0] && bakedMats[0].envMap;            // captured again once the products are in
   for (const m of bakedMats) { m.envMap = env; m.needsUpdate = true; }
+  if (old) old.dispose();
 }
 
 // A soft blob under an item so it sits on its surface instead of floating.
@@ -303,12 +323,12 @@ function contactShadow(holder) {
   sh.raycast = () => {}; sh.renderOrder = 1; holder.add(sh);
 }
 const flowerCache = {};
-const getFlowers = file => flowerCache[file] || (flowerCache[file] = load('staging/' + file));
+const getFlowers = file => flowerCache[file] || (flowerCache[file] = load(DIRS.staging + '/' + file + V));
 
 // Places one model at real size. Products (folder 'products') get a dot and a card; staging items
 // (folder 'staging': toilet, shower, rug, flowers) are only there to dress the room, so no dot.
 async function placeItem(def, folder, withDot) {
-  const g = await load(folder + '/' + encodeURIComponent(def.file));
+  const g = await load(DIRS[folder] + '/' + encodeURIComponent(def.file) + V);
   const obj = g.scene;
   if (def.flat) obj.rotation.x = -Math.PI / 2;          // Meshy rugs come out standing up: lay them down
   let box = new THREE.Box3().setFromObject(obj);
@@ -353,7 +373,7 @@ async function placeItem(def, folder, withDot) {
   }
   if (def.anchor !== 'center' && !def.noShadow) contactShadow(holder);
   scene.add(holder);
-  if (!withDot) return;
+  if (!withDot) { staged.push(holder); return; }
   const dot = document.createElement('div'); dot.className = 'dot';
   dot.innerHTML = '<span class="tip">' + def.name + '</span>';
   const entry = { def, obj: holder, body: obj, dot, size: new THREE.Box3().setFromObject(holder).getSize(new THREE.Vector3()) };
@@ -386,22 +406,41 @@ addEventListener('keydown', e => { if (e.key === 'Escape') closeCard(); });
 // dots follow the objects every frame; hidden when something is in front
 const ray = new THREE.Raycaster();
 const tgt = new THREE.Vector3(), dir = new THREE.Vector3(), ndc = new THREE.Vector3();
-let dotsOn = true, frame = 0;
+let dotsOn = true;
+// Dots follow their products every frame (one projected point each, cheap). Whether something stands in front
+// of a dot is tested for ONE dot per frame, in turn, and only while the camera moves (and a round after): a ray
+// against the room's own geometry plus a box round every product and fixture. Never against the products'
+// meshes: at full detail they are millions of triangles, and testing them made the view hitch ~165 ms at a time.
+const hitAt = new THREE.Vector3(), lastCamPos = new THREE.Vector3(Infinity, 0, 0), lastCamTgt = new THREE.Vector3();
+let turn = 0, settle = 0;
+const boxOf = o => o.userData.box || (o.userData.box = new THREE.Box3().setFromObject(o));   // products never move
+function occluded(p, dist) {
+  ray.set(camera.position, dir); ray.far = dist;
+  const hit = ray.intersectObject(room, true).find(hh => hh.object.isMesh && hh.object.visible && !/Glass/.test(hh.object.name));   // clear glass hides nothing
+  if (hit && hit.distance < dist - 0.06) return true;
+  for (const o of [...placed.map(q => q.obj), ...staged]) {
+    if (o === p.obj) continue;
+    if (ray.ray.intersectBox(boxOf(o), hitAt) && hitAt.distanceTo(camera.position) < dist - 0.06) return true;
+  }
+  return false;
+}
 function updateDots() {
-  frame++;
   const w = innerWidth, h = innerHeight;
+  if (camera.position.distanceToSquared(lastCamPos) > 1e-10 || controls.target.distanceToSquared(lastCamTgt) > 1e-10) {
+    lastCamPos.copy(camera.position); lastCamTgt.copy(controls.target); settle = placed.length + 1;
+  }
+  const test = settle > 0 && placed.length ? placed[turn = (turn + 1) % placed.length] : null;
+  if (test) settle--;
   for (const p of placed) {
-    const b = new THREE.Box3().setFromObject(p.body || p.obj);   // dot sits on the product itself, not on the flowers
-    b.getCenter(tgt); tgt.y = b.max.y + 0.025;
-    ndc.copy(tgt).project(camera);
-    const onScreen = dotsOn && ndc.z < 1 && Math.abs(ndc.x) < 1.05 && Math.abs(ndc.y) < 1.05;
-    let visible = onScreen;
-    if (visible && frame % 3 === 0) {          // occlusion test every 3rd frame
+    if (!p.anchor) {                                // dot sits on the product itself, not on its flowers
+      const b = new THREE.Box3().setFromObject(p.body || p.obj);
+      p.anchor = b.getCenter(new THREE.Vector3()); p.anchor.y = b.max.y + 0.025;
+    }
+    tgt.copy(p.anchor); ndc.copy(tgt).project(camera);
+    const visible = dotsOn && ndc.z < 1 && Math.abs(ndc.x) < 1.05 && Math.abs(ndc.y) < 1.05;
+    if (visible && p === test) {
       dir.copy(tgt).sub(camera.position); const dist = dir.length(); dir.normalize();
-      ray.set(camera.position, dir); ray.far = dist;
-      const hits = ray.intersectObjects([room, ...placed.map(q => q.obj)], true);
-      const first = hits.find(hh => hh.object.isMesh && !/Window Sky/.test(hh.object.name));
-      p.blocked = !!first && first.distance < dist - 0.06 && !p.obj.getObjectById(first.object.id);
+      p.blocked = occluded(p, dist);
     }
     p.dot.classList.toggle('hidden', !visible || p.blocked);
     p.dot.style.left = ((ndc.x * .5 + .5) * w) + 'px';
@@ -458,26 +497,35 @@ document.getElementById('hint').textContent = matchMedia('(hover: none) and (poi
 document.getElementById('humanBtn').onclick = e => { human.visible = !human.visible; e.target.classList.toggle('on', human.visible); };
 document.getElementById('dotsBtn').onclick = e => { dotsOn = !dotsOn; e.target.classList.toggle('on', dotsOn); };
 
+// ?shot=1: a clean frame for reference images (no header, buttons, dots or stats)
+if (QS.get('shot')) {
+  for (const sel of ['header', '#bar', '#hint', '#stats', '#dots']) document.querySelector(sel).style.display = 'none';
+}
+window.__pilot = { scene, camera, controls, placed, setView, renderer };
+
+// Room first: it is a few MB and is the whole first impression, so it shows the moment it arrives. The pieces
+// (most of the download, at full detail) stream in on top, each as soon as its own file lands, with a quiet
+// count in the hint line until the last one is in.
+const hintEl = document.getElementById('hint'), hintText = hintEl.textContent;
 try {
   await loadRoom();
-  document.getElementById('loadMsg').textContent = 'Placing the pieces';
+  captureRoomEnv();                                    // gloss from the bare room straight away
+  loop();
+  document.getElementById('loader').classList.add('gone');
   const staging = BARE ? STAGING.filter(d => !/Rug|Mat/.test(d.name)) : STAGING;
   const jobs = [...staging.map(d => [d, 'staging', false]), ...PRODUCTS.map(d => [d, 'products', true])];
-  const results = await Promise.allSettled(jobs.map(j => placeItem(...j)));
+  let done = 0;
+  const count = () => { hintEl.textContent = 'Bringing in the pieces · ' + done + ' of ' + jobs.length; };
+  count();
+  const results = await Promise.allSettled(jobs.map(j => placeItem(...j).finally(() => { done++; count(); })));
   results.forEach((r, i) => { if (r.status === 'rejected') console.warn('item failed:', jobs[i][0].name, r.reason); });
-  captureRoomEnv();
+  hintEl.textContent = hintText;
+  captureRoomEnv();                                    // again, now that the pieces show in the reflections
   document.getElementById('stats').innerHTML = Math.round(tris/1000) + 'k triangles<br>' + placed.length + ' products placed';
 } catch (e) {
   console.error(e);
   document.getElementById('loadMsg').textContent = 'Could not load the room: ' + (e.message || e);
 }
-// ?shot=1: a clean frame for reference images (no header, buttons, dots or stats)
-if (new URLSearchParams(location.search).get('shot')) {
-  for (const sel of ['header', '#bar', '#hint', '#stats', '#dots']) document.querySelector(sel).style.display = 'none';
-}
-window.__pilot = { scene, camera, controls, placed, setView, renderer };
-loop();
-setTimeout(() => document.getElementById('loader').classList.add('gone'), 400);
 </script>
 </body>
 </html>

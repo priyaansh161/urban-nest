@@ -11,3 +11,15 @@
 
 /manifest.webmanifest
   Content-Type: application/manifest+json
+
+# 3D rooms: the models are loaded with a version (?v=, stamped by mocks/room-pilot/publish_room.mjs) and
+# three.js sits in a folder named by its version, so browsers may keep them for a year. A re-published room
+# gets a new version and is fetched fresh. The room's index.html and placements.json stay revalidated.
+/rooms/lib/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/rooms/*/room.glb
+  Cache-Control: public, max-age=31536000, immutable
+
+/rooms/*/models/*
+  Cache-Control: public, max-age=31536000, immutable

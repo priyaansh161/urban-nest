@@ -1,0 +1,33 @@
+Attach: 1-room-wide.png
+
+Turn this 3D render into a high-end architectural interior photograph of the very same bathroom, as if shot by a
+professional interiors photographer for a luxury design magazine, and style it lightly, the way an interior
+stylist would before a shoot.
+
+KEEP EXACTLY AS THEY ARE (these are real products; their shape, colour, size and position must not change):
+the camera position, angle and framing; the room's layout and proportions; the white marble walls with fine grey
+veining; the dark grey large-format stone floor tiles; the floating walnut vanity with its white stone top,
+undermount basin, chrome tap and black bar handles; the backlit rounded mirror; the white back-to-wall toilet;
+the black rain shower with its black electric water heater; the frameless glass shower panel; the recessed black
+niche; the brass towel ring with its white hand towel; the chrome toilet paper holder; the white toilet brush; the
+two white vases with white calla lilies and eucalyptus; the small accessories on the counter; the white wavy
+memory-foam mat in front of the vanity; the beige U-shaped mat around the toilet; and the BROWN-AND-WHITE SLATTED
+shower mat inside the shower (keep it brown and white, not grey). Do not remove, move, resize or restyle any of these.
+
+ADD ONLY THESE FEW STYLING PIECES, nothing else:
+1. One framed artwork on the empty marble wall above the toilet, centred over it: a calm, minimal print (a soft
+   neutral abstract or a fine botanical line drawing) in a thin black or natural oak frame with a white mat,
+   about 50 x 70 cm, hung at eye level.
+2. One tall plant in a textured matte ceramic planter (warm stone or off-white) standing on the floor in the
+   empty space between the left wall and the vanity: an olive tree or a tall snake plant, about 1.2 m tall.
+3. A small bundle of fresh eucalyptus hanging from the rain shower arm.
+4. One small amber-glass candle and a little stack of two rolled white towels inside the black wall niche.
+Keep the overall look calm, minimal and spa-like, with plenty of breathing room. Do NOT add stools, chairs,
+baskets, hampers, rugs, shelves, extra mirrors, extra lights, people, text or logos.
+
+MAKE IT LOOK PHOTOGRAPHED, NOT RENDERED: soft natural light mixing with the warm ceiling downlights; gentle
+realistic shadows under the vanity, the toilet, the mats and the new pieces; real depth in the marble veining and
+a soft polished sheen on the walls and the stone top; subtle true reflections on the floor tiles and in the glass
+panel; fine fabric texture on the towels and the mats; crisp detail, natural colour, a calm, airy, premium mood.
+
+Output one photorealistic image, 16:9, the same framing as the attached render.

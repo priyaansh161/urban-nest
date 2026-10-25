@@ -100,6 +100,9 @@
   /* ── ROOMS ── */
   .rooms { max-width: 1280px; margin: 0 auto; padding: 72px 48px 96px; }
   .rooms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; }
+  /* one room for now (the rebuilt Quiet Bath): a single wide tile, not one stretched portrait */
+  .rooms-grid.one { grid-template-columns: 1fr; max-width: 1080px; margin: 0 auto; }
+  .rooms-grid.one .room-media { aspect-ratio: 16 / 9; }
   .room {
     display: block; text-decoration: none; color: inherit;
     border: .5px solid var(--border); background: var(--white);
@@ -482,54 +485,27 @@
       <h1 class="page-title">The <em>Spaces.</em></h1>
       <p class="page-sub">
         Every room we have built in 3D. Step into one, look around, and tap anything
-        you like the look of.
+        you like the look of. More rooms are being rebuilt and join here one by one.
       </p>
     </div>
   </div>
 
   <div class="rooms">
-    <div class="rooms-grid">
+    <!-- The first-generation Spline rooms (bathroom.html, kitchen.html, bedroom.html) were taken down on
+         25 Oct 2026; their addresses forward via _redirects. Rooms come back one at a time as they are
+         rebuilt in the new pipeline (Blender + our own viewer, published under /rooms/). -->
+    <div class="rooms-grid one">
 
-      <a class="room" href="bathroom.html">
+      <a class="room" href="/rooms/quiet-bath/" id="roomQuietBath">
         <div class="room-media">
           <span class="room-badge">Bathroom</span>
-          <img src="images/cover-bath-1.webp" alt="The Urban Nest bathroom, rendered in 3D" loading="lazy" decoding="async"/>
+          <img src="images/cover-quiet-bath.webp" alt="The Quiet Bath: white marble, a walnut vanity and a walk-in shower" loading="lazy" decoding="async"/>
         </div>
         <div class="room-body">
-          <div class="room-name">The Bathroom</div>
+          <div class="room-name">The Quiet Bath</div>
           <p class="room-desc">
-            Stone, brass and soft light. Fittings and finishes you can turn over
-            before deciding they belong in yours.
-          </p>
-          <span class="room-go">Enter the room →</span>
-        </div>
-      </a>
-
-      <a class="room" href="kitchen.html">
-        <div class="room-media">
-          <span class="room-badge">Kitchen</span>
-          <img src="images/cover-kitchen-1.webp" alt="The Urban Nest kitchen, rendered in 3D" loading="lazy" decoding="async"/>
-        </div>
-        <div class="room-body">
-          <div class="room-name">The Kitchen</div>
-          <p class="room-desc">
-            The room that gets used hardest. Worktops, handles and hardware, shown
-            the way they actually sit together.
-          </p>
-          <span class="room-go">Enter the room →</span>
-        </div>
-      </a>
-
-      <a class="room" href="bedroom.html">
-        <div class="room-media">
-          <span class="room-badge">Bedroom</span>
-          <img src="images/cover-bed-1.webp" alt="The Urban Nest bedroom, rendered in 3D" loading="lazy" decoding="async"/>
-        </div>
-        <div class="room-body">
-          <div class="room-name">The Bedroom</div>
-          <p class="room-desc">
-            Quieter, warmer, and the room people get most wrong. Lighting and
-            textiles that decide how it feels at the end of a day.
+            White marble, warm walnut and soft light. Walk round it, look closer at anything
+            on the counter or the walls, and see what each piece is.
           </p>
           <span class="room-go">Enter the room →</span>
         </div>
@@ -576,6 +552,22 @@
     dark.addEventListener('click', function () { set('dark'); });
     paint();
     unWatchTheme(paint);
+  })();
+
+  /* A head start for the 3D room: once this page has settled, fetch the room itself (about 3 MB) and
+     three.js into the cache, so "Enter the room" opens without that wait. Not on Save-Data or a 2G
+     connection: that would spend someone's data on a room they may never open. The products (most of the
+     download) are left for the room page, which streams them in after the room is already on screen. */
+  (function () {
+    var c = navigator.connection;
+    if (c && (c.saveData || /2g/.test(c.effectiveType || ''))) return;
+    function go() {
+      fetch('/rooms/lib/three-0.160.0/build/three.module.min.js').catch(function () {});
+      fetch('/rooms/quiet-bath/placements.json').then(function (r) { return r.json(); }).then(function (p) {
+        return fetch('/rooms/quiet-bath/' + p.room + '?v=' + p.version);
+      }).catch(function () {});
+    }
+    if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 4000 }); else setTimeout(go, 2500);
   })();
 </script>
 </body>

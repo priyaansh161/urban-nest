@@ -1,0 +1,20 @@
+Attach: 1-room-wide.png (use 2-room-angle.png instead only if you want an angled tile)
+
+Turn this 3D render into a high-end architectural interior photograph of the very same bathroom, as if shot by
+a professional interiors photographer for a luxury design magazine.
+
+Keep EXACTLY as they are: the camera position, angle and framing; the room's layout and proportions; every
+object, its position, size, shape and colour - the white marble walls with fine grey veining, the dark grey
+large-format stone floor tiles, the floating walnut vanity with its white stone top, undermount basin, chrome tap
+and black bar handles, the backlit rounded mirror, the white back-to-wall toilet, the black rain shower with its
+black electric water heater, the frameless glass shower panel, the recessed black niche, the brass towel ring with
+its white hand towel, the toilet paper holder, the toilet brush, the white vases with calla lilies and eucalyptus,
+the small accessories on the counter, and the three bath mats on the floor. Do not add, remove, move, resize or
+restyle anything. No people, no text, no logos, no extra decor.
+
+Make it look photographed, not rendered: soft natural light mixing with the warm downlights from the ceiling;
+gentle realistic shadows under the vanity, the toilet and the mats; real depth in the marble veining and a soft
+polished sheen on the walls and the stone top; subtle true reflections on the floor tiles and in the glass panel;
+fine fabric texture on the towel and the mats; crisp detail, natural colour, a calm, airy, premium mood.
+
+Output one photorealistic image, 16:9, the same framing as the attached render.

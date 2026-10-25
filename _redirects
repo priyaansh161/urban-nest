@@ -8,5 +8,15 @@
 # Cloudflare redirects /designer.html to /designer, which would lose the name.
 /designers/*  /designer  200
 
+# The first-generation Spline rooms were taken down on 25 Oct 2026; rooms return one at a time, rebuilt,
+# under /rooms/. Old links (shared, bookmarked, in search) land on the rebuilt bath or on Spaces. 302, not
+# 301: a rebuilt kitchen or bedroom may take these addresses back.
+/bathroom       /rooms/quiet-bath/  302
+/bathroom.html  /rooms/quiet-bath/  302
+/kitchen        /spaces             302
+/kitchen.html   /spaces             302
+/bedroom        /spaces             302
+/bedroom.html   /spaces             302
+
 # storeurbannest.co.in and www. are forwarded to storeurbannest.in by
 # Redirect Rules in the Cloudflare dashboard; this file cannot match on domain.

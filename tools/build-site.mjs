@@ -25,7 +25,10 @@ const DIST = join(ROOT, 'dist');
 // Each rule is a folder plus the extensions that ship from it. `deep: false`
 // means the folder's own files only — its subfolders are working material.
 const RULES = [
-  { dir: '.',      exts: ['.html', '.css', '.splinecode', '.png', '.js', '.toml', '.webmanifest'], deep: false },
+  { dir: '.',      exts: ['.html', '.css', '.splinecode', '.png', '.js', '.toml', '.webmanifest'], deep: false,
+    /* The first-generation Spline rooms, taken down 25 Oct 2026: kept in the repo as an archive, not
+       shipped; _redirects forwards their addresses. */
+    skip: ['bathroom.html', 'kitchen.html', 'bedroom.html'] },
   /* Named, not by extension. The root folder also holds DEPLOY.txt and
      DEPLOY-CHECKLIST.txt — private working notes — and allowing every .txt
      would have published them. */
@@ -33,6 +36,16 @@ const RULES = [
   { dir: 'admin',  exts: ['.html', '.js', '.css'],                                 deep: false },
   { dir: 'studio', exts: ['.html', '.js'],                                 deep: false },
   { dir: 'images', exts: ['.webp', '.png', '.jpg', '.svg'],                deep: false },
+  /* The 3D rooms (published from mocks/room-pilot by publish_room.mjs) and the three.js they run on,
+     served from the site so a visit needs no CDN. Each folder named, as everywhere here. */
+  { dir: 'rooms/quiet-bath',        exts: ['.html', '.json', '.glb'],     deep: false },
+  { dir: 'rooms/quiet-bath/models', exts: ['.glb'],                       deep: false },
+  { dir: 'rooms/lib/three-0.160.0/build',                exts: ['.js'],   deep: false },
+  { dir: 'rooms/lib/three-0.160.0/jsm/controls',         exts: ['.js'],   deep: false },
+  { dir: 'rooms/lib/three-0.160.0/jsm/loaders',          exts: ['.js'],   deep: false },
+  { dir: 'rooms/lib/three-0.160.0/jsm/environments',     exts: ['.js'],   deep: false },
+  { dir: 'rooms/lib/three-0.160.0/jsm/utils',            exts: ['.js'],   deep: false },
+  { dir: 'rooms/lib/three-0.160.0/jsm/libs/draco/gltf',  exts: ['.js', '.wasm'], deep: false },
   /* models/ is deliberately NOT here. Every one of the 21 listings with a 3D
      view stores an absolute Supabase Storage URL — the admin's upload button
      cannot produce anything else — so nothing on the site ever asks Netlify
@@ -46,7 +59,7 @@ const RULES = [
 
 // A rule ships files by extension, or an exact list of names.
 const wanted = (rule, name) => rule.names ? rule.names.includes(name)
-  : rule.exts.includes(extname(name).toLowerCase());
+  : rule.exts.includes(extname(name).toLowerCase()) && !(rule.skip || []).includes(name);
 
 await rm(DIST, { recursive: true, force: true });
 await mkdir(DIST, { recursive: true });

@@ -296,11 +296,11 @@
    "built": "make_rack_brush.py"
   },
   {
-   "id": "p1",
+   "id": "271ce125-61fd-4435-b868-804d37fcae61",
    "name": "Ribbed Ceramic Vase",
-   "tag": "BATHROOM DECOR",
+   "tag": "COLLECTION",
    "file": "ribbed-ceramic-vase-for-home-decor-modern-minimali-light.glb",
-   "height": 0.3,
+   "height": 0.229,
    "pos": [
     -0.78,
     0.85,
@@ -308,25 +308,26 @@
    ],
    "rotY": 0.3,
    "flowers": "flowers.glb",
-   "flowerHeight": 0.4,
+   "flowerHeight": 0.36,
    "noShadow": true,
-   "desc": "A ribbed ceramic vase with a soft matte glaze. Sits at the end of the vanity counter.",
+   "desc": "A ribbed ceramic vase with a soft matte glaze, at the end of the vanity counter.",
    "specs": [
     [
      "Material",
      "Ceramic"
     ],
     [
-     "Height",
-     "30 cm"
+     "Size",
+     "10.2 x 10.2 x 22.9 cm"
     ]
    ],
-   "link": "https://amazon.in"
+   "link": "https://link.amazon/B093PCuRU",
+   "listing": "Ribbed Ceramic Vase for Home Decor | Modern Minimalist Flower Vase"
   },
   {
-   "id": "p2",
-   "name": "Spring Vase",
-   "tag": "BATHROOM DECOR",
+   "id": "b70a0cfa-6e0d-4132-8a21-b7591a126383",
+   "name": "Spiral Ribbed Vase",
+   "tag": "COLLECTION",
    "file": "Spring Vase.glb",
    "height": 0.2,
    "pos": [
@@ -338,18 +339,19 @@
    "flowers": "flowers_small.glb",
    "flowerHeight": 0.28,
    "noShadow": false,
-   "desc": "A small sculptural vase with a few stems, on the toilet cistern beside the reed diffuser.",
+   "desc": "A sculptural spiral vase with a few calla stems, on the toilet cistern.",
    "specs": [
     [
      "Material",
      "Ceramic"
     ],
     [
-     "Height",
-     "22 cm"
+     "Size",
+     "18 x 18 x 20 cm"
     ]
    ],
-   "link": "https://amazon.in"
+   "link": "https://link.amazon/B07OYJFRE",
+   "listing": "Spiral Ribbed Flower Vase for Home Decor | Modern Decorative Vase for Pampas Grass"
   }
  ],
  "staging": [

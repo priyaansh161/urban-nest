@@ -9,6 +9,11 @@
  *                              opened before falls back to offline.html.
  *   images, .splinecode        served from cache and refreshed behind the
  *                              scenes, since they only change with a deploy.
+ *   3D rooms (/rooms/)         served from cache, never re-fetched: room files
+ *                              carry a version (?v=) and the three.js folder is
+ *                              named by its version, so a stored copy cannot be
+ *                              stale, and re-downloading ~20 MB of models on
+ *                              every visit would be pure waste.
  *   admin, Netlify functions,  not touched. Neither is anything on another
  *   other hosts                host — Supabase, Spline, Google Fonts,
  *                              Razorpay — which the browser handles as usual.
@@ -17,7 +22,7 @@
  * the new worker takes over. netlify.toml serves this file with no-cache so
  * phones pick up a new one on their next visit.
  */
-const VERSION = 'v3';   // v3: asset URLs are version-stamped now; drop the old unstamped copies
+const VERSION = 'v4';   // v4: 3D rooms kept for good (their files are versioned)
 const CACHE = `un-${VERSION}`;
 const PRECACHE = ['/offline.html', '/favicon.png', '/images/app-icon-192.png'];
 
@@ -48,7 +53,9 @@ self.addEventListener('fetch', event => {
   // The studio is a signed-in writing tool, like the admin: always live.
   if (url.pathname.startsWith('/admin/') || url.pathname.startsWith('/studio/') || url.pathname.startsWith('/.netlify/') || url.pathname.startsWith('/api/')) return;
 
-  if (req.mode === 'navigate' || /\.(html|js|webmanifest)$/.test(url.pathname)) {
+  if (url.pathname.startsWith('/rooms/') && (url.searchParams.has('v') || url.pathname.startsWith('/rooms/lib/'))) {
+    event.respondWith(cacheFirst(event, req));
+  } else if (req.mode === 'navigate' || /\.(html|js|webmanifest)$/.test(url.pathname)) {
     event.respondWith(networkFirst(event, req));
   } else if (/\.(png|jpe?g|webp|svg|splinecode)$/.test(url.pathname)) {
     event.respondWith(cacheFirstThenRefresh(event, req));
@@ -77,6 +84,10 @@ async function networkFirst(event, req) {
     if (req.mode === 'navigate') return caches.match('/offline.html');
     return Response.error();
   }
+}
+
+async function cacheFirst(event, req) {
+  return (await caches.match(req)) || keep(event, req, await fetch(req));
 }
 
 async function cacheFirstThenRefresh(event, req) {
