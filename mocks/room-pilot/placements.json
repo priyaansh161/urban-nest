@@ -323,35 +323,6 @@
    ],
    "link": "https://link.amazon/B093PCuRU",
    "listing": "Ribbed Ceramic Vase for Home Decor | Modern Minimalist Flower Vase"
-  },
-  {
-   "id": "b70a0cfa-6e0d-4132-8a21-b7591a126383",
-   "name": "Spiral Ribbed Vase",
-   "tag": "COLLECTION",
-   "file": "Spring Vase.glb",
-   "height": 0.2,
-   "pos": [
-    0.2,
-    0.8,
-    -1.28
-   ],
-   "rotY": -0.4,
-   "flowers": "flowers_small.glb",
-   "flowerHeight": 0.28,
-   "noShadow": false,
-   "desc": "A sculptural spiral vase with a few calla stems, on the toilet cistern.",
-   "specs": [
-    [
-     "Material",
-     "Ceramic"
-    ],
-    [
-     "Size",
-     "18 x 18 x 20 cm"
-    ]
-   ],
-   "link": "https://link.amazon/B07OYJFRE",
-   "listing": "Spiral Ribbed Flower Vase for Home Decor | Modern Decorative Vase for Pampas Grass"
   }
  ],
  "staging": [
