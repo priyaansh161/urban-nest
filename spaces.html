@@ -100,9 +100,12 @@
   /* ── ROOMS ── */
   .rooms { max-width: 1280px; margin: 0 auto; padding: 72px 48px 96px; }
   .rooms-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; }
-  /* one room for now (the rebuilt Quiet Bath): a single wide tile, not one stretched portrait */
+  /* one room: a single wide tile, not one stretched portrait */
   .rooms-grid.one { grid-template-columns: 1fr; max-width: 1080px; margin: 0 auto; }
   .rooms-grid.one .room-media { aspect-ratio: 16 / 9; }
+  /* two rooms (the Quiet Bath and the Sunday Bedroom, 25 Oct 2026): side by side, landscape covers; one above
+     the other on a phone (the grid's own auto-fit) */
+  .rooms-grid.pair .room-media { aspect-ratio: 3 / 2; }
   .room {
     display: block; text-decoration: none; color: inherit;
     border: .5px solid var(--border); background: var(--white);
@@ -494,7 +497,7 @@
     <!-- The first-generation Spline rooms (bathroom.html, kitchen.html, bedroom.html) were taken down on
          25 Oct 2026; their addresses forward via _redirects. Rooms come back one at a time as they are
          rebuilt in the new pipeline (Blender + our own viewer, published under /rooms/). -->
-    <div class="rooms-grid one">
+    <div class="rooms-grid pair">
 
       <a class="room" href="/rooms/quiet-bath/" id="roomQuietBath">
         <div class="room-media">
@@ -506,6 +509,21 @@
           <p class="room-desc">
             White marble, warm walnut and soft light. Walk round it, look closer at anything
             on the counter or the walls, and see what each piece is.
+          </p>
+          <span class="room-go">Enter the room →</span>
+        </div>
+      </a>
+
+      <a class="room" href="/rooms/sunday-bedroom/" id="roomSundayBedroom">
+        <div class="room-media">
+          <span class="room-badge">Bedroom</span>
+          <img src="images/cover-sunday-bedroom.webp" alt="The Sunday Bedroom: a bouclé bed against a fluted oak wall, a teal throw and a walnut dresser" loading="lazy" decoding="async"/>
+        </div>
+        <div class="room-body">
+          <div class="room-name">The Sunday Bedroom</div>
+          <p class="room-desc">
+            Bouclé, oak and linen in soft morning light. Walk round it, look closer at anything
+            on the nightstands or the dresser, and see what each piece is.
           </p>
           <span class="room-go">Enter the room →</span>
         </div>

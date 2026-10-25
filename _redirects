@@ -15,8 +15,8 @@
 /bathroom.html  /rooms/quiet-bath/  302
 /kitchen        /spaces             302
 /kitchen.html   /spaces             302
-/bedroom        /spaces             302
-/bedroom.html   /spaces             302
+/bedroom        /rooms/sunday-bedroom/  302
+/bedroom.html   /rooms/sunday-bedroom/  302
 
 # storeurbannest.co.in and www. are forwarded to storeurbannest.in by
 # Redirect Rules in the Cloudflare dashboard; this file cannot match on domain.

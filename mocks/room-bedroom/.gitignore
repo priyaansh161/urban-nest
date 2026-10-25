@@ -1,0 +1,7 @@
+*.blend
+source/
+textures/
+bedroom_v*.glb
+*.tmp.glb
+*.log
+*.blend1

@@ -224,6 +224,8 @@ grid('Left Wall', (X0, Y0, 0), (0, Y1 - Y0, 0), (0, 0, H), M['marble'], tile=1.5
 # Right wall is ONE baked surface (so its light is continuous); the niche opening is cut out of it after
 # the bake, along existing grid lines: y 1.00..0.68 (columns 5-9), z rows 12-17.
 right = grid('Right Wall', (X1, Y1, 0), (0, -(Y1 - Y0), 0), (0, 0, H), M['marble'], tile=1.5)
+# the fourth wall (25 Oct): the room is closed, so the viewer's camera stays inside and never shows an open edge
+grid('Front Wall', (X1, Y0, 0), (-(X1 - X0), 0, 0), (0, 0, H), M['marble'], tile=1.5)
 _dz = H / round(H / STEP)
 ny0, ny1, nz0, nz1 = Y1 - 9 * 0.08, Y1 - 5 * 0.08, 12 * _dz, 17 * _dz
 NY, NZ = (ny0 + ny1) / 2, (nz0 + nz1) / 2
@@ -237,10 +239,13 @@ grid('Drop Back Under', (X0 + FW, Y1, HD), (X1 - X0 - 2 * FW, 0, 0), (0, -FW, 0)
 grid('Drop Left Face', (X0 + FW, Y0, HD), (0, Y1 - Y0, 0), (0, 0, FD), M['ceiling'], tile=3.0)
 grid('Drop Right Face', (X1 - FW, Y1, HD), (0, -(Y1 - Y0), 0), (0, 0, FD), M['ceiling'], tile=3.0)
 grid('Drop Back Face', (X0 + FW, Y1 - FW, HD), (X1 - X0 - 2 * FW, 0, 0), (0, 0, FD), M['ceiling'], tile=3.0)
+grid('Drop Front Under', (X0 + FW, Y0 + FW, HD), (X1 - X0 - 2 * FW, 0, 0), (0, -FW, 0), M['ceiling'], tile=3.0)
+grid('Drop Front Face', (X1 - FW, Y0 + FW, HD), (-(X1 - X0 - 2 * FW), 0, 0), (0, 0, FD), M['ceiling'], tile=3.0)
 GW = 0.025
 box('Cove Glow Left', (X0 + FW + 0.02, 0, H - 0.01), (GW, Y1 - Y0 - 0.05, 0.01), M['glow'])
 box('Cove Glow Right', (X1 - FW - 0.02, 0, H - 0.01), (GW, Y1 - Y0 - 0.05, 0.01), M['glow'])
 box('Cove Glow Back', (0, Y1 - FW - 0.02, H - 0.01), (X1 - X0 - 2 * FW - 0.05, GW, 0.01), M['glow'])
+box('Cove Glow Front', (0, Y0 + FW + 0.02, H - 0.01), (X1 - X0 - 2 * FW - 0.05, GW, 0.01), M['glow'])
 box('Shadow Gap', (0, Y1 - 0.006, HD - 0.008), (X1 - X0, 0.012, 0.016), M['blackmat'])     # thin reveal where the frame meets the back wall
 DOWNLIGHTS = [(VX, Y1 - FW / 2), (TX, Y1 - FW / 2), (SX, Y1 - FW / 2), (X0 + FW / 2, 0.15), (X0 + FW / 2, -0.85), (X1 - FW / 2, 0.15), (X1 - FW / 2, -0.85)]
 for sx, sy in DOWNLIGHTS: cyl('Downlight', (sx, sy, HD - 0.006), 0.045, 0.012, M['bulb'], seg=24)
@@ -353,6 +358,7 @@ for sx, sy in DOWNLIGHTS:
 area('Cove L', (X0 + FW + 0.05, 0, H - 0.02), 0.12, Y1 - Y0 - 0.1, 30, WARM, (0, math.radians(-35), 0))
 area('Cove R', (X1 - FW - 0.05, 0, H - 0.02), 0.12, Y1 - Y0 - 0.1, 30, WARM, (0, math.radians(35), 0))
 area('Cove B', (0, Y1 - FW - 0.05, H - 0.02), X1 - X0 - 2 * FW, 0.12, 30, WARM, (math.radians(-35), 0, 0))
+area('Cove F', (0, Y0 + FW + 0.05, H - 0.02), X1 - X0 - 2 * FW, 0.12, 30, WARM, (math.radians(35), 0, 0))
 area('Mirror Light', (VX, Y1 - 0.12, 1.45), 0.95, 0.65, 18, WARM, (math.radians(90), 0, 0))
 area('Fill', (0, -0.2, H - 0.05), 4.0, 2.2, 22, (1.0, 0.95, 0.9), (math.radians(180), 0, 0))
 world = bpy.data.worlds.new('W'); scene.world = world; world.use_nodes = True
@@ -394,7 +400,6 @@ refl_d = bpy.data.cameras.new('Refl'); refl_d.lens = 24
 refl = bpy.data.objects.new('Refl', refl_d); scene.collection.objects.link(refl)
 refl.location = (VX, Y1 - 0.08, 1.42); refl.rotation_euler = (Vector((-2.0, -0.6, 1.15)) - refl.location).to_track_quat('-Z', 'Y').to_euler()   # looks toward the door, as in the reference
 scene.camera = refl; mirror.hide_render = True
-fw = grid('Front Temp', (X1, Y0 - 0.01, 0), (-(X1 - X0), 0, 0), (0, 0, H), M['marble']); SHELL.pop()
 scene.render.resolution_x = 900; scene.render.resolution_y = 620
 scene.cycles.samples = 96; scene.cycles.use_denoising = True
 scene.render.filepath = os.path.join(TMP, 'refl.png'); bpy.ops.render.render(write_still=True)
@@ -406,7 +411,7 @@ mi2 = bpy.data.images.load(mp); mi2.pack()
 mm = mirror.data.materials[0]; mm.name = 'Mirror'; nt = mm.node_tree; b = nt.nodes['Principled BSDF']
 t = nt.nodes.new('ShaderNodeTexImage'); t.image = mi2; nt.links.new(t.outputs['Color'], b.inputs['Base Color']); nt.links.new(t.outputs['Color'], b.inputs['Emission Color'])
 b.inputs['Emission Strength'].default_value = 0.35; b.inputs['Roughness'].default_value = 0.1
-mirror.hide_render = False; bpy.data.objects.remove(fw)
+mirror.hide_render = False
 
 # ---------------------------------------------------------------- previews: front (like the reference) and plan (to check the layout)
 scene.view_settings.view_transform = 'AgX'; scene.render.resolution_x, scene.render.resolution_y = 1800, 760; scene.cycles.samples = 96

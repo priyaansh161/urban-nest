@@ -137,7 +137,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-// glTF is Y-up. The room is 4.4 (x) x 2.8 (z) x 2.7 (y) metres; back wall z = -1.4, open front at z = +1.4.
+// glTF is Y-up. The room is 4.4 (x) x 2.8 (z) x 2.7 (y) metres, closed on all four sides (back wall z = -1.4, front
+// wall z = +1.4): the camera stays inside, so no view shows an open edge.
 // Products are sized by REAL measurements in metres, so scale can never drift.
 // Products (dots + cards) and staging (dress the room, no dots) live in placements.json, which the Blender
 // build reads too, so their shadows are baked into the room exactly where they stand here.
@@ -156,7 +157,7 @@ if (QS.get('dev')) document.body.classList.add('dev');      // Scale check + tri
 const BARE = !!QS.get('bare');
 
 const VIEWS = {
-  wide:   { pos:[0.0, 1.45, 1.6], target:[0.0, 1.15, -1.4] },
+  wide:   { pos:[0.0, 1.45, 1.3], target:[0.0, 1.15, -1.4] },
   vanity: { pos:[-1.35, 1.35, 0.2], target:[-1.35, 1.0, -1.4] },
   shower: { pos:[1.0, 1.5, 0.9], target:[1.65, 1.2, -1.4] },
   toilet: { pos:[0.3, 1.3, 0.5], target:[0.1, 0.55, -1.4] },
@@ -303,15 +304,12 @@ function bakedMaterial(src, lift = 1) {
   m.customProgramCacheKey = () => 'baked';
   bakedMats.push(m); return m;
 }
-// The room's own reflection: a cube render from the middle of the room (with a stand-in wall closing the open
-// front), blurred by roughness through PMREM. Until it exists the baked surfaces show no gloss.
+// The room's own reflection: a cube render from the middle of the room, blurred by roughness through PMREM.
+// Until it exists the baked surfaces show no gloss.
 function captureRoomEnv() {
-  const front = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.7), new THREE.MeshBasicMaterial({ color: 0x8c877f }));
-  front.position.set(0, 1.35, 1.4); front.rotation.y = Math.PI; scene.add(front);
   const rt = new THREE.WebGLCubeRenderTarget(256, { type: THREE.HalfFloatType });
   const cam = new THREE.CubeCamera(0.05, 20, rt); cam.position.set(0, 1.3, -0.1);
   cam.update(renderer, scene);
-  scene.remove(front);
   const env = pmrem.fromCubemap(rt.texture).texture; rt.dispose();
   const old = bakedMats[0] && bakedMats[0].envMap;            // captured again once the products are in
   for (const m of bakedMats) { m.envMap = env; m.needsUpdate = true; }
@@ -461,7 +459,7 @@ function updateDots() {
 function clampCamera() {
   camera.position.x = THREE.MathUtils.clamp(camera.position.x, -2.1, 2.1);
   camera.position.y = THREE.MathUtils.clamp(camera.position.y, 0.25, 2.55);
-  camera.position.z = THREE.MathUtils.clamp(camera.position.z, -1.3, 2.3);
+  camera.position.z = THREE.MathUtils.clamp(camera.position.z, -1.3, 1.3);
 }
 
 // Desktop: keep the card just beside the focused product (not too close, not too far), flipping to its left near the screen edge.
