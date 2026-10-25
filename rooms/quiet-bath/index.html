@@ -51,6 +51,7 @@
      most people find their way; this is only there for someone who gets stuck. */
   #hint { position:fixed; left:50%; bottom:calc(12px + env(safe-area-inset-bottom)); transform:translateX(-50%); width:calc(100% - 24px); text-align:center;
           font-size:11px; letter-spacing:.04em; color:rgba(248,247,244,.42); text-shadow:0 1px 4px rgba(0,0,0,.35); z-index:5; pointer-events:none; }
+  @media (max-width: 700px) { #hint { font-size:9.5px; letter-spacing:.02em; line-height:1.35; } }
   button { font:inherit; font-size:12px; letter-spacing:.08em; color:var(--ink); background:rgba(14,42,42,.78); border:1px solid rgba(248,247,244,.25); padding:9px 14px;
            border-radius:999px; cursor:pointer; backdrop-filter:blur(6px); }
   button:hover, button.on { background:var(--gold); color:#10201f; border-color:var(--gold); }
@@ -492,7 +493,7 @@ renderer.domElement.addEventListener('pointerup', e => {
 document.querySelectorAll('#bar [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 // OrbitControls' own gestures: mouse left = rotate, right = pan, wheel = zoom; one finger = rotate, two = pinch-zoom + pan
 document.getElementById('hint').textContent = matchMedia('(hover: none) and (pointer: coarse)').matches
-  ? 'Swipe with one finger to turn · Two fingers to slide · Pinch to zoom · Tap a dot for details'
+  ? 'Swipe to turn · Two fingers to slide · Pinch to zoom · Tap a dot'
   : 'Click and drag to turn · Right-click and drag to slide · Scroll to zoom · Click a dot for details';
 document.getElementById('humanBtn').onclick = e => { human.visible = !human.visible; e.target.classList.toggle('on', human.visible); };
 document.getElementById('dotsBtn').onclick = e => { dotsOn = !dotsOn; e.target.classList.toggle('on', dotsOn); };
