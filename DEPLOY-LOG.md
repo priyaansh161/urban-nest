@@ -64,3 +64,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-22 | 20:33 | e2aa902 (+ uncommitted changes) | Homepage and /look hero now opens on a random room each visit (never the same twice in a row) | https://5afb4c3f.storeurbannest.pages.dev |
 | 2026-10-25 | 12:09 | c5b6b92 | Spaces: old Spline rooms taken down; rebuilt Quiet Bath live at /rooms/quiet-bath/ (own viewer, faster loading, caching) | https://1ec89e7f.storeurbannest.pages.dev |
 | 2026-10-25 | 12:23 | 5d7aa12 | Quiet Bath: smaller one-line navigation hint on phones | https://daf236bd.storeurbannest.pages.dev |
+| 2026-10-25 | 12:29 | d2c7133 | Quiet Bath: logo loader; Spiral Ribbed Vase taken off the cistern | https://f237cf1b.storeurbannest.pages.dev |
