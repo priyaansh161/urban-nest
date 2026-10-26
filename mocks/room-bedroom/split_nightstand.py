@@ -2,7 +2,7 @@
 # right). The left nightstand already carries the clock and the charging dock, so it gets a bare copy; the plant
 # moves to the dresser as staging (no dot). The right nightstand keeps the original, cup and plant included.
 #   blender -b -P split_nightstand.py -- <room-bedroom dir>
-# Writes products/bed-nightstand-bare.glb, products/bed-nightstand-plant.glb and split_check.png.
+# Writes products/bed-nightstand-bare.glb, -plant.glb, -nocup.glb and split_check.png.
 import bpy, bmesh, sys, os
 import numpy as np
 from mathutils import Vector
@@ -77,6 +77,9 @@ def export(keep, name, fill=False):
 decor_ix = {f.index for f in dec}
 bare = export(lambda i: i not in decor_ix, 'bed-nightstand-bare', fill=True)
 pl = export(lambda i: i in plant, 'bed-nightstand-plant')
+# the right nightstand keeps its plant but loses the cup (26 Oct: the table lamp stands where the cup was)
+cup_ix = {f.index for f in dec if f.calc_center_median().x >= cx}
+export(lambda i: i not in cup_ix, 'bed-nightstand-nocup', fill=True)
 ob.hide_render = True; pl.location.x = (mx[0] - mn[0]) * 1.3
 
 scene.render.engine = 'BLENDER_WORKBENCH'; scene.display.shading.light = 'STUDIO'; scene.display.shading.color_type = 'TEXTURE'

@@ -134,9 +134,9 @@
    "file": "bed-table-lamp.glb",
    "height": 0.342,
    "pos": [
-    1.2,
+    1.19,
     0.512,
-    -1.62
+    -1.74
    ],
    "noShadow": true,
    "light": {
@@ -391,8 +391,8 @@
  ],
  "staging": [
   {
-   "name": "Fluted Nightstand, right (same piece, no second dot)",
-   "file": "bed-nightstand.glb",
+   "name": "Fluted Nightstand, right (same piece without its cup, no second dot)",
+   "file": "bed-nightstand-nocup.glb",
    "height": 0.7,
    "pos": [
     1.11,

@@ -80,6 +80,11 @@
   #card a.buy { display:inline-block; background:var(--teal); color:#fff; text-decoration:none; padding:10px 18px; border-radius:999px; font-size:12px; letter-spacing:.1em; }
   #card button.back { margin-left:8px; background:none; color:#14302f; border:1px solid rgba(20,48,47,.3); backdrop-filter:none; padding:9px 14px; }
   #card button.back:hover { background:#14302f; color:#fff; border-color:#14302f; }
+  /* next / previous piece: ‹ 3 of 12 › at the foot of the card (a swipe or the arrow keys do the same) */
+  #card .cnav { display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px; font-size:11px; letter-spacing:.12em; color:#6b8583; }
+  #card .cnav button { background:none; border:1px solid rgba(20,48,47,.25); color:#14302f; backdrop-filter:none; width:34px; height:34px; padding:0; font-size:17px; line-height:1; }
+  #card .cnav button:hover { background:#14302f; color:#fff; border-color:#14302f; }
+  @media (max-width: 700px) { #card .cnav { margin-top:10px; } }
   #card .x { position:absolute; top:10px; right:12px; background:none; border:none; color:#14302f; font-size:20px; padding:2px 6px; cursor:pointer; }
 
   #loader { position:fixed; inset:0; z-index:20; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; transition:opacity .9s; }
@@ -112,6 +117,7 @@
   <div class="specs" id="cSpecs"></div>
   <a class="buy" id="cBuy" href="#" target="_blank" rel="noopener">View on Amazon</a>
   <button class="back" id="cBack">&larr; Back to room</button>
+  <div class="cnav"><button id="cPrev" aria-label="Previous piece">&lsaquo;</button><span id="cPos"></span><button id="cNext" aria-label="Next piece">&rsaquo;</button></div>
 </div>
 
 <div id="bar">
@@ -121,6 +127,7 @@
   <button data-view="window">Window</button>
   <button data-view="dresser">Dresser</button>
   <button data-view="walkin">Walk-in</button>
+  <button data-view="chandelier">Chandelier</button>
   <button id="humanBtn" class="dev-only">Scale check</button>
   <button id="dotsBtn" class="on">Dots</button>
 </div>
@@ -160,7 +167,8 @@ if (QS.get('dev')) document.body.classList.add('dev');      // Scale check + tri
 
 const VIEWS = {
   wide:    { pos:[0.0, 1.5, 1.75], target:[0.0, 1.0, -1.9] },
-  overview:{ pos:[1.85, 2.55, 1.7], target:[-0.5, 0.35, -0.8] },   // high in the door-side corner, the whole room at once
+  overview:{ pos:[1.85, 2.55, 1.7], target:[-0.5, 1.3, -0.8] },   // high in the door-side corner, the whole room at once, the chandelier at the top
+  chandelier:{ pos:[0.9, 1.5, 1.4], target:[-0.05, 2.15, -0.4] },   // looking up at the ceiling light
   bed:     { pos:[1.0, 1.35, 0.9], target:[-0.15, 0.6, -0.9] },
   window:  { pos:[1.2, 1.45, 1.2], target:[-2.1, 1.25, 0.1] },
   dresser: { pos:[-0.8, 1.4, 0.9], target:[2.1, 0.9, 0.0] },
@@ -414,11 +422,33 @@ function openCard(d) {
   document.getElementById('cDesc').textContent = d.desc;
   document.getElementById('cSpecs').innerHTML = d.specs.map(s => '<div><b>' + s[0] + '</b>' + s[1] + '</div>').join('');
   document.getElementById('cBuy').href = d.link;
+  const list = productOrder();
+  document.getElementById('cPos').textContent = (list.indexOf(focused) + 1) + ' of ' + list.length;
   card.classList.add('open');
 }
+// The pieces in the order placements.json lists them (they arrive in any order, as each file lands).
+const productOrder = () => [...placed].sort((a, b) => PRODUCTS.indexOf(a.def) - PRODUCTS.indexOf(b.def));
+// While a card is open: the next or previous piece, the camera flying on to it.
+function stepProduct(d) {
+  if (!focused) return;
+  const list = productOrder(), i = list.indexOf(focused);
+  focusProduct(list[(i + d + list.length) % list.length]);
+}
+document.getElementById('cPrev').onclick = () => stepProduct(-1);
+document.getElementById('cNext').onclick = () => stepProduct(1);
+let swipeX = null;                                     // a sideways swipe on the card (phones)
+card.addEventListener('touchstart', e => { swipeX = e.touches[0].clientX; }, { passive: true });
+card.addEventListener('touchend', e => {
+  if (swipeX === null) return;
+  const dx = e.changedTouches[0].clientX - swipeX; swipeX = null;
+  if (Math.abs(dx) > 50) stepProduct(dx < 0 ? 1 : -1);
+});
 document.getElementById('cardX').onclick = closeCard;
 document.getElementById('cBack').onclick = closeCard;
-addEventListener('keydown', e => { if (e.key === 'Escape') closeCard(); });
+addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCard();
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') stepProduct(e.key === 'ArrowRight' ? 1 : -1);
+});
 
 // dots follow the objects every frame; hidden when something is in front
 const ray = new THREE.Raycaster();
