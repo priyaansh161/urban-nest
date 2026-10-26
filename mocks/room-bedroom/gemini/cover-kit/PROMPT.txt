@@ -1,4 +1,4 @@
-Attach: 4-room-overview.png
+Attach: 5-overview-dresser.png   (his pick, 26 Oct: from the window-side corner, the dresser and its canvas in view)
 
 Turn this 3D render into a high-end architectural interior photograph of the very same bedroom, as if shot by a
 professional interiors photographer for a luxury design magazine on a slow Sunday morning, and style it lightly,
@@ -7,36 +7,36 @@ the way an interior stylist would before a shoot.
 THE ROOM: a calm, warm, modern Indian bedroom. Soft beige hand-troweled plaster walls with a gentle mottled
 texture; a full-height fluted wall panel in pale natural oak behind the bed, its slim vertical slats catching the
 light in fine stripes; a recessed cove ceiling with a hidden warm LED strip washing the ceiling in a soft glow;
-wide-plank honey-oak flooring with real grain and a satin sheen; slim walnut skirting; a large white-framed
-window on the left with floor-to-ceiling ivory linen curtains, slightly sheer, falling in soft folds. Morning
-sunlight pours through the window, laying long warm patches of light across the floor, the rug and the foot of
-the bed, with the curtains glowing where the sun passes through them. Outside the window: a lush, softly out-of-
-focus garden of green trees and leaves, bright with daylight.
+wide-plank honey-oak flooring with real grain and a satin sheen; slim walnut skirting; a doorway with a walnut
+frame on the right leading into a walk-in wardrobe. Morning sunlight comes in from a large window just out of
+frame on the left, laying long, warm, soft-edged patches of light across the floor, the rug and the foot of the bed.
 
 KEEP EXACTLY AS THEY ARE (these are real products; their shape, colour, size and position must not change):
 the camera position, angle and framing; the room's layout and proportions; the cream boucle upholstered bed with
 its rounded headboard; the white bedding, the two white pillows, the terracotta cushion, the teal cushion and the
 cream lumbar cushion; the deep teal quilted throw across the foot of the bed and the open book lying on it; the
 large shaggy rug under the bed in its beige, brown and ivory mix (keep its colour and pile exactly); the colourful
-painting of a woman playing a grand piano on the fluted panel; both BLACK fluted nightstands with their drawers
-and shelves; the blue twin-bell alarm clock and the small charging stand on the left nightstand; the gold
-mushroom table lamp, the small potted plant and the stacked books on the right nightstand (no mug or cup there); the
-black arc floor lamp with its white drum shade in the back-left corner; the brass six-arm
-ceiling chandelier with its white globe bulbs at the top centre (bulbs glowing softly); the corner of the walnut
-dresser in the bottom right with the little white family figurines on it. Do not remove, move, resize, recolour or restyle any of
-these.
+painting of a woman playing a grand piano on the fluted panel; the black arc floor lamp with its white drum shade
+in the front-left corner; both BLACK fluted nightstands; the blue twin-bell alarm clock and the small charging
+stand on the left nightstand; the slim gold table lamp, the small potted plant and the stacked books on the right
+nightstand (no mug or cup there); the brass six-arm ceiling chandelier with its white globe bulbs at the top
+(bulbs glowing softly); the walnut chest of drawers on the right wall with, from left to right, the little white
+family figurines, the small potted plant, the white-and-gold yoga-lady vase with white flowers and the white
+abstract face sculpture; the sailboats-at-sunset canvas in its wooden frame on the wall above it. Do not remove,
+move, resize, recolour or restyle any of these.
 
 ADD ONLY THESE FEW STYLING PIECES, nothing else:
-1. A tall, healthy snake plant (about 1 m) in a terracotta pot standing on the floor in the empty corner between
-   the window and the arc floor lamp.
+1. A tall, healthy snake plant (about 1 m) in a terracotta pot standing on the floor in the empty space between
+   the right nightstand and the chest of drawers.
 2. A small wooden breakfast tray on the bed beside the open book: a cup of coffee and a croissant on a white plate.
 3. Gently lived-in bedding: the duvet and pillows softly creased and plumped, as if just made by hand.
 Keep the room calm, uncluttered and airy. Do NOT add rugs, chairs, benches, baskets, shelves, extra lamps, extra
 art, mirrors, people, pets, text or logos.
 
-MAKE IT LOOK PHOTOGRAPHED, NOT RENDERED: soft, warm natural light from the window mixing with the gentle glow of
-the cove and the table lamp; realistic soft shadows under the bed, the nightstands, the rug and every object;
-visible weave in the linen and the throw, the nubbly loops of the boucle, the deep soft pile of the rug, real oak
-grain in the floor and the slats; natural colour, crisp detail, a cosy, premium, slow-Sunday-morning mood.
+MAKE IT LOOK PHOTOGRAPHED, NOT RENDERED: soft, warm natural morning light mixing with the gentle glow of the cove,
+the chandelier and the table lamp; realistic soft shadows under the bed, the nightstands, the chest of drawers,
+the rug and every object; visible weave in the linen and the throw, the nubbly loops of the boucle, the deep soft
+pile of the rug, real oak grain in the floor and the slats, the walnut grain of the drawers; natural colour, crisp
+detail, a cosy, premium, slow-Sunday-morning mood.
 
 Output one photorealistic image, 16:9, the same framing as the attached render.

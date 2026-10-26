@@ -16,6 +16,9 @@ const SHOTS = [
   ['2-room-window.png', [1.55, 1.5, 1.65], [-0.8, 0.95, -0.9]],
   ['3-room-dresser.png', [-1.55, 1.5, 1.65], [0.8, 0.95, -0.9]],
   ['4-room-overview.png', [1.85, 2.55, 1.7], [-0.5, 1.3, -0.8]],   // the viewer's Overview, his pick (26 Oct)
+  ['5-overview-dresser.png', [-1.85, 2.55, 1.7], [0.6, 1.3, -0.8]],   // the same, from the window-side corner: the dresser and its canvas in view
+  ['6-overview-dresser-wide.png', [-1.85, 2.55, 1.7], [1.0, 1.2, -0.4]],
+  ['7-overview-centre.png', [-0.4, 2.3, 1.78], [0.3, 1.4, -1.0]],   // from the middle of the door wall: window left, dresser right
 ];
 const browser = await chromium.launch({ channel: 'msedge', headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 try {
