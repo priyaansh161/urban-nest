@@ -84,7 +84,14 @@
   #card .cnav { display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px; font-size:11px; letter-spacing:.12em; color:#6b8583; }
   #card .cnav button { background:none; border:1px solid rgba(20,48,47,.25); color:#14302f; backdrop-filter:none; width:34px; height:34px; padding:0; font-size:17px; line-height:1; }
   #card .cnav button:hover { background:#14302f; color:#fff; border-color:#14302f; }
-  @media (max-width: 700px) { #card .cnav { margin-top:10px; } }
+  /* phone: the arrows sit small on the card's left and right edges (a swipe does the same); the count stays below */
+  @media (max-width: 700px) {
+    #card .cnav { margin-top:10px; }
+    #card .cnav button { position:absolute; top:50%; transform:translateY(-50%); width:26px; height:26px; font-size:15px;
+                         background:rgba(248,247,244,.96); box-shadow:0 2px 8px rgba(0,0,0,.18); }
+    #card #cPrev { left:-9px; }
+    #card #cNext { right:-9px; }
+  }
   #card .x { position:absolute; top:10px; right:12px; background:none; border:none; color:#14302f; font-size:20px; padding:2px 6px; cursor:pointer; }
 
   #loader { position:fixed; inset:0; z-index:20; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; transition:opacity .9s; }
