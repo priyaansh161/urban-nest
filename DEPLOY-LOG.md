@@ -66,3 +66,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-25 | 12:23 | 5d7aa12 | Quiet Bath: smaller one-line navigation hint on phones | https://daf236bd.storeurbannest.pages.dev |
 | 2026-10-25 | 12:29 | d2c7133 | Quiet Bath: logo loader; Spiral Ribbed Vase taken off the cistern | https://f237cf1b.storeurbannest.pages.dev |
 | 2026-10-25 | 23:19 | 589a98c | Sunday Bedroom 3D room live (Spaces + homepage tile, /bedroom redirect); Quiet Bath gets a fourth wall | https://e169dfe8.storeurbannest.pages.dev |
+| 2026-10-26 | 12:15 | f7a44da | Rooms: swipe/arrow-key/arrow-button stepping between products (both rooms), bedroom Chandelier view + higher Overview, right nightstand without cup | https://e4c2c8cb.storeurbannest.pages.dev |
