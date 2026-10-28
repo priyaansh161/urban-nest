@@ -903,6 +903,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
 <script src="share.js"></script>
+<script src="urls.js"></script>
 <script src="nest-body.js"></script>
 <script>
   /* ── THEME SWITCH · SHARED ──
@@ -1092,8 +1093,9 @@
     <div class="footer-disclosure">
       Every piece here is shown as a 3D model, built with AI assistance from the
       maker&rsquo;s own photographs. It is a close likeness, not a photograph of the
-      object itself &mdash; colour, finish and scale can differ from what arrives.
+      object itself, so colour, finish and scale can differ from what arrives.
       Treat the specification and the retailer&rsquo;s own page as the final word.
+      As an Amazon Associate, we earn from qualifying purchases.
       <a href="about.html#renders">How we model things &rarr;</a>
     </div>
     <div class="footer-left">
@@ -1176,14 +1178,14 @@
       if (new URLSearchParams(location.search).has('a')) history.replaceState(null, '', location.pathname);
     }
 
-    // Articles have no page of their own, so a shared link is this page
-    // with ?a=<id>, which opens the reader on load (see loadNestPosts).
+    // A shared link is the article's own page, /edit/<slug>: it has its own
+    // title and photo for the preview. Old ?a=<id> links still open the reader.
     let currentArticle = null;
     function shareArticle() {
       if (!currentArticle) return;
-      const u = new URL(location.pathname, location.origin);
-      u.searchParams.set('a', currentArticle.key);
-      UNShare.share({ title: currentArticle.title + ' · The Nest Edit', text: currentArticle.title + ' — The Nest Edit, Urban Nest', url: u.href });
+      const p = nestPosts[currentArticle.key];
+      const u = new URL(p ? UNUrls.post(p) : location.pathname, location.origin);
+      UNShare.share({ title: currentArticle.title + ' · The Nest Edit', text: currentArticle.title + ', The Nest Edit, Urban Nest', url: u.href });
     }
 
     function handleOverlayClick(e) {
@@ -1302,7 +1304,7 @@
       const cat = p.category || 'The Nest';
       const plain = (p.content || '').replace(/[#*>_-]/g, ' ').replace(/\s+/g, ' ').trim();
       return {
-        key: p.id, kind: 'nest', cat: cat, filter: cat.toLowerCase(),
+        key: p.id, kind: 'nest', cat: cat, filter: cat.toLowerCase(), url: UNUrls.post(p),
         title: p.title,
         excerpt: (p.excerpt && p.excerpt.trim()) ? p.excerpt
                : plain.slice(0, 165) + (plain.length > 165 ? '…' : ''),
@@ -1323,27 +1325,29 @@
         : `<span class="na-media na-ph"><img src="favicon.png" alt="" aria-hidden="true"/></span>`;
     }
     function naOpen(it) {
-      return it.kind === 'static' ? `openArticle('${it.key}')` : `openNestArticle('${it.key}')`;
+      // A modified click (ctrl, cmd, shift) is left to the link: the article's own page in a new tab.
+      const go = it.kind === 'static' ? `openArticle('${it.key}')` : `openNestArticle('${it.key}')`;
+      return `if(event.ctrlKey||event.metaKey||event.shiftKey)return;event.preventDefault();${go}`;
     }
     function naCard(it, variant) {
       if (variant === 'rail') {
-        return `<div class="na na-rail" onclick="${naOpen(it)}">
+        return `<a class="na na-rail" href="${naEsc(it.url || '/community')}" onclick="${naOpen(it)}">
             ${naMedia(it)}
             <span class="na-rail-txt">
               <span class="na-cat">${it.cat}</span>
               <span class="na-title">${it.title}</span>
               <span class="na-meta">${it.read || it.date}</span>
             </span>
-          </div>`;
+          </a>`;
       }
       const meta = [it.author, it.read, it.date].filter(Boolean).join(' · ') + (it.votes ? ' · ▲ ' + it.votes : '');
-      return `<div class="na na-${variant}" onclick="${naOpen(it)}">
+      return `<a class="na na-${variant}" href="${naEsc(it.url || '/community')}" onclick="${naOpen(it)}">
           ${naMedia(it)}
           <span class="na-cat">${it.cat}</span>
           <span class="na-title">${it.title}</span>
           <span class="na-excerpt">${it.excerpt}</span>
           <span class="na-meta">${meta}</span>
-        </div>`;
+        </a>`;
     }
 
     function renderNest() {

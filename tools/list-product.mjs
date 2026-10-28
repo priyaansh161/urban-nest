@@ -161,6 +161,7 @@ const description = (p) => {
     .replace(/^[A-Z0-9][A-Z0-9 &'.,/-]{3,70}[:\-–]\s*/, '')         // '6 INCH COMPACT BRASS URLI BOWL: '
     .replace(/^【[^】]*】\s*/, '').trim()).filter(Boolean);
   let d = b.slice(0, 2).join(' ');
+  d = d.replace(/\s*—\s*/g, ', ');                               // no em dashes in our copy (28 Oct 2026)
   if (d.length > 320) d = d.slice(0, 320).replace(/\s+\S*$/, '') + '…';
   return d || null;
 };

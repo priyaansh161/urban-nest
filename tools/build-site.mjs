@@ -32,7 +32,7 @@ const RULES = [
   /* Named, not by extension. The root folder also holds DEPLOY.txt and
      DEPLOY-CHECKLIST.txt — private working notes — and allowing every .txt
      would have published them. */
-  { dir: '.',      names: ['robots.txt', 'sitemap.xml', '_redirects', '_headers'] },
+  { dir: '.',      names: ['robots.txt', '_redirects', '_headers'] },   // sitemap.xml is built per request: functions/sitemap.xml.js
   { dir: 'admin',  exts: ['.html', '.js', '.css'],                                 deep: false },
   { dir: 'studio', exts: ['.html', '.js'],                                 deep: false },
   { dir: 'images', exts: ['.webp', '.png', '.jpg', '.svg'],                deep: false },

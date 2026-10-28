@@ -4,20 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Collection · Urban Nest</title>
-  <meta name="description" content="Handpicked statement décor for Indian homes — chandeliers, vases, sculptures and wall clocks, each modelled in 3D so you can turn it over before you buy."/>
+  <meta name="description" content="Handpicked statement décor for Indian homes: chandeliers, vases, sculptures and wall clocks, each modelled in 3D so you can turn it over before you buy."/>
   <!-- The link-preview card WhatsApp and others show (same square card as the homepage). -->
   <meta property="og:type" content="website"/>
   <meta property="og:site_name" content="Urban Nest"/>
   <meta property="og:url" content="https://storeurbannest.in/collection"/>
   <meta property="og:title" content="The Collection · Urban Nest"/>
-  <meta property="og:description" content="Handpicked statement décor for Indian homes — chandeliers, vases, sculptures and wall clocks, each modelled in 3D so you can turn it over before you buy."/>
+  <meta property="og:description" content="Handpicked statement décor for Indian homes: chandeliers, vases, sculptures and wall clocks, each modelled in 3D so you can turn it over before you buy."/>
   <meta property="og:image" content="https://storeurbannest.in/images/share-card.jpg"/>
   <meta property="og:image:width" content="1200"/>
   <meta property="og:image:height" content="1200"/>
   <meta property="og:image:alt" content="Urban Nest"/>
   <meta name="twitter:card" content="summary"/>
   <meta name="twitter:title" content="The Collection · Urban Nest"/>
-  <meta name="twitter:description" content="Handpicked statement décor for Indian homes — chandeliers, vases, sculptures and wall clocks, each modelled in 3D so you can turn it over before you buy."/>
+  <meta name="twitter:description" content="Handpicked statement décor for Indian homes: chandeliers, vases, sculptures and wall clocks, each modelled in 3D so you can turn it over before you buy."/>
   <meta name="twitter:image" content="https://storeurbannest.in/images/share-card.jpg"/>
   <link rel="icon" type="image/png" href="favicon.png"/>
   <!-- Installable app: manifest.webmanifest + sw.js (registered by pwa.js). -->
@@ -42,6 +42,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="supabase.js"></script>
   <script src="share.js"></script>
+  <script src="urls.js"></script>
   <script src="rating.js"></script>
   <!-- Renders a single .glb as an orbitable object. One file per piece; no
        scene, no camera rig, nothing to arrange — which is why these do not
@@ -206,6 +207,7 @@
     .cat { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
     .in-category .item .cat { display: none; }
     .name { font-family: 'Bodoni Moda', serif; font-size: 21px; font-weight: 400; line-height: 1.2; }
+    .name-link { color: inherit; text-decoration: none; }
     .desc { font-size: 13px; line-height: 1.8; color: var(--grey); flex: 1; }
     .foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
     .price { font-size: 13px; color: var(--black); }
@@ -875,7 +877,7 @@
     <div class="hero-inner">
       <div class="page-tag">SINGLE PIECES</div>
       <h1 class="page-title">The <em>Collection.</em></h1>
-      <p class="page-sub">Handpicked décor that stands out. Every piece modelled in 3D — turn it over before you decide.</p>
+      <p class="page-sub">Handpicked décor that stands out. Every piece is modelled in 3D, so you can turn it over before you decide.</p>
     </div>
   </div>
 
@@ -938,11 +940,12 @@
     <div class="footer-disclosure">
       Pieces marked 3D are shown as a model, built with AI assistance from the
       maker&rsquo;s own photographs. It is a close likeness, not a photograph of the
-      object itself &mdash; colour, finish and scale can differ from what arrives.
+      object itself, so colour, finish and scale can differ from what arrives.
       The rest are shown in the seller&rsquo;s photographs.
       Treat the specification, and the seller&rsquo;s own page where there is one, as
       the final word. Where a piece links out to a retailer we may earn a
       commission on the sale; where it is sold here, the seller is named on the piece.
+      As an Amazon Associate, we earn from qualifying purchases.
       <a href="about.html#renders">How we model things &rarr;</a>
     </div>
     <div class="footer-left">
@@ -994,7 +997,9 @@
     return '<article class="item" data-id="' + esc(item.id) + '">' + stage(item) +
       '<div class="body">' +
         (item.category ? '<span class="cat">' + esc(catLabel(item.category)) + '</span>' : '') +
-        '<h2 class="name">' + esc(item.name) + '</h2>' +
+        // A real link as well as the card's click: search engines follow it to
+        // the piece's own page (/piece/…), and ctrl-click opens that page.
+        '<h2 class="name"><a class="name-link" href="' + esc(UNUrls.piece(item)) + '">' + esc(item.name) + '</a></h2>' +
         (item.description ? '<p class="desc">' + esc(item.description) + '</p>' : '<p class="desc"></p>') +
         '<div class="foot">' +
           '<span class="price">' + esc(priceText(item)) + '</span>' + UNTake.chip(item) +
@@ -1010,10 +1015,9 @@
   function sharePiece(id) {
     var it = ITEMS[id];
     if (!it) return;
-    var u = new URL(location.pathname, location.origin);
-    if (it.category) u.searchParams.set('c', it.category);
-    u.searchParams.set('p', id);
-    UNShare.share({ title: it.name + ' · Urban Nest', text: it.name + ' — on Urban Nest', url: u.href });
+    // The piece's own page: its photo and name show in the WhatsApp preview.
+    var u = new URL(UNUrls.piece(it), location.origin);
+    UNShare.share({ title: it.name + ' · Urban Nest', text: it.name + ', on Urban Nest', url: u.href });
   }
 
   var SELLERS = {};
@@ -1082,7 +1086,10 @@
     if (e.target.closest('#cartPanel')) return;
     closeCart();
     var card = e.target.closest('.item[data-id]');
-    if (card) openPiece(card.getAttribute('data-id'));
+    if (!card) return;
+    if (e.target.closest('a.name-link') && (e.ctrlKey || e.metaKey || e.shiftKey)) return;   // a new tab, as asked
+    if (e.target.closest('a.name-link')) e.preventDefault();
+    openPiece(card.getAttribute('data-id'));
   });
 
   /* ── THE CART ──
@@ -1216,7 +1223,7 @@
 
     cartBt.style.display = leads ? '' : 'none';
     cartBt.disabled = it.in_stock === false;
-    cartBt.textContent = it.in_stock === false ? 'Out of stock' : 'Add to Cart — ' + priceText(it);
+    cartBt.textContent = it.in_stock === false ? 'Out of stock' : 'Add to Cart · ' + priceText(it);
     cartBt.setAttribute('data-add', it.id);
 
     // The other route, kept quiet but present. A visitor who would rather buy
@@ -1226,7 +1233,7 @@
       secondHtml = 'Also available on <a href="' + esc(it.buy_link) +
                    '" target="_blank" rel="noopener sponsored">' + esc(affName(it)) + '</a>';
     } else if (!leads && it.buy_link && sellable(it)) {
-      secondHtml = 'Also available here — ' + esc(priceText(it));
+      secondHtml = 'Also available here: ' + esc(priceText(it));
     }
     second.innerHTML = secondHtml;
     second.style.display = secondHtml ? '' : 'none';
@@ -1286,7 +1293,7 @@
     });
     // some connections are slow enough that silence reads as breakage
     setTimeout(function () {
-      if (!mv.classList.contains('ready')) status.textContent = 'Still loading — larger piece';
+      if (!mv.classList.contains('ready')) status.textContent = 'Still loading, larger piece';
     }, 6000);
     stageEl.insertBefore(mv, poster);
     dViewer = mv;
@@ -1302,7 +1309,7 @@
     gal.innerHTML =
       '<div class="d-track">' + photos.map(function (u, i) {
         return '<img src="' + esc(unImg(u, 1000)) + '" alt="' + esc(name) +
-               (many ? ' — photo ' + (i + 1) + ' of ' + photos.length : '') + '"' +
+               (many ? ', photo ' + (i + 1) + ' of ' + photos.length : '') + '"' +
                (i ? ' loading="lazy"' : '') + ' decoding="async" draggable="false"/>';
       }).join('') + '</div>' +
       (many

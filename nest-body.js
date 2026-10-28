@@ -12,8 +12,15 @@ function formatBody(raw) {
   // a bold pair.
   const bold = s => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   const italic = s => s.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  const linkify = s => s.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-  const inline = s => linkify(italic(bold(esc(s))));
+  // [words](address) links the words: to a piece or page of our own
+  // (/piece/…, /collection/…) in the same tab, anywhere else in a new one.
+  // Bare addresses are still linked as themselves, but not ones already
+  // inside a link.
+  const links = s => s.replace(/\[([^\]]+)\]\(((?:https?:\/\/|\/)[^\s)]+)\)/g, (m, words, url) =>
+    url.charAt(0) === '/' ? '<a href="' + url + '">' + words + '</a>'
+      : '<a href="' + url + '" target="_blank" rel="noopener">' + words + '</a>');
+  const linkify = s => s.replace(/(^|[^"=>])(https?:\/\/[^\s<]+)/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+  const inline = s => linkify(links(italic(bold(esc(s)))));
   return (raw || '').replace(/\r/g,'').split(/\n\s*\n/).map(block => {
     const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
     if (!lines.length) return '';
@@ -36,3 +43,7 @@ function formatBody(raw) {
     return '<p>' + lines.map(inline).join('<br>') + '</p>';
   }).join('');
 }
+
+// The server pages (functions/edit) import this file too, and a module keeps
+// its functions to itself unless they are handed over like this.
+globalThis.formatBody = formatBody;
