@@ -136,7 +136,6 @@
   <button data-view="walkin">Walk-in</button>
   <button data-view="chandelier">Chandelier</button>
   <button id="humanBtn" class="dev-only">Scale check</button>
-  <button id="dotsBtn" class="on">Dots</button>
 </div>
 <div id="hint"></div>
 <div id="stats"></div>
@@ -549,7 +548,8 @@ document.getElementById('hint').textContent = matchMedia('(hover: none) and (poi
   ? 'Swipe to turn · Two fingers to slide · Pinch to zoom · Tap a dot'
   : 'Click and drag to turn · Right-click and drag to slide · Scroll to zoom · Click a dot for details';
 document.getElementById('humanBtn').onclick = e => { human.visible = !human.visible; e.target.classList.toggle('on', human.visible); };
-document.getElementById('dotsBtn').onclick = e => { dotsOn = !dotsOn; e.target.classList.toggle('on', dotsOn); };
+// The Dots on/off button was removed on 28 Oct 2026: switched off by mistake, it left people
+// with no way to reach the products. Dots now always show (dotsOn stays true).
 
 // ?shot=1: a clean frame for reference images (no header, buttons, dots or stats)
 if (QS.get('shot')) {
