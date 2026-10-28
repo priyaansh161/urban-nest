@@ -43,6 +43,7 @@
   <script src="supabase.js"></script>
   <script src="share.js"></script>
   <script src="urls.js"></script>
+  <script src="reel-scrub.js" defer></script>
   <script src="rating.js"></script>
   <!-- Renders a single .glb as an orbitable object. One file per piece; no
        scene, no camera rig, nothing to arrange — which is why these do not
@@ -944,7 +945,7 @@
       Treat the specification, and the seller&rsquo;s own page where there is one, as
       the final word. Where a piece links out to a retailer we may earn a
       commission on the sale; where it is sold here, the seller is named on the piece.
-      As an Amazon Associate, we earn from qualifying purchases.
+      Pieces marked &ldquo;Sold &amp; shipped via Amazon&rdquo; are bought on Amazon; as an Amazon Associate, we earn from qualifying purchases.
       <a href="about.html#renders">How we model things &rarr;</a>
     </div>
     <div class="footer-left">
@@ -1051,7 +1052,10 @@
   }
   function soldByLine(it) {
     var s = SELLERS[it.seller_id];
-    if (!s) return '';
+    // Bought on Amazon: say so on the piece, the way Amazon itself names who
+    // sells and ships. A piece sold here, or by a partner, has a seller and
+    // says that instead, so this line never needs taking down as that grows.
+    if (!s) return it.buy_link && /amazon.|amzn./i.test(it.buy_link) && !cartLeads(it) ? 'Sold & shipped via Amazon' : '';
     if (s.kind === 'consignment') return 'Sold by Urban Nest · Sourced from ' + s.name;
     if (s.kind === 'direct') return 'Sold & shipped by Urban Nest';
     return 'Sold by ' + s.name;

@@ -18,6 +18,7 @@ export async function onRequestGet(ctx) {
   const more = it.category ? await sb(`collection_items?select=id,name,image_url,price,model_url&published=eq.true&category=eq.${encodeURIComponent(it.category)}&id=neq.${it.id}&order=sort_order.asc,name.asc&limit=8`) : [];
   const section = it.section === 'essentials' ? 'essentials' : 'collection';
   const buy = liveBuyLink(it);
+  const amazon = buy && /amazon.|amzn./i.test(buy);   // the same test as the cards' "Sold & shipped via Amazon"
   const photos = [it.image_url].concat(Array.isArray(it.gallery) ? it.gallery : []).filter(Boolean);
   const specs = Array.isArray(it.specs) ? it.specs.filter((s) => Array.isArray(s) && s[0] && s[1]) : [];
   const interactive = `/${section}?c=${encodeURIComponent(it.category || '')}&p=${it.id}`;
@@ -43,11 +44,11 @@ export async function onRequestGet(ctx) {
           ${it.price ? `<div class="sv-pc-price">${esc(it.price)}</div>` : ''}
           ${it.description ? `<p class="sv-pc-desc">${esc(it.description)}</p>` : ''}
           <div class="sv-btns">
-            ${buy ? `<a class="sv-btn" href="${esc(buy)}" target="_blank" rel="noopener sponsored nofollow">Shop on Amazon →</a>` : ''}
+            ${buy ? `<a class="sv-btn" href="${esc(buy)}" target="_blank" rel="noopener sponsored nofollow">${amazon ? 'Shop on Amazon' : 'Shop now'} →</a>` : ''}
             <a class="sv-btn ${buy ? 'sv-ghost' : ''}" href="${esc(interactive)}">${it.model_url ? 'Open in the 3D viewer' : 'See it in the Collection'}</a>
           </div>
           ${specs.length ? `<table class="sv-pc-specs">${specs.map((s) => `<tr><th>${esc(s[0])}</th><td>${esc(s[1])}</td></tr>`).join('')}</table>` : ''}
-          ${buy ? `<p class="sv-pc-note">Sold and delivered by Amazon. Urban Nest may earn a small commission if you buy through this link, at no cost to you.</p>` : ''}
+          ${amazon ? `<p class="sv-pc-note"><strong>Sold &amp; shipped via Amazon.</strong> As an Amazon Associate, Urban Nest earns from qualifying purchases, at no extra cost to you.</p>` : ''}
         </div>
       </div>
       ${more.length ? `<h2 class="sv-h">More from ${esc(cat ? cat.name : 'the Collection')}</h2><div class="sv-grid">${more.map((x) => pieceCard(x, cat && cat.name)).join('')}</div>` : ''}
