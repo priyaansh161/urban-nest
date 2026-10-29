@@ -209,15 +209,21 @@ const day = new THREE.DirectionalLight(0xfff0dc, 0.5);   // no window in this ro
 day.position.set(0.5, 2.4, 2.5); day.target.position.set(0, 0.6, -1.2);
 scene.add(day, day.target);   // no realtime shadows: the room's shadows are baked, products get contact shadows
 
+const roomBox = new THREE.Box3();          // the room's extent, measured once it has loaded (see viewFor)
+const camRay = new THREE.Raycaster();
 let tweenId = 0, focused = null, returnView = null;
-function tweenTo(pos, tgt, dur = 1100) {
+// arc > 0 lifts the camera along the way (most at the middle), so a move from one product to another
+// passes over the furniture between them instead of through it; capped below the ceiling.
+function tweenTo(pos, tgt, dur = 1100, arc = 0) {
   const id = ++tweenId;
   const from = { p: camera.position.clone(), t: controls.target.clone() };
+  const roof = roomBox.isEmpty() ? Infinity : roomBox.max.y - 0.2;
   const t0 = performance.now();
   (function step(now) {
     if (id !== tweenId) return;                       // a newer move replaced this one
     const k = Math.min(1, (now - t0) / dur), e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2) / 2;
     camera.position.lerpVectors(from.p, pos, e); controls.target.lerpVectors(from.t, tgt, e);
+    if (arc) camera.position.y = Math.min(roof, camera.position.y + Math.sin(Math.PI * e) * arc);
     if (k < 1) requestAnimationFrame(step);
   })(t0);
 }
@@ -227,22 +233,62 @@ function setView(name, instant) {
   tweenTo(new THREE.Vector3(...v.pos), new THREE.Vector3(...v.target), instant ? 1 : 1100);
   document.querySelectorAll('#bar [data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === name));
 }
+// Where the camera stands to show a product. Until 29 Oct 2026 the direction was borrowed from wherever the
+// camera happened to be, at the product's own height: stepping from the painting to the nightstand left the
+// camera low behind the bed. Now every product has a viewpoint of its own, the same whichever way you arrive:
+//   - a product may name one by hand in placements.json: "view": { "pos": [x,y,z], "target": [x,y,z] };
+//   - otherwise it is worked out from the room: stand on the room's open side of the piece (towards the
+//     middle of the room), at eye level for wall pieces and a little above anything low, looking at it;
+//     if something stands between (the bed, a lamp), turn around the piece in 30° steps until the view is
+//     clear, and if none is, use the clearest and come in close enough to see past what is in the way.
+function viewFor(p) {
+  if (p.def.view) return { pos: new THREE.Vector3(...p.def.view.pos), aim: new THREE.Vector3(...p.def.view.target) };
+  if (roomBox.isEmpty()) roomBox.setFromObject(room);
+  const b = new THREE.Box3().setFromObject(p.obj), c = b.getCenter(new THREE.Vector3()), s = b.getSize(new THREE.Vector3());
+  // Far enough back for the whole height to fit the frame (a floor lamp), and a flat piece (a rug) is
+  // seen from standing height, looking down on it rather than skimming across its pile.
+  const fit = s.y * 0.5 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * 1.3;
+  const flat = s.y < 0.12 && Math.max(s.x, s.z) > 0.6;
+  const dist = THREE.MathUtils.clamp(Math.max(Math.max(s.x, s.y, s.z) * 2.1 + 0.15, fit), 0.55, flat ? 1.5 : 2.2);
+  const eyeY = flat ? 1.65 : c.y > 1.1 ? c.y : THREE.MathUtils.clamp(c.y + dist * 0.55, 0.9, 1.5);
+  const mid = roomBox.getCenter(new THREE.Vector3());
+  const toMid = new THREE.Vector3(mid.x - c.x, 0, mid.z - c.z);
+  if (toMid.lengthSq() < 1e-4) toMid.set(0, 0, 1);
+  toMid.normalize();
+  const own = new Set(); p.obj.traverse(o => own.add(o));
+  const blockers = [room, ...staged, ...placed.filter(q => q !== p).map(q => q.obj)];
+  const inside = v => roomBox.isEmpty() || (v.x > roomBox.min.x + 0.15 && v.x < roomBox.max.x - 0.15 && v.z > roomBox.min.z + 0.15 && v.z < roomBox.max.z - 0.15);
+  let best = null;
+  for (const deg of [0, 30, -30, 60, -60, 90, -90, 120, -120]) {
+    const dir = toMid.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(deg));
+    const pos = c.clone().addScaledVector(dir, dist); pos.y = eyeY;
+    if (!inside(pos)) continue;
+    const toCam = pos.clone().sub(c), len = toCam.length();
+    camRay.set(c, toCam.normalize()); camRay.far = len;
+    const hit = camRay.intersectObjects(blockers, true).find(h => h.distance > 0.04 && !own.has(h.object) && h.object.visible);
+    const clear = hit ? hit.distance : len;
+    if (!hit) { best = { pos, clear }; break; }
+    if (!best || clear > best.clear) best = { pos: c.clone().addScaledVector(toCam, Math.max(0.35, clear - 0.1)), clear };
+  }
+  if (!best) best = { pos: c.clone().addScaledVector(toMid, dist).setY(eyeY) };
+  return { pos: best.pos, aim: c };
+}
 // Clicking a dot flies the camera in on that product and opens its card.
 function focusProduct(p) {
+  const fromProduct = !!focused;
   if (!focused) returnView = { pos: camera.position.clone(), target: controls.target.clone() };
   focused = p;
-  const b = new THREE.Box3().setFromObject(p.obj), c = b.getCenter(new THREE.Vector3()), s = b.getSize(new THREE.Vector3());
-  const dir = camera.position.clone().sub(c); dir.y = 0;
-  if (dir.lengthSq() < 1e-4) dir.set(0, 0, 1);
-  dir.normalize();
-  const dist = THREE.MathUtils.clamp(Math.max(s.x, s.y, s.z) * 2.1 + 0.15, 0.5, 1.1);
-  const pos = c.clone().addScaledVector(dir, dist); pos.y = c.y;
+  const { pos, aim } = viewFor(p);
   // Product stays dead centre on desktop (the card sits beside it); on a phone the card is a bottom
   // sheet, so aim a little low to lift the product above it.
+  const dist = pos.distanceTo(aim);
   const halfH = dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-  const aim = c.clone();
-  if (innerWidth <= 700) aim.y -= halfH * 0.45;
-  tweenTo(pos, aim, 1000);
+  const target = aim.clone();
+  // A flat piece (a rug) is looked down on steeply, so it needs a bigger lift to clear the sheet.
+  const flatPiece = new THREE.Box3().setFromObject(p.obj).getSize(new THREE.Vector3()).y < 0.12;
+  if (innerWidth <= 700) target.y -= halfH * (flatPiece ? 0.95 : 0.45);
+  const travel = camera.position.distanceTo(pos);
+  tweenTo(pos, target, fromProduct ? 1300 : 1000, fromProduct ? Math.min(0.5, travel * 0.18) : 0);
   document.querySelectorAll('#bar [data-view]').forEach(x => x.classList.remove('on'));
   openCard(p.def);
 }
