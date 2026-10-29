@@ -318,8 +318,10 @@ let tris = 0;
 
 function markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true; tris += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3; } }); }
 
-async function loadRoom() {
-  const g = await load(ROOM_FILE + V);   // bath_v7.glb run through tools/compress-model.mjs --size=2048 (16 MB -> 3.1 MB, 2K scans kept)
+let roomRoot = null;   // the scene of whichever room file is showing (the preview, until the full one's images arrive)
+async function loadRoom(file = ROOM_FILE) {
+  const g = await load(file + V);   // bath_v7.glb run through tools/compress-model.mjs --size=2048 (16 MB -> 3.1 MB, 2K scans kept)
+  roomRoot = g.scene;
   room.add(g.scene);
   markShadows(g.scene);
   // Walls, floor and ceiling carry their lighting baked into vertex colours (done in Blender), so they
@@ -334,6 +336,34 @@ async function loadRoom() {
       m.material = bakedMaterial(m.material);
     }
   });
+}
+
+// ROOM PREVIEW (29 Oct 2026). The full room is mostly images (baked light, scanned walls and floor) and took up
+// to a minute to arrive on a slow connection. placements.json can name a "preview": the same room, mesh for
+// mesh, with its images shrunk (tools/room-preview.mjs, about a fifth of the size). That shows first; once the
+// pieces are in, the full room loads and only its images are moved across onto what is already showing, so
+// every surface, dot and reflection stays exactly where it is. If the two files do not match mesh for mesh
+// (a room republished without a new preview), the preview simply stays.
+async function sharpenRoom() {
+  try {
+    const g = await load(ROOM_FILE + V);
+    const a = [], b = [];
+    roomRoot.traverse(m => { if (m.isMesh) a.push(m); });
+    g.scene.traverse(m => { if (m.isMesh) b.push(m); });
+    if (a.length !== b.length || a.some((m, i) => m.name !== b[i].name)) { console.warn('preview and room differ; keeping the preview'); return; }
+    const was = new Set();
+    a.forEach((pm, i) => {
+      const dst = pm.material, src = b[i].material;
+      if (Array.isArray(dst) || Array.isArray(src)) return;
+      const slots = bakedMats.includes(dst)
+        ? [['map', 'map'], ['normalMap', 'normalMap'], ['roughnessMap', 'roughnessMap'], ['lightMap', 'emissiveMap']]
+        : [['map', 'map'], ['normalMap', 'normalMap'], ['roughnessMap', 'roughnessMap'], ['metalnessMap', 'metalnessMap'], ['emissiveMap', 'emissiveMap'], ['aoMap', 'aoMap']];
+      for (const [d, s] of slots) if (dst[d] && src[s]) { was.add(dst[d]); dst[d] = src[s]; }
+    });
+    const inUse = new Set();
+    scene.traverse(m => { if (m.isMesh && !Array.isArray(m.material)) for (const k in m.material) if (m.material[k] && m.material[k].isTexture) inUse.add(m.material[k]); });
+    was.forEach(t => { if (!inUse.has(t)) t.dispose(); });
+  } catch (e) { console.warn('the full room did not load; the preview stays', e); }
 }
 
 // Baked surfaces: all their diffuse light comes from the lightmap (so the live lights must not add to it), but
@@ -608,7 +638,8 @@ window.__pilot = { scene, camera, controls, placed, setView, renderer };
 // count in the hint line until the last one is in.
 const hintEl = document.getElementById('hint'), hintText = hintEl.textContent;
 try {
-  await loadRoom();
+  // the light preview if there is one (see ROOM PREVIEW); if its file is missing, the full room as before
+  const previewing = PLACEMENTS.preview ? await loadRoom(PLACEMENTS.preview).then(() => true, () => loadRoom().then(() => false)) : (await loadRoom(), false);
   captureRoomEnv();                                    // gloss from the bare room straight away
   loop();
   document.getElementById('loader').classList.add('gone');
@@ -618,6 +649,7 @@ try {
   count();
   const results = await Promise.allSettled(jobs.map(j => placeItem(...j).finally(() => { done++; count(); })));
   results.forEach((r, i) => { if (r.status === 'rejected') console.warn('item failed:', jobs[i][0].name, r.reason); });
+  if (previewing) await sharpenRoom();                 // the full room's images, once the pieces are in
   hintEl.textContent = hintText;
   captureRoomEnv();                                    // again, now that the pieces show in the reflections
   document.getElementById('stats').innerHTML = Math.round(tris/1000) + 'k triangles<br>' + placed.length + ' products placed';
