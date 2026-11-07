@@ -59,3 +59,19 @@ const date = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
 const time = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' });
 appendFileSync(LOG, `| ${date} | ${time} | ${commit}${dirty} | ${note.replace(/\|/g, '/')} | ${url} |\n`);
 console.log(`\nLogged in DEPLOY-LOG.md: ${date} ${time}, ${commit}, ${url}`);
+
+/* Back up to GitHub (added 7 Nov 2026). The site is live by now, so nothing here can fail the deploy.
+   Only files git already tracks are saved (git add -u) plus the log: new, untracked files such as client folders or
+   work in progress are never picked up on their own; add those by hand when they are ready. */
+try {
+  execSync('git add -u', { cwd: ROOT, stdio: 'ignore' });
+  execSync('git add DEPLOY-LOG.md', { cwd: ROOT, stdio: 'ignore' });
+  if (run('git diff --cached --name-only')) {
+    execSync(`git commit -q -m ${q('Deploy: ' + note)}`, { cwd: ROOT, stdio: 'ignore' });
+    console.log('Saved to git: ' + run('git rev-parse --short HEAD'));
+  }
+  execSync('git push -q origin HEAD', { cwd: ROOT, stdio: 'ignore', timeout: 180000 });
+  console.log('Pushed to GitHub.');
+} catch (e) {
+  console.log('Note: the site is live, but saving to GitHub did not finish (' + String(e.message).split('\n')[0] + '). Run: git push origin HEAD');
+}
