@@ -22,7 +22,7 @@
 
   var css = document.createElement('style');
   css.textContent =
-    '.rs{position:fixed;right:2px;width:30px;z-index:60;touch-action:none;opacity:0;pointer-events:none;transition:opacity .35s}' +
+    '.rs{position:fixed;right:max(16px,env(safe-area-inset-right));width:30px;z-index:60;touch-action:none;opacity:0;pointer-events:none;transition:opacity .35s}' +
     '.rs.on{opacity:1;pointer-events:auto}' +
     '.rs-line{position:absolute;top:0;bottom:0;right:7px;width:3px;border-radius:3px;background:rgba(128,140,142,.28)}' +
     '.rs-thumb{position:absolute;right:4px;width:9px;height:44px;border-radius:9px;background:var(--gold,#A37B3F);box-shadow:0 1px 6px rgba(0,0,0,.3);transition:transform .2s,width .2s}' +

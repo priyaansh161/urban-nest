@@ -31,7 +31,10 @@ for (const [src, dst] of unique) {
 }
 const version = hash.digest('hex').slice(0, 10);
 const { _note, dirs, ...rest } = pl;
-writeFileSync(join(OUT, 'placements.json'), JSON.stringify({ room: 'room.glb', dirs: { products: 'models', staging: 'models' }, version, ...rest }));
+writeFileSync(join(OUT, 'placements.json'), JSON.stringify({ room: 'room.glb', dirs: { products: 'models', staging: 'models' }, version, ...rest, preview: 'room-preview.glb' }));
 copyFileSync(join(HERE, 'viewer.html'), join(OUT, 'index.html'));
 console.log(`published rooms/sunday-bedroom: ${unique.length} files, ${(bytes / 1e6).toFixed(1)} MB, version ${version}`);
 console.log(`  room.glb ${(statSync(join(OUT, 'room.glb')).size / 1e6).toFixed(2)} MB`);
+// the folder was wiped, so its light first copy must be remade (placements.json names it: "preview", added 3 Nov 2026 after
+// a publish dropped the hand-added key and the room lost its fast first load)
+console.log('  NOW: node tools/room-preview.mjs rooms/sunday-bedroom/room.glb rooms/sunday-bedroom/room-preview.glb --size=512');

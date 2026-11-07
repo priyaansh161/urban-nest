@@ -179,6 +179,8 @@ def place(d):
     x, y, z = d['pos']; root.location = (x, -z, y); root.rotation_euler.z = d.get('rotY', 0)
     if 'alignBack' in d:
         bpy.context.view_layer.update(); mn, mx = bounds(new); root.location.y += -d['alignBack'] - mx.y
+    if 'alignLeft' in d:
+        bpy.context.view_layer.update(); mn, mx = bounds(new); root.location.x += d['alignLeft'] - mn.x
     if 'alignRight' in d:
         bpy.context.view_layer.update(); mn, mx = bounds(new); root.location.x += d['alignRight'] - mx.x
     made = new + [root, inner]
@@ -539,6 +541,12 @@ lm = me.uv_layers.new(name='LM'); lm.data.foreach_set('uv', np.stack([I.ravel()[
 me.uv_layers.active = lm
 rug = bpy.data.objects.new('LM_Rug', me); scene.collection.objects.link(rug); me.materials.append(rug_mat); smooth(rug)
 
+# ---------------------------------------------------------------- staging decor (Nov 2026): no dots, lit live in the viewer,
+# in the room for the bake (their shadows land in the lightmaps) and kept in the export
+sys.path.insert(0, OUT)
+import staging_bedroom
+STAGING = staging_bedroom.build(OUT)
+
 # ---------------------------------------------------------------- products: shadow casters for the bake, lamps lit
 PL = json.load(open(os.path.join(OUT, 'placements.json')))
 CASTERS, LAMPS = [], []
@@ -615,6 +623,8 @@ scene.camera = cam; scene.render.resolution_x, scene.render.resolution_y = (1400
 scene.render.filepath = OUT + '/bedroom_%s_front.png' % tag; bpy.ops.render.render(write_still=True)
 cam.location = (1.3, -1.5, 1.15); cam_d.lens = 26; cam.rotation_euler = (Vector((-0.3, 0.7, 0.45)) - cam.location).to_track_quat('-Z', 'Y').to_euler()
 scene.render.filepath = OUT + '/bedroom_%s_detail.png' % tag; bpy.ops.render.render(write_still=True)
+cam.location = (-1.75, -1.65, 1.7); cam_d.lens = 20; cam.rotation_euler = (Vector((0.9, 0.4, 0.55)) - cam.location).to_track_quat('-Z', 'Y').to_euler()
+scene.render.filepath = OUT + '/bedroom_%s_corner.png' % tag; bpy.ops.render.render(write_still=True)
 hide = [o for o, _, _ in SHELL if 'Ceiling' in o.name or 'Drop' in o.name] + [o for o in bpy.data.objects if o.name.startswith('Cove Glow')]
 for o in hide: o.hide_render = True
 pd = bpy.data.cameras.new('Plan'); pd.type = 'ORTHO'; pd.ortho_scale = 5.6

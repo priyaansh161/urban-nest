@@ -20,22 +20,44 @@ def img(name, arr):
     p = os.path.join(TMP, name + '.png'); im.filepath_raw = p; im.file_format = 'PNG'; im.save()
     im2 = bpy.data.images.load(p); im2.pack(); return im2
 
+trng = np.random.default_rng(23)                 # the towels' own noise (2 Nov), so the brush's bristles stay as they were
+
+def _blur(a, r):
+    for ax in (0, 1):
+        for _ in range(2): a = sum(np.roll(a, s, ax) for s in range(-r, r + 1)) / (2 * r + 1)
+    return a
+
 def towel_tex(name, base, band=None, S=512):
-    """Terry towel: a fine woven loop texture, soft mottling, and (for the hand towel) a woven border band."""
+    """Terry towel: a fine woven loop texture, soft mottling, and (for the hand towel) a woven border band.
+    2 Nov 2026: plus a normal map of the loops (and the band's ribbing), so the pile catches the light (it read flat)."""
     y, x = np.mgrid[0:S, 0:S] / S
     loops = 0.5 + 0.5 * np.sin(x * 2 * np.pi * 90) * np.sin(y * 2 * np.pi * 90)
     v = 0.86 + 0.10 * loops + 0.06 * (rng.random((S, S)) - 0.5)
+    pile = _blur(trng.random((S, S)), 1); pile = (pile - pile.min()) / (pile.max() - pile.min())
+    mott = _blur(trng.normal(0, 1, (S, S)), 20); mott /= np.abs(mott).max()
+    v = v * (0.92 + 0.08 * pile + 0.05 * mott)
     arr = np.array(base)[None, None, :] * v[..., None]
+    h = pile.copy()
     if band:
         b = ((y > 0.08) & (y < 0.15)) | ((y > 0.85) & (y < 0.92))
         arr[b] = np.array(band)[None, :] * (0.9 + 0.1 * np.sin(x[b] * 2 * np.pi * 160))[:, None]
-    return img(name, arr)
+        h[b] = 0.5 + 0.5 * np.sin(x[b] * 2 * np.pi * 160)                 # the flat-woven band: fine ribs, no pile
+    dx = (np.roll(h, -1, 1) - np.roll(h, 1, 1)) * 2.5; dy = (np.roll(h, 1, 0) - np.roll(h, -1, 0)) * 2.5
+    n = np.stack([-dx, -dy, np.ones_like(h)], -1); n /= np.linalg.norm(n, axis=-1, keepdims=True)
+    nimg = img(name + '_n', n * 0.5 + 0.5); nimg.colorspace_settings.name = 'Non-Color'
+    return img(name, arr), nimg
 
-def mat(name, color, rough, metal=0.0, image=None):
+def mat(name, color, rough, metal=0.0, image=None, sheen=0.0):
     m = bpy.data.materials.new(name); m.use_nodes = True; b = m.node_tree.nodes['Principled BSDF']
     b.inputs['Base Color'].default_value = (*color, 1); b.inputs['Roughness'].default_value = rough; b.inputs['Metallic'].default_value = metal
+    if sheen: b.inputs['Sheen Weight'].default_value = sheen
+    if isinstance(image, tuple): image, normal = image
+    else: normal = None
     if image:
         t = m.node_tree.nodes.new('ShaderNodeTexImage'); t.image = image; m.node_tree.links.new(t.outputs['Color'], b.inputs['Base Color'])
+    if normal:
+        t = m.node_tree.nodes.new('ShaderNodeTexImage'); t.image = normal
+        nm = m.node_tree.nodes.new('ShaderNodeNormalMap'); m.node_tree.links.new(t.outputs['Color'], nm.inputs['Color']); m.node_tree.links.new(nm.outputs['Normal'], b.inputs['Normal'])
     return m
 
 def box(loc, dim, m, bevel=0.0015, seg=3):
@@ -137,8 +159,8 @@ for i, y in enumerate((-0.035, -0.080, -0.125, -0.170, -0.218)):                
 objs.append(cyl((0, -0.062, 0.070), 0.0085, W - 0.03, BLACK, rot=(0, math.pi / 2, 0)))   # towel rod
 for s in (-1, 1): objs.append(cyl((s * (W - 0.03) / 2, -0.062, 0.070), 0.0105, 0.012, BLACK, rot=(0, math.pi / 2, 0), bevel=0.003))
 for x in (-0.12, -0.085, -0.05): objs.append(hook(x, -0.062, 0.070 - 0.009, BLACK, depth=0.022, drop=0.030))   # sliding hooks
-WHITE_T = mat('White Towel', (1, 1, 1), 0.95, image=towel_tex('towel_white', (0.93, 0.93, 0.91)))
-OLIVE_T = mat('Olive Towel', (1, 1, 1), 0.95, image=towel_tex('towel_olive', (0.47, 0.42, 0.22), band=(0.40, 0.36, 0.18)))
+WHITE_T = mat('White Towel', (1, 1, 1), 0.95, image=towel_tex('towel_white', (0.93, 0.93, 0.91)), sheen=0.3)
+OLIVE_T = mat('Olive Towel', (1, 1, 1), 0.95, image=towel_tex('towel_olive', (0.42, 0.41, 0.24), band=(0.35, 0.34, 0.19)), sheen=0.3)
 objs.append(soft_box((0.04, -0.118, H + 0.026), (0.30, 0.17, 0.036), WHITE_T, 0.014))   # two folded towels on the shelf
 objs.append(soft_box((0.045, -0.120, H + 0.060), (0.28, 0.16, 0.032), WHITE_T, 0.013))
 # the olive hand towel over the rod: a long front fall, a shorter back fall, and the fold over the top

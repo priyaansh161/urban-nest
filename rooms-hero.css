@@ -100,3 +100,5 @@
   .sh-room.on .sh-zoom { animation: none; }
   .sh-dot::after { animation: none; }
 }
+
+@media (max-width: 600px) { .sh-tab { font-size: 10.5px; } }   /* phone only: was 9.5px */

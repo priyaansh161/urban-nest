@@ -69,3 +69,37 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-10-26 | 12:15 | f7a44da | Rooms: swipe/arrow-key/arrow-button stepping between products (both rooms), bedroom Chandelier view + higher Overview, right nightstand without cup | https://e4c2c8cb.storeurbannest.pages.dev |
 | 2026-10-26 | 12:55 | 0043806 | Sunday Bedroom tile gets its Gemini-styled cover photo | https://8e7fbb10.storeurbannest.pages.dev |
 | 2026-10-28 | 13:45 | 16bcc23 | Nest Edit: all 14 articles from the database (built-in 7 migrated), em dashes removed | https://3aa1a030.storeurbannest.pages.dev |
+| 2026-10-28 | 14:04 | 72e9028 | Own pages for every article, piece and category (+ live sitemap); copy clean-up; Amazon Associates disclosure; homepage join card | https://d297340c.storeurbannest.pages.dev |
+| 2026-10-28 | 16:42 | b61234a (+ uncommitted changes) | Amazon seller line + disclosure wording; join card folds to corner button; phone scroll bar; hello@ email | https://46c4d482.storeurbannest.pages.dev |
+| 2026-10-28 | 17:26 | 1fb4e92 (+ uncommitted changes) | Rooms: Dots toggle removed | https://26d8b497.storeurbannest.pages.dev |
+| 2026-10-29 | 14:19 | 0eeb110 (+ uncommitted changes) | Rooms: fixed product viewpoints + arcing camera moves | https://373fcde0.storeurbannest.pages.dev |
+| 2026-10-29 | 15:24 | 1680249 (+ uncommitted changes) | Rooms: fast preview then full-quality images | https://72d04ca4.storeurbannest.pages.dev |
+| 2026-11-03 | 10:50 | 1680249 (+ uncommitted changes) | Sunday Bedroom: staging decor (breakfast tray with contact shadow, slippers, detailed snake plant), Qutub planter, Boxy wall shelf, Sunrise Mountain canvas, rebuilt charging dock, decluttered dresser | https://deda54c2.storeurbannest.pages.dev |
+| 2026-11-03 | 16:11 | 1680249 (+ uncommitted changes) | Quiet Bath: CARTADEN mango wood stool + Soul & Scents Jasmine reed diffuser (Blender-built products), staging refresh (towels and candle on the stool, plastic bin, marble niche with labelled bottles, terry towels), poppy calla flowers, wider Shower view | https://5a8d99bb.storeurbannest.pages.dev |
+| 2026-11-03 | 16:24 | 1680249 (+ uncommitted changes) | Quiet Bath: soft folded towels on the stool | https://c2eaabda.storeurbannest.pages.dev |
+| 2026-11-03 | 16:51 | 1680249 (+ uncommitted changes) | Quiet Bath: the stool's dot pinned to its front rail (placements dotAt for placed products) | https://5edc2938.storeurbannest.pages.dev |
+| 2026-11-05 | 16:02 | 1680249 (+ uncommitted changes) | SEO: fix price in product structured data (ranges no longer glued into one number); search-wording titles, descriptions and intro paragraph on 15 category pages | https://5457e2eb.storeurbannest.pages.dev |
+| 2026-11-05 | 16:42 | 1680249 (+ uncommitted changes) | Room dots: smaller, teal, soft breathing glow (sunday-bedroom, quiet-bath) | https://91ecb8c6.storeurbannest.pages.dev |
+| 2026-11-05 | 16:58 | 1680249 (+ uncommitted changes) | Admin: new Rooms editor (move pieces, dots, cards, add from Collection; saves to Storage, no deploy); Spline Scenes + 3D Products tabs removed from nav; room viewers load saved layout + dotAt | https://d14ff6fa.storeurbannest.pages.dev |
+| 2026-11-05 | 17:17 | 1680249 (+ uncommitted changes) | Admin Rooms: simpler editing (drag piece, drag dot, arrows push into walls, keyboard arrows) | https://251988da.storeurbannest.pages.dev |
+| 2026-11-05 | 19:22 | 1680249 (+ uncommitted changes) | Add Admitad/Mitgo ad-space verification meta tag to homepage head | https://c1c61c73.storeurbannest.pages.dev |
+| 2026-11-05 | 21:14 | 1680249 (+ uncommitted changes) | Admin Rooms: picture picker for adding pieces, new pieces land where the camera looks (hang/wall aware), undo/redo, full screen | https://8b53cf04.storeurbannest.pages.dev |
+| 2026-11-05 | 21:18 | 1680249 (+ uncommitted changes) | Admin Rooms: fix script crash (broken regex in thumbnail helper) that stopped the page opening | https://bbd18e38.storeurbannest.pages.dev |
+| 2026-11-05 | 21:25 | 1680249 (+ uncommitted changes) | Rooms editor: new pieces land within 1.5 m in view, spread out; selection box shows through objects | https://7ace47e5.storeurbannest.pages.dev |
+| 2026-11-05 | 21:32 | 1680249 (+ uncommitted changes) | Rooms editor: added pieces get a short card name plus the Collection description and details | https://42159d4b.storeurbannest.pages.dev |
+| 2026-11-05 | 21:53 | 1680249 (+ uncommitted changes) | Rooms editor: fix piece list not refreshing when switching rooms | https://9c65579e.storeurbannest.pages.dev |
+| 2026-11-05 | 22:04 | 1680249 (+ uncommitted changes) | India/US stores: country detection (/api/country), IN/US switch in the top bar, pieces not sold in the visitor's market show 'India only'/'US only' (market.js); Privacy has India and US versions | https://d495fb4b.storeurbannest.pages.dev |
+| 2026-11-06 | 10:59 | 1680249 (+ uncommitted changes) | Phone: short names, sticky price + Shop bar in piece sheet, join card as button, finger-size taps; prices as rupee symbols; typo fixes in Collection data | https://b35a0dd7.storeurbannest.pages.dev |
+| 2026-11-06 | 11:01 | 1680249 (+ uncommitted changes) | Phone: bigger IN/US tap targets | https://01c04a17.storeurbannest.pages.dev |
+| 2026-11-06 | 11:02 | 1680249 (+ uncommitted changes) | Phone: keep IN/US widening off the narrowest phones | https://2a3bb6d6.storeurbannest.pages.dev |
+| 2026-11-06 | 11:57 | 1680249 (+ uncommitted changes) | Phone: undo the IN/US widening, it pushed the menu button off-screen on some pages | https://59fefc99.storeurbannest.pages.dev |
+| 2026-11-06 | 12:04 | 1680249 (+ uncommitted changes) | Phone: category intro folds to 3 lines, small labels 10.5px, narrowest-phone header | https://0e9a6636.storeurbannest.pages.dev |
+| 2026-11-06 | 12:05 | 1680249 (+ uncommitted changes) | Phone: header fits 320px phones | https://14902761.storeurbannest.pages.dev |
+| 2026-11-06 | 12:06 | 1680249 (+ uncommitted changes) | Phone: header fits 320px phones, part 2 | https://d8a33d46.storeurbannest.pages.dev |
+| 2026-11-06 | 14:22 | 1680249 (+ uncommitted changes) | Hide the Heritage Lounge cards until /rooms/living-room/ is published | https://9df1bef6.storeurbannest.pages.dev |
+| 2026-11-06 | 15:34 | 1680249 (+ uncommitted changes) | Heritage Lounge: third 3D room (rooms/living-room), Spaces + homepage cards | https://cc5c09f0.storeurbannest.pages.dev |
+| 2026-11-06 | 16:06 | 1680249 (+ uncommitted changes) | Phone review: header margins and small toggles, landscape-first rooms with rotate prompt, 3D-first product sheet, search (Collection, Essentials, Nest Edit), Join button on every phone page, Essentials loading bug | https://1cb95e75.storeurbannest.pages.dev |
+| 2026-11-06 | 17:13 | 1680249 (+ uncommitted changes) | Rooms: turn-phone note shows on every visit; Spaces back link follows touchend so it always presses | https://cd7ae1d7.storeurbannest.pages.dev |
+| 2026-11-06 | 17:15 | 1680249 (+ uncommitted changes) | Phone product sheet back to a card (page visible around it); more room above Shop button | https://f133f92c.storeurbannest.pages.dev |
+| 2026-11-06 | 22:24 | 1680249 (+ uncommitted changes) | Heritage Lounge v2: his Collection listings, sheesham table, navy walls, sofa fixes, phone viewer | https://d767a931.storeurbannest.pages.dev |
+| 2026-11-07 | 00:05 | 1680249 (+ uncommitted changes) | Heritage Lounge v3: painting view, staging, new cushions, resized pieces, lamps moved, window detail | https://6ea7082f.storeurbannest.pages.dev |

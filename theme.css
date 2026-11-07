@@ -231,3 +231,46 @@ section.join { padding-bottom: 44px !important; }
   .reach > a { border-radius: 22px !important; }
   .door { border-radius: 26px !important; }
 }
+
+
+/* ── PHONE ONLY (600px and under). Nothing here applies on a laptop. 6 Nov 2026 ──
+   Finger-sized taps for the small controls the audit found: the IN / US switch, the footer links, the room tabs. */
+@media (max-width: 600px) {
+  .footer-note, .footer-disclosure a { display: inline-block; padding: 10px 4px; }
+  .sh-tab { padding-top: 12px; }
+}
+
+/* Small labels: 9 to 9.5px is hard to read on a phone. Same labels, a touch larger, phone only. */
+@media (max-width: 600px) {
+  .pc-3d, .pc-cat, .dcard-hint, .ed-tag, .ed-m, .flip-hint, .sp-room, .cat-tile-count, .badge3d, .badge-soon, .spin-hint, .article-cat, .dynamic-card-cat { font-size: 10.5px; }
+}
+/* The narrowest phones (320 to 360px): the header was already a few pixels too wide, so the wordmark steps down a size. */
+@media (max-width: 360px) {
+  nav .nav-logo-text { font-size: 12px !important; letter-spacing: .1em !important; }
+  nav .nav-logo { gap: 8px; }
+  nav .nav-right { gap: 8px; }
+  nav { padding-left: 12px !important; padding-right: 12px !important; }
+}
+/* 320px phones: a little more room back for the menu button */
+@media (max-width: 340px) {
+  nav .nav-logo-text { font-size: 10.5px !important; letter-spacing: .06em !important; }
+  nav .switch button { min-width: 30px !important; }
+}
+@media (max-width: 340px) {
+  nav .nav-logo-text { letter-spacing: .03em !important; }
+  nav .nav-right { gap: 4px !important; }
+  nav .nav-logo { gap: 6px !important; }
+  nav .hamburger { min-width: 28px !important; width: 28px !important; }
+}
+
+/* ── PHONE HEADER (dictated review, 6 Nov 2026) ──
+   The IN / US and light / dark switches are utilities people look for, so they can be small; that frees the room the menu
+   button needs to sit as far from the right edge as the logo does from the left (20px each side). */
+@media (max-width: 600px) {
+  nav .nav-right { gap: 8px !important; }
+  nav .switch { padding: 2px !important; }
+  nav .switch button { width: 28px !important; min-width: 28px !important; height: 28px !important; min-height: 28px !important; }
+  nav .switch.un-mkt button { width: auto !important; min-width: 24px !important; padding: 0 7px !important; font-size: 9.5px !important; }
+  nav .switch svg { width: 12px !important; height: 12px !important; }
+  nav .hamburger { width: 28px !important; min-width: 28px !important; margin-right: -4px !important; }
+}

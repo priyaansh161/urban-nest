@@ -29,6 +29,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="Urban Nest"/>
   <script src="pwa.js" defer></script>
+  <script src="market.js" defer></script>
 <script>
   /* Applied before first paint so the page never flashes the wrong theme. */
   (function () {
@@ -115,7 +116,7 @@
     /* display:grid above beats the browser's own [hidden] { display: none },
        so hiding either of these needs saying again — without this the grid
        kept its "Loading the collection…" line visible under the tiles. */
-    .grid[hidden], .cats[hidden] { display: none; }
+    .grid[hidden], .cats[hidden], #grid[hidden] { display: none !important; }   /* phone: the reel layout was overriding [hidden], leaving "Loading the collection…" on the page */
 
     /* ── PIECE FILTERS · SHARED ──
        Sort and price bands above a category's pieces. Byte-identical in
@@ -439,6 +440,62 @@
       .nav-links a { min-height: 44px; display: flex; align-items: center; }
       .hamburger { min-height: 34px; justify-content: center; }
     }
+
+    /* ── PHONE ONLY (600px and under, or a phone held sideways). The laptop sheet is exactly as before: .d-buybar is display:contents there. ──
+       Dictated review 6 Nov 2026: the 3D gets most of the screen. Closed: the object, the name, two lines of description and the price / Shop
+       bar. "More details" opens the brand, colour, size and our take, and the object steps back to make room for them. The close button
+       lives on the (fixed) stage, so it never scrolls away. */
+    .d-buybar { display: contents; }
+    .d-more { display: none; }
+    .n-short { display: none; }
+    @media (max-width: 600px), (orientation: landscape) and (max-height: 520px) {
+      .n-full { display: none; } .n-short { display: inline; }
+      #detail { padding: 0; }
+      .sheet { width: 100%; max-height: none; height: 100dvh; }
+      .d-stage { min-height: 0; }
+      .d-stage .sheet-close { top: 10px; right: 10px; z-index: 12; color: rgba(234,242,241,.85); }
+      .d-stage.light .sheet-close, .d-stage.photo .sheet-close { color: rgba(16,16,16,.6); }
+      .d-name { font-size: 19px; line-height: 1.2; }
+      .d-desc { font-size: 13.5px; line-height: 1.6; }
+      .sheet:not(.expanded) .d-desc { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .sheet:not(.expanded) .d-specs, .sheet:not(.expanded) #dTake { display: none; }
+      .d-more { display: inline-flex; align-self: flex-start; background: none; border: 0; padding: 8px 0; font: inherit; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); cursor: pointer; }
+      .d-more[hidden] { display: none; }
+      .d-buybar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; position: sticky; bottom: 0; z-index: 3; margin: 6px -20px 0; padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--white); border-top: .5px solid var(--border); }
+      .d-buybar .d-price { order: 1; flex: 1 1 auto; margin: 0; font-size: 16px; }
+      .d-buybar .d-soldby { order: 2; flex: 0 1 auto; text-align: right; font-size: 11px; }
+      .d-buybar .d-second { order: 3; flex-basis: 100%; font-size: 11px; }
+      .d-buybar .d-buy { order: 4; flex: 1 1 100%; margin: 6px 0 0; padding: 13px 16px; }
+    }
+    @media (max-width: 600px) {
+      /* Held upright the sheet is a card again, as it was: the page stays visible around it. */
+      #detail { padding: 28px 20px; }
+      .sheet { width: 100%; height: auto; max-height: 92dvh; }
+      .d-stage { aspect-ratio: 1/1; height: auto; }
+      .sheet.expanded .d-stage { aspect-ratio: auto; height: 30dvh; }
+      .d-body { padding: 14px 20px 0; gap: 6px; }
+    }
+    @media (orientation: landscape) and (max-height: 520px) {
+      .sheet { grid-template-columns: 1.15fr 1fr !important; overflow: hidden !important; }
+      .d-stage { aspect-ratio: auto; height: 100dvh; position: relative; top: auto; }
+      .d-body { max-height: 100dvh; overflow-y: auto; padding: 14px max(22px, env(safe-area-inset-right)) 0 18px; gap: 6px; }
+      .sheet-close { top: 8px; right: max(10px, env(safe-area-inset-right)); }
+      .d-buybar { margin: 6px calc(-1 * max(22px, env(safe-area-inset-right))) 0 -18px; padding-left: 18px; padding-right: max(22px, env(safe-area-inset-right)); }
+    }
+
+    /* Phone: the category intro folds to three lines so the pieces start higher; tap it to read all. */
+    @media (max-width: 600px) { #catHeroAbout:not(.open) { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; } #catHeroAbout { cursor: pointer; } }
+    /* ── SEARCH (new, 6 Nov 2026): one box above the categories; typing replaces them with matching pieces ── */
+    .s-box { position: relative; max-width: 560px; margin: 0 0 28px; }
+    .s-box input { width: 100%; padding: 13px 46px 13px 46px; border-radius: 100px; border: 1px solid var(--border); background: transparent; color: var(--black); font: inherit; font-size: 16px; -webkit-appearance: none; appearance: none; }
+    .s-box input::placeholder { color: var(--grey); }
+    .s-box input:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+    .s-box svg { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--grey); pointer-events: none; }
+    .s-box .s-x { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border: 0; background: none; color: var(--grey); font-size: 22px; line-height: 1; cursor: pointer; display: none; }
+    .s-box.has .s-x { display: block; }
+    .s-count { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); margin: -8px 0 18px; }
+    .s-results[hidden], .s-count[hidden] { display: none; }
+    @media (max-width: 768px) { .s-box { margin-bottom: 20px; } }
 
     /* ── TILE RECEDE ──
        The tile you point at steps back and shrinks rather than lifting, so
@@ -895,6 +952,13 @@
   </header>
 
   <div class="grid-wrap">
+    <div class="s-box" id="sBox" role="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>
+      <input type="search" id="sInput" placeholder="Search pieces: lamp, vase, brass…" autocomplete="off" enterkeyhint="search" aria-label="Search pieces"/>
+      <button type="button" class="s-x" id="sClear" aria-label="Clear search">&times;</button>
+    </div>
+    <div class="s-count" id="sCount" hidden></div>
+    <div class="grid s-results" id="sResults" hidden></div>
     <div class="cats" id="cats" hidden></div>
     <div class="pf" id="pf" hidden></div>
     <div class="grid" id="grid">
@@ -925,11 +989,14 @@
         <p class="d-desc" id="dDesc"></p>
         <div id="dTake"></div>
         <div class="d-specs" id="dSpecs"></div>
+        <button class="d-more" id="dMore" type="button" hidden>More details</button>
+        <div class="d-buybar">
         <span class="d-price" id="dPrice"></span>
         <a class="d-buy" id="dBuy" href="#" target="_blank" rel="noopener sponsored">Shop this piece →</a>
         <button class="d-buy" id="dCart" type="button" style="display:none">Add to Cart</button>
         <span class="d-second" id="dSecond" style="display:none"></span>
         <span class="d-soldby" id="dSoldBy" style="display:none"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -1002,7 +1069,7 @@
         (item.category ? '<span class="cat">' + esc(catLabel(item.category)) + '</span>' : '') +
         // A real link as well as the card's click: search engines follow it to
         // the piece's own page (/piece/…), and ctrl-click opens that page.
-        '<h2 class="name"><a class="name-link" href="' + esc(UNUrls.piece(item)) + '">' + esc(item.name) + '</a></h2>' +
+        '<h2 class="name"><a class="name-link" href="' + esc(UNUrls.piece(item)) + '">' + bothNames(item.name) + '</a></h2>' +
         (item.description ? '<p class="desc">' + esc(item.description) + '</p>' : '<p class="desc"></p>') +
         '<div class="foot">' +
           '<span class="price">' + esc(priceText(item)) + '</span>' + UNTake.chip(item) +
@@ -1196,12 +1263,67 @@
   if (window.matchMedia('(pointer: coarse)').matches)
     document.getElementById('dHint').textContent = 'One finger to rotate · two to pan · pinch to zoom';
 
+  // Our long-form names are "Brand item size | what it is for": the part before the bar is the name shown on a phone.
+  function shortName(n) {
+    var t = String(n || '').split('|')[0].trim();
+    if (t.length > 64) t = t.slice(0, 64).replace(/\s+\S*$/, '');
+    t = t.replace(/[\s,;:–-]+$/, '').replace(/\s+(for|with|and|in|of|to|&)$/i, '');
+    return t || String(n || '');
+  }
+  function bothNames(n) { return '<span class="n-full">' + esc(n) + '</span><span class="n-short">' + esc(shortName(n)) + '</span>'; }
+  (function () {
+    var m = document.getElementById('dMore');
+    if (m) m.addEventListener('click', function () {
+      var on = document.querySelector('.sheet').classList.toggle('expanded');
+      m.textContent = on ? 'Fewer details' : 'More details';
+    });
+  })();
+
+  document.addEventListener('click', function (e) { var p = e.target.closest && e.target.closest('#catHeroAbout'); if (p) p.classList.toggle('open'); });
+
+  /* Search: every piece, by name, kind, description and details (brand, colour, material). */
+  (function () {
+    var box = document.getElementById('sBox'), inp = document.getElementById('sInput'), res = document.getElementById('sResults'),
+        cnt = document.getElementById('sCount'), clr = document.getElementById('sClear');
+    if (!inp) return;
+    var saved = null, timer = null;
+    function hay(it) {
+      var sp = Array.isArray(it.specs) ? it.specs.map(function (s) { return (s && s[1]) || ''; }).join(' ') : '';
+      return (String(it.name || '') + ' ' + catLabel(it.category) + ' ' + (it.category || '') + ' ' + String(it.description || '') + ' ' + sp).toLowerCase();
+    }
+    function run() {
+      var raw = inp.value.trim(), q = raw.toLowerCase();
+      box.classList.toggle('has', !!q);
+      var cats = document.getElementById('cats'), pf = document.getElementById('pf'), grid = document.getElementById('grid');
+      if (!q) {
+        if (saved) { cats.hidden = saved.cats; pf.hidden = saved.pf; grid.hidden = saved.grid; saved = null; }
+        res.hidden = true; cnt.hidden = true; res.innerHTML = '';
+        return;
+      }
+      if (!saved) saved = { cats: cats.hidden, pf: pf.hidden, grid: grid.hidden };
+      cats.hidden = true; pf.hidden = true; grid.hidden = true;
+      var words = q.split(/\s+/).filter(Boolean);
+      var inName = function (it) { var n = String(it.name || '').toLowerCase(); return words.every(function (w) { return n.indexOf(w) >= 0; }) ? 0 : 1; };
+      var list = Object.keys(ITEMS).map(function (k) { return ITEMS[k]; })
+        .filter(function (it) { var h = hay(it); return words.every(function (w) { return h.indexOf(w) >= 0; }); })
+        .sort(function (a, b) { return inName(a) - inName(b); });
+      cnt.hidden = !list.length;
+      cnt.textContent = list.length + (list.length === 1 ? ' piece' : ' pieces') + ' for \u201c' + raw + '\u201d';
+      res.hidden = false;
+      res.innerHTML = list.length ? list.map(card).join('')
+        : '<div class="empty">Nothing matches \u201c' + esc(raw) + '\u201d.<br/>Try a simpler word, like lamp, vase or clock.</div>';
+    }
+    inp.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(run, 120); });
+    clr.addEventListener('click', function () { inp.value = ''; run(); inp.focus(); });
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Escape') { inp.value = ''; run(); } });
+  })();
+
   function openDetail(id) {
     var it = ITEMS[id];
     if (!it) return;
     document.getElementById('dCat').textContent = catLabel(it.category);
     document.getElementById('dShare').setAttribute('data-share', id);
-    document.getElementById('dName').textContent = it.name || '';
+    document.getElementById('dName').innerHTML = bothNames(it.name || '');
     document.getElementById('dDesc').textContent = it.description || '';
     document.getElementById('dTake').innerHTML = UNTake.block(it);
 
@@ -1214,6 +1336,14 @@
              '</span><span class="d-spec-v">' + esc(s[1]) + '</span></div>';
     }).join('');
     sp.style.display = specs.length ? '' : 'none';
+    var sheetEl = document.querySelector('.sheet');
+    sheetEl.classList.remove('expanded');
+    var moreBt = document.getElementById('dMore');
+    if (moreBt) { moreBt.textContent = 'More details'; moreBt.hidden = !(specs.length || String(it.description || '').length > 100 || document.getElementById('dTake').innerHTML.trim()); }
+    // On a phone the close button sits on the fixed stage, so scrolling the words never carries it away
+    var closeBt = document.querySelector('.sheet-close'), stg = document.getElementById('dStage');
+    if (matchMedia('(max-width: 600px)').matches) stg.appendChild(closeBt);
+    else if (closeBt.parentNode !== sheetEl) sheetEl.insertBefore(closeBt, sheetEl.firstChild);
 
     document.getElementById('dPrice').textContent = priceText(it);
 
@@ -1744,5 +1874,6 @@
     unWatchTheme(paint);
   })();
 </script>
+<script src="join-nest.js" defer></script>
 </body>
 </html>

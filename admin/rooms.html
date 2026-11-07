@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rooms — Urban Nest Admin</title>
+<link rel="icon" type="image/png" href="../favicon.png"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/admin/config.js"></script>
+<script src="/admin/auth.js"></script>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --gold: #B8956A; --gold-light: rgba(184,149,106,0.1); --white: #FAFAF8; --black: #111110; --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF; --ok: #2f7d5b; --bad: #c0392b; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
+  .sidebar { width: 220px; min-height: 100vh; background: var(--black); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-brand { padding: 32px 24px 24px; border-bottom: 0.5px solid rgba(255,255,255,0.08); }
+  .sidebar-brand-name { font-family: 'Bodoni Moda', serif; font-size: 15px; letter-spacing: 0.16em; color: var(--white); display: block; }
+  .sidebar-brand-tag { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-top: 4px; display: block; }
+  .sidebar-nav { flex: 1; padding: 16px 0; }
+  .nav-group-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 24px 8px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 24px; text-decoration: none; font-size: 12px; letter-spacing: 0.08em; color: rgba(255,255,255,0.5); transition: all 0.2s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--white); border-left-color: var(--gold); background: rgba(184,149,106,0.08); }
+  .nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 20px 24px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+  .sign-out-btn { width: 100%; padding: 10px 16px; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .sign-out-btn:hover { border-color: rgba(255,255,255,0.4); color: var(--white); }
+  .view-site-link { display: block; font-size: 10px; letter-spacing: 0.15em; color: rgba(255,255,255,0.25); text-decoration: none; text-align: center; margin-top: 12px; transition: color 0.2s; }
+  .view-site-link:hover { color: rgba(255,255,255,0.5); }
+  .main { margin-left: 220px; flex: 1; padding: 32px 36px; min-width: 0; }
+  .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; }
+  .page-header p { font-size: 13px; color: var(--grey); margin: 4px 0 18px; max-width: 760px; line-height: 1.55; }
+  .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+  .bar .sp { flex: 1; }
+  select, input[type=text], input[type=number], textarea { font-family: inherit; font-size: 13px; padding: 8px 10px; border: 0.5px solid var(--border); background: var(--white); color: var(--black); width: 100%; outline: none; }
+  select { width: auto; }
+  input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+  textarea { resize: vertical; min-height: 64px; line-height: 1.45; }
+  .rb { padding: 9px 16px; border: 0.5px solid var(--border); background: var(--white); color: var(--black); font-family: inherit; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+  .rb:hover { border-color: var(--black); }
+  .rb.on { background: var(--black); color: var(--white); border-color: var(--black); }
+  .rb.pri { background: var(--gold); border-color: var(--gold); color: #fff; }
+  .rb.pri:disabled { opacity: .4; cursor: default; }
+  .rb.sm { padding: 5px 9px; font-size: 10px; }
+  .rb.danger { color: var(--bad); }
+  .seg { display: inline-flex; }
+  .seg .rb + .rb { margin-left: -0.5px; }
+  #status { font-size: 12px; color: var(--grey); }
+  #status.ok { color: var(--ok); } #status.err { color: var(--bad); }
+  .stage { display: grid; grid-template-columns: minmax(0, 1fr) 390px; gap: 18px; height: calc(100vh - 190px); min-height: 560px; }
+  .view { background: #0e2a2a; border: 0.5px solid var(--border); position: relative; }
+  .view iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .view .wait { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; letter-spacing: .12em; background: rgba(14,42,42,.85); z-index: 2; }
+  .view .wait.gone { display: none; }
+  .side { overflow-y: auto; background: var(--white); border: 0.5px solid var(--border); }
+  .sec { padding: 14px 16px; border-bottom: 0.5px solid var(--border); }
+  .sec h3 { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--grey); font-weight: 500; margin-bottom: 10px; }
+  .sec p.note { font-size: 11px; color: var(--grey); line-height: 1.5; margin-top: 8px; }
+  .piece { display: flex; align-items: center; gap: 6px; padding: 7px 8px; cursor: pointer; font-size: 13px; border-left: 2px solid transparent; }
+  .piece:hover { background: var(--gold-light); }
+  .piece.sel { background: var(--gold-light); border-left-color: var(--gold); }
+  .piece .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .piece .k { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--grey); }
+  #pieces { max-height: 250px; overflow-y: auto; }
+  .grp { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--grey); padding: 10px 8px 4px; }
+  .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .f label { display: block; font-size: 9px; letter-spacing: .15em; text-transform: uppercase; color: var(--grey); margin-bottom: 4px; }
+  .f { margin-bottom: 10px; }
+  .pad { display: grid; grid-template-columns: repeat(3, 34px); gap: 4px; margin-top: 8px; align-items: center; }
+  .pad .rb { padding: 6px 0; text-align: center; }
+  .row2 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chk { display: flex; gap: 8px; align-items: center; font-size: 12px; margin-bottom: 8px; }
+  .chk input { width: auto; }
+  details { margin-top: 12px; } summary { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--grey); cursor: pointer; }
+  body.fs .sidebar { display: none; } body.fs .main { margin-left: 0; padding: 10px 14px; } body.fs .page-header { display: none; }
+  body.fs .stage { height: calc(100vh - 66px); grid-template-columns: minmax(0, 1fr) 360px; }
+  #picker { position: fixed; inset: 0; background: rgba(17,17,16,.6); z-index: 100; display: none; align-items: center; justify-content: center; }
+  #picker.open { display: flex; }
+  .pk { background: var(--white); width: min(1000px, 94vw); height: min(740px, 90vh); display: flex; flex-direction: column; border: .5px solid var(--border); }
+  .pk-top { display: flex; gap: 10px; padding: 14px 16px; border-bottom: .5px solid var(--border); align-items: center; }
+  .pk-top input { flex: 1; }
+  .pk-grid { flex: 1; overflow: auto; padding: 14px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px; align-content: start; }
+  .pk-card { border: .5px solid var(--border); background: #fff; cursor: pointer; padding: 0; text-align: left; font-family: inherit; }
+  .pk-card:hover { border-color: var(--gold); }
+  .pk-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #eee; }
+  .pk-card span { display: block; font-size: 11px; line-height: 1.35; padding: 6px 8px 8px; color: var(--black); }
+  .pk-card.used { opacity: .4; }
+  .rb:disabled { opacity: .35; cursor: default; }
+  .empty { padding: 28px 16px; color: var(--grey); font-size: 13px; }
+  @media (max-width: 1100px) { .stage { grid-template-columns: 1fr; height: auto; } .view { height: 60vh; } }
+  @media (max-width: 900px) { .main { margin-left: 0; padding: 20px 14px; } .sidebar { display: none; } }
+</style>
+<link rel="stylesheet" href="/admin/studio-colors.css"/>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <span class="sidebar-brand-name">Urban Nest</span>
+    <span class="sidebar-brand-tag">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Overview</div>
+    <a href="index.html" class="nav-item"><span class="icon">◈</span> Dashboard</a>
+    <div class="nav-group-label">Content</div>
+    <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
+    <a href="contributors.html" class="nav-item"><span class="icon">✧</span> Contributors</a>
+    <a href="collection.html" class="nav-item"><span class="icon">◻</span> Collection</a>
+    <a href="rooms.html" class="nav-item active"><span class="icon">◉</span> Rooms</a>
+    <a href="amazon-links.html" class="nav-item"><span class="icon">⛓</span> Amazon Links</a>
+    <div class="nav-group-label">Commerce</div>
+    <a href="sellers.html" class="nav-item"><span class="icon">⬢</span> Sellers</a>
+    <a href="orders.html" class="nav-item"><span class="icon">▦</span> Orders</a>
+    <div class="nav-group-label">Content Creation</div>
+    <a href="social.html" class="nav-item"><span class="icon">▣</span> Media Engagement</a>
+    <a href="caption.html" class="nav-item"><span class="icon">✎</span> Caption</a>
+    <a href="article-card.html" class="nav-item"><span class="icon">▤</span> Article Cards</a>
+    <div class="nav-group-label">Community</div>
+    <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
+    <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="sign-out-btn" onclick="adminSignOut()">Sign Out</button>
+    <a href="../index.html" class="view-site-link" target="_blank">View Site →</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Rooms</h1>
+    <p>Click a piece to select it. <b>Drag it</b> to move it, <b>drag its glowing dot</b> to move the dot, and drag empty space to turn the room. Changes show here straight away and go live for visitors when you press <strong>Save</strong>, with no deploy.</p>
+  </div>
+
+  <div class="bar">
+    <select id="room"></select>
+    <span id="status"></span>
+    <span class="sp"></span>
+    <button class="rb" id="addOpen2">+ Add piece</button>
+    <button class="rb" id="undo" title="Undo (Ctrl+Z)" disabled>↶ Undo</button>
+    <button class="rb" id="redo" title="Redo (Ctrl+Y)" disabled>↷ Redo</button>
+    <button class="rb" id="fs" title="Hide the menu and give the room the whole screen">Full screen</button>
+    <button class="rb" id="revert" title="Throw away everything changed since the last Save">Discard changes</button>
+    <button class="rb danger" id="reset" title="Delete your saved layout; the room goes back to the published one">Back to published</button>
+    <button class="rb pri" id="save" disabled>Save</button>
+  </div>
+
+  <div class="stage">
+    <div class="view"><div class="wait" id="wait">Loading the room…</div><iframe id="frame" title="Room"></iframe></div>
+    <div class="side">
+      <div class="sec" id="pieces"></div>
+      <div id="form"><div class="empty">Click a piece in the room, or in the list, to edit it.</div></div>
+      <div class="sec" id="adder"></div>
+    </div>
+  </div>
+</main>
+<div id="picker"><div class="pk">
+  <div class="pk-top"><input type="text" id="pkq" placeholder="Search by name, e.g. chandelier, vase, clock…" autocomplete="off"><select id="pkcat"></select><button class="rb" id="pkx">Close</button></div>
+  <div class="pk-grid" id="pkgrid"></div>
+</div></div>
+
+<script>
+const ROOMS = [
+  { key: 'sunday-bedroom', name: 'The Sunday Bedroom' },
+  { key: 'quiet-bath',     name: 'The Quiet Bath' },
+];
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const r2 = n => Math.round(n * 100) / 100;
+let E = null, dirty = false, roomKey = ROOMS[0].key, collection = [], step = 0.05, timer = null;
+
+function setStatus(t, cls) { const s = $('status'); s.textContent = t || ''; s.className = cls || ''; }
+function setDirty(v) { dirty = v; $('save').disabled = !v; setStatus(v ? 'Unsaved changes' : ''); }
+// Undo / redo: a snapshot of the whole layout after each change (edits in quick succession count as one)
+let hist = [], hi = -1, histTimer = null, baseline = '', restoring = false;
+const snap = () => JSON.stringify(E.data());
+function updateUndo() { $('undo').disabled = hi <= 0; $('redo').disabled = hi >= hist.length - 1; }
+function markDirty() { setDirty(snap() !== baseline); }
+function histReset() { clearTimeout(histTimer); hist = [snap()]; hi = 0; baseline = hist[0]; updateUndo(); }
+function histNote() { clearTimeout(histTimer); histTimer = setTimeout(histPush, 450); }
+function histPush() { clearTimeout(histTimer); if (!E || restoring) return; const s = snap(); if (s === hist[hi]) return; hist = hist.slice(0, hi + 1); hist.push(s); if (hist.length > 100) hist.shift(); hi = hist.length - 1; updateUndo(); }
+async function histGo(d) {
+  if (!E || restoring) return; histPush();
+  const ni = hi + d; if (ni < 0 || ni >= hist.length) return;
+  restoring = true; hi = ni; await E.restore(JSON.parse(hist[hi])); restoring = false;
+  markDirty(); renderPieces(); renderForm(); updateUndo();
+}
+$('undo').onclick = () => histGo(-1); $('redo').onclick = () => histGo(1);
+function onUndoKey(e) {
+  if (!(e.ctrlKey || e.metaKey) || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '')) return;
+  const k = e.key.toLowerCase();
+  if (k === 'z' && !e.shiftKey) { e.preventDefault(); histGo(-1); } else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); histGo(1); }
+}
+document.addEventListener('keydown', onUndoKey);
+// Full screen
+$('fs').onclick = () => {
+  const on = !document.body.classList.contains('fs'); document.body.classList.toggle('fs', on); $('fs').textContent = on ? 'Exit full screen' : 'Full screen';
+  try { if (on) document.documentElement.requestFullscreen(); else if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {}
+};
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && document.body.classList.contains('fs')) { document.body.classList.remove('fs'); $('fs').textContent = 'Full screen'; } });
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+(async () => {
+  await requireAuth();
+  $('room').innerHTML = ROOMS.map(r => `<option value="${r.key}">${esc(r.name)}</option>`).join('');
+  const want = new URLSearchParams(location.search).get('room');
+  if (ROOMS.some(r => r.key === want)) { roomKey = want; $('room').value = want; }
+  $('room').onchange = () => { if (dirty && !confirm('Leave without saving your changes?')) { $('room').value = roomKey; return; } roomKey = $('room').value; loadRoom(); };
+  const { data } = await db.from('collection_items').select('id,name,model_url,buy_link,price,category,image_url,description,specs').not('model_url', 'is', null).order('name');
+  collection = data || [];
+  loadRoom();
+})();
+
+function loadRoom() {
+  E = null; setDirty(false); hist = []; hi = -1; updateUndo(); $('wait').classList.remove('gone'); $('wait').textContent = 'Loading the room…';
+  $('pieces').innerHTML = ''; $('form').innerHTML = '<div class="empty">Click a piece in the room, or in the list, to edit it.</div>'; $('adder').innerHTML = '';
+  const f = $('frame'), token = String(Date.now()) + Math.floor(Math.random() * 1000);
+  if (window.__poll) clearInterval(window.__poll);
+  f.src = `/rooms/${roomKey}/?edit=1&t=${token}`;
+  const t0 = Date.now();
+  // Only trust the iframe once it is the page just asked for: right after src changes, the old room's window is still there, still "ready"
+  const poll = window.__poll = setInterval(() => {
+    let w = null, mine = false;
+    try { w = f.contentWindow; mine = !!w && w.location.search.includes('t=' + token); } catch (e) {}
+    if (mine && w.__roomReady && w.UNEdit) {
+      clearInterval(poll); E = w.UNEdit; w.addEventListener('keydown', onKey); w.addEventListener('keydown', onUndoKey);
+      E.onSelect = () => { renderPieces(); renderForm(); };
+      E.onChange = () => { if (restoring) return; markDirty(); histNote(); renderPieces(); };
+      $('wait').classList.add('gone'); histReset(); renderPieces(); renderForm(); renderAdder();
+    } else if (Date.now() - t0 > 90000) { clearInterval(poll); $('wait').textContent = 'The room did not load. Reload this page.'; }
+  }, 400);
+}
+
+
+/* ───────── the list of pieces ───────── */
+function renderPieces() {
+  if (!E) return;
+  const d = E.data(), sel = E.sel;
+  const row = (def, kind, i, n) => `<div class="piece ${def === sel ? 'sel' : ''}" data-kind="${kind}" data-i="${i}">
+      <span class="nm">${esc(def.name)}</span>
+      ${kind === 'products' ? `<button class="rb sm" data-up="${i}" ${i === 0 ? 'disabled' : ''} title="Earlier in the card order">↑</button><button class="rb sm" data-dn="${i}" ${i === n - 1 ? 'disabled' : ''} title="Later in the card order">↓</button>` : '<span class="k">no dot</span>'}
+    </div>`;
+  $('pieces').innerHTML = `<h3>Pieces with a dot</h3>` + d.products.map((p, i) => row(p, 'products', i, d.products.length)).join('') +
+    (d.staging.length ? `<div class="grp">Dressing the room (no dot)</div>` + d.staging.map((p, i) => row(p, 'staging', i, d.staging.length)).join('') : '');
+}
+$('pieces').onclick = e => {
+  if (!E) return;
+  const d = E.data();
+  const up = e.target.closest('[data-up]'), dn = e.target.closest('[data-dn]');
+  if (up) { E.reorder(d.products[+up.dataset.up], -1); return; }
+  if (dn) { E.reorder(d.products[+dn.dataset.dn], 1); return; }
+  const r = e.target.closest('.piece'); if (!r) return;
+  E.select(d[r.dataset.kind][+r.dataset.i]);
+};
+
+/* ───────── the form for the selected piece ───────── */
+const SPECS = d => (d.specs || []).map(s => s.join(' | ')).join('\n');
+const num = (v, dp = 2) => (v === '' || v === null || v === undefined || isNaN(+v)) ? null : Math.round(+v * Math.pow(10, dp)) / Math.pow(10, dp);
+const r3 = n => Math.round(n * 1000) / 1000;
+
+function renderForm() {
+  const d = E && E.sel; const box = $('form');
+  if (!d) { box.innerHTML = '<div class="empty">Click a piece in the room, or in the list, to edit it.</div>'; return; }
+  const isProduct = E.data().products.includes(d);
+  const movable = !d.inRoom && d.pos;
+  const deg = d.rotY ? r2(d.rotY * 180 / Math.PI) : 0;
+  const pinned = d.alignBack !== undefined ? 'back wall' : d.alignLeft !== undefined ? 'left wall' : d.alignRight !== undefined ? 'right wall' : '';
+  box.innerHTML = `
+  <div class="sec"><h3>${esc(d.name)}</h3>
+    ${!movable ? '<p class="note">This piece is built into the room itself (like the rug), so it cannot be moved here. Its dot and card can be edited.</p>' : `
+    <p class="note" style="margin:0 0 10px"><b>Drag the piece</b> in the room to move it. Or use these arrows (your keyboard arrows work too; Page Up and Page Down go up and down).</p>
+    <div class="pad">
+      <button class="rb sm" data-n="y+" title="Up">▲</button><button class="rb sm" data-n="z-" title="Back">↑</button><button class="rb sm" data-n="y-" title="Down">▼</button>
+      <button class="rb sm" data-n="x-" title="Left">←</button><button class="rb sm" data-n="z+" title="Front">↓</button><button class="rb sm" data-n="x+" title="Right">→</button>
+    </div>
+    <div class="row2" style="margin-top:8px">
+      <span class="seg" id="stepSeg"><button class="rb sm ${step === 0.01 ? 'on' : ''}" data-s="0.01">1 cm</button><button class="rb sm ${step === 0.05 ? 'on' : ''}" data-s="0.05">5 cm</button><button class="rb sm ${step === 0.1 ? 'on' : ''}" data-s="0.1">10 cm</button></span>
+    </div>
+    ${pinned ? `<p class="note">This piece sits against the <b>${pinned}</b>. The arrows that point at that wall push it <b>into</b> the wall (so a thick painting can sink in), the opposite arrow pulls it out.</p>` : ''}
+    <div class="row2" style="margin-top:12px"><span class="k" style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey)">Turn</span><button class="rb sm" data-r="-15">−15°</button><button class="rb sm" data-r="15">+15°</button><button class="rb sm" data-r="90">+90°</button></div>
+    <div class="g2" style="margin-top:12px">
+      <div class="f"><label>Height (cm)</label><input type="number" step="1" id="hgt" value="${d.height ? r2(d.height * 100) : ''}"></div>
+      <div class="f"><label>Length (cm)</label><input type="number" step="1" id="len" value="${d.length ? r2(d.length * 100) : ''}"></div>
+    </div>
+    <details><summary>Exact numbers</summary>
+      <div class="g3" style="margin-top:8px">
+        <div class="f"><label>Left ↔ right</label><input type="number" step="0.01" id="px" value="${d.pos[0]}"></div>
+        <div class="f"><label>Height</label><input type="number" step="0.01" id="py" value="${d.pos[1]}"></div>
+        <div class="f"><label>Back ↔ front</label><input type="number" step="0.01" id="pz" value="${d.pos[2]}"></div>
+      </div>
+      <div class="f"><label>Turn (degrees)</label><input type="number" step="5" id="rot" value="${deg}" style="width:90px"></div>
+      <div class="g3">
+        <div class="f"><label>Back wall z</label><input type="number" step="0.01" id="aB" value="${d.alignBack ?? ''}"></div>
+        <div class="f"><label>Left wall x</label><input type="number" step="0.01" id="aL" value="${d.alignLeft ?? ''}"></div>
+        <div class="f"><label>Right wall x</label><input type="number" step="0.01" id="aR" value="${d.alignRight ?? ''}"></div>
+      </div>
+      <p class="note">Meters. A wall number pushes the piece flush against that wall; empty means free.</p>
+    </details>`}
+  </div>
+  ${isProduct ? `
+  <div class="sec"><h3>Dot</h3>
+    <p class="note" style="margin:0 0 10px"><b>Drag the glowing dot</b> in the room to where you want it on the piece (the selected piece's dot turns white and bigger). ${d.dotAt ? 'This dot has been placed by hand.' : 'Right now it sits on top of the piece by itself.'}</p>
+    <div class="row2">${d.dotAt ? '<button class="rb sm" id="bDotAuto">Put the dot back on top</button>' : ''}<button class="rb sm" id="bPrev">Show its card</button></div>
+    <details><summary>Camera for this piece</summary>
+      <p class="note">Where visitors stand when they open this piece. Turn the room how you like, then press the button.</p>
+      <div class="row2" style="margin-top:8px"><button class="rb sm" id="bView">Use the camera as it is now</button>${d.view ? '<button class="rb sm" id="bViewClr">Automatic camera</button>' : ''}</div>
+    </details>
+  </div>
+  <div class="sec"><h3>Options</h3>
+    ${/flower|vase/i.test(d.name) || d.flowers ? `<div class="chk"><input type="checkbox" id="flw" ${d.flowers ? 'checked' : ''}><label for="flw">Show flowers in it</label></div>` : ''}
+    <div class="chk"><input type="checkbox" id="shd" ${d.noShadow ? '' : 'checked'}><label for="shd">Soft shadow under it</label></div>
+    <p class="note">The room's light and shadows are baked in. A piece moved far from where it was shows its old shadow until I re-bake the room.</p>
+  </div>
+  <div class="sec"><details><summary style="margin:0">Card text</summary>
+    <div class="f" style="margin-top:10px"><label>Name</label><input type="text" id="tName" value="${esc(d.name)}"></div>
+    <div class="f"><label>Tag line</label><input type="text" id="tTag" value="${esc(d.tag)}"></div>
+    <div class="f"><label>Description</label><textarea id="tDesc">${esc(d.desc)}</textarea></div>
+    <div class="f"><label>Details, one per line: Label | Value</label><textarea id="tSpecs" rows="4">${esc(SPECS(d))}</textarea></div>
+    <div class="f"><label>Buy link</label><input type="text" id="tLink" value="${esc(d.link)}"></div>
+    <div class="f"><label>Listing title (what Amazon calls it)</label><input type="text" id="tList" value="${esc(d.listing)}"></div>
+  </details></div>` : ''}
+  <div class="sec"><button class="rb danger" id="bDel">Remove this piece from the room</button></div>`;
+  wireForm(d);
+}
+
+function patch(d, p, delay = 0) { clearTimeout(timer); if (!delay) return E.update(d, p); timer = setTimeout(() => E.update(d, p), delay); }
+
+// One nudge. A piece pushed against a wall has that axis set by the wall number, so the arrows change that number:
+// the arrow towards the wall pushes the piece into it.
+let chain = Promise.resolve();
+function nudge(axis, dir) {
+  const d0 = E && E.sel; if (!d0 || !d0.pos || d0.inRoom) return;
+  chain = chain.then(async () => {
+    const d = d0, s = step * dir, p = {};
+    if (axis === 'z' && d.alignBack !== undefined) p.alignBack = r3(d.alignBack + s);
+    else if (axis === 'x' && d.alignLeft !== undefined) p.alignLeft = r3(d.alignLeft + s);
+    else if (axis === 'x' && d.alignRight !== undefined) p.alignRight = r3(d.alignRight + s);
+    else { const q = d.pos.slice(), i = { x: 0, y: 1, z: 2 }[axis]; q[i] = r2(q[i] + s); p.pos = q; }
+    await E.update(d, p);
+    ['px', 'py', 'pz'].forEach((id, j) => { const el = $(id); if (el && d.pos) el.value = d.pos[j]; });
+    if ($('aB') && 'alignBack' in p) $('aB').value = d.alignBack;
+  });
+}
+function onKey(e) {
+  if (!E || !E.sel || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '')) return;
+  const k = { ArrowLeft: ['x', -1], ArrowRight: ['x', 1], ArrowUp: ['z', -1], ArrowDown: ['z', 1], PageUp: ['y', 1], PageDown: ['y', -1] }[e.key];
+  if (k) { e.preventDefault(); nudge(k[0], k[1]); }
+}
+document.addEventListener('keydown', onKey);
+
+function wireForm(d) {
+  const g = id => $(id);
+  const pos = () => [num(g('px').value) ?? 0, num(g('py').value) ?? 0, num(g('pz').value) ?? 0];
+  ['px', 'py', 'pz'].forEach(id => g(id) && (g(id).oninput = () => patch(d, { pos: pos() }, 300)));
+  if (g('rot')) g('rot').oninput = () => patch(d, { rotY: (num(g('rot').value) || 0) * Math.PI / 180 || undefined }, 300);
+  document.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { const v = ((d.rotY || 0) * 180 / Math.PI) + +b.dataset.r; patch(d, { rotY: v * Math.PI / 180 }); if (g('rot')) g('rot').value = r2(v); });
+  document.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { step = +b.dataset.s; document.querySelectorAll('[data-s]').forEach(x => x.classList.toggle('on', x === b)); });
+  document.querySelectorAll('[data-n]').forEach(b => b.onclick = () => nudge(b.dataset.n[0], b.dataset.n[1] === '+' ? 1 : -1));
+  if (g('hgt')) g('hgt').oninput = () => { const v = num(g('hgt').value); patch(d, { height: v ? v / 100 : undefined }, 350); };
+  if (g('len')) g('len').oninput = () => { const v = num(g('len').value); patch(d, { length: v ? v / 100 : undefined }, 350); };
+  if (g('aB')) g('aB').oninput = () => patch(d, { alignBack: num(g('aB').value, 3) ?? undefined }, 350);
+  if (g('aL')) g('aL').oninput = () => patch(d, { alignLeft: num(g('aL').value, 3) ?? undefined }, 350);
+  if (g('aR')) g('aR').oninput = () => patch(d, { alignRight: num(g('aR').value, 3) ?? undefined }, 350);
+  if (g('bDotAuto')) g('bDotAuto').onclick = async () => { await E.update(d, { dotAt: undefined }); renderForm(); };
+  if (g('bView')) g('bView').onclick = async () => { const c = E.cameraPose(); await E.update(d, { view: { pos: c.pos, target: c.target } }); renderForm(); };
+  if (g('bViewClr')) g('bViewClr').onclick = async () => { await E.update(d, { view: undefined }); renderForm(); };
+  if (g('bPrev')) g('bPrev').onclick = () => E.focus(d);
+  if (g('flw')) g('flw').onchange = () => patch(d, { flowers: g('flw').checked ? (d.flowers || true) : undefined });
+  if (g('shd')) g('shd').onchange = () => patch(d, { noShadow: g('shd').checked ? undefined : true });
+  const text = (id, key) => g(id) && (g(id).oninput = () => patch(d, { [key]: g(id).value }, 250));
+  text('tName', 'name'); text('tTag', 'tag'); text('tDesc', 'desc'); text('tLink', 'link'); text('tList', 'listing');
+  if (g('tSpecs')) g('tSpecs').oninput = () => patch(d, { specs: g('tSpecs').value.split('\n').map(l => l.split('|').map(x => x.trim())).filter(a => a[0] && a[1]).map(a => [a[0], a.slice(1).join(' | ')]) }, 250);
+  if (g('bDel')) g('bDel').onclick = () => { if (confirm('Remove "' + d.name + '" from this room?')) E.remove(d); };
+}
+
+/* ───────── adding a piece from the Collection ───────── */
+const CAT_H = { lighting: 60, luminaires: 45, 'wall-art': 60, timepieces: 40, amphorae: 30, sculptures: 25, festive: 20, furniture: 45, sofas: 80, 'bath-essentials': 25, 'kitchen-essentials': 25 };
+const thumb = u => { const S = '/storage/v1/object/public/'; return u && u.includes(S) && !/\.(gif|svg)(\?|$)/i.test(u) ? u.replace(S, '/storage/v1/render/image/public/') + (u.includes('?') ? '&' : '?') + 'width=260&resize=contain&quality=70' : u; };
+// The name on a room card: the Amazon title up to its first "|", cut at a word if still long (the full title stays as "listing")
+const cardName = n => { let t = String(n || '').split('|')[0].trim(); if (t.length > 52) t = t.slice(0, 52).replace(/\s+\S*$/, ''); return t; };
+const shortName = n => String(n || '').split('|')[0].trim().slice(0, 70);
+function defaultHeight(c) {
+  if (/floor lamp/i.test(c.name)) return 150;
+  if (c.category === 'timepieces') { const m = String(c.name).match(/(\d+(?:\.\d+)?)\s?cm/i); if (m && +m[1] > 15 && +m[1] < 120) return +m[1]; }
+  return CAT_H[c.category] || 40;
+}
+function renderAdder() {
+  $('adder').innerHTML = '<h3>Add a piece</h3><button class="rb pri" id="addOpen">+ Add a piece</button><p class="note">Search your Collection pieces that already have a 3D model. The new piece lands where the camera is looking (a ceiling light hangs from the ceiling, a picture goes on the wall in front of you). Then drag it where it belongs.</p>';
+  $('addOpen').onclick = openPicker;
+}
+$('addOpen2').onclick = () => { if (E) openPicker(); };
+function openPicker() {
+  const cats = [...new Set(collection.map(c => c.category).filter(Boolean))].sort();
+  $('pkcat').innerHTML = '<option value="">All kinds</option>' + cats.map(c => '<option>' + esc(c) + '</option>').join('');
+  $('pkq').value = ''; $('picker').classList.add('open'); drawPicker(); $('pkq').focus();
+}
+function drawPicker() {
+  const used = new Set(E.data().products.map(p => p.id));
+  const words = $('pkq').value.toLowerCase().split(/\s+/).filter(Boolean), cat = $('pkcat').value;
+  const list = collection.filter(c => (!cat || c.category === cat) && words.every(w => (c.name + ' ' + (c.category || '')).toLowerCase().includes(w)))
+    .sort((a, b) => (used.has(a.id) - used.has(b.id)) || a.name.localeCompare(b.name));
+  $('pkgrid').innerHTML = list.length ? list.map(c => '<button class="pk-card ' + (used.has(c.id) ? 'used' : '') + '" data-id="' + c.id + '" title="' + esc(c.name) + '">' +
+    (c.image_url ? '<img loading="lazy" src="' + esc(thumb(c.image_url)) + '" alt="">' : '<img alt="">') + '<span>' + esc(shortName(c.name)) + (used.has(c.id) ? ' (already here)' : '') + '</span></button>').join('')
+    : '<p class="note">Nothing matches.</p>';
+}
+$('pkq').oninput = drawPicker; $('pkcat').onchange = drawPicker;
+$('pkx').onclick = () => $('picker').classList.remove('open');
+$('picker').onclick = e => { if (e.target === $('picker')) $('picker').classList.remove('open'); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('picker').classList.remove('open'); });
+$('pkgrid').onclick = async e => {
+  const card = e.target.closest('.pk-card'); if (!card || !E) return;
+  const c = collection.find(x => x.id === card.dataset.id); if (!c) return;
+  $('picker').classList.remove('open');
+  const hang = c.category === 'lighting' || /chandelier|pendant|ceiling/i.test(c.name);
+  const wall = !hang && (c.category === 'wall-art' || (c.category === 'timepieces' && /wall/i.test(c.name)) || /wall (shelf|hanging|lamp)/i.test(c.name));
+  const hcm = defaultHeight(c), drop = E.dropPoint({ hang, wall, height: hcm / 100 });
+  setStatus('Adding…');
+  await E.add('products', Object.assign({ id: c.id, name: cardName(c.name), url: c.model_url, height: hcm / 100, tag: 'THE COLLECTION' + (c.category ? ' · ' + String(c.category).toUpperCase() : ''), desc: c.description || '', specs: Array.isArray(c.specs) ? c.specs.filter(s => Array.isArray(s) && s[0] && s[1]) : [], link: c.buy_link || '', listing: c.name }, drop));
+  setStatus('Added. Drag it where it belongs, and check its height in the panel.', 'ok');
+};
+
+/* ───────── save / undo / reset ───────── */
+$('save').onclick = async () => {
+  if (!E) return; $('save').disabled = true; setStatus('Saving…');
+  // application/octet-stream: the Models bucket only accepts model/binary types, and the viewer reads it as JSON regardless
+  const body = new Blob([JSON.stringify(E.data())], { type: 'application/octet-stream' });
+  const { error } = await db.storage.from('Models').upload(`layouts/${roomKey}.json`, body, { upsert: true, contentType: 'application/octet-stream', cacheControl: '30' });
+  if (error) { setStatus('Could not save: ' + error.message, 'err'); $('save').disabled = false; return; }
+  baseline = snap(); setDirty(false); setStatus('Saved. Visitors see it within a minute.', 'ok');
+};
+$('revert').onclick = () => { if (!dirty || confirm('Throw away everything changed since your last Save?')) loadRoom(); };
+$('reset').onclick = async () => {
+  if (!confirm('Delete your saved layout and go back to the room as I published it? Your edits to this room will be lost.')) return;
+  const { error } = await db.storage.from('Models').remove([`layouts/${roomKey}.json`]);
+  if (error) { setStatus('Could not reset: ' + error.message, 'err'); return; }
+  loadRoom(); setTimeout(() => setStatus('Back to the published room.', 'ok'), 100);
+};
+</script>
+</body>
+</html>

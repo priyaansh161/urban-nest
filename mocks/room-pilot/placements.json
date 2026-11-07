@@ -307,7 +307,7 @@
     -1.2
    ],
    "rotY": 0.3,
-   "flowers": "flowers.glb",
+   "flowers": "flowers-bright.glb",
    "flowerHeight": 0.36,
    "noShadow": true,
    "desc": "A ribbed ceramic vase with a soft matte glaze, at the end of the vanity counter.",
@@ -323,6 +323,73 @@
    ],
    "link": "https://link.amazon/B093PCuRU",
    "listing": "Ribbed Ceramic Vase for Home Decor | Modern Minimalist Flower Vase"
+  },
+  {
+   "id": "fe88ac6a-bba7-4782-88fd-1c12439ca4aa",
+   "name": "Mango Wood Stool",
+   "tag": "FURNITURE",
+   "file": "bath-cartaden-stool.glb",
+   "height": 0.3,
+   "pos": [
+    0.76,
+    0,
+    -1.225
+   ],
+   "rotY": 0.04,
+   "desc": "Solid mango wood with a slatted top, an H-braced frame and rubber anti-slip feet; 29 × 29 cm, 30 cm tall, holds 100 kg.",
+   "specs": [
+    [
+     "Material",
+     "Mango wood"
+    ],
+    [
+     "Dimensions",
+     "29 × 29 × 30 cm"
+    ],
+    [
+     "Weight capacity",
+     "100 kg"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0DWN6C8KY?tag=urbannest03b-21",
+   "listing": "CARTADEN Mango Wood Slatted Stool, 30 cm | Bathroom & Bedside",
+   "built": "make_stool.py",
+   "dotAt": [
+    0.76,
+    0.25,
+    -1.07
+   ]
+  },
+  {
+   "id": "a3581c47-064f-4cca-bd9a-0cf61aea7f90",
+   "name": "Jasmine Reed Diffuser",
+   "tag": "BATHROOM ESSENTIALS",
+   "file": "bath-reed-diffuser.glb",
+   "height": 0.182,
+   "pos": [
+    -1.63,
+    0.85,
+    -1.28
+   ],
+   "rotY": 0.15,
+   "desc": "Frosted-glass reed diffusers in lavender and jasmine, five black fibre reeds each; toxin-free, up to two months a bottle.",
+   "specs": [
+    [
+     "Scents",
+     "Lavender, Jasmine"
+    ],
+    [
+     "Volume",
+     "2 × 50 ml"
+    ],
+    [
+     "Lasts",
+     "Up to 2 months"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0FDQNCQ39?tag=urbannest03b-21",
+   "listing": "Soul & Scents Lavender and Jasmine Reed Diffuser Set, 2 × 50 ml | Bathroom & Bedroom",
+   "built": "make_diffuser.py"
   }
  ],
  "staging": [

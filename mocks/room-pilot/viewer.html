@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>The Quiet Bath · Urban Nest</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="description" content="Walk through the Quiet Bath in 3D: marble, walnut and soft light, with every piece in it a tap away.">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preload" as="image" href="/logo-icon.png">
@@ -29,13 +29,14 @@
   #dots { position:fixed; inset:0; pointer-events:none; }
   .dot { position:absolute; width:30px; height:30px; margin:-15px 0 0 -15px; border-radius:50%; pointer-events:auto; cursor:pointer;
          display:flex; align-items:center; justify-content:center; transition:opacity .25s; }
-  .dot::before { content:''; width:11px; height:11px; border-radius:50%; background:#fff; box-shadow:0 0 0 3px rgba(201,164,92,.9), 0 2px 8px rgba(0,0,0,.5); }
-  .dot::after { content:''; position:absolute; inset:0; border-radius:50%; border:1.5px solid rgba(255,255,255,.7); animation:pulse 2s ease-out infinite; }
+  .dot::before { content:''; width:7px; height:7px; border-radius:50%; background:#7fe8df; box-shadow:0 0 5px 2px rgba(95,224,214,.95), 0 0 14px 6px rgba(45,190,182,.55); animation:glow 2.4s ease-in-out infinite; }
+  .dot::after { content:''; position:absolute; inset:3px; border-radius:50%; background:radial-gradient(circle, rgba(95,224,214,.45) 0%, rgba(95,224,214,0) 70%); animation:pulse 2.4s ease-out infinite; }
   .dot.hidden { opacity:0; pointer-events:none; }
   .dot .tip { position:absolute; left:34px; top:50%; transform:translateY(-50%); white-space:nowrap; font-size:11px; letter-spacing:.12em; text-transform:uppercase;
               background:rgba(14,42,42,.82); padding:5px 9px; border-radius:6px; opacity:0; transition:opacity .2s; pointer-events:none; }
   .dot:hover .tip { opacity:1; }
-  @keyframes pulse { 0%{transform:scale(.6);opacity:.9} 100%{transform:scale(1.6);opacity:0} }
+  @keyframes pulse { 0%{transform:scale(.5);opacity:.9} 100%{transform:scale(1.7);opacity:0} }
+  @keyframes glow { 0%,100%{box-shadow:0 0 4px 1px rgba(95,224,214,.85), 0 0 10px 4px rgba(45,190,182,.4)} 50%{box-shadow:0 0 6px 2px rgba(95,224,214,1), 0 0 18px 8px rgba(45,190,182,.65)} }
 
   header { position:fixed; top:0; left:0; right:0; padding:16px 18px; display:flex; justify-content:space-between; align-items:center; pointer-events:none; z-index:5;
            background:linear-gradient(rgba(14,42,42,.7), transparent); }
@@ -106,6 +107,54 @@
   #stats { position:fixed; right:12px; bottom:calc(70px + env(safe-area-inset-bottom)); font-size:10px; color:rgba(248,247,244,.45); z-index:4; text-align:right; pointer-events:none; line-height:1.5; }
   #stats { display:none; }                                  /* a build readout: ?dev=1 only */
   @media (min-width: 701px) { body.dev #stats { display:block; } }   /* on a phone it would sit on the buttons */
+
+  /* ───── PHONE REVIEW, 6 Nov 2026: landscape-first, small utility controls, margins that clear the screen's curve ───── */
+  #cBody { display:flex; flex-direction:column; }
+  #turn { display:none; position:fixed; top:calc(max(12px, env(safe-area-inset-top)) + 94px); left:50%; transform:translateX(-50%); z-index:6; align-items:center; gap:8px;
+          padding:5px 6px 5px 12px; border-radius:999px; background:rgba(14,42,42,.86); border:1px solid rgba(248,247,244,.22); color:rgba(248,247,244,.92);
+          font-size:11px; letter-spacing:.05em; white-space:nowrap; backdrop-filter:blur(6px); }
+  #turn svg { width:16px; height:16px; flex:none; }
+  #turn button { padding:0; width:24px; height:24px; font-size:16px; line-height:1; border:0; background:none; color:rgba(248,247,244,.7); }
+  @media (pointer: coarse) and (orientation: portrait) and (max-width: 700px) { #turn.show { display:flex; } }
+  @media (pointer: coarse), (max-width: 700px) {
+    :root { --sl:max(18px, env(safe-area-inset-left)); --sr:max(18px, env(safe-area-inset-right)); --st:max(12px, env(safe-area-inset-top)); --sb:max(10px, env(safe-area-inset-bottom)); }
+    header { padding:var(--st) var(--sr) 14px var(--sl); }
+    header h1 { font-size:18px; }
+    header small { font-size:9px; }
+    header a.back { padding:14px 28px 14px 0; margin:-14px 0 -6px; position:relative; z-index:6; touch-action:manipulation; }
+    #bar { bottom:calc(var(--sb) + 26px); gap:6px; width:calc(100% - var(--sl) - var(--sr)); }
+    #bar button { font-size:11px; letter-spacing:.06em; padding:6px 11px; }
+    #hint { bottom:calc(var(--sb) + 2px); }
+    #cBody { overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
+    #card .x { z-index:2; width:32px; height:32px; top:6px; right:8px; font-size:22px; }   /* outside the scrolling part, so it stays put */
+    #card .tag { padding-right:34px; }
+    #card a, #card button { touch-action:manipulation; }
+  }
+  @media (max-width: 700px) {
+    #card { bottom:calc(var(--sb) + 92px); width:calc(100% - var(--sl) - var(--sr)); padding:16px 16px 14px; }
+    #cBody { max-height:calc(100dvh - 330px); }
+  }
+  @media (orientation: landscape) and (max-height: 520px) {
+    :root { --sl:max(18px, env(safe-area-inset-left)); --sr:max(18px, env(safe-area-inset-right)); --st:max(12px, env(safe-area-inset-top)); --sb:max(10px, env(safe-area-inset-bottom)); }
+    header { padding-left:var(--sl); padding-right:var(--sr); padding-top:var(--st); }
+    header a.back { padding:14px 28px 14px 0; margin:-14px 0 -6px; position:relative; z-index:6; touch-action:manipulation; }
+    #bar button { font-size:11px; letter-spacing:.06em; padding:6px 11px; }
+    header h1 { font-size:16px; }
+    header { padding-bottom:6px; }
+    #hint { display:none; }
+    #bar { bottom:var(--sb); }
+    #card.open ~ #bar { opacity:0; pointer-events:none; }
+    #card { left:auto !important; top:auto !important; right:var(--sr); bottom:var(--sb); width:min(300px, 38vw); max-width:none; max-height:calc(100dvh - var(--st) - var(--sb));
+            transform:translateX(16px); padding:14px 14px 10px; border-radius:16px; }
+    #card.open { transform:none; }
+    #cBody { max-height:calc(100dvh - var(--st) - var(--sb) - 40px); }
+    #card h2 { font-size:18px; margin:2px 0 4px; padding-right:30px; }
+    #card p { font-size:12px; line-height:1.4; margin:0 0 8px; }
+    #card .specs { flex-direction:row; flex-wrap:wrap; gap:10px 14px; margin:0 0 10px; font-size:11px; }
+    #card a.buy, #card button.back { padding:8px 14px; font-size:11px; }
+    #card button.back { margin:8px 0 0 !important; }
+    #card .cnav { margin-top:8px; }
+  }
 </style>
 </head>
 <body>
@@ -118,23 +167,24 @@
 
 <div id="card">
   <button class="x" id="cardX" aria-label="Close">&times;</button>
-  <div class="tag" id="cTag"></div>
+  <div id="cBody">  <div class="tag" id="cTag"></div>
   <h2 id="cName"></h2>
   <p id="cDesc"></p>
   <div class="specs" id="cSpecs"></div>
   <a class="buy" id="cBuy" href="#" target="_blank" rel="noopener">View on Amazon</a>
   <button class="back" id="cBack">&larr; Back to room</button>
-  <div class="cnav"><button id="cPrev" aria-label="Previous piece">&lsaquo;</button><span id="cPos"></span><button id="cNext" aria-label="Next piece">&rsaquo;</button></div>
+  <div class="cnav"><button id="cPrev" aria-label="Previous piece">&lsaquo;</button><span id="cPos"></span><button id="cNext" aria-label="Next piece">&rsaquo;</button></div></div>
 </div>
 
 <div id="bar">
-  <button data-view="wide" class="on">Wide</button>
+  <button data-view="wide" class="on">Overview</button>
   <button data-view="vanity">Vanity</button>
   <button data-view="shower">Shower</button>
   <button data-view="toilet">Toilet</button>
   <button id="humanBtn" class="dev-only">Scale check</button>
 </div>
 <div id="hint"></div>
+<div id="turn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M20.5 9.5a8 8 0 0 1 0 5M3.5 14.5a8 8 0 0 1 0-5"/></svg>Turn your phone sideways for the best view<button id="turnX" type="button" aria-label="Dismiss">&times;</button></div>
 <div id="stats"></div>
 
 <div id="loader">
@@ -156,7 +206,20 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 // build reads too, so their shadows are baked into the room exactly where they stand here.
 // ?placements=other.json tries an alternative set (e.g. full-detail models) without touching the real one
 const QS = new URLSearchParams(location.search);
-const PLACEMENTS = await (await fetch(QS.get('placements') || 'placements.json')).json();
+const EDIT = !!QS.get('edit');                       // admin/rooms.html opens the room like this to move pieces about
+// A layout saved from Admin > Rooms (Storage: Models/layouts/<room>.json) replaces placements.json, but only while
+// it was made from the same published room (same "version"): republishing a room starts from its own file again.
+const ROOM_KEY = (location.pathname.match(/\/rooms\/([^/]+)/) || [])[1];
+const PLACEMENTS = await (async () => {
+  const own = QS.get('placements');
+  const [base, saved] = await Promise.all([
+    fetch(own || 'placements.json').then(r => r.json()),
+    own || QS.get('base') || !ROOM_KEY ? null
+      : fetch('https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/layouts/' + ROOM_KEY + '.json', { cache: 'no-cache' })
+          .then(r => r.ok ? r.json() : null).catch(() => null),
+  ]);
+  return saved && saved.version === base.version && Array.isArray(saved.products) && Array.isArray(saved.staging) ? saved : base;
+})();
 const PRODUCTS = PLACEMENTS.products;
 const STAGING = PLACEMENTS.staging.filter(d => !d.inRoom);   // inRoom items are part of the room .glb itself
 // Where the files are: the working copy keeps products/ and staging/; the published room keeps them all in
@@ -169,9 +232,9 @@ if (QS.get('dev')) document.body.classList.add('dev');      // Scale check + tri
 const BARE = !!QS.get('bare');
 
 const VIEWS = {
-  wide:   { pos:[0.0, 1.45, 1.3], target:[0.0, 1.15, -1.4] },
+  wide:   { pos:[0.0, 1.5, 1.3], target:[0.0, 1.1, -1.4], fov:82 },   // 6 Nov 2026: the whole room, both side walls and the towel rack
   vanity: { pos:[-1.35, 1.35, 0.2], target:[-1.35, 1.0, -1.4] },
-  shower: { pos:[1.0, 1.5, 0.9], target:[1.65, 1.2, -1.4] },
+  shower: { pos:[-0.2, 1.6, 1.25], target:[1.6, 1.15, -0.6] },   // 3 Nov 2026: pulled back so the towel rack and the niche are in the frame too
   toilet: { pos:[0.3, 1.3, 0.5], target:[0.1, 0.55, -1.4] },
 };
 
@@ -192,7 +255,15 @@ scene.environmentIntensity = 0.55;
 
 const camera = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.05, 30);
 // Tall (phone) screens get a wider vertical field of view so the room is not cropped to a narrow slice.
-function fitFov() { camera.fov = camera.aspect < 1 ? Math.min(96, 62 + (1 - camera.aspect) * 62) : 62; camera.updateProjectionMatrix(); }
+let viewFov = 0, fovId = 0;
+const baseFov = () => camera.aspect < 1 ? Math.min(96, 62 + (1 - camera.aspect) * 62) : 62;
+const wantFov = () => Math.max(baseFov(), camera.aspect < 1 ? 0 : viewFov);
+function fitFov() { camera.fov = wantFov(); camera.updateProjectionMatrix(); }
+function tweenFov(dur) {
+  const f0 = camera.fov, f1 = wantFov(), t0 = performance.now(), id = ++fovId;
+  (function step(n) { if (id !== fovId) return; const k = Math.min(1, (n - t0) / dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    camera.fov = f0 + (f1 - f0) * e; camera.updateProjectionMatrix(); if (k < 1) requestAnimationFrame(step); })(t0);
+}
 fitFov();
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
@@ -230,6 +301,7 @@ function tweenTo(pos, tgt, dur = 1100, arc = 0) {
 function setView(name, instant) {
   const v = VIEWS[name]; if (!v) return;
   focused = null; returnView = null; card.classList.remove('open');
+  viewFov = v.fov || 0; tweenFov(instant ? 1 : 1100);
   tweenTo(new THREE.Vector3(...v.pos), new THREE.Vector3(...v.target), instant ? 1 : 1100);
   document.querySelectorAll('#bar [data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === name));
 }
@@ -275,6 +347,7 @@ function viewFor(p) {
 }
 // Clicking a dot flies the camera in on that product and opens its card.
 function focusProduct(p) {
+  if (viewFov) { viewFov = 0; tweenFov(900); }
   const fromProduct = !!focused;
   if (!focused) returnView = { pos: camera.position.clone(), target: controls.target.clone() };
   focused = p;
@@ -297,12 +370,15 @@ function closeCard() {
   if (focused && returnView) tweenTo(returnView.pos, returnView.target, 900);
   focused = null; returnView = null;
 }
+viewFov = VIEWS.wide.fov || 0; fitFov();
 camera.position.set(...VIEWS.wide.pos); controls.target.set(...VIEWS.wide.target); controls.update();
 
 // loaders
 const draco = new DRACOLoader().setDecoderPath('/rooms/lib/three-0.160.0/jsm/libs/draco/gltf/');
 const loader = new GLTFLoader().setDRACOLoader(draco);
 const load = url => new Promise((res, rej) => loader.load(url, res, undefined, rej));
+const _cache = {};   // edit mode only: a piece nudged again and again is fetched and decoded once
+const loadCached = url => (_cache[url] || (_cache[url] = load(url))).then(g => ({ scene: g.scene.clone(true) }));
 
 const room = new THREE.Group(); room.name = 'Room'; scene.add(room);
 const placed = [];   // { def, obj, body, dot, anchor, blocked }
@@ -423,7 +499,7 @@ const getFlowers = file => flowerCache[file] || (flowerCache[file] = load(DIRS.s
 // Places one model at real size. Products (folder 'products') get a dot and a card; staging items
 // (folder 'staging': toilet, shower, rug, flowers) are only there to dress the room, so no dot.
 async function placeItem(def, folder, withDot) {
-  const g = await load(DIRS[folder] + '/' + encodeURIComponent(def.file) + V);
+  const g = await (EDIT ? loadCached : load)(def.url || DIRS[folder] + '/' + encodeURIComponent(def.file) + V);
   const obj = g.scene;
   if (def.flat) obj.rotation.x = -Math.PI / 2;          // Meshy rugs come out standing up: lay them down
   let box = new THREE.Box3().setFromObject(obj);
@@ -432,7 +508,7 @@ async function placeItem(def, folder, withDot) {
   box.setFromObject(obj);
   const c = box.getCenter(new THREE.Vector3());
   const bodyH = box.max.y - box.min.y;                           // measured now, before the item is moved into the room
-  const holder = new THREE.Group(); holder.name = def.name;      // named objects, like Spline
+  const holder = new THREE.Group(); holder.name = def.name; holder.userData.def = def;      // named objects, like Spline
   obj.position.sub(new THREE.Vector3(c.x, def.anchor === 'center' ? c.y : box.min.y, c.z));
   if (def.footprint) {
     // footprint [w, d] in metres: fit a mat to its listed size exactly (Meshy's proportions drift a few cm,
@@ -471,8 +547,10 @@ async function placeItem(def, folder, withDot) {
   if (!withDot) { staged.push(holder); return; }
   const dot = document.createElement('div'); dot.className = 'dot';
   dot.innerHTML = '<span class="tip">' + def.name + '</span>';
-  const entry = { def, obj: holder, body: obj, dot, size: new THREE.Box3().setFromObject(holder).getSize(new THREE.Vector3()) };
-  dot.addEventListener('click', e => { e.stopPropagation(); focusProduct(entry); });
+  // placements.json can pin a dot ("dotAt": [x, y, z]) where it stays visible, e.g. on the stool's front rail when
+  // towels sit on its top (3 Nov 2026: the dot above the stool landed inside the towels and was always hidden)
+  const entry = { def, obj: holder, body: obj, dot, size: new THREE.Box3().setFromObject(holder).getSize(new THREE.Vector3()), anchor: def.dotAt ? new THREE.Vector3(...def.dotAt) : null };
+  dot.addEventListener('click', e => { e.stopPropagation(); EDIT ? window.UNEdit.pick(entry) : focusProduct(entry); });
   dotsEl.appendChild(dot);
   placed.push(entry);
 }
@@ -594,7 +672,7 @@ function placeCard() {
 function loop() {
   controls.update(); clampCamera();
   renderer.render(scene, camera);
-  updateDots(); placeCard();
+  updateDots(); placeCard(); if (EDIT && window.UNEdit) window.UNEdit.frame();
   requestAnimationFrame(loop);
 }
 
@@ -619,6 +697,197 @@ document.getElementById('humanBtn').onclick = e => { human.visible = !human.visi
 if (QS.get('shot')) {
   for (const sel of ['header', '#bar', '#hint', '#stats', '#dots']) document.querySelector(sel).style.display = 'none';
 }
+
+// ───────────────────────────── ADMIN EDIT MODE (?edit=1) ─────────────────────────────
+// Driven by admin/rooms.html through window.UNEdit. Nothing here runs for a visitor.
+//   click a piece: select it · drag a piece: move it · drag its teal dot: move the dot · drag empty space: turn the room
+if (EDIT) {
+  const dom = renderer.domElement, rc = new THREE.Raycaster(), pt = new THREE.Vector2(), hp = new THREE.Vector3();
+  const api = window.UNEdit = { sel: null, onSelect: null, onChange: null };
+  const kindOf = d => PLACEMENTS.products.includes(d) ? 'products' : 'staging';
+  const objOf = d => { const p = placed.find(q => q.def === d); return p ? p.obj : staged.find(h => h.userData.def === d); };
+  const defOf = o => { for (; o; o = o.parent) { if (o.userData && o.userData.def) return o.userData.def; const e = placed.find(p => p.obj === o); if (e) return e.def; } return null; };
+  const r2 = n => Math.round(n * 100) / 100, r3 = n => Math.round(n * 1000) / 1000;
+  const movable = d => d && !d.inRoom && d.pos;
+  function dispose(d) {
+    const pi = placed.findIndex(p => p.def === d);
+    if (pi >= 0) { const e = placed[pi]; if (!d.inRoom) scene.remove(e.obj); e.dot.remove(); placed.splice(pi, 1); }
+    const si = staged.findIndex(h => h.userData.def === d);
+    if (si >= 0) { scene.remove(staged[si]); staged.splice(si, 1); }
+  }
+  async function rebuild(d) { dispose(d); const k = kindOf(d); await placeItem(d, k, k === 'products'); }
+  const VISUAL = ['pos', 'rotY', 'height', 'length', 'file', 'url', 'flowers', 'flowerHeight', 'alignBack', 'alignLeft', 'alignRight', 'dotAt', 'hang', 'noShadow', 'tint', 'thin', 'flat', 'footprint', 'anchor'];
+
+  api.data = () => PLACEMENTS;
+  api.list = () => [...PLACEMENTS.products.map(d => ({ kind: 'products', def: d })), ...PLACEMENTS.staging.map(d => ({ kind: 'staging', def: d }))];
+  api.select = (d, quiet) => { if (api.sel === d && !quiet) return; api.sel = d; if (!quiet && api.onSelect) api.onSelect(d); };
+  api.pick = e => api.select(e.def);
+  api.focus = d => { const e = placed.find(p => p.def === d); if (e) focusProduct(e); };
+  api.leaveFocus = () => { if (focused) closeCard(); };
+  api.cameraPose = () => ({ pos: camera.position.toArray().map(r2), target: controls.target.toArray().map(r2) });
+  api.update = async (d, patch) => {
+    for (const k in patch) { if (patch[k] === undefined || patch[k] === null) delete d[k]; else d[k] = patch[k]; }
+    if (Object.keys(patch).some(k => VISUAL.includes(k))) await rebuild(d);
+    else { const p = placed.find(q => q.def === d); if (p) p.dot.querySelector('.tip').textContent = d.name; }
+    if (api.onChange) api.onChange(d);
+  };
+  api.add = async (kind, d) => { PLACEMENTS[kind].push(d); await placeItem(d, kind, kind === 'products'); api.select(d); if (api.onChange) api.onChange(d); };
+  api.remove = d => { dispose(d); for (const k of ['products', 'staging']) { const i = PLACEMENTS[k].indexOf(d); if (i >= 0) PLACEMENTS[k].splice(i, 1); } if (api.sel === d) { api.sel = null; if (api.onSelect) api.onSelect(null); } if (api.onChange) api.onChange(null); };
+  api.reorder = (d, dir) => { const a = PLACEMENTS.products, i = a.indexOf(d), j = i + dir; if (i < 0 || j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; if (api.onChange) api.onChange(d); };
+
+  // Where a new piece should land: where the camera is looking, standing on whatever is there (floor, bed, table).
+  //   opts.hang: a ceiling light, hung from the ceiling over that spot
+  //   opts.wall + opts.height: a picture or clock, on the wall the camera faces, at eye level, turned to face the room
+  api.dropPoint = (opts = {}) => {
+    if (roomBox.isEmpty()) roomBox.setFromObject(room);
+    const solid = hh => hh.object.isMesh && hh.object.visible && !/Glass/.test(hh.object.name);
+    const dir = camera.getWorldDirection(new THREE.Vector3());
+    const flat = new THREE.Vector3(dir.x, 0, dir.z); if (flat.lengthSq() < 1e-4) flat.set(0, 0, -1); flat.normalize();
+    if (opts.wall) {
+      rc.set(new THREE.Vector3(camera.position.x, camera.position.y, camera.position.z), flat);
+      const h = rc.intersectObject(room, true).find(solid);
+      if (h) {
+        const hy = Math.max(0.9, Math.min(roomBox.max.y - 0.6, camera.position.y)) - (opts.height || 0.5) / 2;
+        const ax = Math.abs(flat.x) > Math.abs(flat.z) ? 'x' : 'z';
+        if (ax === 'z' && flat.z < 0) return { pos: [r2(h.point.x), r2(Math.max(0.6, hy)), 0], rotY: 0, alignBack: r3(h.point.z) };
+        if (ax === 'x' && flat.x < 0) return { pos: [0, r2(Math.max(0.6, hy)), r2(h.point.z)], rotY: r2(Math.PI / 2), alignLeft: r3(h.point.x) };
+        if (ax === 'x' && flat.x > 0) return { pos: [0, r2(Math.max(0.6, hy)), r2(h.point.z)], rotY: r2(-Math.PI / 2), alignRight: r3(h.point.x) };
+      }                                                    // facing the door wall, or nothing there: fall through to the floor
+    }
+    rc.setFromCamera(new THREE.Vector2(0, 0), camera);
+    const hit = rc.intersectObject(room, true).find(solid);
+    let x, z;
+    if (hit) {                                                      // where you look, but never farther than 1.5 m away, so it lands in view and in front of what is behind it
+      const run = Math.max(0.3, Math.min(hit.distance - 0.25, 1.5)), q = camera.position.clone().addScaledVector(rc.ray.direction, run);
+      x = q.x; z = q.z;
+    }
+    else { const p = camera.position.clone().addScaledVector(flat, 1.5); x = p.x; z = p.z; }
+    x = Math.max(roomBox.min.x + 0.3, Math.min(roomBox.max.x - 0.3, x)); z = Math.max(roomBox.min.z + 0.3, Math.min(roomBox.max.z - 0.3, z));
+    for (let k = 0; k < 8 && [...placed.map(p => p.def), ...staged.map(h => h.userData.def)].some(d => d && d.pos && !d.hang && Math.hypot(d.pos[0] - x, d.pos[2] - z) < 0.3); k++) x += (k % 2 ? -1 : 1) * 0.35 * Math.ceil((k + 1) / 2);   // not on top of one just added
+    if (opts.hang) {                                          // hung from the underside of the ceiling over that spot
+      rc.set(new THREE.Vector3(x, Math.min(camera.position.y, roomBox.max.y - 0.3), z), new THREE.Vector3(0, 1, 0));
+      const up = rc.intersectObject(room, true).find(solid);
+      return { pos: [r2(x), r2(up ? up.point.y : roomBox.max.y - 0.2), r2(z)], hang: true };
+    }
+    rc.set(new THREE.Vector3(x, Math.min(camera.position.y, roomBox.max.y - 0.3), z), new THREE.Vector3(0, -1, 0));
+    const under = rc.intersectObject(room, true).find(solid);
+    return { pos: [r2(x), r2(under ? under.point.y : roomBox.min.y), r2(z)] };
+  };
+  // Put the whole room's pieces back as they were in an earlier snapshot (undo / redo)
+  api.restore = async snap => {
+    for (const p of [...placed]) dispose(p.def);
+    for (const h of [...staged]) dispose(h.userData.def);
+    const keep = api.sel ? PLACEMENTS.products.indexOf(api.sel) : -1;
+    PLACEMENTS.products.splice(0, PLACEMENTS.products.length, ...snap.products);
+    PLACEMENTS.staging.splice(0, PLACEMENTS.staging.length, ...snap.staging);
+    await Promise.all([...PLACEMENTS.staging.filter(d => !d.inRoom).map(d => placeItem(d, 'staging', false)), ...PLACEMENTS.products.map(d => placeItem(d, 'products', true))]);
+    api.sel = keep >= 0 ? PLACEMENTS.products[keep] || null : null;
+    if (api.onSelect) api.onSelect(api.sel);
+  };
+
+  // the selected piece: a teal box round it, and its dot brighter
+  const st = document.createElement('style');
+  st.textContent = '.dot.sel::before{width:10px;height:10px;background:#fff;box-shadow:0 0 6px 3px #fff,0 0 18px 9px rgba(95,224,214,.95)} .dot{touch-action:none}';
+  document.head.appendChild(st);
+  const helper = new THREE.Box3Helper(new THREE.Box3(), 0x5fe0d6); helper.visible = false; helper.raycast = () => {}; helper.material.depthTest = false; helper.renderOrder = 999;   // shows through whatever hides the piece scene.add(helper);
+  api.frame = () => {
+    for (const p of placed) p.dot.classList.toggle('sel', p.def === api.sel);
+    const o = api.sel && objOf(api.sel); if (!o) { helper.visible = false; return; }
+    helper.box.setFromObject(o); helper.visible = true;
+  };
+
+  const aim = e => { const r = dom.getBoundingClientRect(); pt.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height * 2 - 1)); rc.setFromCamera(pt, camera); };
+  function pieceAt(e) {                                     // nearest piece under the pointer, by its box (never its triangles)
+    aim(e); let best = null, bd = 1e9;
+    for (const o of [...placed.map(p => p.obj), ...staged]) {
+      const d = defOf(o); if (!d) continue;
+      if (rc.ray.intersectBox(new THREE.Box3().setFromObject(o), hp)) { const dist = hp.distanceTo(camera.position); if (dist < bd) { bd = dist; best = { def: d, point: hp.clone() }; } }
+    }
+    return best;
+  }
+
+  // ── a piece: press it and drag; press empty space and the room turns as usual
+  let down = null, drag = null;
+  dom.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    const hit = pieceAt(e); down = { x: e.clientX, y: e.clientY, hit };
+    if (hit && movable(hit.def)) {
+      const d = hit.def, o = objOf(d); api.select(d);
+      const n = d.alignBack !== undefined ? new THREE.Vector3(0, 0, 1) : (d.alignLeft !== undefined || d.alignRight !== undefined) ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+      drag = { d, o, plane: new THREE.Plane().setFromNormalAndCoplanarPoint(n, hit.point), start: hit.point.clone(), pos0: d.pos.slice(), p0: o.position.clone(), dl: new THREE.Vector3() };
+      controls.enabled = false; try { dom.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+  });
+  // ── a dot: press it and drag it over its piece
+  let dotDrag = null;
+  dotsEl.addEventListener('pointerdown', e => {
+    const el = e.target.closest('.dot'); if (!el || e.button !== 0) return;
+    const ent = placed.find(p => p.dot === el); if (!ent) return;
+    api.select(ent.def); dotDrag = { ent, x: e.clientX, y: e.clientY, moved: false }; e.preventDefault();
+  });
+  addEventListener('pointermove', e => {
+    if (drag) {
+      aim(e); if (!rc.ray.intersectPlane(drag.plane, hp)) return;
+      drag.dl.copy(hp).sub(drag.start); drag.o.position.copy(drag.p0).add(drag.dl);
+    } else if (dotDrag) {
+      if (!dotDrag.moved && Math.hypot(e.clientX - dotDrag.x, e.clientY - dotDrag.y) < 5) return;
+      dotDrag.moved = true; aim(e); dotDrag.ent.blocked = false;
+      if (rc.ray.intersectBox(new THREE.Box3().setFromObject(dotDrag.ent.obj), hp)) dotDrag.ent.anchor = hp.clone();   // a quick stand-in while dragging
+    }
+  });
+  addEventListener('pointerup', async e => {
+    if (dotDrag) {
+      const g = dotDrag; dotDrag = null;
+      if (g.moved) {                                         // settled on the piece's real surface, a little towards the viewer so it stays visible
+        aim(e); const h = rc.intersectObject(g.ent.obj, true)[0];
+        const p = h ? h.point.clone().addScaledVector(rc.ray.direction, -0.03) : g.ent.anchor;
+        if (!p) return;
+        await api.update(g.ent.def, { dotAt: [r3(p.x), r3(p.y), r3(p.z)] });
+      }
+      return;
+    }
+    if (drag) {
+      const g = drag; drag = null; controls.enabled = true; down = null;
+      if (g.dl.length() > 0.005) await api.update(g.d, { pos: [r2(g.pos0[0] + g.dl.x), r2(g.pos0[1] + g.dl.y), r2(g.pos0[2] + g.dl.z)] });
+      else g.o.position.copy(g.p0);
+      return;
+    }
+    if (down && down.hit && Math.hypot(e.clientX - down.x, e.clientY - down.y) <= 6) api.select(down.hit.def);   // a plain click on a piece that cannot be dragged (built into the room)
+    down = null;
+  });
+  document.body.classList.add('editing');
+}
+// ── PHONE REVIEW, 6 Nov 2026 ──
+{
+  // no accidental page zoom (iOS): pinch and double-tap belong to the room
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+  // a card beside the room in landscape: slide the picture left by half the card, so the piece is not behind it
+  const land = matchMedia('(orientation: landscape) and (max-height: 520px)');
+  const offsetView = () => {
+    const on = card.classList.contains('open') && land.matches && innerWidth > 500;
+    if (on) camera.setViewOffset(innerWidth, innerHeight, (Math.min(300, innerWidth * 0.38) + 16) / 2, 0, innerWidth, innerHeight);
+    else if (camera.view && camera.view.enabled) camera.clearViewOffset();
+  };
+  new MutationObserver(offsetView).observe(card, { attributes: true, attributeFilter: ['class'] });
+  addEventListener('resize', () => setTimeout(offsetView, 60));
+  if (land.addEventListener) land.addEventListener('change', offsetView);
+  // held upright on a phone: a quiet note that the room is best sideways (it cannot turn the phone itself)
+  const turn = document.getElementById('turn');
+  // shown on every visit to a room (dismissing it only hides it until the next room is opened)
+  if (turn && matchMedia('(pointer: coarse)').matches) turn.classList.add('show');
+  const tx = document.getElementById('turnX');
+  if (tx) tx.onclick = () => { turn.classList.remove('show'); };
+  // BACK-LINK TAP FIX: after turning the room the canvas can still hold the finger, so a plain tap on "Spaces" was sometimes lost.
+  // Touch events stay with the element they started on, so the link is followed on touchend, whatever the viewer thinks.
+  document.querySelectorAll('header a.back').forEach(a => {
+    let t0 = null;
+    a.addEventListener('touchstart', e => { const t = e.touches[0]; t0 = { x: t.clientX, y: t.clientY }; }, { passive: true });
+    a.addEventListener('touchend', e => {
+      if (!t0) return; const t = e.changedTouches[0], d = Math.hypot(t.clientX - t0.x, t.clientY - t0.y); t0 = null;
+      if (d < 12) { e.preventDefault(); location.href = a.href; }
+    }, { passive: false });
+  });
+}
 window.__pilot = { scene, camera, controls, placed, setView, renderer };
 
 // Room first: it is a few MB and is the whole first impression, so it shows the moment it arrives. The pieces
@@ -639,7 +908,7 @@ try {
   const results = await Promise.allSettled(jobs.map(j => placeItem(...j).finally(() => { done++; count(); })));
   results.forEach((r, i) => { if (r.status === 'rejected') console.warn('item failed:', jobs[i][0].name, r.reason); });
   if (previewing) await sharpenRoom();                 // the full room's images, once the pieces are in
-  hintEl.textContent = hintText;
+  hintEl.textContent = hintText; window.__roomReady = true;
   captureRoomEnv();                                    // again, now that the pieces show in the reflections
   document.getElementById('stats').innerHTML = Math.round(tris/1000) + 'k triangles<br>' + placed.length + ' products placed';
 } catch (e) {

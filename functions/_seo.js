@@ -54,10 +54,27 @@ export function img(url, width) {
     (url.indexOf('?') < 0 ? '?' : '&') + 'width=' + Math.min(2000, width) + '&resize=contain&quality=75';
 }
 
+// The display name of a piece: our long-form names are "Brand item size | what it is for", and the part before the bar
+// is the name. Cut at a word if it is still long, and never end on a joining word.
+export const shortName = (n) => {
+  let t = String(n || '').split('|')[0].trim();
+  if (t.length > 64) t = t.slice(0, 64).replace(/\s+\S*$/, '');
+  t = t.replace(/[\s,;:–-]+$/, '').replace(/\s+(for|with|and|in|of|to|&)$/i, '');
+  return t || String(n || '');
+};
+// A name that reads short on a phone and in full on a laptop (CSS picks one: .n-full / .n-short in seo-page.html)
+export const nameBoth = (n) => `<span class="n-full">${esc(n)}</span><span class="n-short">${esc(shortName(n))}</span>`;
+
 export const dateIN = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata' });
 export const plain = (s) => String(s || '').replace(/[#*_>]/g, ' ').replace(/\s+/g, ' ').trim();
 export const clip = (s, n) => { s = plain(s); return s.length <= n ? s : s.slice(0, n - 1).replace(/[\s,.;:]+\S*$/, '') + '…'; };
-export const priceNumber = (p) => { const n = parseFloat(String(p || '').replace(/[^0-9.]/g, '')); return isFinite(n) && n > 0 ? n : null; };
+// First price in the text. A range such as "₹999 - ₹1,399" gives 999; stripping every
+// non-digit used to glue the two together into 9991399 in the structured data.
+export const priceNumber = (p) => {
+  const m = String(p || '').match(/\d[\d,]*(?:\.\d+)?/);
+  const n = m ? parseFloat(m[0].replace(/,/g, '')) : NaN;
+  return isFinite(n) && n > 0 ? n : null;
+};
 
 // A buy link that leads somewhere: not a TODO placeholder, not marked gone in Admin → Amazon Links.
 export const liveBuyLink = (it) => it.buy_link && !/^TODO-/i.test(it.buy_link) && it.amazon_status !== 'gone' ? it.buy_link : null;
@@ -66,7 +83,7 @@ export function pieceCard(it, catName) {
   return `<a class="sv-card" href="${esc(UNUrls.piece(it))}">` +
     `<img src="${esc(img(it.image_url, 600))}" alt="${esc(it.name)}" loading="lazy" decoding="async"/>` +
     `<div class="sv-card-b"><div class="sv-card-k">${esc(catName || '')}${it.model_url ? (catName ? ' · ' : '') + '3D' : ''}</div>` +
-    `<div class="sv-card-t">${esc(it.name)}</div>${it.price ? `<div class="sv-card-p">${esc(it.price)}</div>` : ''}</div></a>`;
+    `<div class="sv-card-t">${nameBoth(it.name)}</div>${it.price ? `<div class="sv-card-p">${esc(it.price)}</div>` : ''}</div></a>`;
 }
 
 export function postCard(p) {
@@ -95,7 +112,7 @@ export async function page(ctx, o) {
   ].filter(Boolean).join('\n  ');
   const fill = {
     '{{TITLE}}': esc(o.title + ' · Urban Nest'),
-    '{{TAG}}': o.tag, '{{H1}}': esc(o.h1), '{{H1CLASS}}': o.h1.length > 48 ? ' sv-is-long' : '',
+    '{{TAG}}': o.tag, '{{H1}}': o.h1Html || esc(o.h1), '{{H1CLASS}}': o.h1.length > 48 ? ' sv-is-long' : '',
     '{{SUB}}': o.sub ? `<p class="page-sub">${o.sub}</p>` : '',
     '{{MAIN}}': o.main, '{{SCRIPTS}}': o.scripts || '',
   };

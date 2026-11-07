@@ -147,12 +147,7 @@
     <a href="collection.html" class="nav-item">
       <span class="icon">◻</span> Collection
     </a>
-    <a href="spline.html" class="nav-item">
-      <span class="icon">◉</span> Spline Scenes
-    </a>
-    <a href="products.html" class="nav-item">
-      <span class="icon">◆</span> 3D Products
-    </a>
+    <a href="rooms.html" class="nav-item"><span class="icon">◉</span> Rooms</a>
     <a href="amazon-links.html" class="nav-item">
       <span class="icon">⛓</span> Amazon Links
     </a>
@@ -198,11 +193,6 @@
       <div class="stat-value" id="statFeedback">—</div>
       <div class="stat-sub">new messages</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Spline Scenes</div>
-      <div class="stat-value" id="statSpline">—</div>
-      <div class="stat-sub">active</div>
-    </div>
   </div>
 
   <div class="content-grid">
@@ -236,16 +226,14 @@
     'Welcome back, ' + (session.user.email.split('@')[0] || 'admin');
 
   // Stats
-  const [posts, items, feedback, spline] = await Promise.all([
+  const [posts, items, feedback] = await Promise.all([
     db.from('nest_posts').select('id', { count: 'exact' }).eq('published', true),
     db.from('collection_items').select('id', { count: 'exact' }).eq('published', true),
     db.from('feedback').select('id', { count: 'exact' }).eq('status', 'unread'),
-    db.from('spline_scenes').select('id', { count: 'exact' }).eq('active', true),
   ]);
   document.getElementById('statPosts').textContent    = posts.count ?? 0;
   document.getElementById('statItems').textContent    = items.count ?? 0;
   document.getElementById('statFeedback').textContent = feedback.count ?? 0;
-  document.getElementById('statSpline').textContent   = spline.count ?? 0;
 
   // Recent posts
   const { data: recentPosts } = await db.from('nest_posts')

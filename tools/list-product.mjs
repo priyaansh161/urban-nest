@@ -6,6 +6,7 @@
  *                        → Draco compression → a real render check → upload
  *                        → attached to the listing
  *   --3d-for=<item id>   make the 3D model for a listing that already exists
+ *   --model-file=<glb>   with --3d-for: attach this model (built by hand, already compressed) instead of Meshy
  *   --photo=<n>          with --3d-for / --prep-for: build from photo n (1 = cover)
  *                        instead of letting the script choose
  *   --photo-file=<path>  with --3d-for / --prep-for: build from a photo cropped by hand instead
@@ -396,7 +397,14 @@ if (MODEL_FOR) {
   const [item] = await sb(`/rest/v1/collection_items?id=eq.${MODEL_FOR}&select=id,name,image_url,gallery,model_url`);
   if (!item) { console.error('No listing with id ' + MODEL_FOR); process.exit(1); }
   if (item.model_url) console.log('   (it already has a 3D model; this replaces it)');
-  await makeModel(item);
+  if (flag('model-file')) {
+    // a model built by hand (Blender), already compressed: render check, upload, attach. No Meshy credits.
+    const file = resolve(flag('model-file'));
+    console.log(`   3D · ${basename(file)} renders fine (${await renderCheck(file)})`);
+    const url = await upload(MODEL_BUCKET, (slugify(item.name) || 'piece') + '-' + Date.now().toString(36) + '.glb', readFileSync(file), 'model/gltf-binary');
+    await sb('/rest/v1/collection_items?id=eq.' + item.id, { method: 'PATCH', headers: { 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ model_url: url }) });
+    console.log('   3D · attached to the listing');
+  } else await makeModel(item);
 }
 
 let ok = 0, failed = 0;

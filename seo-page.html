@@ -11,6 +11,7 @@
   <meta name="theme-color" content="#0B343C" media="(prefers-color-scheme: dark)"/>
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png"/>
   <script src="/pwa.js" defer></script>
+  <script src="/market.js" defer></script>
 <script>
   /* Applied before first paint so the page never flashes the wrong theme. */
   (function () {
@@ -80,6 +81,8 @@
     .sv-card.sv-wide img { aspect-ratio: 4 / 3; object-fit: cover; }
     .sv-card-b { padding: 16px 18px 20px; }
     .sv-card-k { font-size: 10px; letter-spacing: .2em; color: var(--gold); font-weight: 500; text-transform: uppercase; }
+    .n-short { display: none; }
+    @media (max-width: 600px) { .n-full { display: none; } .n-short { display: inline; } .page-hero .page-title.sv-is-long { font-size: clamp(30px, 8vw, 40px); } }
     .sv-card-t { font-family: 'Bodoni Moda', serif; font-size: 18px; line-height: 1.3; margin-top: 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .sv-card-p { font-size: 13px; color: var(--grey); margin-top: 8px; }
 
@@ -515,5 +518,6 @@
   })();
 </script>
 {{SCRIPTS}}
+<script src="/join-nest.js" defer></script>
 </body>
 </html>

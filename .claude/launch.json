@@ -9,6 +9,12 @@
       "autoPort": true
     },
     {
+      "name": "pharmvials-pitch",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "C:/Users/priya/OneDrive/Projects/pharmvials-pitch", "-l", "3500"],
+      "port": 3500
+    },
+    {
       "name": "portfolio",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "C:/Users/priya/OneDrive/Projects/priyaansh-portfolio"],

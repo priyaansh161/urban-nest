@@ -2,7 +2,7 @@
  * The last eight characters are the start of the piece's id, which finds it;
  * the words are for people and search. If the name has changed since a link
  * was made, the old address moves to the new one. */
-import { sb, page, notFound, redirect, esc, img, clip, pieceCard, liveBuyLink, priceNumber, UNUrls, ORIGIN } from '../_seo.js';
+import { sb, page, notFound, redirect, esc, img, clip, pieceCard, liveBuyLink, priceNumber, UNUrls, ORIGIN, shortName, nameBoth } from '../_seo.js';
 
 export async function onRequestGet(ctx) {
   const slug = String(ctx.params.slug || '').toLowerCase();
@@ -30,10 +30,10 @@ export async function onRequestGet(ctx) {
     : (it.image_url ? `<img src="${esc(img(it.image_url, 1100))}" alt="${esc(it.name)}" fetchpriority="high"/>` : '');
 
   return page(ctx, {
-    path, title: it.name, description, image: it.image_url, ogType: 'product',
+    path, title: shortName(it.name), description, image: it.image_url, ogType: 'product',
     tag: `<a href="/${section}" style="color:inherit;text-decoration:none">${section === 'essentials' ? 'ESSENTIALS' : 'THE COLLECTION'}</a>` +
       (cat ? ` · <a href="${esc(UNUrls.category(cat))}" style="color:inherit;text-decoration:none">${esc(cat.name.toUpperCase())}</a>` : ''),
-    h1: it.name,
+    h1: it.name, h1Html: nameBoth(it.name),
     main: `<div class="sv-in">
       <div class="sv-pc">
         <div>

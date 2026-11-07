@@ -14,6 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Urban Nest"/>
 <script src="pwa.js" defer></script>
+<script src="market.js" defer></script>
 <meta name="description" content="Urban Nest terms of use, shipping and delivery, returns and refunds, privacy, and how to reach us."/>
 <!-- The link-preview card WhatsApp and others show (same square card as the homepage). -->
 <meta property="og:type" content="website"/>
@@ -535,7 +536,7 @@
 </div>
 
 <main>
-  <p class="updated">Last updated 2 September 2026</p>
+  <p class="updated">Last updated 5 November 2026 (Privacy now has an India and a US version)</p>
 
   <div class="layout">
     <aside class="toc">
@@ -783,6 +784,20 @@
       <section id="privacy">
         <h2>Privacy</h2>
 
+        <!-- One page, two readings: the privacy rules are not the same in India and in the US.
+             The tabs follow the store switch in the top bar (market.js) and can be flipped here. -->
+        <style>
+          .pv-tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 100px; padding: 3px; margin: 4px 0 22px; }
+          .pv-tabs button { border: 0; background: none; cursor: pointer; font: 500 12px/1 'DM Sans', sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--black); opacity: .7; padding: 10px 18px; border-radius: 100px; transition: background .2s, color .2s; }
+          .pv-tabs button[aria-pressed="true"] { background: var(--black); color: var(--white); opacity: 1; }
+          .pv-pane[hidden] { display: none; }
+        </style>
+        <div class="pv-tabs" id="privacy-us" role="group" aria-label="Privacy notice for">
+          <button type="button" data-pv="IN" aria-pressed="true">India</button>
+          <button type="button" data-pv="US" aria-pressed="false">United States</button>
+        </div>
+
+        <div class="pv-pane" id="pvIN">
         <h3>What we collect</h3>
         <ul>
           <li><strong>When you order:</strong> your name, phone number, email and delivery address.</li>
@@ -834,6 +849,68 @@
           preference and what is in your basket. Your basket stays on your own device and is not
           sent to us until you check out.
         </p>
+        </div><!-- /pvIN -->
+
+        <div class="pv-pane" id="pvUS" hidden>
+        <p>
+          This is the version for visitors in the United States. Urban Nest is a small, independent
+          project run from India, and a US visit works differently from an Indian one: for now we do
+          not take payment or ship orders in the US. The pieces are bought from the retailers we link to.
+        </p>
+
+        <h3>What we collect</h3>
+        <ul>
+          <li><strong>Just browsing:</strong> nothing that names you. Our host (Cloudflare) sees the
+              technical details every website sees, such as your browser type and a rough location
+              (your country), which we use to show you the right store.</li>
+          <li><strong>When you join, subscribe or write to us:</strong> your name and email, and whatever else
+              you choose to tell us.</li>
+        </ul>
+
+        <h3>Affiliate links</h3>
+        <div class="callout">
+          <p>
+            Some pieces link to a retailer such as Walmart or Amazon. If you buy through one of our links we
+            may earn a commission, at no extra cost to you. As an Amazon Associate we earn from qualifying
+            purchases. When you click, the retailer and its affiliate network may set cookies on their own
+            sites to record that you came from us. We do not see your purchase, your payment details or your
+            address. Their privacy policies apply there.
+          </p>
+        </div>
+
+        <h3>What we do with it</h3>
+        <ul>
+          <li>Answer you when you get in touch.</li>
+          <li>Send occasional updates, but only if you asked for them. Every email has an unsubscribe link.</li>
+          <li>We do not sell your personal information, and we do not share it for advertising across other
+              websites.</li>
+        </ul>
+
+        <h3>Who else sees it</h3>
+        <p>
+          Only the providers that run the site for us: our hosting and database providers, which may keep
+          data on servers outside the United States, including in India. We do not pass your details to anyone else.
+        </p>
+
+        <h3>Your rights</h3>
+        <p>
+          If you live in California or another US state with a privacy law, you can ask what personal information
+          we hold about you, ask us to correct or delete it, and ask us not to sell or share it (we do neither).
+          Email <a href="mailto:hello@storeurbannest.in">hello@storeurbannest.in</a> and we will reply within 45 days.
+          We will not treat you differently for asking.
+        </p>
+
+        <h3>Children</h3>
+        <p>
+          Urban Nest is not meant for children under 13, and we do not knowingly collect their information.
+        </p>
+
+        <h3>Cookies and browser storage</h3>
+        <p>
+          We use browser storage for practical things only: remembering your light or dark theme and your
+          choice of India or US store. Retailers we link to may set their own cookies once you leave our site.
+        </p>
+        </div><!-- /pvUS -->
       </section>
 
       <p style="font-size:13px;color:var(--grey);border-top:1px solid var(--border);padding-top:20px;">
@@ -867,6 +944,19 @@
 
 <script>
   function toggleNav() { document.getElementById('navLinks').classList.toggle('open'); }
+  // Privacy: India or US reading. Starts on the visitor's store, can be flipped, and #privacy-us opens the US one.
+  (function () {
+    var tabs = document.querySelectorAll('.pv-tabs button');
+    function show(m) {
+      document.getElementById('pvIN').hidden = m !== 'IN';
+      document.getElementById('pvUS').hidden = m !== 'US';
+      for (var i = 0; i < tabs.length; i++) tabs[i].setAttribute('aria-pressed', String(tabs[i].getAttribute('data-pv') === m));
+    }
+    for (var i = 0; i < tabs.length; i++) tabs[i].addEventListener('click', function () { show(this.getAttribute('data-pv')); });
+    function start() { show(location.hash === '#privacy-us' ? 'US' : (window.UNMarket ? UNMarket.current() : 'IN')); }
+    window.addEventListener('load', start);
+    document.addEventListener('un-market', function (e) { show(e.detail); });
+  })();
   (function () {
     var root = document.documentElement;
     var light = document.getElementById('themeLight');
@@ -888,5 +978,6 @@
   })();
 </script>
 
+<script src="join-nest.js" defer></script>
 </body>
 </html>

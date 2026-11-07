@@ -14,6 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Urban Nest"/>
 <script src="pwa.js" defer></script>
+<script src="market.js" defer></script>
 <meta name="description" content="Every room Urban Nest has built in 3D. Step into any of them and look around."/>
 <!-- The link-preview card WhatsApp and others show (same square card as the homepage). -->
 <meta property="og:type" content="website"/>
@@ -103,7 +104,7 @@
   /* one room: a single wide tile, not one stretched portrait */
   .rooms-grid.one { grid-template-columns: 1fr; max-width: 1080px; margin: 0 auto; }
   .rooms-grid.one .room-media { aspect-ratio: 16 / 9; }
-  /* two rooms (the Quiet Bath and the Sunday Bedroom, 25 Oct 2026): side by side, landscape covers; one above
+  /* three rooms now (the Quiet Bath, the Sunday Bedroom, the Heritage Lounge; first two 25 Oct 2026): side by side, landscape covers; one above
      the other on a phone (the grid's own auto-fit) */
   .rooms-grid.pair .room-media { aspect-ratio: 3 / 2; }
   .room {
@@ -529,6 +530,21 @@
         </div>
       </a>
 
+      <a class="room" href="/rooms/living-room/" id="roomHeritageLounge">
+        <div class="room-media">
+          <span class="room-badge">Living room</span>
+          <img src="images/room-lounge1.webp" alt="The Heritage Lounge: ink-blue walls, a cognac Chesterfield, a rosewood sideboard and a crystal chandelier by lamplight" loading="lazy" decoding="async"/>
+        </div>
+        <div class="room-body">
+          <div class="room-name">The Heritage Lounge</div>
+          <p class="room-desc">
+            Ink-blue walls, cognac leather and brass by lamplight. Walk round it, look closer at anything
+            on the sideboard, the coffee table or the walls, and see what each piece is.
+          </p>
+          <span class="room-go">Enter the room →</span>
+        </div>
+      </a>
+
     </div>
   </div>
 
@@ -589,5 +605,6 @@
     if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 4000 }); else setTimeout(go, 2500);
   })();
 </script>
+<script src="join-nest.js" defer></script>
 </body>
 </html>

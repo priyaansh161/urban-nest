@@ -304,18 +304,21 @@ box('Glass Panel', (GX, 0.70, 1.02), (0.010, 1.40, 2.00), M['glass'])
 for zz in (0.35, 1.65): box('Panel Clamp', (GX, Y1 - 0.035, zz), (0.045, 0.07, 0.12), M['blackmat'])
 box('Panel Foot Clamp', (GX, 0.05, 0.05), (0.04, 0.05, 0.08), M['blackmat'])
 box('Floor Drain', (SX, 0.35, 0.004), (0.7, 0.045, 0.008), M['chrome'])
-# black niche recessed 10 cm into the right wall, with bottles on its floor. Its boxes start 1 mm behind the
-# wall plane so no face of theirs lies in the wall surface (that flickered).
+# niche recessed 10 cm into the right wall. Its boxes start 1 mm behind the wall plane so no face of theirs lies
+# in the wall surface (that flickered). 2 Nov 2026: lined in the wall's own marble and lightmapped (it was flat
+# matte black and read as a hole); its bottles and washcloth are staging now (staging_bath.py).
 ND, E = 0.10, 0.001
-nb = [box('n', (X1 + ND + 0.005, NY, NZ), (0.01, ny1 - ny0 + 0.02, nz1 - nz0 + 0.02), M['blackmat']),
-      box('n', (X1 + E + ND / 2, NY, nz0 - 0.005), (ND, ny1 - ny0 + 0.02, 0.01), M['blackmat']), box('n', (X1 + E + ND / 2, NY, nz1 + 0.005), (ND, ny1 - ny0 + 0.02, 0.01), M['blackmat']),
-      box('n', (X1 + E + ND / 2, ny0 - 0.005, NZ), (ND, 0.01, nz1 - nz0), M['blackmat']), box('n', (X1 + E + ND / 2, ny1 + 0.005, NZ), (ND, 0.01, nz1 - nz0), M['blackmat'])]
-join(nb, 'Niche')
+nb = [box('n', (X1 + ND + 0.005, NY, NZ), (0.01, ny1 - ny0 + 0.02, nz1 - nz0 + 0.02), M['marble']),
+      box('n', (X1 + E + ND / 2, NY, nz0 - 0.005), (ND, ny1 - ny0 + 0.02, 0.01), M['marble']), box('n', (X1 + E + ND / 2, NY, nz1 + 0.005), (ND, ny1 - ny0 + 0.02, 0.01), M['marble']),
+      box('n', (X1 + E + ND / 2, ny0 - 0.005, NZ), (ND, 0.01, nz1 - nz0), M['marble']), box('n', (X1 + E + ND / 2, ny1 + 0.005, NZ), (ND, 0.01, nz1 - nz0), M['marble'])]
+join(nb, 'LM_Niche')
+niche = bpy.context.active_object
+for p in niche.data.polygons:                    # the marble at the walls' own scale (1.5 m slabs), projected per face
+    ax = max(range(3), key=lambda a: abs(p.normal[a])); u, v = [a for a in range(3) if a != ax]
+    for li in p.loop_indices:
+        co = niche.matrix_world @ niche.data.vertices[niche.data.loops[li].vertex_index].co
+        niche.data.uv_layers[0].data[li].uv = (co[u] / 1.5, co[v] / 1.5)
 box('Niche Glow', (X1 + ND / 2, NY, nz1 - 0.008), (ND - 0.02, ny1 - ny0 - 0.03, 0.006), M['glow'])
-cyl('Niche Bottle', (X1 + 0.05, NY - 0.09, nz0 + 0.09), 0.026, 0.18, M['blackmat'])
-cyl('Niche Pump', (X1 + 0.05, NY - 0.09, nz0 + 0.20), 0.007, 0.04, M['chrome'])
-cyl('Niche Jar', (X1 + 0.05, NY + 0.03, nz0 + 0.02), 0.035, 0.04, M['cream'])
-cyl('Niche Vial', (X1 + 0.05, NY + 0.11, nz0 + 0.06), 0.022, 0.12, M['amber'])
 
 # ---------------------------------------------------------------- mats
 # the toilet, vanity and shower mats are MK2 products, placed in the viewer
@@ -341,7 +344,12 @@ for d in PL['staging'] + PL['products']:
     if len(meshes) > 1: bpy.ops.object.join()
     bpy.context.active_object.name = 'LM_' + d['name']
     lightmap_prep(bpy.context.active_object, 1024)   # its own lightmap layout: Meshy's packed atlas bled light along its seams (streaks on the toilet)
+# staging decor (Nov 2026): no dots, lit live in the viewer, in the room for the bake and kept in the export
+sys.path.insert(0, OUT)
+import staging_bath
+STAGING = staging_bath.build(OUT, niche=(X1, ny0, ny1, nz0))
 lightmap_prep(vanity, 1024)
+lightmap_prep(niche, 256)
 # the shell: one lightmap per surface at ~4.5 mm a pixel (the ceiling, plain paint, at 9 mm)
 for ob, ul, vl in SHELL:
     d = 0.009 if ob.name == 'Shell_Ceiling' else 0.0045

@@ -6,6 +6,8 @@
   <title>Urban Nest · Curated Living Spaces</title>
   <meta name="description" content="The things that change a home are rarely expensive, just hard to find. Walk through rooms in 3D, turn each piece over, and find the small things that make a home."/>
   <link rel="icon" type="image/png" href="favicon.png"/>
+  <!-- Admitad (Mitgo) ad-space ownership verification -->
+  <meta name="mitgo-verification" content="bdd0e4f7-3581-4500-bb60-e712f7c25a24" />
   <!-- Installable app: manifest.webmanifest + sw.js (registered by pwa.js). -->
   <link rel="manifest" href="manifest.webmanifest"/>
   <meta name="theme-color" content="#0E3238" media="(prefers-color-scheme: light)"/>
@@ -15,6 +17,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-title" content="Urban Nest"/>
   <script src="pwa.js" defer></script>
+  <script src="market.js" defer></script>
 
   <!-- ── THE LINK PREVIEW ──
        What WhatsApp, Instagram DMs, iMessage, Slack and LinkedIn show when
@@ -1777,6 +1780,7 @@
     <div class="spaces-grid" id="spacesGrid">
       <a class="sp sp-a" href="/rooms/quiet-bath/"><span class="sp-media"><img src="images/cover-quiet-bath.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bathroom</span><span class="sp-name">The Quiet Bath</span></span></a>
       <a class="sp sp-a" href="/rooms/sunday-bedroom/"><span class="sp-media"><img src="images/cover-sunday-bedroom.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Bedroom</span><span class="sp-name">The Sunday Bedroom</span></span></a>
+      <a class="sp sp-full" href="/rooms/living-room/"><span class="sp-media"><img src="images/room-lounge1.webp" alt="" loading="lazy" decoding="async"/></span><span class="sp-cap"><span class="sp-room">Living room</span><span class="sp-name">The Heritage Lounge</span></span></a>
     </div>
   </section>
 
@@ -2341,7 +2345,7 @@
   :root { --jn-bg: #FFFFFF; --jn-ink: #0F1F22; --jn-dim: #586366; --jn-line: #CFDCD9; --jn-gold: #735427; --jn-lift: 0 2px 6px rgba(8,8,7,.09), 0 18px 40px rgba(8,8,7,.18); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --jn-bg: #0A2429; --jn-ink: #EAF2F1; --jn-dim: #7F9295; --jn-line: #1E4148; --jn-gold: #C2934D; --jn-lift: inset 0 0 0 1px rgba(234,242,241,.11), 0 16px 38px rgba(0,0,0,.5); } }
   :root[data-theme="dark"] { --jn-bg: #0A2429; --jn-ink: #EAF2F1; --jn-dim: #7F9295; --jn-line: #1E4148; --jn-gold: #C2934D; --jn-lift: inset 0 0 0 1px rgba(234,242,241,.11), 0 16px 38px rgba(0,0,0,.5); }
-  @media (max-width: 600px) { .jn { left: 12px; right: 12px; bottom: 12px; width: auto; padding: 20px 18px 16px; } .jn-t { font-size: 21px; } .jn-dot { right: 14px; bottom: 14px; width: 48px; height: 48px; } }
+  @media (max-width: 600px) { .jn { left: 18px; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom)); width: auto; padding: 20px 18px 16px; } .jn-t { font-size: 21px; } .jn-dot { right: max(22px, env(safe-area-inset-right)); bottom: calc(22px + env(safe-area-inset-bottom)); width: 48px; height: 48px; } }
   @media (prefers-reduced-motion: reduce) { .jn, .jn-dot { transition: none; } }
 </style>
 <aside class="jn" id="jn" role="dialog" aria-labelledby="jnT" aria-hidden="true">
@@ -2376,6 +2380,7 @@
     }
     // A first visit opens the card after a moment; after that, only the button shows.
     if (state && state.folded) dot.classList.add('show');
+    else if (matchMedia('(max-width: 600px)').matches) dot.classList.add('show');   // a phone has no room to spare: the button only, until it is tapped
     else setTimeout(open, 6000);
     dot.addEventListener('click', function () { open(); setTimeout(function () { document.getElementById('jnE').focus(); }, 300); });
     document.getElementById('jnX').addEventListener('click', fold);

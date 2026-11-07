@@ -42,6 +42,8 @@ const RULES = [
   { dir: 'rooms/quiet-bath/models', exts: ['.glb'],                       deep: false },
   { dir: 'rooms/sunday-bedroom',        exts: ['.html', '.json', '.glb'], deep: false },   // from mocks/room-bedroom
   { dir: 'rooms/sunday-bedroom/models', exts: ['.glb'],                   deep: false },
+  { dir: 'rooms/living-room',        exts: ['.html', '.json', '.glb'], deep: false },   // from mocks/room-living
+  { dir: 'rooms/living-room/models', exts: ['.glb'],                   deep: false },
   { dir: 'rooms/lib/three-0.160.0/build',                exts: ['.js'],   deep: false },
   { dir: 'rooms/lib/three-0.160.0/jsm/controls',         exts: ['.js'],   deep: false },
   { dir: 'rooms/lib/three-0.160.0/jsm/loaders',          exts: ['.js'],   deep: false },
