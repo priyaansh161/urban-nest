@@ -4,7 +4,7 @@
  * file's list. Add a line here when a new public page is added. */
 import { sb, UNUrls, ORIGIN } from './_seo.js';
 
-const PAGES = ['/', '/collection', '/essentials', '/spaces', '/community', '/rooms/quiet-bath/', '/rooms/sunday-bedroom/', '/rooms/living-room/', '/about', '/join', '/policies', '/look'];
+const PAGES = ['/', '/collection', '/essentials', '/spaces', '/community', '/rooms/quiet-bath/', '/rooms/sunday-bedroom/', '/about', '/join', '/policies', '/look'];
 
 export async function onRequestGet() {
   const [posts, cats, items] = await Promise.all([
