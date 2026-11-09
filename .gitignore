@@ -42,3 +42,6 @@ tools/regression/
 
 # Instagram API credentials for tools/ig-insights.mjs. Real token, never committed.
 tools/.ig-credentials.json
+
+# scratch moved here 2026-11-08
+_archive/

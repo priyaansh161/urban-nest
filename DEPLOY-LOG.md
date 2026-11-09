@@ -104,3 +104,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-11-06 | 22:24 | 1680249 (+ uncommitted changes) | Heritage Lounge v2: his Collection listings, sheesham table, navy walls, sofa fixes, phone viewer | https://d767a931.storeurbannest.pages.dev |
 | 2026-11-07 | 00:05 | 1680249 (+ uncommitted changes) | Heritage Lounge v3: painting view, staging, new cushions, resized pieces, lamps moved, window detail | https://6ea7082f.storeurbannest.pages.dev |
 | 2026-11-07 | 10:30 | a4d1f70 (+ uncommitted changes) | Deploy script now saves to GitHub after each deploy (no site change) | https://c9721f62.storeurbannest.pages.dev |
+| 2026-11-09 | 12:38 | e74e577 (+ uncommitted changes) | Heritage Lounge v4: clean window mouldings, sofa off the wall, clock + wall lamp orientation, detailed records/books/side tables, lounge in admin Rooms | https://06470762.storeurbannest.pages.dev |
