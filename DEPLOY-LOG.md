@@ -108,3 +108,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-11-09 | 13:34 | 809a8b3 | Heritage Lounge: furniture split out as movable pieces for admin Rooms (sofas, armchairs, sideboard, side tables) | https://e1816571.storeurbannest.pages.dev |
 | 2026-11-09 | 14:22 | 3dba426 | Heritage Lounge: ghost shadows removed, painting height fixed, stepped false ceiling with cove glow | https://79b9eb83.storeurbannest.pages.dev |
 | 2026-11-09 | 15:25 | f6bacc0 | Heritage Lounge: restore the layout he saved in admin (shadow-free floor, false ceiling stay) | https://7d73f893.storeurbannest.pages.dev |
+| 2026-11-09 | 15:40 | d6996e2 | Heritage Lounge: dark floor/wall marks filled in, cornice + window shading fixed, false ceiling cove glow | https://ad547815.storeurbannest.pages.dev |
