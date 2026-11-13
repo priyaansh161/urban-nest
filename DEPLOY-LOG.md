@@ -112,3 +112,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-11-09 | 19:12 | 3d741d4 (+ uncommitted changes) | Heritage Lounge taken down until it is finished: cards, sitemap, room page, admin entry off (redirects to /spaces) | https://3aa60a5f.storeurbannest.pages.dev |
 | 2026-11-13 | 15:14 | 41fa828 (+ uncommitted changes) | Heritage Lounge back live: wall panel mouldings, false ceiling with downlights, his layout baked, new canvas; festive dots now Occasional Pieces | https://600fbb14.storeurbannest.pages.dev |
 | 2026-11-13 | 16:08 | 034ee5e (+ uncommitted changes) | Mango wood stool: middle bar now joins both stretchers (listing model + Quiet Bath) | https://9c815e3f.storeurbannest.pages.dev |
+| 2026-11-13 | 16:30 | 4ba8ee2 (+ uncommitted changes) | Heritage Lounge: rebuilt Krishna Bansuri and rattan side table models | https://d635bee2.storeurbannest.pages.dev |
