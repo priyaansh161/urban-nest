@@ -20,5 +20,3 @@
 
 # storeurbannest.co.in and www. are forwarded to storeurbannest.in by
 # Redirect Rules in the Cloudflare dashboard; this file cannot match on domain.
-/rooms/living-room/  /spaces  302
-/rooms/living-room   /spaces  302
