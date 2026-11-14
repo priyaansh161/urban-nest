@@ -20,3 +20,7 @@ homecloud_mat 643d1344-6c58-40ab-8c2c-3317ed6a4594
 pickle_spoons ace72caf-f295-447d-9d8e-afe036d494dc
 dmaiolica c02bca89-2008-4cdb-bb4f-241e0f2ec89e
 knife_block 48410c20-4c17-471e-8141-2620d3f04818
+knives c65af49f-f8d4-402c-981e-6af2ae270066
+canway_mat 258b0233-7d09-4587-983f-f34abbe93d5f
+bag_holder 6970f7d6-2c64-4e7f-a0c3-41e8de7d56b0
+tissue_box 194251f4-6456-40ee-8fce-2a7f4c8879e5
