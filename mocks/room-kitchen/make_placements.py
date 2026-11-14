@@ -7,6 +7,9 @@ def P(id8, name, z, x, y, size, rot=0.0, **kw):
     r = items[id8]; d = dict(id=r['id'], name=name, file='final/%s.glb' % id8, listing=r['name'], link=r.get('buy_link'), tag='ESSENTIALS · KITCHEN',
                              pos=[x, z, -y]); d.update(size); 
     if rot: d['rotY'] = rot
+    desc = ' '.join((r.get('description') or '').split()); desc = desc.split('. ')[0].rstrip('.') + '.' if desc else ''
+    d['desc'] = desc[:220]
+    d['specs'] = [s for s in (r.get('specs') or []) if s[0] in ('Material', 'Material Type', 'Colour', 'Item Dimensions L x W x H', 'Product Dimensions', 'Item Dimensions L x W', 'Item Dimensions D x W x H', 'Item Dimensions W x H', 'Brand', 'Brand Name', 'Capacity')][:3]
     d.update(kw); return d
 H = lambda h: {'height': h}; L = lambda l: {'length': l}
 Q = 1.5708
