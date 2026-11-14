@@ -61,10 +61,19 @@ def coconut_opener():
 def sink_mat():
     # a grey silicone tray: rounded rim, chevron drain ridges, a pour spout in the front edge, satin silicone
     reset(); G = pmat('Grey Silicone', (0.36, 0.37, 0.39), 0.6)
-    b = slab('Tray', rrect(0.300, 0.100, 0.018, 12), 0, 0.016, G, bevel=0.003, bseg=4)
-    cut(b, slab('cut', rrect(0.288, 0.088, 0.013, 12), 0.0040, 0.05, None, bevel=0, keep=False))
-    sp = cutter_box((-0.105, -0.047, 0.0145), (0.032, 0.020, 0.012)); cut(b, sp)
-    lip = slab('Spout', rrect(0.032, 0.016, 0.006, 8), 0.0, 0.0045, G, bevel=0.0012); lip.location = (-0.105, -0.056, 0)
+    SX = -0.040                                                   # spout ~a third in from the left, as in the photos
+    def bow(pts, A=0.011, sw=0.020):                              # the front edge swells smoothly out into the spout tongue
+        return [(x, y - A * math.exp(-((x - SX) / sw) ** 2)) if y < 0 else (x, y) for x, y in pts]
+    def dense(w, d, r):                                           # rrect with the straight front edge subdivided so it can bow
+        pts = rrect(w, d, r, 12); out = []
+        for i, p in enumerate(pts):
+            q = pts[(i + 1) % len(pts)]; out.append(p)
+            if abs(p[1] - q[1]) < 1e-9 and p[1] < 0:
+                for k in range(1, 60): out.append((p[0] + (q[0] - p[0]) * k / 60, p[1]))
+        return out
+    b = slab('Tray', bow(dense(0.300, 0.100, 0.018)), 0, 0.016, G, bevel=0.003, bseg=4)
+    cut(b, slab('cut', bow(dense(0.288, 0.088, 0.013), 0.010, 0.017), 0.0040, 0.05, None, bevel=0, keep=False))
+    cut(b, cutter_cyl(0.011, 0.040, (SX, -0.068, 0.0040 + 0.011), rot=(math.pi / 2, 0, 0), v=64))   # U-shaped pour notch in the rim
     ang = math.radians(35); L2 = 0.016
     for i in range(-4, 5):
         for s_, yc in ((1, 0.019), (-1, -0.019)):
