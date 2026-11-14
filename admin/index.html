@@ -241,7 +241,7 @@
       <div class="card kpi"><div class="lbl">Visits</div><div class="val" id="kVisits">—</div><div class="sub" id="kVisitsSub">&nbsp;</div></div>
       <div class="card kpi"><div class="lbl">Page views</div><div class="val" id="kViews">—</div><div class="sub" id="kViewsSub">&nbsp;</div></div>
       <div class="card kpi"><div class="lbl">Pages per visit</div><div class="val" id="kDepth">—</div><div class="sub" id="kDepthSub">&nbsp;</div></div>
-      <div class="card kpi"><div class="lbl">Reached a room</div><div class="val" id="kRoom">—</div><div class="sub" id="kRoomSub">&nbsp;</div></div>
+      <div class="card kpi"><div class="lbl">Room views</div><div class="val" id="kRoom">—</div><div class="sub" id="kRoomSub">&nbsp;</div></div>
     </div>
 
     <div class="grid2" style="margin-top:14px">
@@ -364,7 +364,7 @@ function drawChart(series) {
   const line = k => pts.map((q, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(q[k]).toFixed(1)).join(' ');
   const grid = [0, .5, 1].map(f => `<line x1="${L}" x2="${W - R}" y1="${y(top * f)}" y2="${y(top * f)}" stroke="#E6EAE9"/><text x="${L - 8}" y="${y(top * f) + 4}" text-anchor="end">${fmt(Math.round(top * f))}</text>`).join('');
   const every = Math.ceil(pts.length / 8);
-  const labels = pts.map((q, i) => i % every && i !== pts.length - 1 ? '' :
+  const labels = pts.map((q, i) => (i % every || (i !== pts.length - 1 && pts.length - 1 - i < every)) && i !== pts.length - 1 ? '' :
     `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${new Date(q.d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</text>`).join('');
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML = grid + labels +
@@ -394,29 +394,35 @@ function renderTraffic(d) {
   $('kDepth').textContent = depth.toFixed(1); $('kDepthSub').innerHTML = pdepth ? delta(depth, pdepth) : '<span class="muted">no earlier data</span>';
   drawChart(d.series);
 
-  // Sections: visits that loaded each kind of page
+  // Sections, by PAGE VIEWS. Cloudflare credits a "visit" only to the page someone lands on,
+  // so a Home → Spaces → room walk counts 0 visits for Spaces and the room. Views count every load.
   const sec = {};
-  for (const r of d.pages) { const s = sectionOf(r.key); sec[s] = sec[s] || { v: 0, p: 0 }; sec[s].v += r.visits; sec[s].p += r.pageviews; }
-  const total = Math.max(1, t.visits);
-  const room = sec['A room']?.v || 0;
-  $('kRoom').textContent = Math.round(room / total * 100) + '%';
-  $('kRoomSub').textContent = fmt(room) + ' visits opened a 3D room';
+  for (const r of d.pages) { const s = sectionOf(r.key); sec[s] = (sec[s] || 0) + r.pageviews; }
+  const totalViews = Math.max(1, t.pageviews);
+  const room = sec['A room'] || 0;
+  $('kRoom').textContent = fmt(room);
+  $('kRoomSub').textContent = Math.round(room / totalViews * 100) + '% of all page views';
   const steps = ['Home', 'Spaces', 'A room', 'Piece page', 'Collection', 'Essentials', 'Nest Edit'];
   $('funnel').innerHTML = steps.map(s => {
-    const v = sec[s]?.v || 0, pct = Math.round(v / total * 100);
+    const v = sec[s] || 0, pct = Math.round(v / totalViews * 100);
     return `<div class="step"><span>${s}</span><div class="track"><div class="fill" style="width:${Math.max(pct, v ? 1 : 0)}%;${['Collection','Essentials','Nest Edit'].includes(s) ? 'background:var(--gold)' : ''}"></div></div>
-      <span class="num">${pct}%<small>${fmt(v)} visits</small></span></div>`;
+      <span class="num">${pct}%<small>${fmt(v)} views</small></span></div>`;
   }).join('');
 
   const top = [...d.pages].sort((a, b) => b.pageviews - a.pageviews).slice(0, 10);
-  $('topPages').innerHTML = `<table><tr><th>Page</th><th>Views</th><th>Visits</th></tr>` +
+  $('topPages').innerHTML = `<table><tr><th>Page</th><th>Views</th><th title="Visits that started on this page">Landed here</th></tr>` +
     top.map(r => `<tr><td><a href="${esc(r.key)}" target="_blank" title="${esc(r.key)}">${esc(r.key)}</a></td><td>${fmt(r.pageviews)}</td><td>${fmt(r.visits)}</td></tr>`).join('') + '</table>';
 
-  const pctOf = n => Math.round(n / total * 100);
-  bars($('refs'), d.referrers.map(r => ({ k: (r.key || 'Direct / app / unknown').replace(/^www\./, ''), n: r.visits, pct: pctOf(r.visits) })).slice(0, 8));
-  bars($('countries'), d.countries.map(r => ({ k: countryName(r.key), n: r.visits, pct: pctOf(r.visits) })).slice(0, 8));
-  bars($('devices'), d.devices.map(r => ({ k: r.key ? r.key[0].toUpperCase() + r.key.slice(1) : 'Unknown', n: r.visits, pct: pctOf(r.visits) })), { gold: true });
-  bars($('browsers'), d.browsers.map(r => ({ k: r.key || 'Unknown', n: r.visits, pct: pctOf(r.visits) })).slice(0, 5), { gold: true });
+  // Referrers are what start a visit, so they stay in visits; clicks between our own pages are not a source.
+  const OWN = /(^|\.)storeurbannest\.(in|co\.in|pages\.dev)$/i;
+  const totalVisits = Math.max(1, t.visits);
+  bars($('refs'), d.referrers.filter(r => r.visits > 0 && !OWN.test(r.key || ''))
+    .map(r => ({ k: (r.key || 'Direct / app / unknown').replace(/^www\./, ''), n: r.visits, pct: Math.round(r.visits / totalVisits * 100) })).slice(0, 8));
+  // Who is looking: by page views, so nobody drops to 0 just because they landed elsewhere.
+  const byViews = (rows, name) => rows.filter(r => r.pageviews > 0).map(r => ({ k: name(r.key), n: r.pageviews, pct: Math.round(r.pageviews / totalViews * 100) }));
+  bars($('countries'), byViews(d.countries, countryName).slice(0, 8));
+  bars($('devices'), byViews(d.devices, k => k ? k[0].toUpperCase() + k.slice(1) : 'Unknown'), { gold: true });
+  bars($('browsers'), byViews(d.browsers, k => k || 'Unknown').slice(0, 5), { gold: true });
 }
 
 function sampleTraffic() {
