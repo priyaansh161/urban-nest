@@ -1767,7 +1767,7 @@
       document.getElementById('pageHero').hidden = true;
       var hero = document.getElementById('catHero');
       hero.hidden = false;
-      document.title = cat.name + ' · The Collection · Urban Nest';
+      if (!window.UN_SEO) document.title = cat.name + ' · The Collection · Urban Nest';
 
       var img = catImage(cat, 'hero');
       var media = document.getElementById('catHeroMedia');

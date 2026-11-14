@@ -15,3 +15,8 @@ garlic_press b46a7d38-021d-4c5c-bea0-d64c4a980cd4
 coconut_opener b4867f61-c3fd-4743-881f-27e05ea7bac4
 butter_dish 3bc04eb5-4cd9-4a4b-888d-8044c7fea590
 mugs 04283da4-9167-45c5-9612-437410f87051
+glen_stove d0ccbf0a-de62-4f01-9823-743d4b1bf189
+homecloud_mat 643d1344-6c58-40ab-8c2c-3317ed6a4594
+pickle_spoons ace72caf-f295-447d-9d8e-afe036d494dc
+dmaiolica c02bca89-2008-4cdb-bb4f-241e0f2ec89e
+knife_block 48410c20-4c17-471e-8141-2620d3f04818
