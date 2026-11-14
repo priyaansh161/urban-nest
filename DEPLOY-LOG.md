@@ -114,3 +114,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-11-13 | 16:08 | 034ee5e (+ uncommitted changes) | Mango wood stool: middle bar now joins both stretchers (listing model + Quiet Bath) | https://9c815e3f.storeurbannest.pages.dev |
 | 2026-11-13 | 16:30 | 4ba8ee2 (+ uncommitted changes) | Heritage Lounge: rebuilt Krishna Bansuri and rattan side table models | https://d635bee2.storeurbannest.pages.dev |
 | 2026-11-14 | 15:11 | 643e7b6 (+ uncommitted changes) | Admin dashboard redesign: Cloudflare traffic (visits, pages, path into rooms, referrers, countries, devices) via server-side /api/admin-analytics, catalogue counts with 3D, Amazon link health, smaller feedback | https://552ae878.storeurbannest.pages.dev |
+| 2026-11-14 | 15:18 | 75157bb | Redeploy so the admin dashboard picks up the new Cloudflare analytics secrets | https://8207831a.storeurbannest.pages.dev |
