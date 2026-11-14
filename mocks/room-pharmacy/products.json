@@ -1,0 +1,368 @@
+[
+ {
+  "key": "amber_cr",
+  "name": "Amber Vials, Child Resistant",
+  "tag": "VIALS",
+  "page": "https://pharmvials.com/product/13dr-amber-vials-child-resistant/",
+  "link": "https://pharmvials.com/product-category/vials/child-resistant-vials/",
+  "desc": "Our child-resistant vials are designed to keep medications safe from children and pets while remaining easy for staff and clients to use.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "320"
+   ],
+   [
+    "Vial Volume (DR)",
+    "13DR"
+   ],
+   [
+    "Color",
+    "Amber"
+   ],
+   [
+    "Vial Closure Type",
+    "Child Resistant"
+   ]
+  ]
+ },
+ {
+  "key": "blue_cr",
+  "name": "Blue Vials, Child Resistant",
+  "tag": "VIALS",
+  "page": "https://pharmvials.com/product/13dr-blue-vials-child-resistant/",
+  "link": "https://pharmvials.com/product-category/vials/child-resistant-vials/",
+  "desc": "Our child-resistant vials are designed to keep medications safe from children and pets while remaining easy for staff and clients to use.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "320"
+   ],
+   [
+    "Vial Volume (DR)",
+    "13DR"
+   ],
+   [
+    "Color",
+    "Blue"
+   ],
+   [
+    "Vial Closure Type",
+    "Child Resistant"
+   ]
+  ]
+ },
+ {
+  "key": "snap",
+  "name": "Snap Cap Vials, Amber and Blue",
+  "tag": "VIALS",
+  "page": "https://pharmvials.com/product/13dr-amber-vials-snap-cap/",
+  "link": "https://pharmvials.com/product-category/vials/snap-cap-vials/",
+  "desc": "Designed for patients who need a hassle-free alternative to child-resistant packaging. User-Friendly Design: Easy-to-open snap caps with a leak-resistant seal.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "360"
+   ],
+   [
+    "Vial Volume (DR)",
+    "13DR"
+   ],
+   [
+    "Color",
+    "Amber"
+   ],
+   [
+    "Vial Closure Type",
+    "Snap Cap"
+   ]
+  ]
+ },
+ {
+  "key": "cutter",
+  "name": "Multiple Pill Cutter",
+  "tag": "PHARMACY SUPPLIES",
+  "page": "https://pharmvials.com/product/multiple-pill-cutter/",
+  "link": "https://pharmvials.com/product/multiple-pill-cutter/",
+  "desc": "Our Multiple Pill Cutter is designed for efficient and accurate splitting of multiple pills at once, making medication management easier for pharmacies, caregivers, and individuals.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "1"
+   ],
+   [
+    "Product Type",
+    "Multiple Pill Cutter"
+   ]
+  ]
+ },
+ {
+  "key": "scale",
+  "name": "Digital Laboratory Scale, 310 g",
+  "tag": "PHARMACY SUPPLIES",
+  "page": "https://pharmvials.com/product/digital-laboratory-scale-310g/",
+  "link": "https://pharmvials.com/product/digital-laboratory-scale-310g/",
+  "desc": "Digital Laboratory Scale 310g: This precision digital balance scale offers 0.01g accuracy with a capacity of up to 310g.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "1"
+   ],
+   [
+    "Product Type",
+    "Digital Scale"
+   ],
+   [
+    "Precision",
+    "0.01g"
+   ]
+  ]
+ },
+ {
+  "key": "boats",
+  "name": "Weighing Boats",
+  "tag": "PHARMACY SUPPLIES",
+  "page": "https://pharmvials.com/product/weighing-boat-medium/",
+  "link": "https://pharmvials.com/product/weighing-boat-medium/",
+  "desc": "Weighing Boat: Designed for precise and efficient weighing, these disposable weighing boats provide a reliable solution for laboratory and pharmaceutical applications.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "500"
+   ],
+   [
+    "Product Type",
+    "Weighing Boat"
+   ],
+   [
+    "Material Type",
+    "Polystyrene"
+   ]
+  ]
+ },
+ {
+  "key": "label",
+  "name": "Paxxol 4.625 x 2.125 in Thermal Direct Label",
+  "tag": "THERMAL LABELS",
+  "page": "https://pharmvials.com/product/paxxol-4-625x2-125-thermal-direct-label/",
+  "link": "https://pharmvials.com/product/paxxol-4-625x2-125-thermal-direct-label/",
+  "desc": "Our high-performance thermal direct labels are designed to meet the demanding needs of pharmacies and automated dispensing systems.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "12 Rolls of 500 labels"
+   ],
+   [
+    "Product Type",
+    "Thermal Label"
+   ],
+   [
+    "Material Type",
+    "Thermal Direct , Permanent"
+   ],
+   [
+    "Compatibility Software",
+    "Fillware, Kroll, PharmaClik"
+   ]
+  ]
+ },
+ {
+  "key": "receipt",
+  "name": "Paxxol 3.375 x 4.25 in Thermal Direct Receipt",
+  "tag": "THERMAL LABELS",
+  "page": "https://pharmvials.com/product/paxxol-3-375x4-25-thermal-direct-receipt/",
+  "link": "https://pharmvials.com/product/paxxol-3-375x4-25-thermal-direct-receipt/",
+  "desc": "Paxxol 3.375 x 4.25 Thermal Direct Receipt: These high-quality thermal direct receipt labels provide sharp, clear printing without the need for ink or ribbons.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "12 Rolls of 900 Receipts"
+   ],
+   [
+    "Product Type",
+    "Thermal Label"
+   ],
+   [
+    "Material Type",
+    "Thermal Direct , Permanent"
+   ],
+   [
+    "Compatibility Software",
+    "Fillware, Kroll, PharmaClik, WinRx"
+   ]
+  ]
+ },
+ {
+  "key": "tape",
+  "name": "Prescription Clear Label Tape",
+  "tag": "LABELS",
+  "page": "https://pharmvials.com/product/prescription-clear-label-tape/",
+  "link": "https://pharmvials.com/product/prescription-clear-label-tape/",
+  "desc": "Prescription Clear Label Tape: This high-quality, transparent tape is designed for easy application of prescription labels.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "1"
+   ],
+   [
+    "Product Type",
+    "Prescription Tape"
+   ]
+  ]
+ },
+ {
+  "key": "syringes",
+  "name": "Oral Syringes",
+  "tag": "PHARMACY SUPPLIES",
+  "page": "https://pharmvials.com/product/oral-syringes-5ml/",
+  "link": "https://pharmvials.com/product/oral-syringes-5ml/",
+  "desc": "Our high-quality Oral Syringes are designed to provide precise and reliable medication dosing for both pharmacy and home use.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "100"
+   ],
+   [
+    "Product Type",
+    "Oral Syringe"
+   ],
+   [
+    "Size",
+    "5ml"
+   ],
+   [
+    "Material Type",
+    "Plastic"
+   ]
+  ]
+ },
+ {
+  "key": "jumbo",
+  "name": "Paxxol Jumbo Blister Pack",
+  "tag": "COMPLIANCE PACKAGING",
+  "page": "https://pharmvials.com/product/paxxol-jumbo-blister-pack/",
+  "link": "https://pharmvials.com/product/paxxol-jumbo-blister-pack/",
+  "desc": "Jumbo Blister Pack: Designed for high-volume prescriptions, the Jumbo pack includes four daily slots with added space, ensuring secure, organized medication management.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "Blister -250 , Cards -250"
+   ],
+   [
+    "Product Type",
+    "Adherence Package"
+   ],
+   [
+    "Size",
+    "47"
+   ],
+   [
+    "Color",
+    "Transparent"
+   ]
+  ]
+ },
+ {
+  "key": "twin",
+  "name": "Paxxol Twin Blister Pack",
+  "tag": "COMPLIANCE PACKAGING",
+  "page": "https://pharmvials.com/product/paxxol-twin-blister-pack/",
+  "link": "https://pharmvials.com/product/paxxol-twin-blister-pack/",
+  "desc": "Twin Blister Pack: offers secure, tamper-evident storage with two daily time slots: breakfast and bedtime. Its cold-seal, easy-to-fill design ensures efficient medication setup without heat sealing.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "Blister -250 , Cards -250"
+   ],
+   [
+    "Product Type",
+    "Adherence Package"
+   ],
+   [
+    "Size",
+    "27"
+   ],
+   [
+    "Color",
+    "Transparent"
+   ]
+  ]
+ },
+ {
+  "key": "trifold",
+  "name": "Paxxol Tri-Fold Blister Pack",
+  "tag": "COMPLIANCE PACKAGING",
+  "page": "https://pharmvials.com/product/paxxol-tri-fold-blister-pack/",
+  "link": "https://pharmvials.com/product/paxxol-tri-fold-blister-pack/",
+  "desc": "Tri-Fold Blister Pack: The Tri-Fold card is designed to improve medication adherence for patients on complex oral solid medication regimens while optimizing pharmacy workflow.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "Blister -250 , Cards -250"
+   ],
+   [
+    "Product Type",
+    "Adherence Package"
+   ],
+   [
+    "Size",
+    "47"
+   ],
+   [
+    "Color",
+    "Transparent"
+   ]
+  ]
+ },
+ {
+  "key": "tray",
+  "name": "Jumbo Assembly Tray",
+  "tag": "COMPLIANCE PACKAGING",
+  "page": "https://pharmvials.com/product/jumbo-assembly-tray/",
+  "link": "https://pharmvials.com/product/jumbo-assembly-tray/",
+  "desc": "Jumbo Assembly Tray: Engineered for precision, our assembly tray is designed to perfectly fit our Jumbo Blister Pack with 28 cavities.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "1"
+   ],
+   [
+    "Product Type",
+    "Accessories"
+   ],
+   [
+    "Size",
+    "27"
+   ],
+   [
+    "Color",
+    "Transparent"
+   ]
+  ]
+ },
+ {
+  "key": "roller",
+  "name": "Compliance Pack Roller, 10 cm",
+  "tag": "COMPLIANCE PACKAGING",
+  "page": "https://pharmvials.com/product/compliance-pack-roller-10-cm/",
+  "link": "https://pharmvials.com/product/compliance-pack-roller-10-cm/",
+  "desc": "Compliance Pack Roller 10 cm: This essential tool ensures secure and even sealing of compliance blister packs by applying consistent pressure.",
+  "specs": [
+   [
+    "Quantity in Box",
+    "1"
+   ],
+   [
+    "Product Type",
+    "Accessories"
+   ],
+   [
+    "Width",
+    "10cm"
+   ],
+   [
+    "Color",
+    "Transparent"
+   ]
+  ]
+ }
+]

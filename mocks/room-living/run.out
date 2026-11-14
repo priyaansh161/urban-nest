@@ -1,0 +1,30 @@
+01:22.390  render           | Saved: 'C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-living\living_quick_corner.png'
+01:48.046  render           | Saved: 'C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-living\living_quick_corner2.png'
+02:12.984  render           | Saved: 'C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-living\living_quick_door.png'
+02:35.765  render           | Saved: 'C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-living\living_quick_sofa.png'
+02:58.703  render           | Saved: 'C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-living\living_quick_plan.png'
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+DracoDecoder | Decoded 336825 vertices, 506109 indices
+DracoDecoder | Decoded 329863 vertices, 1850616 indices
+DracoDecoder | Decoded 482816 vertices, 2773338 indices
+DracoDecoder | Decoded 1089656 vertices, 6109506 indices
+DracoDecoder | Decoded 366648 vertices, 1193460 indices
+DracoDecoder | Decoded 143091 vertices, 323796 indices
+DracoDecoder | Decoded 271617 vertices, 1447728 indices
+DracoDecoder | Decoded 50871 vertices, 185580 indices
+DracoDecoder | Decoded 298850 vertices, 1378656 indices
+DracoDecoder | Decoded 268970 vertices, 1451718 indices
+DracoDecoder | Decoded 16767 vertices, 82620 indices
+DracoDecoder | Decoded 18622 vertices, 87312 indices
+DracoDecoder | Decoded 388283 vertices, 2205828 indices
+DracoDecoder | Decoded 138750 vertices, 759726 indices
+DracoDecoder | Decoded 80056 vertices, 183363 indices
+DracoDecoder | Decoded 45783 vertices, 215970 indices
+TRIS LM_Sofa 8050
+TRIS LM_Loveseat 6766
+TRIS LM_Armchair1 3680
+TRIS LM_Armchair2 3680
+TRIS LM_Sideboard 2300
+TRIS LM_SideTableA 2276
+TRIS LM_SideTableB 2276
+DONE quick

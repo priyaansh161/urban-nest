@@ -1,0 +1,2188 @@
+C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-pharmacy\build_pharmacy.py:101: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  tm = bpy.data.materials.new('Backsplash tile'); tm.use_nodes = True
+C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-pharmacy\build_pharmacy.py:280: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  sc.world = bpy.data.worlds.new('w'); sc.world.use_nodes = True
+product amber_cr -> Vial amber 40 CR size cm [19, 15, 10]
+product blue_cr -> Vial blue 40 CR size cm [19, 15, 10]
+product snap -> Vial blue 40 snap size cm [12, 11, 9]
+product cutter -> Cutter lid size cm [11, 9, 3]
+product scale -> Digital scale size cm [22, 28, 8]
+product boats -> Weighing boat.001 size cm [10, 10, 3]
+product label -> Printer body size cm [38, 31, 16]
+product receipt -> Receipt roll size cm [18, 31, 11]
+product tape -> Clear label tape size cm [10, 10, 5]
+product syringes -> Methadone cup size cm [5, 6, 13]
+product gloves -> Gloves box.001 size cm [26, 18, 17]
+product jumbo -> Jumbo open grid size cm [48, 33, 1]
+product twin -> Twin grid size cm [30, 36, 11]
+product trifold -> Tri-Fold closed grid size cm [32, 37, 3]
+product tray -> Filling tray size cm [28, 34, 2]
+product roller -> Roller drum size cm [13, 14, 8]
+BAKING 12 lightmaps
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+Info: Baking map saved to internal image, save it externally or pack it
+BAKE gain 0.197
+LIGHTMAP LM_Counter 2048 px, mean 0.144
+LIGHTMAP LM_BaseCabinets 2048 px, mean 0.142
+LIGHTMAP LM_WallCabinets 2048 px, mean 0.39
+LIGHTMAP LM_Skirting 512 px, mean 0.001
+LIGHTMAP LM_Backsplash 1024 px, mean 0.023
+LIGHTMAP Shell_Floor 1024 px, mean 0.387
+LIGHTMAP Shell_Ceiling 512 px, mean 0.416
+LIGHTMAP Shell_WallBack 1024 px, mean 0.176
+LIGHTMAP Shell_WallFront 1024 px, mean 0.42
+LIGHTMAP Shell_WallLeft 1024 px, mean 0.264
+LIGHTMAP Shell_WallRight 1024 px, mean 0.245
+LIGHTMAP LM_Machine 2048 px, mean 0.235
+triangles 900352
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+19:15:00 | INFO: Starting glTF 2.0 export
+19:15:00 | INFO: Extracting primitive: Cube.135
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.134
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.133
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.132
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.131
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.130
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.129
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.128
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.127
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.126
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.125
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.124
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.123
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.106
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.105
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.104
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.077
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.078
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.079
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.080
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.081
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.082
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.083
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.084
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.085
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.086
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.087
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.088
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.089
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.001
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.002
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.003
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.004
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.005
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.006
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.007
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.008
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.009
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.010
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.011
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.012
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.013
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.014
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.015
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.016
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.017
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.018
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.019
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.020
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Capsule on tray.021
+19:15:00 | INFO: Primitives created: 1
+19:15:00 | INFO: Extracting primitive: Cube.069
+19:15:00 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.049
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.048
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.047
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.071
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.073
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.075
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.046
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.045
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.072
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.074
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.076
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.304
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.305
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.306
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.307
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Clear label tape
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Tape core
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Tape print
+19:15:01 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.311
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.313
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.314
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.315
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.316
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.317
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.318
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.319
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.320
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.321
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.322
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.323
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.324
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.325
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.326
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.327
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.328
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.329
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.330
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.331
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.332
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.333
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.334
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.335
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.336
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.337
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.338
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.339
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.340
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.341
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.342
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.343
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.344
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.345
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.346
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.347
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.348
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.349
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.350
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.351
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.352
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.353
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.354
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.355
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.356
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.357
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.358
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.359
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.360
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.361
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.362
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.363
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.364
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.365
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.366
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.367
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.368
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.369
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.370
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.371
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.372
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.373
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.374
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.375
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.376
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.377
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.378
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.379
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.380
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.381
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.382
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.384
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.385
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.386
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.387
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.388
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.389
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.390
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.391
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.392
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.393
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.394
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.395
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.396
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.397
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.398
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.399
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.400
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.401
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.402
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.403
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.404
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.405
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.406
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.312
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.308
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.310
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Monitor base
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.309
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Monitor screen
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Sphere.022
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.407
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.383
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.433
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.434
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.436
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.435
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Tray body.001
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Digital scale
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.010
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Scale foot
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Scale foot.001
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Scale foot.002
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Scale foot.003
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.011
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Scale panel
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.050
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.056
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.090
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.096
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.062
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.102
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.055
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.061
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.095
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Cube.101
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Empty vial
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Empty vial cap
+19:15:01 | INFO: Primitives created: 1
+19:15:01 | INFO: Extracting primitive: Circle.014
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.221
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.222
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.223
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.224
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.225
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.226
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.227
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.228
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.229
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.230
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.231
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.232
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.233
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.234
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.235
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.236
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.237
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.238
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.239
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.240
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.241
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.242
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.243
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.244
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.245
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.246
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.247
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.248
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.249
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Finished Rx
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.024
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.025
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.026
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.027
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.028
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.029
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.030
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.031
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.032
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.033
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.034
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.035
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.036
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.037
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.038
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.039
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.040
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.041
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.042
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.043
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.044
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.045
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.046
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.047
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.048
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.049
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.050
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.051
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.052
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.053
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.054
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.055
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.056
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.057
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.058
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.059
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.060
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.061
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.062
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.063
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.064
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.065
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Finished Rx cap
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Circle.011
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Label
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Finished Rx blue
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.066
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.067
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.068
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.069
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.070
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.071
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.072
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.073
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.074
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.075
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.076
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.077
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.078
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.079
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.080
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.081
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.082
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Capsule.083
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Finished Rx blue cap
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Circle.012
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Label.001
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Glove
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.020
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Jumbo closed grid
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.193
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.194
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.195
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.196
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.197
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.198
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.199
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.200
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.201
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.202
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.203
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.204
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.205
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.206
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.207
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.208
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.209
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.210
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.211
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.212
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.213
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.214
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.215
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.216
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.217
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.218
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.219
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Cube.220
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.154
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.155
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.156
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.157
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.158
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.159
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.160
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.161
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.162
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.163
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.164
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.165
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.166
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.167
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.168
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.169
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.170
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.171
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.172
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.173
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.174
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.175
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.176
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.177
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.178
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.179
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.180
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.181
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.182
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.183
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.184
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.185
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.186
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.187
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.188
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.189
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.190
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.191
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.192
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.193
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.194
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.195
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.196
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.197
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.198
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.199
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.200
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.201
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.202
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.203
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.204
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.205
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.206
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.207
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.208
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.209
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.210
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.211
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.212
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.213
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.214
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.215
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.216
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.217
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.218
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.219
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.220
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.221
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.222
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.223
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.224
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.225
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.226
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.227
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.228
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.229
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.230
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.231
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.232
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.233
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.234
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Dose capsule.235
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.101
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.102
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.103
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.104
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.105
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.106
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.107
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.108
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.109
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.110
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.111
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.112
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.113
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.114
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.115
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.116
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.117
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.118
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.119
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.120
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.121
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.122
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.123
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.124
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.125
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.126
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.127
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.128
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.129
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.130
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.131
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.132
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.133
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.134
+19:15:02 | INFO: Primitives created: 1
+19:15:02 | INFO: Extracting primitive: Tablet.135
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Jumbo closed label side
+19:15:03 | INFO: Primitives created: 2
+19:15:03 | INFO: Extracting primitive: Jumbo open grid
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.266
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.265
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.264
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.263
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.262
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.261
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.260
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.259
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.258
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.257
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.256
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.255
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.254
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.136
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.137
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.138
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.139
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.140
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.141
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.142
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.143
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.144
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.145
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.146
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.147
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.148
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.149
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Cube.150
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.001
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.002
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.003
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.004
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.005
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.006
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.007
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.008
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.009
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.010
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.011
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.012
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.013
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.014
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.015
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.016
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.017
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.018
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.019
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.020
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.021
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.022
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.023
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.024
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.025
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.026
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.027
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.028
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.029
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.030
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.031
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.032
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.033
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.034
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.035
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.036
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.037
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.038
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Dose capsule.039
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.006
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.007
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.008
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.009
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.010
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.011
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.012
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.013
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.014
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.015
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.016
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.017
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.018
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.019
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.020
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.021
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.022
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.023
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.024
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.025
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.026
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.027
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.028
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.029
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.030
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.136
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.137
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.138
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.139
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.140
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Tablet.141
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Jumbo open label side
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Label roll
+19:15:03 | INFO: Primitives created: 3
+19:15:03 | INFO: Extracting primitive: Label roll back
+19:15:03 | INFO: Primitives created: 3
+19:15:03 | INFO: Extracting primitive: Labelled vial
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.085
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.084
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.087
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.086
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.089
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.088
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.091
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.090
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.093
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.092
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.095
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.094
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.097
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.096
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.099
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.098
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.101
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.100
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.103
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.102
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.105
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.104
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.107
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Capsule.106
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Label.002
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Labelled vial cap
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: Circle.013
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: LM_Backsplash
+19:15:03 | INFO: Primitives created: 1
+19:15:03 | INFO: Extracting primitive: LM_BaseCabinets
+19:15:04 | INFO: Primitives created: 2
+19:15:04 | INFO: Extracting primitive: LM_Counter
+19:15:04 | INFO: Primitives created: 1
+19:15:04 | INFO: Extracting primitive: LM_Machine
+19:15:05 | INFO: Primitives created: 5
+19:15:05 | INFO: Extracting primitive: LM_Skirting
+19:15:05 | INFO: Primitives created: 1
+19:15:05 | INFO: Extracting primitive: LM_WallCabinets
+19:15:05 | INFO: Primitives created: 1
+19:15:05 | INFO: Extracting primitive: Pen
+19:15:05 | INFO: Primitives created: 1
+19:15:05 | INFO: Extracting primitive: Pen cup
+19:15:05 | INFO: Primitives created: 1
+19:15:05 | INFO: Extracting primitive: Pen.001
+19:15:05 | INFO: Primitives created: 1
+19:15:05 | INFO: Extracting primitive: Pen.002
+19:15:05 | INFO: Primitives created: 1
+19:15:05 | INFO: Extracting primitive: Pen.003
+19:15:05 | INFO: Primitives created: 1
+19:15:05 | INFO: Extracting primitive: Box vial
+19:15:05 | INFO: Primitives created: 1
+19:15:05 | INFO: Extracting primitive: Box vial cap
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.015
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.001
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.001
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.016
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.002
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.002
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.017
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.003
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.003
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.018
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.004
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.004
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.019
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.005
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.005
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.020
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.006
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.006
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.021
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.007
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.007
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.022
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.008
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.008
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.023
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.009
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.009
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.024
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.010
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.010
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.025
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.011
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.011
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.026
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.012
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.012
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.027
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.013
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.013
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.028
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.014
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.014
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.029
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.015
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.015
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.030
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.016
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.016
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.031
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.017
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.017
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.032
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.018
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.018
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.033
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial.019
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Box vial cap.019
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Circle.034
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cube.428
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cube.429
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cube.430
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cube.431
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Vial box
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cube.035
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cube.070
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cutter base.001
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cutter lid.001
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cutter seam
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cube.426
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Peg head
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Peg head.001
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Peg head.002
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Cube.427
+19:15:06 | INFO: Primitives created: 1
+19:15:06 | INFO: Extracting primitive: Printed label
+19:15:06 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Receipt
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Receipt roll
+19:15:07 | INFO: Primitives created: 3
+19:15:07 | INFO: Extracting primitive: Receipt roll flat
+19:15:07 | INFO: Primitives created: 3
+19:15:07 | INFO: Extracting primitive: Cube.408
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Cube.409
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Cube.410
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Cube.411
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Rx basket
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Rx basket.001
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Rx basket.002
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Rx label on card
+19:15:07 | INFO: Primitives created: 1
+19:15:07 | INFO: Extracting primitive: Rx sign face
+19:15:07 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.432
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Stand-off
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Stand-off.001
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Pump
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.252
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Sanitizer bottle
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.253
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.250
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.251
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Roller drum
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Roller handle
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.298
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.297
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.299
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.300
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.301
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.302
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.108
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.109
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.110
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.111
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.113
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.114
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.115
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.116
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.118
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.119
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.120
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.121
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.012
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Cube.001
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Methadone cup
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe plunger
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe tip
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe.001
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe plunger.001
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe tip.001
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe.002
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe plunger.002
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe tip.002
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe.003
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe plunger.003
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Oral syringe tip.003
+19:15:08 | INFO: Primitives created: 1
+19:15:08 | INFO: Extracting primitive: Power button
+19:15:08 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.019
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.018
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.017
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.016
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.015
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Printer front
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.014
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Printer side L
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Printer side R
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.013
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.030
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.029
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.066
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.065
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.122
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tri-Fold closed grid
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.165
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.166
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.167
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.168
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.169
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.170
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.171
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.172
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.173
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.174
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.175
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.176
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.177
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.178
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.179
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.180
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.181
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.182
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.183
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.184
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.185
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.186
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.187
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.188
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.189
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.190
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.191
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Cube.192
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.084
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.085
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.086
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.087
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.088
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.089
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.090
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.091
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.092
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.093
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.094
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.095
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.096
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.097
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.098
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.099
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.100
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.101
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.102
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.103
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.104
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.105
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.106
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.107
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.108
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.109
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.110
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.111
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.112
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.113
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.114
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.115
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.116
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.117
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.118
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.119
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.120
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.121
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.122
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.123
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.124
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.125
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.126
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.127
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.128
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.129
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.130
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.131
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.132
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.133
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.134
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.135
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.136
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.137
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.138
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.139
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.140
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.141
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.142
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.143
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.144
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.145
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.146
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.147
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.148
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.149
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.150
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.151
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.152
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Dose capsule.153
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.053
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.054
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.055
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.056
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.057
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.058
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.059
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.060
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.061
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.062
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.063
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.064
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.065
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.066
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.067
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.068
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.069
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.070
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.071
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.072
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.073
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.074
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.075
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.076
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.077
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.078
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.079
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.080
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.081
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.082
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.083
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.084
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.085
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.086
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.087
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.088
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.089
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.090
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.091
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.092
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.093
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.094
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.095
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.096
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.097
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.098
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.099
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tablet.100
+19:15:09 | INFO: Primitives created: 1
+19:15:09 | INFO: Extracting primitive: Tri-Fold closed label side
+19:15:09 | INFO: Primitives created: 2
+19:15:09 | INFO: Extracting primitive: Twin grid
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.151
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.152
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.153
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.154
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.155
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.156
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.157
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.158
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.159
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.160
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.161
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.162
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.163
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.164
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.040
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.041
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.042
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.043
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.044
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.045
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.046
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.047
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.048
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.049
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.050
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.051
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.052
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.053
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.054
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.055
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.056
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.057
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.058
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.059
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.060
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.061
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.062
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.063
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.064
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.065
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.066
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.067
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.068
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.069
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.070
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.071
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.072
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.073
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.074
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.075
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.076
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.077
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.078
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.079
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.080
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.081
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.082
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Dose capsule.083
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.031
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.032
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.033
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.034
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.035
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.036
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.037
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.038
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.039
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.040
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.041
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.042
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.043
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.044
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.045
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.046
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.047
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.048
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.049
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.050
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.051
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Tablet.052
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Twin label side
+19:15:10 | INFO: Primitives created: 2
+19:15:10 | INFO: Extracting primitive: Cube.296
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 6 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 6 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.004
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 8 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 8 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.003
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 13 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 13 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.002
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 13 snap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 13 snap cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 13 snap cap ring
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.002
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 20 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 20 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.001
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 20 snap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 20 snap cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 20 snap cap ring
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.004
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 40 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial amber 40 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial being filled
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.001
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.002
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.003
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.004
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.005
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.006
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.007
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.008
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.009
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.010
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.011
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.012
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.013
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.014
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.015
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.016
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.017
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.018
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.019
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.020
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.021
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.022
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Capsule.023
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial being filled cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.010
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 6 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 6 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.009
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 8 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 8 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.008
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 13 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 13 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.007
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 13 snap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 13 snap cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 13 snap cap ring
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.003
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 20 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 20 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.006
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 40 CR
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 40 CR cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Circle.005
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 40 snap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 40 snap cap
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Vial blue 40 snap cap ring
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Cube.005
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Clock face
+19:15:10 | INFO: Primitives created: 1
+19:15:10 | INFO: Extracting primitive: Clock rim
+19:15:10 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.424
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.425
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.412
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.413
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.414
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.415
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.416
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.417
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.418
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.419
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.420
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.421
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.422
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Cube.423
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Tablet.142
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Tablet.143
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Tablet.144
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Tablet.145
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Tablet.146
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Tablet.147
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Weighing boat.007
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Weighing boat.004
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Weighing boat.005
+19:15:11 | INFO: Primitives created: 1
+19:15:11 | INFO: Extracting primitive: Weighing boat.006
+19:15:11 | INFO: Primitives created: 1
+19:15:12 | INFO: Finished glTF 2.0 export in 11.878262996673584 s
+
+Info: Saved as "pharmacy.blend"
+DONE 16 products
+Blender 5.2.0 LTS (hash fbe6228777e7 built 2026-07-14 01:35:40)
+
+Blender quit

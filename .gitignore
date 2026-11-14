@@ -45,3 +45,27 @@ tools/.ig-credentials.json
 
 # scratch moved here 2026-11-08
 _archive/
+
+# 3D room working files (2026-11-14): bake intermediates, review renders, logs and backups stay local
+*.blend1
+*.log
+__pycache__/
+mocks/backups_*/
+mocks/review_*/
+mocks/*/renders/
+mocks/*/*_raw.glb
+mocks/*/products/*_raw.glb
+mocks/*/products/*_look.png
+mocks/room-living/living_v1*.glb
+mocks/room-living/living_v1_*.blend
+mocks/room-living/*_check.glb
+mocks/room-living/bansuri_new.glb
+mocks/room-living/kaniel_boucle*.glb
+mocks/room-living/mk2-toilet-mat-flat*.glb
+mocks/room-living/all*.json
+mocks/room-living/saved_layout.json
+mocks/room-living/source/
+mocks/room-bedroom/source/nightstand/
+mocks/room-pharmacy/*.glb
+x.png
+mocks/room-living/backup_live_v3/

@@ -1,0 +1,380 @@
+{
+ "_note": "The Heritage Lounge, laid out from mocks/room-refs/living2/lounge-v1.jpg (LAYOUT.md). three.js metres: x right, y up, z toward the camera; back wall z = -2.1, front wall z = +2.1, left wall x = -2.6, right wall x = 2.6.",
+ "dirs": {
+  "staging": "products"
+ },
+ "products": [
+  {
+   "id": "a18cf5ad-ce5a-4299-831f-bb8101573b03",
+   "name": "Victorian Crystal Chandelier",
+   "file": "liv-chandelier.glb",
+   "height": 0.82,
+   "pos": [
+    0.15,
+    2.99,
+    -0.1
+   ],
+   "tag": "THE COLLECTION · LIGHTING",
+   "desc": "Add a touch of luxury to your home with this elegant chandelier, designed to blend modern aesthetics with timeless charm.",
+   "specs": [
+    [
+     "Material",
+     "Metal, glass and crystal"
+    ],
+    [
+     "Dimensions",
+     "80 × 80 × 70 cm"
+    ],
+    [
+     "Light",
+     "12 candle bulbs, E14"
+    ]
+   ],
+   "link": "https://amzn.to/3Rq7NuZ",
+   "listing": "Whispering Homes Bezel 12-Light Victorian Candle Chandelier | White Crystal Glass Metal Chandelier Lights for Ceiling",
+   "hang": true,
+   "noShadow": true
+  },
+  {
+   "id": "263ce4c4-c4f9-4d8b-bee2-15975134e3b0",
+   "name": "Geometric Textured Canvas",
+   "file": "liv-canvas-geometric.glb",
+   "height": 0.6,
+   "pos": [
+    -1.2,
+    1.55,
+    0
+   ],
+   "tag": "THE COLLECTION · WALL ART",
+   "desc": "Layered geometric blocks with a raised, textured surface, set in a slim black frame.",
+   "specs": [
+    [
+     "Material",
+     "Textured canvas, black frame"
+    ],
+    [
+     "Size",
+     "60 cm tall, landscape"
+    ],
+    [
+     "Maker",
+     "Artsense"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0H2F82ZQC?tag=urbannest03b-21",
+   "listing": "Artsense Abstract Geometric Textured Canvas 60 × 68 cm | Black-Framed Wall Art for Living Room",
+   "alignBack": -2.064,
+   "noShadow": true
+  },
+  {
+   "id": "bd5ca151-0cbb-4870-9490-d0316398eb4b",
+   "name": "Metal & Wood Wall Clock",
+   "file": "liv-wall-clock.glb",
+   "height": 0.5,
+   "pos": [
+    2.55,
+    1.8,
+    1.15
+   ],
+   "tag": "THE COLLECTION · TIMEPIECES",
+   "desc": "Half-metre analog wall clock combining a brushed metal frame with warm wood detailing in black and brown.",
+   "specs": [
+    [
+     "Material",
+     "Metal and wood"
+    ],
+    [
+     "Diameter",
+     "50 cm"
+    ],
+    [
+     "Maker",
+     "Auromin"
+    ]
+   ],
+   "link": "https://link.amazon/B0bP2CEEQ",
+   "listing": "Auromin Metal & Wood Wall Clock 50 cm | Modern Analog Wall Clock for Living Room, Bedroom & Office",
+   "rotY": -1.5708,
+   "alignRight": 2.595,
+   "noShadow": true
+  },
+  {
+   "id": "489d03f5-7ce5-4268-b164-c6830999a24d",
+   "name": "Silver Rearing Horse",
+   "file": "liv-silver-horse.glb",
+   "height": 0.255,
+   "pos": [
+    -1.9,
+    0.82,
+    -1.86
+   ],
+   "tag": "THE COLLECTION · SCULPTURES",
+   "desc": "A symbol of vigor, ambition, and grace, this handcrafted sculpture captures a stallion poised in a dynamic rearing stance.",
+   "specs": [
+    [
+     "Material",
+     "999 silver plate over resin"
+    ],
+    [
+     "Dimensions",
+     "18 × 9.5 × 25.5 cm"
+    ],
+    [
+     "Made in",
+     "India"
+    ]
+   ],
+   "link": "https://link.amazon/B0eEc7qf4",
+   "listing": "Dev Aastha 999 Silver Plated Rearing Horse Statue 18 x 9.5 x 25.5 cm | Vastu Showpiece for Success & Home Decor"
+  },
+  {
+   "id": "e9559650-5081-4428-ab4e-3191ca816ae8",
+   "name": "Whispering Waves Vase",
+   "file": "liv-whisper-vase.glb",
+   "height": 0.23,
+   "pos": [
+    -0.55,
+    0.82,
+    -1.86
+   ],
+   "tag": "THE COLLECTION · VASES",
+   "desc": "Elegant 9-inch ceramic vase featuring a modern twisted, wave-inspired design and matte off-white finish.",
+   "specs": [
+    [
+     "Material",
+     "Ceramic"
+    ],
+    [
+     "Colour",
+     "Off white"
+    ],
+    [
+     "Dimensions",
+     "16 × 16 × 23 cm"
+    ]
+   ],
+   "link": "https://link.amazon/B0g7up9Dc",
+   "listing": "Glimpse Homes Ceramic Whispering Waves Vase"
+  },
+  {
+   "id": "9fb4a2b2-5e68-44ad-a31b-8b5e6d3b6f86",
+   "name": "Brass Elephant Urli",
+   "file": "liv-brass-urli.glb",
+   "height": 0.114,
+   "pos": [
+    0.15,
+    0.43,
+    -0.1
+   ],
+   "tag": "THE COLLECTION · FESTIVE",
+   "desc": "A small solid-brass urli standing on four carved elephants, in an antique gold finish.",
+   "specs": [
+    [
+     "Material",
+     "Solid brass, handmade"
+    ],
+    [
+     "Size",
+     "6 in across, 4.5 in high"
+    ],
+    [
+     "Finish",
+     "Antique gold"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0GWV15RXC?tag=urbannest03b-21",
+   "listing": "Kansakruti Handmade Brass Elephant Urli 6 inch | Floating Flower & Candle Bowl for Mandir & Entrance"
+  },
+  {
+   "id": "0ef73d2f-81e6-4558-b8e0-d352e36d276e",
+   "name": "Navy Blue Floor Vase",
+   "file": "liv-blue-vase.glb",
+   "height": 0.51,
+   "pos": [
+    -2.35,
+    0,
+    -1.9
+   ],
+   "tag": "THE COLLECTION · VASES",
+   "desc": "Stylish terracotta flower vase designed to add an elegant, modern touch to living rooms, corners, tables, and other home spaces.",
+   "specs": [
+    [
+     "Material",
+     "Terracotta"
+    ],
+    [
+     "Dimensions",
+     "23 × 23 × 51 cm"
+    ],
+    [
+     "Colour",
+     "Navy blue"
+    ]
+   ],
+   "link": "https://link.amazon/B01shg3VC",
+   "listing": "Habere India - All The Cultures Fabricating India Room Decor Aesthetic | Ceramic Flower Vase - Bottle, Navy Blue"
+  },
+  {
+   "id": "8d4142d1-540f-4e01-9b63-2101061ee556",
+   "name": "Go Hooked Floor Planter",
+   "file": "liv-planter.glb",
+   "height": 1.45,
+   "pos": [
+    0.55,
+    0,
+    -1.85
+   ],
+   "tag": "THE COLLECTION · PLANTERS",
+   "desc": "24-inch white polymer planter with a stylish textured finish, perfect for indoor and outdoor spaces.",
+   "specs": [
+    [
+     "Material",
+     "Polymer"
+    ],
+    [
+     "Colour",
+     "White"
+    ],
+    [
+     "Brand",
+     "Go Hooked"
+    ]
+   ],
+   "link": "https://link.amazon/B0itt1QJ8",
+   "listing": "Go Hooked Home Decor Planter | Decorative Planter Perfect for Artificial & Live Plants (Qutub Pot, White)"
+  },
+  {
+   "id": "5e586bdd-fee0-4f64-b0aa-576e356f48d4",
+   "name": "Wooden Side Table",
+   "file": "liv-side-table-wood.glb",
+   "height": 0.432,
+   "pos": [
+    1.25,
+    0,
+    -1.88
+   ],
+   "tag": "THE COLLECTION · FURNITURE",
+   "desc": "Smart Two-Tier Storage: Features a spacious top surface and a built-in lower shelf, perfect for displaying plants, storing books, or keeping living room essentials organized.",
+   "specs": [
+    [
+     "Shape",
+     "Square"
+    ],
+    [
+     "Size",
+     "30.5 × 30.5 × 43.2 cm"
+    ],
+    [
+     "Tiers",
+     "Two"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0H6BKT3QV?tag=urbannest03b-21",
+   "listing": "InoSlashed Beautiful Wooden Side Table/End Table/Plant Stand/Tea Table/Stool Living Room Furniture Square Shape with Rattan Webbing",
+   "rotY": 0,
+   "view": {
+    "pos": [
+     1.15,
+     1.35,
+     -0.35
+    ],
+    "target": [
+     1.25,
+     0.3,
+     -1.88
+    ]
+   }
+  },
+  {
+   "id": "8ff79f13-e380-4df2-9ec5-13ef83e36306",
+   "name": "Round Side Table",
+   "file": "liv-side-table-round.glb",
+   "height": 0.55,
+   "pos": [
+    -0.7,
+    0,
+    1.8
+   ],
+   "tag": "THE COLLECTION · FURNITURE",
+   "desc": "Contemporary round side table featuring clean white surfaces and natural wooden legs for a minimalist aesthetic appeal Practical double-shelf design offers ample space for books, d",
+   "specs": [
+    [
+     "Shape",
+     "Round"
+    ],
+    [
+     "Design",
+     "Two-shelf side table"
+    ],
+    [
+     "Legs",
+     "Natural wood"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0FNWMP3S2?tag=urbannest03b-21",
+   "listing": "OXMIC Modern Round Side Table, Home Decor for Living Room, Bed Side Tables for Bed Room, stools for Home, Furniture for Home, 2-Tier White"
+  },
+  {
+   "id": "7fbfd698-30ef-4379-afef-d11255785382",
+   "name": "Wooden Tripod Floor Lamp",
+   "file": "liv-tripod-lamp.glb",
+   "height": 1.4,
+   "pos": [
+    -2.3,
+    0,
+    0.95
+   ],
+   "tag": "THE COLLECTION · LUMINAIRES",
+   "desc": "An elegant geometric wooden floor lamp that brings warmth and contemporary style to any space.",
+   "specs": [
+    [
+     "Base",
+     "Stained wood tripod"
+    ],
+    [
+     "Shade",
+     "Fabric"
+    ],
+    [
+     "Bulb",
+     "E26"
+    ]
+   ],
+   "link": "https://link.amazon/B00aoXZZy",
+   "listing": "Modern Wooden Tripod Floor Lamp with Fabric Shade",
+   "light": {
+    "w": 25
+   }
+  },
+  {
+   "id": "fe88ac6a-bba7-4782-88fd-1c12439ca4aa",
+   "name": "Mango Wood Stool",
+   "file": "liv-stool.glb",
+   "height": 0.3,
+   "pos": [
+    -1.9,
+    0,
+    1.9
+   ],
+   "tag": "THE COLLECTION · FURNITURE",
+   "desc": "A small solid mango wood stool with a slatted top, an H-braced frame and black rubber anti-slip feet.",
+   "specs": [
+    [
+     "Material",
+     "Mango wood"
+    ],
+    [
+     "Size",
+     "29 × 29 × 30 cm"
+    ],
+    [
+     "Feet",
+     "Black rubber, anti-slip"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0DWN6C8KY?tag=urbannest03b-21",
+   "listing": "CARTADEN Mango Wood Slatted Stool, 30 cm | Bathroom & Bedside"
+  }
+ ],
+ "staging": []
+}

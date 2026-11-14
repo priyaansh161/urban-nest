@@ -1,0 +1,3 @@
+Photo textures (Wikimedia Commons):
+- Wagtail_ct200_barcode_printer.png: CC0 https://commons.wikimedia.org/wiki/File:Wagtail_ct200_barcode_printer.png
+- Balance_Kern.jpg: Public domain https://commons.wikimedia.org/wiki/File:Balance_Kern.jpg

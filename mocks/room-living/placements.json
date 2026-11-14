@@ -1,0 +1,618 @@
+{
+ "_note": "The Heritage Lounge, laid out from mocks/room-refs/living2/lounge-v1.jpg (LAYOUT.md). three.js metres: x right, y up, z toward the camera; back wall z = -2.1, front wall z = +2.1, left wall x = -2.6, right wall x = 2.6.",
+ "dirs": {
+  "staging": "products"
+ },
+ "products": [
+  {
+   "id": "a18cf5ad-ce5a-4299-831f-bb8101573b03",
+   "name": "Victorian Crystal Chandelier",
+   "file": "liv-chandelier.glb",
+   "tag": "THE COLLECTION · LIGHTING",
+   "desc": "Add a touch of luxury to your home with this elegant chandelier, designed to blend modern aesthetics with timeless charm.",
+   "specs": [
+    [
+     "Material",
+     "Metal, glass and crystal"
+    ],
+    [
+     "Dimensions",
+     "80 × 80 × 70 cm"
+    ],
+    [
+     "Light",
+     "12 candle bulbs, E14"
+    ]
+   ],
+   "link": "https://amzn.to/3Rq7NuZ",
+   "listing": "Whispering Homes Bezel 12-Light Victorian Candle Chandelier | White Crystal Glass Metal Chandelier Lights for Ceiling",
+   "height": 0.82,
+   "pos": [
+    0.15,
+    2.99,
+    -0.1
+   ],
+   "hang": true,
+   "noShadow": true
+  },
+  {
+   "id": "263ce4c4-c4f9-4d8b-bee2-15975134e3b0",
+   "name": "Geometric Textured Canvas",
+   "file": "liv-canvas-geometric.glb",
+   "tag": "THE COLLECTION · WALL ART",
+   "desc": "Layered geometric blocks with a raised, textured surface, set in a slim black frame.",
+   "specs": [
+    [
+     "Material",
+     "Textured canvas, black frame"
+    ],
+    [
+     "Maker",
+     "Artsense"
+    ],
+    [
+     "Style",
+     "Abstract geometric"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0H2F82ZQC?tag=urbannest03b-21",
+   "listing": "Artsense Abstract Geometric Textured Canvas 60 × 68 cm | Black-Framed Wall Art for Living Room",
+   "height": 0.7,
+   "pos": [
+    -1.2,
+    1.325,
+    0
+   ],
+   "alignBack": -2.064,
+   "noShadow": true
+  },
+  {
+   "id": "872070ef-ec77-4dfc-bc40-21c474d6d105",
+   "name": "Seven Running Horses",
+   "file": "liv-seven-horses.glb",
+   "tag": "THE COLLECTION · SCULPTURES",
+   "desc": "Bring elegance and positive energy to your space with this premium 19-inch 7 Running Horses statue, expertly handcrafted from high-quality resin.",
+   "specs": [
+    [
+     "Material",
+     "Resin"
+    ],
+    [
+     "Length",
+     "19 inch"
+    ],
+    [
+     "Style",
+     "Vastu, Feng Shui"
+    ]
+   ],
+   "link": "https://link.amazon/B06pJ0tSP",
+   "listing": "UAG Exports 19 Inch 7 Running Horses Statue Resin Vastu & Feng Shui Lucky Horse Decor | Stock Market Growth Item (Dark Brown, Wave Base)",
+   "length": 0.48,
+   "pos": [
+    -0.44,
+    0.82,
+    -1.82
+   ],
+   "rotY": 0.2
+  },
+  {
+   "id": "fc8422e3-a75c-4479-bd69-72d0ccab8d4b",
+   "name": "Hampi Stone Chariot",
+   "file": "liv-hampi-chariot.glb",
+   "tag": "THE COLLECTION · SCULPTURES",
+   "desc": "The chariot at Hampi cut down to nine inches, in marble powder and resin with an antique bronze finish.",
+   "specs": [
+    [
+     "Material",
+     "Stone"
+    ],
+    [
+     "Dimensions",
+     "23 × 16 × 18 cm"
+    ],
+    [
+     "Maker",
+     "SILAII"
+    ]
+   ],
+   "link": "https://link.amazon/B07OWcCdH",
+   "listing": "SILAII Hampi Stone Chariot Sculpture 9 Inch (23 x 16 x 18 cm) | Traditional Indian Temple Art Showpiece for Home & Office",
+   "height": 0.18,
+   "pos": [
+    2.29,
+    0.5,
+    1.75
+   ]
+  },
+  {
+   "id": "9adffab2-27c8-4059-81b5-ee1d97c9b130",
+   "name": "Crackled Metal Ball Vase",
+   "file": "liv-ball-vase.glb",
+   "tag": "THE COLLECTION · VASES",
+   "desc": "Perfectly spherical iron vase finished in a textured black crackle glaze, seventeen centimetres in every direction.",
+   "specs": [
+    [
+     "Material",
+     "Metal, crackled finish"
+    ],
+    [
+     "Dimensions",
+     "17 × 17 × 17 cm"
+    ],
+    [
+     "Brand",
+     "BEHOMA"
+    ]
+   ],
+   "link": "https://link.amazon/B05ClDL3l",
+   "listing": "BEHOMA Metal Ball Vase for Home Decor | Round Black Crackled Decorative Vase",
+   "height": 0.34,
+   "pos": [
+    0.71,
+    0.82,
+    -1.85
+   ]
+  },
+  {
+   "id": "f6355faf-00aa-4420-9166-ca48968b1a3c",
+   "name": "Brass Dogwood Steel Vase",
+   "file": "liv-dogwood-vase.glb",
+   "tag": "THE COLLECTION · VASES",
+   "desc": "Bring timeless luxury to your tabletops with this statement decorative vase.",
+   "specs": [
+    [
+     "Material",
+     "Stainless steel, brass dogwood"
+    ],
+    [
+     "Dimensions",
+     "17 × 15 × 20.5 cm"
+    ],
+    [
+     "Brand",
+     "BEHOMA"
+    ]
+   ],
+   "link": "https://link.amazon/B09OZxgII",
+   "listing": "BEHOMA Designer Stainless Steel Vase with Brass Dogwood 17 x 15 x 20.5 cm | Black Textured Decorative Vase for Living Room",
+   "height": 0.38,
+   "pos": [
+    0.2,
+    0.357,
+    -0.3
+   ]
+  },
+  {
+   "id": "cde2a73b-524a-4ffe-9c25-83900de47e2d",
+   "name": "Cotton Fabric Floor Lamp",
+   "file": "liv-cylinder-lamp.glb",
+   "tag": "THE COLLECTION · LUMINAIRES",
+   "desc": "A stylish and functional floor lamp featuring a cotton-linen shade, sturdy base, and warm, eye-friendly illumination.",
+   "specs": [
+    [
+     "Shade",
+     "Cotton fabric"
+    ],
+    [
+     "Style",
+     "Slim column"
+    ],
+    [
+     "Placement",
+     "Floor"
+    ]
+   ],
+   "link": "https://link.amazon/B09NyfcG3",
+   "listing": "Cotton Fabric Floor Lamp",
+   "height": 1,
+   "pos": [
+    2.32,
+    0,
+    -1.86
+   ],
+   "light": {
+    "w": 22
+   }
+  },
+  {
+   "id": "966832fa-8c3f-4a00-baed-dd8e91657ea0",
+   "name": "5-Globe Wall Lamp",
+   "file": "liv-globe-wall-lamp.glb",
+   "tag": "THE COLLECTION · LUMINAIRES",
+   "desc": "Elegant Bubble Globe Cluster Design – Features five beautifully arranged frosted glass globes that create a striking decorative statement while adding modern luxury to any interior space.",
+   "specs": [
+    [
+     "Style",
+     "Bubble globes"
+    ],
+    [
+     "Mount",
+     "Wall"
+    ],
+    [
+     "Maker",
+     "The Crafted Gesture"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0H34LRCRD?tag=urbannest03b-21",
+   "listing": "The Crafted Gesture Designer 5-Globe Wall Lamp | Luxury Bubble Globe Wall Lamp for Hallway, Staircase, Bedroom & Lounge",
+   "height": 0.5,
+   "pos": [
+    2.3,
+    1.75,
+    0
+   ],
+   "rotY": 3.14159,
+   "alignBack": -2.07,
+   "noShadow": true,
+   "glow": 1.1,
+   "light": {
+    "w": 14,
+    "at": [
+     1.9,
+     1.95,
+     1.75
+    ]
+   }
+  },
+  {
+   "id": "5e586bdd-fee0-4f64-b0aa-576e356f48d4",
+   "name": "Wooden Side Table",
+   "file": "liv-side-table-wood.glb",
+   "tag": "THE COLLECTION · FURNITURE",
+   "desc": "Smart Two-Tier Storage: Features a spacious top surface and a built-in lower shelf, perfect for displaying plants, storing books, or keeping living room essentials organized.",
+   "specs": [
+    [
+     "Shape",
+     "Square"
+    ],
+    [
+     "Size",
+     "30.5 × 30.5 × 43.2 cm"
+    ],
+    [
+     "Tiers",
+     "Two"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0H6BKT3QV?tag=urbannest03b-21",
+   "listing": "InoSlashed Beautiful Wooden Side Table/End Table/Plant Stand/Tea Table/Stool Living Room Furniture Square Shape with Rattan Webbing",
+   "height": 0.55,
+   "pos": [
+    1.27,
+    0,
+    -1.9
+   ],
+   "view": {
+    "pos": [
+     1.2,
+     1.3,
+     -0.4
+    ],
+    "target": [
+     1.25,
+     0.3,
+     -1.88
+    ]
+   }
+  },
+  {
+   "id": "b2b696ae-57aa-489e-9cc8-6b54090c9a06",
+   "name": "Double-Sided Station Clock",
+   "file": "liv-craftel-clock.glb",
+   "tag": "THE COLLECTION · TIMEPIECES",
+   "desc": "A beautifully crafted double-sided wall clock with a rose gold electroplated metal frame, matte-finish aluminium dials, and premium dome glass.",
+   "specs": [
+    [
+     "Style",
+     "Station clock on bracket"
+    ],
+    [
+     "Size",
+     "20 cm dial"
+    ],
+    [
+     "Maker",
+     "Craftel"
+    ]
+   ],
+   "link": "https://link.amazon/B0cpuMONO",
+   "listing": "CRAFTEL Ethnic English Dial Double Sided Station Wall Clock",
+   "height": 0.55,
+   "pos": [
+    2.55,
+    1.4,
+    1.3
+   ],
+   "rotY": 3.14159,
+   "alignRight": 2.59,
+   "noShadow": true
+  },
+  {
+   "id": "9677aca6-246e-4f79-abb7-fd503824369a",
+   "name": "Modern Abstract Canvas",
+   "file": "liv-paper-plane-canvas.glb",
+   "tag": "THE COLLECTION · WALL ART",
+   "desc": "Rooted in earthy warmth and folk-modern expressionism, this figurative artwork captures a solitary rider atop a sleek black stallion traversing a rolling desert landscape.",
+   "specs": [
+    [
+     "Size",
+     "122 × 81 cm"
+    ],
+    [
+     "Maker",
+     "Paper Plane Design"
+    ],
+    [
+     "Style",
+     "Modern abstract"
+    ]
+   ],
+   "link": "https://link.amazon/B0hEoeBlf",
+   "listing": "PAPER PLANE DESIGN Modern Abstract Canvas Painting 122 x 81 cm (32 x 48 Inch) | Large Statement Wall Art with Black Floater Frame",
+   "height": 1.22,
+   "pos": [
+    1.62,
+    1.065,
+    2.085
+   ],
+   "rotY": 3.14159,
+   "noShadow": true
+  },
+  {
+   "id": "e9b931ae-3bcf-4482-8bde-55c8f2922481",
+   "name": "Woman with Flower Canvas",
+   "file": "liv-artsense-flower-canvas.glb",
+   "tag": "THE COLLECTION · WALL ART",
+   "desc": "Add an intriguing, couture statement to your walls with this surreal mixed-media portrait.",
+   "specs": [
+    [
+     "Size",
+     "20 × 30 inch"
+    ],
+    [
+     "Style",
+     "Abstract, framed"
+    ],
+    [
+     "Maker",
+     "Artsense"
+    ]
+   ],
+   "link": "https://link.amazon/B01CTwVBj",
+   "listing": "Artsense Woman with Flower Abstract Canvas Wall Art 20 x 30 Inch (50 x 71 cm) | Framed Multicolor Painting for Living Room & Bedroom",
+   "height": 0.76,
+   "pos": [
+    -2.575,
+    1.295,
+    1.2
+   ],
+   "rotY": 1.5708,
+   "alignLeft": -2.59,
+   "noShadow": true
+  },
+  {
+   "id": "5046156b-df03-40ab-9619-370865f0e002",
+   "name": "Floral Floor Lamp",
+   "file": "liv-floral-lamp.glb",
+   "tag": "THE COLLECTION · LUMINAIRES",
+   "desc": "A stylish floor lamp featuring a beautiful floral and bird-printed fabric shade that creates a warm, inviting glow.",
+   "specs": [
+    [
+     "Shade",
+     "Floral fabric"
+    ],
+    [
+     "Frame",
+     "Black metal"
+    ],
+    [
+     "Maker",
+     "Homesake"
+    ]
+   ],
+   "link": "https://link.amazon/B08SMBa0s",
+   "listing": "Homesake® Axis Modern Floor Lamp with Fabric Shade, Black Metal Frame & Sturdy Base",
+   "height": 1.5,
+   "pos": [
+    -2.3,
+    0,
+    1.8
+   ],
+   "light": {
+    "w": 22
+   }
+  },
+  {
+   "id": "d833fde8-deea-43cd-8b94-c10b73328e2d",
+   "name": "Adjustable Study Lamp",
+   "file": "liv-lexton-lamp.glb",
+   "tag": "THE COLLECTION · LUMINAIRES",
+   "desc": "Study lamp with a flexible swing arm and adjustable neck that puts light exactly where it is needed.",
+   "specs": [
+    [
+     "Material",
+     "Metal, swing arm"
+    ],
+    [
+     "Size",
+     "31 × 12 × 31 cm"
+    ],
+    [
+     "Maker",
+     "Lexton"
+    ]
+   ],
+   "link": "https://link.amazon/B05f1EQcx",
+   "listing": "Lexton Adjustable Neck Metal Study Table Lamp | Flexible Swing Arm Desk Lamp with E27 Holder for Reading & Office",
+   "height": 0.31,
+   "pos": [
+    0.37,
+    0.82,
+    -1.86
+   ],
+   "rotY": -1.2,
+   "view": {
+    "pos": [
+     1.5,
+     2.2,
+     -0.3
+    ],
+    "target": [
+     2.33,
+     0.6,
+     -1.76
+    ]
+   },
+   "light": {
+    "w": 18,
+    "at": [
+     2.33,
+     1.76,
+     0.85
+    ]
+   }
+  },
+  {
+   "id": "79601e90-7056-4120-8dca-d1dce301ccf8",
+   "name": "Silver Krishna Bansuri",
+   "file": "liv-silver-bansuri.glb",
+   "tag": "THE COLLECTION · SCULPTURES",
+   "desc": "Crafted in Pure 999 Silver plated artwork, this Krishna Bansuri piece features a polished devotional form with raised detailing, engraved platform, and sturdy base.",
+   "specs": [
+    [
+     "Material",
+     "999 pure silver"
+    ],
+    [
+     "Size",
+     "23.5 × 9.3 × 15.7 cm"
+    ],
+    [
+     "Brand",
+     "TOUCH925"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0GS5RBXX2?tag=urbannest03b-21",
+   "listing": "TOUCH925 Pure 999 Silver Krishna Bansuri",
+   "length": 0.235,
+   "pos": [
+    0.15,
+    0.357,
+    0.2
+   ],
+   "rotY": 1.5708,
+   "view": {
+    "pos": [
+     -0.55,
+     0.95,
+     0.85
+    ],
+    "target": [
+     0.15,
+     0.46,
+     0.2
+    ]
+   }
+  },
+  {
+   "id": "e716af29-6b6a-49bb-a10e-949435ead6fe",
+   "name": "Sheesham Coffee Table with Shelf",
+   "file": "liv-sheesham-table.glb",
+   "tag": "THE COLLECTION · FURNITURE",
+   "desc": "Solid sheesham wood coffee table with a lower shelf for books and remotes, in a rich walnut polish.",
+   "specs": [
+    [
+     "Material",
+     "Solid sheesham wood"
+    ],
+    [
+     "Size",
+     "86 × 46 × 46 cm"
+    ],
+    [
+     "Finish",
+     "Walnut polish"
+    ]
+   ],
+   "link": "https://www.amazon.in/dp/B0CGNPGT6K?tag=urbannest03b-21",
+   "listing": "Enfurnish Sheesham Wood Coffee Table with Shelf, Walnut Finish",
+   "length": 0.92,
+   "pos": [
+    0.15,
+    0,
+    -0.1
+   ],
+   "rotY": 1.5708
+  }
+ ],
+ "staging": [
+  {
+   "name": "Chesterfield Sofa",
+   "file": "liv-sofa.glb",
+   "height": 0.9244,
+   "pos": [
+    2.02,
+    0.0,
+    -0.05
+   ],
+   "lm": true
+  },
+  {
+   "name": "Chesterfield Loveseat",
+   "file": "liv-loveseat.glb",
+   "height": 0.9344,
+   "pos": [
+    0.28,
+    0.0,
+    1.38
+   ],
+   "lm": true
+  },
+  {
+   "name": "Rattan Armchair",
+   "file": "liv-armchair-1.glb",
+   "height": 0.925,
+   "pos": [
+    -0.96,
+    0.0,
+    -0.98
+   ],
+   "lm": true
+  },
+  {
+   "name": "Rattan Armchair",
+   "file": "liv-armchair-2.glb",
+   "height": 0.925,
+   "pos": [
+    -1.19,
+    0.0,
+    0.19
+   ],
+   "lm": true
+  },
+  {
+   "name": "Rosewood Sideboard",
+   "file": "liv-sideboard.glb",
+   "height": 1.149,
+   "pos": [
+    0.11,
+    0.0,
+    -1.81
+   ],
+   "lm": true
+  },
+  {
+   "name": "Rosewood Side Table",
+   "file": "liv-side-table-b.glb",
+   "height": 0.5022,
+   "pos": [
+    2.28,
+    0.0,
+    1.75
+   ],
+   "lm": true
+  }
+ ]
+}
