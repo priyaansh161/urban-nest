@@ -15,6 +15,8 @@
     --gold: #B8956A; --gold-light: rgba(184,149,106,0.1);
     --white: #FAFAF8; --black: #111110;
     --grey: #6B6B68; --border: #E0DFD9; --bg: #F4F3EF;
+    --teal: #0E3238; --teal-soft: rgba(14,50,56,0.12);
+    --ok: #2f7d5b; --bad: #c0392b; --warn: #b7791f;
   }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--black); display: flex; min-height: 100vh; }
 
@@ -69,58 +71,107 @@
   .view-site-link:hover { color: rgba(255,255,255,0.5); }
 
   /* MAIN */
-  .main { margin-left: 220px; flex: 1; padding: 48px; }
-  .page-header { margin-bottom: 40px; }
+  .main { margin-left: 220px; flex: 1; padding: 40px 48px 64px; min-width: 0; }
+  .page-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; }
   .page-header h1 { font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; margin-bottom: 4px; }
   .page-header p { font-size: 13px; color: var(--grey); }
+  .range { display: inline-flex; border: 0.5px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--white); }
+  .range button { border: 0; background: transparent; padding: 8px 16px; font: 500 12px 'DM Sans', sans-serif; color: var(--grey); cursor: pointer; }
+  .range button.on { background: var(--teal); color: #fff; }
 
-  /* STATS */
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
-  .stat-card {
-    background: var(--white); padding: 28px 24px;
-    border: 0.5px solid var(--border);
-  }
-  .stat-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); margin-bottom: 12px; }
-  .stat-value { font-family: 'Bodoni Moda', serif; font-size: 40px; font-weight: 400; line-height: 1; }
-  .stat-sub { font-size: 11px; color: var(--grey); margin-top: 6px; }
-  .stat-card.highlight .stat-value { color: var(--gold); }
+  .section-label { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--grey); margin: 32px 0 12px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .section-label a { color: var(--gold); text-decoration: none; letter-spacing: 0.08em; text-transform: none; font-size: 12px; }
+  .section-label .note { text-transform: none; letter-spacing: 0; font-size: 12px; }
 
-  /* CONTENT GRID */
-  .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .panel { background: var(--white); border: 0.5px solid var(--border); }
-  .panel-header {
-    padding: 20px 24px; border-bottom: 0.5px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .panel-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
-  .panel-link { font-size: 11px; color: var(--gold); text-decoration: none; letter-spacing: 0.08em; }
-  .panel-body { padding: 0; }
-  .list-row {
-    padding: 14px 24px; border-bottom: 0.5px solid var(--border);
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 13px;
-  }
-  .list-row:last-child { border-bottom: none; }
-  .list-row-title { font-weight: 400; }
-  .list-row-meta { font-size: 11px; color: var(--grey); }
-  .badge {
-    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 3px 8px; border-radius: 2px;
-  }
-  .badge-gold { background: var(--gold-light); color: var(--gold); }
-  .badge-grey { background: #eee; color: var(--grey); }
-  .badge-red { background: rgba(192,57,43,0.1); color: #c0392b; }
-  .empty-state { padding: 40px 24px; text-align: center; font-size: 13px; color: var(--grey); }
+  .card { background: var(--white); border: 0.5px solid var(--border); border-radius: 14px; }
+  .pad { padding: 20px 22px; }
+  .card h3 { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); font-weight: 400; margin-bottom: 14px; display: flex; justify-content: space-between; gap: 8px; }
+  .card h3 a { color: var(--gold); text-decoration: none; letter-spacing: 0.06em; text-transform: none; font-size: 12px; }
 
-  /* TOAST */
-  .toast {
-    position: fixed; bottom: 32px; right: 32px; z-index: 9999;
-    padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif;
-    background: var(--black); color: var(--white);
-    transform: translateY(20px); opacity: 0; transition: all 0.3s;
-  }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+  .kpi { padding: 20px 22px; }
+  .kpi .lbl { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey); }
+  .kpi .val { font-family: 'Bodoni Moda', serif; font-size: 38px; line-height: 1.1; margin-top: 10px; font-variant-numeric: lining-nums; }
+  .kpi .sub { font-size: 12px; color: var(--grey); margin-top: 6px; }
+  .up { color: var(--ok); } .down { color: var(--bad); }
+
+  .grid2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+  .wide { grid-column: 1 / -1; }
+
+  /* chart */
+  .chart { width: 100%; height: 220px; display: block; }
+  .chart text { font: 11px 'DM Sans', sans-serif; fill: var(--grey); }
+  .legend { display: flex; gap: 18px; font-size: 12px; color: var(--grey); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .tip { position: fixed; pointer-events: none; background: var(--teal); color: #fff; font-size: 12px; padding: 7px 10px; border-radius: 6px; opacity: 0; transition: opacity .1s; z-index: 99; white-space: nowrap; }
+
+  /* bar lists */
+  .bars { display: grid; gap: 9px; }
+  .bar { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 12px; font-size: 13px; }
+  .bar .k { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar .v { color: var(--grey); font-variant-numeric: tabular-nums; }
+  .bar .track { grid-column: 1 / -1; height: 5px; background: #EEF1F0; border-radius: 3px; overflow: hidden; }
+  .bar .fill { height: 100%; background: var(--teal); border-radius: 3px; }
+  .bar.gold .fill { background: var(--gold); }
+  .muted { color: var(--grey); font-size: 12px; line-height: 1.6; }
+
+  /* funnel */
+  .funnel { display: grid; gap: 10px; }
+  .step { display: grid; grid-template-columns: 150px minmax(0,1fr) 110px; gap: 14px; align-items: center; font-size: 13px; }
+  .step .track { height: 26px; background: #EEF1F0; border-radius: 6px; overflow: hidden; }
+  .step .fill { height: 100%; background: var(--teal); border-radius: 6px; }
+  .step .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .step .num small { display: block; color: var(--grey); font-size: 11px; }
+  .gap-note { font-size: 12px; color: var(--grey); margin-top: 14px; padding-top: 12px; border-top: 0.5px solid var(--border); line-height: 1.6; }
+
+  /* tables */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: right; font-weight: 400; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--grey); padding: 0 0 10px; }
+  th:first-child, td:first-child { text-align: left; }
+  td { text-align: right; padding: 9px 0; border-top: 0.5px solid var(--border); font-variant-numeric: tabular-nums; }
+  td:first-child { max-width: 0; width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  td a { color: inherit; text-decoration: none; }
+  td a:hover { color: var(--gold); }
+  tr.total td { font-weight: 500; }
+
+  /* link health */
+  .health { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 10px; }
+  .hchip { border-radius: 10px; padding: 14px 16px; background: #F3F5F4; text-decoration: none; color: inherit; display: block; }
+  .hchip b { display: block; font-family: 'Bodoni Moda', serif; font-size: 28px; font-weight: 400; line-height: 1.1; }
+  .hchip span { font-size: 11px; color: var(--grey); }
+  .hchip.ok b { color: var(--ok); } .hchip.bad b { color: var(--bad); } .hchip.warn b { color: var(--warn); }
+  .stack { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin: 16px 0 6px; background: #EEF1F0; }
+  .stack div { height: 100%; }
+
+  /* feedback, small */
+  .fb-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; padding: 8px 0; border-top: 0.5px solid var(--border); }
+  .fb-row:first-of-type { border-top: 0; }
+  .fb-row small { color: var(--grey); }
+  .badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
+  .badge-red { background: rgba(192,57,43,0.1); color: var(--bad); }
+
+  .setup { border-left: 3px solid var(--gold); }
+  .setup ol { margin: 10px 0 0 18px; font-size: 13px; line-height: 1.8; }
+  .setup code { background: rgba(0,0,0,0.06); padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+  .demo-flag { display: none; background: #fff6e5; border: 0.5px solid #e6c98a; border-radius: 10px; padding: 10px 14px; font-size: 12px; margin-bottom: 14px; }
+  .skeleton { color: var(--grey); font-size: 13px; padding: 8px 0; }
+
+  .toast { position: fixed; bottom: 32px; right: 32px; z-index: 9999; padding: 14px 24px; font-size: 13px; background: var(--black); color: var(--white); transform: translateY(20px); opacity: 0; transition: all 0.3s; }
   .toast.show { transform: translateY(0); opacity: 1; }
-  .toast-error { background: #c0392b; }
+
+  @media (max-width: 1100px) {
+    .kpis { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .grid3 { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+    .health { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  }
+  @media (max-width: 760px) {
+    .main { margin-left: 0; padding: 24px 16px 48px; }
+    .grid2, .grid3 { grid-template-columns: minmax(0,1fr); }
+    .health { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .step { grid-template-columns: 96px minmax(0,1fr) 72px; gap: 8px; }
+    .kpi .val { font-size: 30px; }
+  }
 </style>
 <link rel="stylesheet" href="/admin/studio-colors.css"/>
 </head>
@@ -173,100 +224,316 @@
 <!-- MAIN -->
 <main class="main">
   <div class="page-header">
-    <h1>Dashboard</h1>
-    <p id="welcomeMsg">Welcome back</p>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">Nest Posts</div>
-      <div class="stat-value" id="statPosts">—</div>
-      <div class="stat-sub">published</div>
+    <div>
+      <h1>Dashboard</h1>
+      <p id="welcomeMsg">Welcome back</p>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Collection Items</div>
-      <div class="stat-value" id="statItems">—</div>
-      <div class="stat-sub">published</div>
-    </div>
-    <div class="stat-card highlight">
-      <div class="stat-label">Unread Feedback</div>
-      <div class="stat-value" id="statFeedback">—</div>
-      <div class="stat-sub">new messages</div>
+    <div class="range" role="group" aria-label="Period">
+      <button data-days="7" class="on">7 days</button>
+      <button data-days="30">30 days</button>
     </div>
   </div>
 
-  <div class="content-grid">
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">Recent Posts</span>
-        <a href="nest.html" class="panel-link">Manage →</a>
-      </div>
-      <div class="panel-body" id="recentPosts">
-        <div class="empty-state">Loading…</div>
+  <!-- TRAFFIC -->
+  <div id="trafficBlock">
+    <div class="demo-flag" id="demoFlag">Sample numbers: this is how the traffic section will look once Cloudflare is connected. Nothing below in the traffic part is real yet.</div>
+    <div class="kpis">
+      <div class="card kpi"><div class="lbl">Visits</div><div class="val" id="kVisits">—</div><div class="sub" id="kVisitsSub">&nbsp;</div></div>
+      <div class="card kpi"><div class="lbl">Page views</div><div class="val" id="kViews">—</div><div class="sub" id="kViewsSub">&nbsp;</div></div>
+      <div class="card kpi"><div class="lbl">Pages per visit</div><div class="val" id="kDepth">—</div><div class="sub" id="kDepthSub">&nbsp;</div></div>
+      <div class="card kpi"><div class="lbl">Reached a room</div><div class="val" id="kRoom">—</div><div class="sub" id="kRoomSub">&nbsp;</div></div>
+    </div>
+
+    <div class="grid2" style="margin-top:14px">
+      <div class="card pad wide">
+        <h3><span>Visits and page views, per day</span><span class="legend"><span><i style="background:var(--teal)"></i>Visits</span><span><i style="background:var(--gold)"></i>Page views</span></span></h3>
+        <svg class="chart" id="chart" role="img" aria-label="Daily visits and page views"></svg>
       </div>
     </div>
-    <div class="panel">
-      <div class="panel-header">
-        <span class="panel-title">Recent Feedback</span>
-        <a href="feedback.html" class="panel-link">View all →</a>
+
+    <div class="section-label"><span>Where visitors go</span><span class="note">From page loads. Clicks inside a page are not counted yet.</span></div>
+    <div class="grid2">
+      <div class="card pad">
+        <h3><span>Path into the rooms</span></h3>
+        <div class="funnel" id="funnel"><div class="skeleton">Loading…</div></div>
+        <div class="gap-note" id="funnelNote">Cloudflare sees which pages load, not what happens on them. Whether someone opens a dot, turns a 3D piece or taps “Buy on Amazon” needs the small event counter proposed below.</div>
       </div>
-      <div class="panel-body" id="recentFeedback">
-        <div class="empty-state">Loading…</div>
+      <div class="card pad">
+        <h3><span>Top pages</span></h3>
+        <div id="topPages"><div class="skeleton">Loading…</div></div>
       </div>
+    </div>
+
+    <div class="grid3" style="margin-top:14px">
+      <div class="card pad"><h3><span>Came from</span></h3><div class="bars" id="refs"><div class="skeleton">Loading…</div></div></div>
+      <div class="card pad"><h3><span>Countries</span></h3><div class="bars" id="countries"><div class="skeleton">Loading…</div></div></div>
+      <div class="card pad"><h3><span>Devices</span></h3><div class="bars" id="devices"><div class="skeleton">Loading…</div></div>
+        <h3 style="margin-top:20px"><span>Browsers</span></h3><div class="bars" id="browsers"></div></div>
+    </div>
+  </div>
+
+  <div class="card pad setup" id="setupCard" style="display:none;margin-bottom:14px">
+    <h3><span>Connect Cloudflare traffic</span></h3>
+    <p class="muted" id="setupWhy">Web Analytics is already collecting on the live site. The dashboard needs three settings in Cloudflare to read it:</p>
+    <ol>
+      <li>Create an API token with only <code>Account › Account Analytics › Read</code>.</li>
+      <li>In Pages → storeurbannest → Settings → Variables and secrets, add <code>CF_API_TOKEN</code> (as a secret), <code>CF_ACCOUNT_ID</code> and <code>CF_SITE_TAG</code>.</li>
+      <li>Deploy. The token stays on the server; the browser never sees it.</li>
+    </ol>
+    <p class="muted" style="margin-top:10px"><a href="?demo=1" style="color:var(--gold)">See the traffic section with sample numbers →</a></p>
+  </div>
+
+  <!-- CATALOGUE + LINKS -->
+  <div class="section-label"><span>Catalogue</span><a href="collection.html">Manage →</a></div>
+  <div class="grid2">
+    <div class="card pad">
+      <h3><span>What is on the site</span></h3>
+      <table id="catTable"><tr><td class="skeleton">Loading…</td></tr></table>
+    </div>
+    <div class="card pad">
+      <h3><span>Amazon links on live pieces</span><a href="amazon-links.html">Check links →</a></h3>
+      <div class="health" id="health"><div class="skeleton">Loading…</div></div>
+      <div class="stack" id="healthStack"></div>
+      <p class="muted" id="healthNote"></p>
+    </div>
+  </div>
+
+  <!-- FEEDBACK (small) -->
+  <div class="grid2" style="margin-top:14px">
+    <div class="card pad">
+      <h3><span>Feedback</span><a href="feedback.html">View all →</a></h3>
+      <div id="fb"><div class="skeleton">Loading…</div></div>
+    </div>
+    <div class="card pad">
+      <h3><span>The Nest</span><a href="nest.html">Manage →</a></h3>
+      <div id="nest"><div class="skeleton">Loading…</div></div>
     </div>
   </div>
 </main>
+<div class="tip" id="tip"></div>
 
 <script>
-(async () => {
-  const session = await requireAuth();
-  if (!session) return;
+const $ = id => document.getElementById(id);
+const fmt = n => (n ?? 0).toLocaleString('en-IN');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DEMO = new URLSearchParams(location.search).has('demo');
+let session, days = 7;
 
-  document.getElementById('welcomeMsg').textContent =
-    'Welcome back, ' + (session.user.email.split('@')[0] || 'admin');
+/* ── TRAFFIC ─────────────────────────────────────────────────────── */
 
-  // Stats
-  const [posts, items, feedback] = await Promise.all([
-    db.from('nest_posts').select('id', { count: 'exact' }).eq('published', true),
-    db.from('collection_items').select('id', { count: 'exact' }).eq('published', true),
-    db.from('feedback').select('id', { count: 'exact' }).eq('status', 'unread'),
+// Which part of the site a path belongs to. Order matters: first match wins.
+const SECTIONS = [
+  ['Home',        p => p === '/' || p === '/index.html' || p === '/hello'],
+  ['Spaces',      p => /^\/spaces(\.html)?\/?$/.test(p)],
+  ['A room',      p => p.startsWith('/rooms/')],
+  ['Collection',  p => p.startsWith('/collection')],
+  ['Essentials',  p => p.startsWith('/essentials')],
+  ['Piece page',  p => p.startsWith('/piece/')],
+  ['Nest Edit',   p => p.startsWith('/edit') || p.startsWith('/nest') || p.startsWith('/community')],
+];
+const sectionOf = p => (SECTIONS.find(([, t]) => t(p)) || ['Other'])[0];
+
+function delta(now, before) {
+  if (!before) return '<span class="muted">no earlier data</span>';
+  const pct = Math.round((now - before) / before * 100);
+  const cls = pct > 0 ? 'up' : pct < 0 ? 'down' : '';
+  return `<span class="${cls}">${pct > 0 ? '▲' : pct < 0 ? '▼' : ''} ${Math.abs(pct)}%</span> vs previous ${days} days`;
+}
+
+function bars(el, rows, opts = {}) {
+  const max = Math.max(1, ...rows.map(r => r.n));
+  el.innerHTML = rows.length ? rows.map(r => `
+    <div class="bar ${opts.gold ? 'gold' : ''}"><span class="k" title="${esc(r.k)}">${esc(r.k)}</span><span class="v">${fmt(r.n)}${r.pct != null ? ' · ' + r.pct + '%' : ''}</span>
+      <div class="track"><div class="fill" style="width:${(r.n / max * 100).toFixed(1)}%"></div></div></div>`).join('')
+    : '<p class="muted">Nothing yet.</p>';
+}
+
+function drawChart(series) {
+  const svg = $('chart'), W = svg.clientWidth || 800, H = 220, L = 36, R = 8, T = 10, B = 26;
+  // fill missing days with zero
+  const byDate = Object.fromEntries(series.map(s => [s.key, s]));
+  const pts = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10);
+    pts.push({ d, v: byDate[d]?.visits || 0, p: byDate[d]?.pageviews || 0 });
+  }
+  const max = Math.max(4, ...pts.map(x => x.p));
+  const step = Math.pow(10, Math.floor(Math.log10(max))); const top = Math.ceil(max / step) * step;
+  const x = i => L + (W - L - R) * (pts.length === 1 ? 0.5 : i / (pts.length - 1));
+  const y = v => T + (H - T - B) * (1 - v / top);
+  const line = k => pts.map((q, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(q[k]).toFixed(1)).join(' ');
+  const grid = [0, .5, 1].map(f => `<line x1="${L}" x2="${W - R}" y1="${y(top * f)}" y2="${y(top * f)}" stroke="#E6EAE9"/><text x="${L - 8}" y="${y(top * f) + 4}" text-anchor="end">${fmt(Math.round(top * f))}</text>`).join('');
+  const every = Math.ceil(pts.length / 8);
+  const labels = pts.map((q, i) => i % every && i !== pts.length - 1 ? '' :
+    `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${new Date(q.d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</text>`).join('');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = grid + labels +
+    `<path d="${line('v')} L${x(pts.length - 1)} ${y(0)} L${x(0)} ${y(0)} Z" fill="rgba(14,50,56,0.08)"/>` +
+    `<path d="${line('p')}" fill="none" stroke="#A37B3F" stroke-width="2"/>` +
+    `<path d="${line('v')}" fill="none" stroke="#0E3238" stroke-width="2"/>` +
+    pts.map((q, i) => `<circle cx="${x(i)}" cy="${y(q.v)}" r="3" fill="#0E3238"/>`).join('') +
+    `<rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent" id="hit"/>`;
+  const tip = $('tip');
+  svg.querySelector('#hit').onmousemove = e => {
+    const r = svg.getBoundingClientRect(), fx = (e.clientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(pts.length - 1, Math.round((fx - L) / (W - L - R) * (pts.length - 1))));
+    const q = pts[i];
+    tip.innerHTML = `${new Date(q.d).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}<br>${fmt(q.v)} visits · ${fmt(q.p)} views`;
+    tip.style.left = (e.clientX + 12) + 'px'; tip.style.top = (e.clientY - 40) + 'px'; tip.style.opacity = 1;
+  };
+  svg.querySelector('#hit').onmouseleave = () => tip.style.opacity = 0;
+}
+
+const countryName = (() => { try { const dn = new Intl.DisplayNames(['en'], { type: 'region' }); return c => (c && c.length === 2 ? dn.of(c) : c) || 'Unknown'; } catch (e) { return c => c || 'Unknown'; } })();
+
+function renderTraffic(d) {
+  const t = d.total, p = d.prev;
+  $('kVisits').textContent = fmt(t.visits); $('kVisitsSub').innerHTML = delta(t.visits, p.visits);
+  $('kViews').textContent = fmt(t.pageviews); $('kViewsSub').innerHTML = delta(t.pageviews, p.pageviews);
+  const depth = t.visits ? t.pageviews / t.visits : 0, pdepth = p.visits ? p.pageviews / p.visits : 0;
+  $('kDepth').textContent = depth.toFixed(1); $('kDepthSub').innerHTML = pdepth ? delta(depth, pdepth) : '<span class="muted">no earlier data</span>';
+  drawChart(d.series);
+
+  // Sections: visits that loaded each kind of page
+  const sec = {};
+  for (const r of d.pages) { const s = sectionOf(r.key); sec[s] = sec[s] || { v: 0, p: 0 }; sec[s].v += r.visits; sec[s].p += r.pageviews; }
+  const total = Math.max(1, t.visits);
+  const room = sec['A room']?.v || 0;
+  $('kRoom').textContent = Math.round(room / total * 100) + '%';
+  $('kRoomSub').textContent = fmt(room) + ' visits opened a 3D room';
+  const steps = ['Home', 'Spaces', 'A room', 'Piece page', 'Collection', 'Essentials', 'Nest Edit'];
+  $('funnel').innerHTML = steps.map(s => {
+    const v = sec[s]?.v || 0, pct = Math.round(v / total * 100);
+    return `<div class="step"><span>${s}</span><div class="track"><div class="fill" style="width:${Math.max(pct, v ? 1 : 0)}%;${['Collection','Essentials','Nest Edit'].includes(s) ? 'background:var(--gold)' : ''}"></div></div>
+      <span class="num">${pct}%<small>${fmt(v)} visits</small></span></div>`;
+  }).join('');
+
+  const top = [...d.pages].sort((a, b) => b.pageviews - a.pageviews).slice(0, 10);
+  $('topPages').innerHTML = `<table><tr><th>Page</th><th>Views</th><th>Visits</th></tr>` +
+    top.map(r => `<tr><td><a href="${esc(r.key)}" target="_blank" title="${esc(r.key)}">${esc(r.key)}</a></td><td>${fmt(r.pageviews)}</td><td>${fmt(r.visits)}</td></tr>`).join('') + '</table>';
+
+  const pctOf = n => Math.round(n / total * 100);
+  bars($('refs'), d.referrers.map(r => ({ k: (r.key || 'Direct / app / unknown').replace(/^www\./, ''), n: r.visits, pct: pctOf(r.visits) })).slice(0, 8));
+  bars($('countries'), d.countries.map(r => ({ k: countryName(r.key), n: r.visits, pct: pctOf(r.visits) })).slice(0, 8));
+  bars($('devices'), d.devices.map(r => ({ k: r.key ? r.key[0].toUpperCase() + r.key.slice(1) : 'Unknown', n: r.visits, pct: pctOf(r.visits) })), { gold: true });
+  bars($('browsers'), d.browsers.map(r => ({ k: r.key || 'Unknown', n: r.visits, pct: pctOf(r.visits) })).slice(0, 5), { gold: true });
+}
+
+function sampleTraffic() {
+  // Deterministic made-up numbers so the layout can be judged before Cloudflare is connected.
+  let s = days * 97; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const series = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const v = Math.round(18 + rnd() * 30 + (days - i) * 0.6);
+    series.push({ key: new Date(Date.now() - i * 864e5).toISOString().slice(0, 10), visits: v, pageviews: Math.round(v * (2 + rnd())) });
+  }
+  const tv = series.reduce((a, b) => a + b.visits, 0), tp = series.reduce((a, b) => a + b.pageviews, 0);
+  const P = (key, f, g = 1.4) => ({ key, visits: Math.round(tv * f), pageviews: Math.round(tv * f * g) });
+  return {
+    total: { visits: tv, pageviews: tp }, prev: { visits: Math.round(tv * 0.82), pageviews: Math.round(tp * 0.8) }, series,
+    pages: [P('/', .62), P('/spaces', .31), P('/rooms/sunday-bedroom/', .17, 1.2), P('/rooms/quiet-bath/', .11, 1.2), P('/collection', .22, 1.8),
+      P('/essentials', .09), P('/piece/kaniel-boucle-accent-chair', .05), P('/edit/urli-decoration-ideas', .07), P('/nest', .04), P('/about', .03)],
+    referrers: [{ key: '', visits: Math.round(tv * .46) }, { key: 'l.instagram.com', visits: Math.round(tv * .24) }, { key: 'www.google.com', visits: Math.round(tv * .17) }, { key: 'wa.me', visits: Math.round(tv * .08) }, { key: 'www.linkedin.com', visits: Math.round(tv * .05) }],
+    countries: [{ key: 'IN', visits: Math.round(tv * .81) }, { key: 'CA', visits: Math.round(tv * .08) }, { key: 'US', visits: Math.round(tv * .06) }, { key: 'AE', visits: Math.round(tv * .03) }],
+    devices: [{ key: 'mobile', visits: Math.round(tv * .72) }, { key: 'desktop', visits: Math.round(tv * .26) }, { key: 'tablet', visits: Math.round(tv * .02) }],
+    browsers: [{ key: 'Chrome', visits: Math.round(tv * .58) }, { key: 'Instagram', visits: Math.round(tv * .2) }, { key: 'Safari', visits: Math.round(tv * .15) }, { key: 'Edge', visits: Math.round(tv * .04) }],
+  };
+}
+
+async function loadTraffic() {
+  if (DEMO) { $('demoFlag').style.display = 'block'; renderTraffic(sampleTraffic()); return; }
+  let res, body = {};
+  try {
+    res = await fetch('/api/admin-analytics?days=' + days, { headers: { Authorization: 'Bearer ' + session.access_token } });
+    body = await res.json();
+  } catch (e) { body = { error: 'unreachable' }; }
+  if (res?.ok && !body.error) { $('trafficBlock').style.display = ''; $('setupCard').style.display = 'none'; renderTraffic(body); return; }
+  $('trafficBlock').style.display = 'none'; $('setupCard').style.display = 'block';
+  if (body.error === 'cloudflare') $('setupWhy').textContent = 'Cloudflare refused the request: ' + body.detail;
+  else if (body.error === 'unreachable') $('setupWhy').textContent = 'The traffic function is not running here (it only runs on Cloudflare, not on a local preview). Steps, for when it is deployed:';
+}
+
+document.querySelectorAll('.range button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.range button').forEach(x => x.classList.toggle('on', x === b));
+  days = +b.dataset.days; loadTraffic();
+});
+
+/* ── CATALOGUE, LINKS, FEEDBACK ───────────────────────────────────── */
+
+// Same rules as Amazon Links (admin/amazon-links.html).
+function linkKind(link) {
+  const l = (link || '').trim();
+  if (!l || /^TODO-/i.test(l) || /^https?:\/\/(www\.)?amazon\.in\/?(\?.*)?$/i.test(l)) return 'none';
+  if (/amazon\.|amzn\.(to|in)\/|link\.amazon\//i.test(l)) return 'amazon';
+  return 'offsite';
+}
+
+async function loadCatalogue() {
+  const [ci, rp, posts, fbUnread, fb] = await Promise.all([
+    db.from('collection_items').select('id, section, published, model_url, buy_link, amazon_status, amazon_checked_at'),
+    db.from('room_products').select('id, room, published, buy_link, amazon_status, amazon_checked_at'),
+    db.from('nest_posts').select('title, published, created_at').order('created_at', { ascending: false }),
+    db.from('feedback').select('id', { count: 'exact', head: true }).eq('status', 'unread'),
+    db.from('feedback').select('name, message, status, created_at').order('created_at', { ascending: false }).limit(3),
   ]);
-  document.getElementById('statPosts').textContent    = posts.count ?? 0;
-  document.getElementById('statItems').textContent    = items.count ?? 0;
-  document.getElementById('statFeedback').textContent = feedback.count ?? 0;
+  const items = ci.data || [], dots = rp.data || [];
 
-  // Recent posts
-  const { data: recentPosts } = await db.from('nest_posts')
-    .select('title, published, created_at')
-    .order('created_at', { ascending: false }).limit(5);
-  const postsEl = document.getElementById('recentPosts');
-  if (!recentPosts?.length) {
-    postsEl.innerHTML = '<div class="empty-state">No posts yet. <a href="nest.html">Create one →</a></div>';
-  } else {
-    postsEl.innerHTML = recentPosts.map(p => `
-      <div class="list-row">
-        <span class="list-row-title">${p.title}</span>
-        <span class="badge ${p.published ? 'badge-gold' : 'badge-grey'}">${p.published ? 'Live' : 'Draft'}</span>
-      </div>`).join('');
-  }
+  const row = (label, list, has3d) => {
+    const live = list.filter(x => x.published), draft = list.length - live.length;
+    const td3 = has3d ? `${fmt(live.filter(has3d).length)} <span class="muted">of ${fmt(live.length)}</span>` : '<span class="muted">in room</span>';
+    return `<tr><td>${label}</td><td>${fmt(live.length)}</td><td>${fmt(draft)}</td><td>${td3}</td></tr>`;
+  };
+  const coll = items.filter(x => x.section !== 'essentials'), ess = items.filter(x => x.section === 'essentials');
+  const rooms = new Set(dots.filter(x => x.published).map(x => x.room)).size;
+  const has3d = x => !!x.model_url;
+  $('catTable').innerHTML = `<tr><th>Section</th><th>Live</th><th>Draft</th><th>Live with 3D</th></tr>` +
+    row('Collection', coll, has3d) + row('Essentials', ess, has3d) + row(`Room dots <span class="muted">(${rooms} rooms)</span>`, dots, null) +
+    `<tr class="total"><td>All products</td><td>${fmt(items.filter(x => x.published).length + dots.filter(x => x.published).length)}</td><td>${fmt(items.filter(x => !x.published).length + dots.filter(x => !x.published).length)}</td><td>${fmt(items.filter(x => x.published && has3d(x)).length)}</td></tr>`;
 
-  // Recent feedback
-  const { data: recentFeedback } = await db.from('feedback')
-    .select('name, message, status, created_at')
-    .order('created_at', { ascending: false }).limit(5);
-  const fbEl = document.getElementById('recentFeedback');
-  if (!recentFeedback?.length) {
-    fbEl.innerHTML = '<div class="empty-state">No feedback yet.</div>';
-  } else {
-    fbEl.innerHTML = recentFeedback.map(f => `
-      <div class="list-row">
-        <div>
-          <div class="list-row-title">${f.name || 'Anonymous'}</div>
-          <div class="list-row-meta">${(f.message || '').slice(0, 50)}…</div>
-        </div>
-        <span class="badge ${f.status === 'unread' ? 'badge-red' : 'badge-grey'}">${f.status}</span>
-      </div>`).join('');
+  // Link health: only what a visitor can click today (published)
+  const live = [...items, ...dots].filter(x => x.published);
+  const MONTH = 30 * 864e5, now = Date.now();
+  const h = { ok: 0, stale: 0, unchecked: 0, gone: 0, none: 0 };
+  for (const x of live) {
+    const k = linkKind(x.buy_link);
+    if (k === 'none') { h.none++; continue; }
+    if (k === 'offsite') { h.ok++; continue; }
+    if (x.amazon_status === 'gone') h.gone++;
+    else if (x.amazon_status === 'ok') (x.amazon_checked_at && now - new Date(x.amazon_checked_at) > MONTH ? h.stale++ : h.ok++);
+    else h.unchecked++;
   }
+  const chips = [
+    ['ok', h.ok, 'Confirmed working', 'ok'],
+    ['bad', h.gone, 'Gone from Amazon', 'gone'],
+    ['warn', h.unchecked, 'Never checked', 'check'],
+    ['warn', h.stale, 'Checked 30+ days ago', 'check'],
+    ['', h.none, 'No product link yet', 'nolink'],
+  ];
+  $('health').innerHTML = chips.map(([c, n, l]) => `<a class="hchip ${n ? c : ''}" href="amazon-links.html"><b>${fmt(n)}</b><span>${l}</span></a>`).join('');
+  const tot = Math.max(1, live.length), col = { ok: 'var(--ok)', gone: 'var(--bad)', unchecked: '#e0b25a', stale: '#ecd29c', none: '#cfd6d4' };
+  $('healthStack').innerHTML = Object.entries(h).map(([k, n]) => `<div style="width:${n / tot * 100}%;background:${col[k]}"></div>`).join('');
+  const attention = h.gone + h.unchecked + h.stale;
+  $('healthNote').textContent = `${fmt(live.length)} live pieces. ${attention ? fmt(attention) + ' need a look.' : 'Nothing needs a look.'} “Gone” pieces keep their page but hide the Amazon button.`;
+
+  // Feedback
+  const unread = fbUnread.count ?? 0;
+  $('fb').innerHTML = `<p style="font-size:13px;margin-bottom:6px">${unread ? `<span class="badge badge-red">${unread} unread</span>` : '<span class="muted">No unread messages.</span>'}</p>` +
+    (fb.data || []).map(f => `<div class="fb-row"><span>${esc(f.name || 'Anonymous')} <small>${esc((f.message || '').slice(0, 60))}</small></span><small>${new Date(f.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</small></div>`).join('');
+
+  // Nest
+  const P = posts.data || [], liveP = P.filter(p => p.published);
+  const last = liveP[0];
+  const ago = last ? Math.floor((now - new Date(last.created_at)) / 864e5) : null;
+  $('nest').innerHTML = `<p style="font-size:13px">${fmt(liveP.length)} live, ${fmt(P.length - liveP.length)} draft.</p>` +
+    (last ? `<div class="fb-row" style="border-top:0"><span>${esc(last.title)}</span><small>${ago === 0 ? 'today' : ago + ' days ago'}</small></div>` : '');
+}
+
+(async () => {
+  session = await requireAuth();
+  if (!session) return;
+  $('welcomeMsg').textContent = 'Welcome back, ' + (session.user.email.split('@')[0] || 'admin');
+  loadTraffic();
+  loadCatalogue();
 })();
 </script>
 </body>
