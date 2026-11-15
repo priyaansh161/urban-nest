@@ -1,0 +1,4 @@
+<!doctype html><meta charset="utf-8"><style>body{margin:0;background:#fff}model-viewer{width:900px;height:900px}</style>
+<script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
+<model-viewer id="m" shadow-intensity="0.9" interaction-prompt="none"></model-viewer>
+<script>const q=new URLSearchParams(location.search);const m=document.getElementById('m');m.setAttribute('camera-orbit',q.get('o'));m.setAttribute('src',q.get('src'));m.addEventListener('load',()=>window.__ok=1);m.addEventListener('error',e=>window.__err=String(e.detail&&e.detail.type))</script>
