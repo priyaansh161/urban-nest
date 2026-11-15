@@ -3,12 +3,12 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 let s = readFileSync('mocks/room-living/viewer.html', 'utf8').replace(/\r\n/g, '\n');
 const R = (a, b) => { if (!s.includes(a)) throw new Error('missing ' + a.slice(0, 70)); s = s.split(a).join(b); };
-R('<title>The Heritage Lounge · Urban Nest</title>', '<title>The NCR Kitchen · Urban Nest</title>');
+R('<title>The Heritage Lounge · Urban Nest</title>', '<title>The Oak Kitchen · Urban Nest</title>');
 R('content="Step into the Heritage Lounge in 3D: ink-blue walls, cognac leather, rosewood and brass by lamplight, with every piece in it a tap away."',
   'content="Step into a Noida high-rise kitchen in 3D: oak tall units, charcoal-navy cabinets, white marble and a sunny window, with every piece on the counter a tap away."');
 R('living-room copy of the bedroom viewer', 'kitchen copy of the lounge viewer');
 R('mocks/room-living/ (this file + placements.json); published by mocks/room-living/publish_room.mjs', 'mocks/room-kitchen/ (this file + placements.json); published by mocks/room-kitchen/publish_room.mjs');
-R('<h1>The Heritage Lounge</h1><small>Living room · in 3D</small>', '<h1>The NCR Kitchen</h1><small>Kitchen · in 3D</small>');
+R('<h1>The Heritage Lounge</h1><small>Living room · in 3D</small>', '<h1>The Oak Kitchen</h1><small>Kitchen · in 3D</small>');
 R(`  <button data-view="painting">Painting</button>
   <button data-view="overview">Overview</button>
   <button data-view="sofa">Sofa</button>

@@ -1,4 +1,4 @@
-// Publishes the NCR Kitchen from this working folder to the site: rooms/kitchen/ (as the Quiet Bath's
+// Publishes the Oak Kitchen from this working folder to the site: rooms/kitchen/ (as the Quiet Bath's
 // mocks/room-pilot/publish_room.mjs does).
 //   node mocks/room-living/publish_room.mjs
 // Copies only what the room uses: the viewer (as index.html), the compressed room (room.glb), every model that
