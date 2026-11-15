@@ -13,8 +13,8 @@
 # 301: a rebuilt kitchen or bedroom may take these addresses back.
 /bathroom       /rooms/quiet-bath/  302
 /bathroom.html  /rooms/quiet-bath/  302
-/kitchen        /spaces             302
-/kitchen.html   /spaces             302
+/kitchen        /rooms/kitchen/     302
+/kitchen.html   /rooms/kitchen/     302
 /bedroom        /rooms/sunday-bedroom/  302
 /bedroom.html   /rooms/sunday-bedroom/  302
 
