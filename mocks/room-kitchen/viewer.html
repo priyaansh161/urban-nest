@@ -388,7 +388,8 @@ const staged = [];   // fixtures with no dot (toilet, shower): they can still st
 const dotsEl = document.getElementById('dots');
 let tris = 0;
 
-function markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true; tris += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3; } }); }
+const ANISO = renderer.capabilities.getMaxAnisotropy();
+function markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true; for (const mt of [].concat(m.material)) for (const k of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap']) if (mt && mt[k]) { mt[k].anisotropy = ANISO; mt[k].needsUpdate = true; } tris += (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3; } }); }
 
 let roomRoot = null;   // the scene of whichever room file is showing (the preview, until the full one's images arrive)
 async function loadRoom(file = ROOM_FILE) {
@@ -509,15 +510,17 @@ function captureRoomEnv() {
 
 // A soft blob under an item so it sits on its surface instead of floating.
 function contactShadow(holder) {
+  const ry = holder.rotation.y; holder.rotation.y = 0; holder.updateMatrixWorld(true);
   const fs = new THREE.Box3().setFromObject(holder).getSize(new THREE.Vector3());
+  holder.rotation.y = ry; holder.updateMatrixWorld(true);
   const cv = document.createElement('canvas'); cv.width = cv.height = 128;
   const cx = cv.getContext('2d'), gr = cx.createRadialGradient(64, 64, 4, 64, 64, 62);
-  gr.addColorStop(0, 'rgba(0,0,0,0.55)'); gr.addColorStop(0.55, 'rgba(0,0,0,0.25)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  gr.addColorStop(0, 'rgba(0,0,0,0.72)'); gr.addColorStop(0.5, 'rgba(0,0,0,0.38)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
   cx.fillStyle = gr; cx.fillRect(0, 0, 128, 128);
   const sh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1),
     new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false }));
   // kept just wider than the item's own footprint: a big blob hung past counter edges like a floating shelf
-  sh.rotation.x = -Math.PI / 2; sh.position.y = 0.003; sh.scale.set(Math.min(fs.x, fs.z) * 1.35, Math.min(fs.x, fs.z) * 1.35, 1);
+  sh.rotation.x = -Math.PI / 2; sh.position.y = 0.003; sh.scale.set(fs.x * 1.15, fs.z * 1.15, 1);
   sh.raycast = () => {}; sh.renderOrder = 1; holder.add(sh);
 }
 const flowerCache = {};

@@ -40,4 +40,17 @@ R(`  camera.position.x = THREE.MathUtils.clamp(camera.position.x, -2.0, 2.0);
   const xl = camera.position.z > 1.62 ? 0.68 : 0.72;
   camera.position.x = THREE.MathUtils.clamp(camera.position.x, -xl, xl);
   camera.position.y = THREE.MathUtils.clamp(camera.position.y, 0.4, 2.6);`);
+// firmer contact shadows: in the bright daylit kitchen the lounge's soft blobs barely showed (his review, 15 Nov)
+R("gr.addColorStop(0, 'rgba(0,0,0,0.55)'); gr.addColorStop(0.55, 'rgba(0,0,0,0.25)');", "gr.addColorStop(0, 'rgba(0,0,0,0.72)'); gr.addColorStop(0.5, 'rgba(0,0,0,0.38)');");
+R('sh.scale.set(Math.min(fs.x, fs.z) * 1.35, Math.min(fs.x, fs.z) * 1.35, 1);', 'sh.scale.set(fs.x * 1.15, fs.z * 1.15, 1);');
+// the blob hangs in the holder, so it is turned with the piece: measure the piece unturned (a turned chopping board
+// got its shadow crosswise, sticking out behind it; his review, 15 Nov)
+R('function contactShadow(holder) {\n  const fs = new THREE.Box3().setFromObject(holder).getSize(new THREE.Vector3());',
+  'function contactShadow(holder) {\n  const ry = holder.rotation.y; holder.rotation.y = 0; holder.updateMatrixWorld(true);\n  const fs = new THREE.Box3().setFromObject(holder).getSize(new THREE.Vector3());\n  holder.rotation.y = ry; holder.updateMatrixWorld(true);');
+// sharp textures at a glancing angle (the TEX-RO rack's wires and plates went soft from across the room): full anisotropic filtering
+R('function markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true;',
+  'const ANISO = renderer.capabilities.getMaxAnisotropy();\nfunction markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true; for (const mt of [].concat(m.material)) for (const k of [\'map\', \'normalMap\', \'roughnessMap\', \'metalnessMap\', \'emissiveMap\']) if (mt && mt[k]) { mt[k].anisotropy = ANISO; mt[k].needsUpdate = true; }');
+// the opening line describes the kitchen, not the lounge
+R('// glTF is Y-up. The room is 5.2 (x) x 4.2 (z) x 3.0 (y) metres, closed on all four sides (back wall z = -2.1, the\n// front wall z = +2.1): the camera stays inside. Arched windows on the right and front walls, the one door on the left wall.',
+  '// glTF is Y-up. The kitchen is 2.9 (x) x 3.4 (z) x 2.9 (y) metres: a U of counters, the window wall at z = -1.7, a 1.6 m opening in the\n// front wall at z = +1.7 to the hall: the camera keeps to the aisle and the doorway. Daylight from the window, LED strips under the uppers.');
 writeFileSync('mocks/room-kitchen/viewer.html', s); console.log('viewer ok');

@@ -9,9 +9,9 @@
    "link": "https://link.amazon/B0dtgBi8c",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    -0.6,
+    -0.56,
     0.9,
-    -1.4
+    -1.42
    ],
    "length": 0.43,
    "desc": "A practical drying stand designed to hold utensils upright for quick air-drying near the sink.",
@@ -31,31 +31,6 @@
    ]
   },
   {
-   "id": "f146104d-860b-4abb-bb80-5b9c29c4e0b4",
-   "name": "Clazkit Strainer Bowl",
-   "file": "final/f146104d.glb",
-   "listing": "Clazkit Multi-Purpose Strainer or Washer Bowl for Rice Fruits & Vegetable Rice Bowl Color May Vary, Plastic - 10.2 x 17.5 x 24.3 Centimeters",
-   "link": "https://www.amazon.in/dp/B0C7V8RC3J?tag=urbannest03b-21",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    -1.13,
-    0.9,
-    -1.4
-   ],
-   "length": 0.22,
-   "desc": "**Multi-Functional Design:** - Versatile bowl designed for washing fruits, vegetables, straining rice, pasta, lentils, and more.",
-   "specs": [
-    [
-     "Item Dimensions L x W x H",
-     "10L x 10W x 10H Millimeters"
-    ],
-    [
-     "Colour",
-     "Color May Vary"
-    ]
-   ]
-  },
-  {
    "id": "1b0130dd-3375-4da7-bc67-72bd1965427f",
    "name": "HOMEZE Silicone Sink Mat",
    "file": "final/1b0130dd.glb",
@@ -63,9 +38,9 @@
    "link": "https://www.amazon.in/dp/B0FFTGW629?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    0.46,
+    0.48,
     0.9,
-    -1.42
+    -1.44
    ],
    "length": 0.3,
    "rotY": -1.5708,
@@ -78,56 +53,53 @@
    ]
   },
   {
-   "id": "3bc04eb5-4cd9-4a4b-888d-8044c7fea590",
-   "name": "Butter Dish with Lid",
-   "file": "final/3bc04eb5.glb",
-   "listing": "Butter Dish with Lid, Durable Butter Container for Fridge",
-   "link": "https://amzn.to/4vd5ZmG",
+   "id": "b4bd8136-6639-49d6-ab75-397f4027d88e",
+   "name": "HomeWiz Hung Curd Maker",
+   "file": "final/b4bd8136.glb",
+   "listing": "HomeWiz Hung Curd Maker 1100ml with Fine Steel Mesh",
+   "link": "https://link.amazon/B086fRRSl",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    0.7,
+    0.74,
     0.9,
-    -1.33
+    -1.52
    ],
-   "length": 0.18,
-   "desc": "A simple, elegant butter dish that keeps butter fresh and adds a tidy touch to the table.",
+   "height": 0.185,
+   "desc": "Makes thick, fresh hung curd effortlessly for dips, desserts, and healthy recipes.",
    "specs": [
     [
      "Material",
-     "Stainless Steel"
+     "Plastic"
     ],
     [
      "Colour",
-     "Green"
+     "White"
     ],
     [
      "Brand",
-     "True Decor"
+     "HomeWiz"
     ]
    ]
   },
   {
-   "id": "2759a7b9-b18d-4395-8ae1-69d02c064ab5",
-   "name": "Wooden Spatula Rest",
-   "file": "final/2759a7b9.glb",
-   "listing": "Wooden Spatula Rest",
-   "link": "https://amzn.to/4v6GYti",
+   "id": "48410c20-4c17-471e-8141-2620d3f04818",
+   "name": "Amazon Basics Knife Block Set",
+   "file": "final/48410c20.glb",
+   "listing": "amazon basics Stainless Steel Knife Set with High-carbon Blades and Pine Wood Block, 14 Pieces",
+   "link": "https://www.amazon.in/dp/B00R3Z49G6?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    0.93,
+    1.24,
     0.9,
-    -1.27
+    -1.56
    ],
-   "length": 0.119,
-   "desc": "No more wondering where to place your spatula.",
+   "height": 0.36,
+   "rotY": -0.6,
+   "desc": "14-piece knife set includes: 1 Pine wood block, 1 pair of scissors, 11 knife( 8-inch chef's knife, 8-inch slicing knife, 8-inch bread knife, 5.5-inch utility knife, and 3.5-inch peeling knife) Also includes (6) 4.5-inch ",
    "specs": [
     [
-     "Material",
-     "Wooden"
-    ],
-    [
-     "Product Dimensions",
-     "11.9L x 11.4W Centimeters"
+     "Colour",
+     "Multicolor"
     ]
    ]
   },
@@ -139,9 +111,9 @@
    "link": "https://www.amazon.in/dp/B0H9XHKHWB?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    1.3,
+    1.29,
     0.9,
-    -1.42
+    -1.06
    ],
    "height": 0.37,
    "desc": "NATURAL NEEM WOOD KITCHEN UTENSILS Made from natural Neem wood, these handcrafted cooking utensils bring the warmth of traditional wooden cookware to your everyday kitchen.",
@@ -149,58 +121,6 @@
     [
      "Item Dimensions L x W",
      "37L x 11.5W Centimeters"
-    ]
-   ]
-  },
-  {
-   "id": "0d924fe2-c7e4-48e2-ad87-3c3ba0d9b77b",
-   "name": "Glass Salt & Pepper Shakers",
-   "file": "final/0d924fe2.glb",
-   "listing": "The Better Home Glass Salt & Pepper Shakers Set- Black & White | Moisture-Proof Seasoning Shakers with Handle",
-   "link": "https://www.amazon.in/dp/B0CB5NGLR6?tag=urbannest03b-21",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    1.3,
-    0.9,
-    -0.97
-   ],
-   "height": 0.136,
-   "rotY": 1.5708,
-   "desc": "Convenient Size: With their compact size, these shakers are easy to handle and store, ensuring they are always within reach when you need them.",
-   "specs": [
-    [
-     "Brand Name",
-     "The Better Home"
-    ],
-    [
-     "Item Dimensions L x W x H",
-     "9.3L x 6.8W x 13.6H Centimeters"
-    ]
-   ]
-  },
-  {
-   "id": "5ee6f430-a68b-481b-a922-10bc39a7f8cc",
-   "name": "NAALSA Steel Spoon Rest",
-   "file": "final/5ee6f430.glb",
-   "listing": "NAALSA CLEANTOP 1Pc Spoon Rest Stainless Steel for Home & Kitchen, Platform and Dining Table, Holding Messy Spoon While Cooking",
-   "link": "https://www.amazon.in/dp/B0DH4YYVZ5?tag=urbannest03b-21",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    0.98,
-    0.9,
-    -0.95
-   ],
-   "length": 0.205,
-   "rotY": 1.5708,
-   "desc": "Contain - 1pc Stainless Steel Spoon Rest holder for kitchen Durable Construction: Made from high-quality stainless steel with a 1.5mm thickness, this spoon rest is built to last.",
-   "specs": [
-    [
-     "Colour",
-     "silver"
-    ],
-    [
-     "Item Dimensions L x W",
-     "20.5L x 10W Centimeters"
     ]
    ]
   },
@@ -235,60 +155,6 @@
    ]
   },
   {
-   "id": "46c9cd64-1108-4e3e-b66b-046d0423a94d",
-   "name": "Kmils Oil Dispenser with Brush",
-   "file": "final/46c9cd64.glb",
-   "listing": "Kmils 230 Ml Oil Dispenser With Brush, Multi-Use For Cooking, Baking, Bbq, Marinating (Pack Of 1 Multi Colour) - Glass",
-   "link": "https://www.amazon.in/dp/B0BZHPJRLF?tag=urbannest03b-21",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    1.36,
-    0.9,
-    0.06
-   ],
-   "height": 0.145,
-   "desc": ": Olive oil bottle comes with a brush, can pour oil and brush oil.",
-   "specs": [
-    [
-     "Capacity",
-     "230 Milliliters"
-    ],
-    [
-     "Item Dimensions W x H",
-     "6.3W x 14.5H Centimeters"
-    ]
-   ]
-  },
-  {
-   "id": "b16d9948-b32b-4ad7-b55d-7adbb8273290",
-   "name": "2-in-1 Glass Oil Dispenser",
-   "file": "final/b16d9948.glb",
-   "listing": "Premium 2 In 1 Glass Oil Dispenser For Kitchen",
-   "link": "https://link.amazon/B0fwWAVbg",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    1.35,
-    0.9,
-    0.18
-   ],
-   "height": 0.25,
-   "desc": "Elegant oil dispenser for storing and pouring cooking oil with precision.",
-   "specs": [
-    [
-     "Brand",
-     "VOLRIX"
-    ],
-    [
-     "Colour",
-     "500 ML - Multicolour"
-    ],
-    [
-     "Material",
-     "Borosilicate Glass"
-    ]
-   ]
-  },
-  {
    "id": "5c8fc071-b2a2-44c6-a097-9af06f0f3df3",
    "name": "Primeway Spoon Rest",
    "file": "final/5c8fc071.glb",
@@ -296,9 +162,9 @@
    "link": "https://link.amazon/B02PRPji5",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    1.0,
+    1.03,
     0.9,
-    0.06
+    0.07
    ],
    "length": 0.2,
    "rotY": 1.5708,
@@ -319,28 +185,27 @@
    ]
   },
   {
-   "id": "71a93adf-95f7-4f63-82b5-ff1bdc4b9135",
-   "name": "Silicone Basting Brush",
-   "file": "final/71a93adf.glb",
-   "listing": "P-Plus International Silicone Basting Brush Set,Stainless Steel Basting Brush with Silicone Bristles for BBQ/Grilling/Pastry Kitchen Oil",
-   "link": "https://www.amazon.in/dp/B07R855Y1X?tag=urbannest03b-21",
+   "id": "46c9cd64-1108-4e3e-b66b-046d0423a94d",
+   "name": "Kmils Oil Dispenser with Brush",
+   "file": "final/46c9cd64.glb",
+   "listing": "Kmils 230 Ml Oil Dispenser With Brush, Multi-Use For Cooking, Baking, Bbq, Marinating (Pack Of 1 Multi Colour) - Glass",
+   "link": "https://www.amazon.in/dp/B0BZHPJRLF?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    1.0,
+    1.36,
     0.9,
-    0.27
+    0.02
    ],
-   "length": 0.21,
-   "rotY": 1.5708,
-   "desc": "[Safe and Durable] Made from high quality eco-friendly silicone and stainless steel.",
+   "height": 0.145,
+   "desc": ": Olive oil bottle comes with a brush, can pour oil and brush oil.",
    "specs": [
     [
-     "Item Dimensions L x W",
-     "12L x 7W Centimeters"
+     "Capacity",
+     "230 Milliliters"
     ],
     [
-     "Colour",
-     "Pack 1(9 inch)"
+     "Item Dimensions W x H",
+     "6.3W x 14.5H Centimeters"
     ]
    ]
   },
@@ -352,11 +217,11 @@
    "link": "https://www.amazon.in/dp/B08FBKK7PM?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    0.98,
+    1.0,
     0.9,
-    0.6
+    0.39
    ],
-   "length": 0.4,
+   "length": 0.38,
    "rotY": 1.5708,
    "desc": "Premium Quality Mango Wood for Durability and Sustainability – Crafted from high-quality mango wood, this cutting board is naturally strong, durable, and resistant to moisture.",
    "specs": [
@@ -367,6 +232,218 @@
    ]
   },
   {
+   "id": "7419de18-ae70-4a51-8835-6e8645a84a38",
+   "name": "Wooden Tissue Roll Holder",
+   "file": "final/7419de18.glb",
+   "listing": "Vintageware® Wooden Kitchen Tissue Roll Holder Stand",
+   "link": "https://link.amazon/B02CBhvd1",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    1.36,
+    0.9,
+    0.3
+   ],
+   "height": 0.3,
+   "desc": "Convenient holder that keeps paper towels easily accessible while saving counter space.",
+   "specs": [
+    [
+     "Material",
+     "Wood"
+    ],
+    [
+     "Colour",
+     "Brown"
+    ],
+    [
+     "Brand",
+     "Vintageware"
+    ]
+   ]
+  },
+  {
+   "id": "3e046e4a-7300-495a-b6b3-3235b78f4b0c",
+   "name": "HomeCloud Dish Drying Mat",
+   "file": "final/3e046e4a.glb",
+   "listing": "HomeCloud Dish Drying Mat for Kitchen Counter Hide Stain Super Absorbent, Non-Slip, Heat-Resistant",
+   "link": "https://link.amazon/B0dp7zFpX",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    1.12,
+    0.9,
+    1.16
+   ],
+   "length": 0.5,
+   "rotY": 1.5708,
+   "desc": "Highly absorbent drying mat that protects countertops while drying dishes and cookware.",
+   "specs": [
+    [
+     "Colour",
+     "Brown, Multi"
+    ],
+    [
+     "Material",
+     "Rubber"
+    ],
+    [
+     "Product Dimensions",
+     "50L x 40W Centimeters"
+    ]
+   ]
+  },
+  {
+   "id": "f146104d-860b-4abb-bb80-5b9c29c4e0b4",
+   "name": "Clazkit Strainer Bowl",
+   "file": "final/f146104d.glb",
+   "listing": "Clazkit Multi-Purpose Strainer or Washer Bowl for Rice Fruits & Vegetable Rice Bowl Color May Vary, Plastic - 10.2 x 17.5 x 24.3 Centimeters",
+   "link": "https://www.amazon.in/dp/B0C7V8RC3J?tag=urbannest03b-21",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    1.08,
+    0.905,
+    1.14
+   ],
+   "length": 0.22,
+   "desc": "**Multi-Functional Design:** - Versatile bowl designed for washing fruits, vegetables, straining rice, pasta, lentils, and more.",
+   "specs": [
+    [
+     "Item Dimensions L x W x H",
+     "10L x 10W x 10H Millimeters"
+    ],
+    [
+     "Colour",
+     "Color May Vary"
+    ]
+   ]
+  },
+  {
+   "id": "04283da4-9167-45c5-9612-437410f87051",
+   "name": "Coffee Mugs",
+   "file": "final/04283da4.glb",
+   "listing": "Coffee Mugs",
+   "link": "https://amzn.to/4eG3jcj",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    1.27,
+    1.938,
+    0.765
+   ],
+   "height": 0.1,
+   "rotY": -1.5708,
+   "desc": "Sturdy, comfortable mugs made for your everyday coffee or tea ritual, with a clean, timeless look.",
+   "specs": [
+    [
+     "Material",
+     "Porcelain"
+    ]
+   ]
+  },
+  {
+   "id": "3bc04eb5-4cd9-4a4b-888d-8044c7fea590",
+   "name": "Butter Dish with Lid",
+   "file": "final/3bc04eb5.glb",
+   "listing": "Butter Dish with Lid, Durable Butter Container for Fridge",
+   "link": "https://amzn.to/4vd5ZmG",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    1.27,
+    1.938,
+    0.53
+   ],
+   "length": 0.18,
+   "rotY": -1.5708,
+   "desc": "A simple, elegant butter dish that keeps butter fresh and adds a tidy touch to the table.",
+   "specs": [
+    [
+     "Material",
+     "Stainless Steel"
+    ],
+    [
+     "Colour",
+     "Green"
+    ],
+    [
+     "Brand",
+     "True Decor"
+    ]
+   ]
+  },
+  {
+   "id": "c02bca89-2008-4cdb-bb4f-241e0f2ec89e",
+   "name": "D'Maiolica Pickle Jars, Set of 2",
+   "file": "final/c02bca89.glb",
+   "listing": "D'Maiolica Ceramic Handmade Pickle Jars in 1000ml (set of 2) | Floral Bale 1 kg Achaar Martban",
+   "link": "https://www.amazon.in/dp/B0H6GLJWNJ?tag=urbannest03b-21",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    1.27,
+    1.538,
+    0.765
+   ],
+   "length": 0.25,
+   "rotY": -1.5708,
+   "desc": "Made from high-quality, durable ceramic, ensuring long-lasting use and a timeless appearance.",
+   "specs": [
+    [
+     "Brand",
+     "D'Maiolica"
+    ],
+    [
+     "Material Type",
+     "Stoneware"
+    ],
+    [
+     "Brand Name",
+     "D'Maiolica"
+    ]
+   ]
+  },
+  {
+   "id": "ace72caf-f295-447d-9d8e-afe036d494dc",
+   "name": "Painted Pickle Jars with Tray",
+   "file": "final/ace72caf.glb",
+   "listing": "Pickle Jar With Spoons | Achar Jar Set for Dining Table",
+   "link": "https://link.amazon/B09FGvo78",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    1.27,
+    1.538,
+    0.53
+   ],
+   "length": 0.27,
+   "desc": "Handcrafted and hand-painted by Indian artisans, this charming pickle holder brings the serene, colourful character of a Puducherry village to your kitchen.",
+   "specs": [
+    [
+     "Colour",
+     "JARS: Multicolored, TRAY: Dark Brown"
+    ],
+    [
+     "Material",
+     "Ceramic, Wood"
+    ],
+    [
+     "Brand",
+     "ExclusiveLane"
+    ]
+   ]
+  },
+  {
+   "id": "c65af49f-f8d4-402c-981e-6af2ae270066",
+   "name": "Green Knife Set of 3",
+   "file": "final/c65af49f.glb",
+   "listing": "Green Knife Set",
+   "link": "https://amzn.to/4aRBcET",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    0.625,
+    0.582,
+    -0.27
+   ],
+   "length": 0.318,
+   "rotY": 1.5708,
+   "desc": "A sharp, versatile knife set in a striking green finish, perfect for everyday prep and serving with style.",
+   "specs": []
+  },
+  {
    "id": "b46a7d38-021d-4c5c-bea0-d64c4a980cd4",
    "name": "HomeWiz Garlic Press",
    "file": "final/b46a7d38.glb",
@@ -374,9 +451,9 @@
    "link": "https://www.amazon.in/dp/B0DNZFY3BK?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    0.98,
-    0.925,
-    0.5
+    0.72,
+    0.582,
+    -0.56
    ],
    "length": 0.16,
    "rotY": 1.5708,
@@ -400,9 +477,9 @@
    "link": "https://www.amazon.in/dp/B0GZ3NNX3F?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    0.99,
-    0.925,
-    0.7
+    0.62,
+    0.582,
+    -0.62
    ],
    "length": 0.17,
    "rotY": 1.5708,
@@ -410,235 +487,30 @@
    "specs": []
   },
   {
-   "id": "7419de18-ae70-4a51-8835-6e8645a84a38",
-   "name": "Wooden Tissue Roll Holder",
-   "file": "final/7419de18.glb",
-   "listing": "Vintageware® Wooden Kitchen Tissue Roll Holder Stand",
-   "link": "https://link.amazon/B02CBhvd1",
+   "id": "71a93adf-95f7-4f63-82b5-ff1bdc4b9135",
+   "name": "Silicone Basting Brush",
+   "file": "final/71a93adf.glb",
+   "listing": "P-Plus International Silicone Basting Brush Set,Stainless Steel Basting Brush with Silicone Bristles for BBQ/Grilling/Pastry Kitchen Oil",
+   "link": "https://www.amazon.in/dp/B07R855Y1X?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    1.33,
-    0.9,
-    0.68
+    0.81,
+    0.582,
+    -0.25
    ],
-   "height": 0.3,
-   "desc": "Convenient holder that keeps paper towels easily accessible while saving counter space.",
-   "specs": [
-    [
-     "Material",
-     "Wood"
-    ],
-    [
-     "Colour",
-     "Brown"
-    ],
-    [
-     "Brand",
-     "Vintageware"
-    ]
-   ]
-  },
-  {
-   "id": "b4bd8136-6639-49d6-ab75-397f4027d88e",
-   "name": "HomeWiz Hung Curd Maker",
-   "file": "final/b4bd8136.glb",
-   "listing": "HomeWiz Hung Curd Maker 1100ml with Fine Steel Mesh",
-   "link": "https://link.amazon/B086fRRSl",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    1.31,
-    0.9,
-    0.88
-   ],
-   "height": 0.185,
-   "desc": "Makes thick, fresh hung curd effortlessly for dips, desserts, and healthy recipes.",
-   "specs": [
-    [
-     "Material",
-     "Plastic"
-    ],
-    [
-     "Colour",
-     "White"
-    ],
-    [
-     "Brand",
-     "HomeWiz"
-    ]
-   ]
-  },
-  {
-   "id": "3e046e4a-7300-495a-b6b3-3235b78f4b0c",
-   "name": "HomeCloud Dish Drying Mat",
-   "file": "final/3e046e4a.glb",
-   "listing": "HomeCloud Dish Drying Mat for Kitchen Counter Hide Stain Super Absorbent, Non-Slip, Heat-Resistant",
-   "link": "https://link.amazon/B0dp7zFpX",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    1.15,
-    0.9,
-    1.18
-   ],
-   "length": 0.5,
-   "desc": "Highly absorbent drying mat that protects countertops while drying dishes and cookware.",
-   "specs": [
-    [
-     "Colour",
-     "Brown, Multi"
-    ],
-    [
-     "Material",
-     "Rubber"
-    ],
-    [
-     "Product Dimensions",
-     "50L x 40W Centimeters"
-    ]
-   ]
-  },
-  {
-   "id": "04283da4-9167-45c5-9612-437410f87051",
-   "name": "Coffee Mugs",
-   "file": "final/04283da4.glb",
-   "listing": "Coffee Mugs",
-   "link": "https://amzn.to/4eG3jcj",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    1.12,
-    0.905,
-    1.16
-   ],
-   "height": 0.1,
-   "desc": "Sturdy, comfortable mugs made for your everyday coffee or tea ritual, with a clean, timeless look.",
-   "specs": [
-    [
-     "Material",
-     "Porcelain"
-    ]
-   ]
-  },
-  {
-   "id": "e5075788-af2b-4f32-a8d1-17d115915852",
-   "name": "Ecotribe Cotton Apron",
-   "file": "final/e5075788.glb",
-   "listing": "Ecotribe Cotton Apron for Kitchen-Adjustable Belt-Unisex Apron with Utility Pocket-Cooking Kitchen Apron-Free Size",
-   "link": "https://www.amazon.in/dp/B09T5VTJ4Z?tag=urbannest03b-21",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    -0.8,
-    0.78,
-    1.25
-   ],
-   "height": 0.78,
+   "length": 0.21,
    "rotY": 1.5708,
-   "desc": "",
+   "desc": "[Safe and Durable] Made from high quality eco-friendly silicone and stainless steel.",
    "specs": [
     [
      "Item Dimensions L x W",
-     "80L x 65W Centimeters"
+     "12L x 7W Centimeters"
     ],
     [
      "Colour",
-     "Denim Grey & Black"
-    ]
-   ],
-   "alignLeft": -0.83
-  },
-  {
-   "id": "48410c20-4c17-471e-8141-2620d3f04818",
-   "name": "Amazon Basics Knife Block Set",
-   "file": "final/48410c20.glb",
-   "listing": "amazon basics Stainless Steel Knife Set with High-carbon Blades and Pine Wood Block, 14 Pieces",
-   "link": "https://www.amazon.in/dp/B00R3Z49G6?tag=urbannest03b-21",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    1.06,
-    0.9,
-    -1.58
-   ],
-   "height": 0.36,
-   "rotY": -0.35,
-   "desc": "14-piece knife set includes: 1 Pine wood block, 1 pair of scissors, 11 knife( 8-inch chef's knife, 8-inch slicing knife, 8-inch bread knife, 5.5-inch utility knife, and 3.5-inch peeling knife) Also includes (6) 4.5-inch ",
-   "specs": [
-    [
-     "Colour",
-     "Multicolor"
+     "Pack 1(9 inch)"
     ]
    ]
-  },
-  {
-   "id": "ace72caf-f295-447d-9d8e-afe036d494dc",
-   "name": "Painted Pickle Jars with Tray",
-   "file": "final/ace72caf.glb",
-   "listing": "Pickle Jar With Spoons | Achar Jar Set for Dining Table",
-   "link": "https://link.amazon/B09FGvo78",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    0.74,
-    0.9,
-    -1.59
-   ],
-   "length": 0.27,
-   "desc": "Handcrafted and hand-painted by Indian artisans, this charming pickle holder brings the serene, colourful character of a Puducherry village to your kitchen.",
-   "specs": [
-    [
-     "Colour",
-     "JARS: Multicolored, TRAY: Dark Brown"
-    ],
-    [
-     "Material",
-     "Ceramic, Wood"
-    ],
-    [
-     "Brand",
-     "ExclusiveLane"
-    ]
-   ]
-  },
-  {
-   "id": "c02bca89-2008-4cdb-bb4f-241e0f2ec89e",
-   "name": "D'Maiolica Pickle Jars, Set of 2",
-   "file": "final/c02bca89.glb",
-   "listing": "D'Maiolica Ceramic Handmade Pickle Jars in 1000ml (set of 2) | Floral Bale 1 kg Achaar Martban",
-   "link": "https://www.amazon.in/dp/B0H6GLJWNJ?tag=urbannest03b-21",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    0.3,
-    1.128,
-    -1.74
-   ],
-   "length": 0.25,
-   "desc": "Made from high-quality, durable ceramic, ensuring long-lasting use and a timeless appearance.",
-   "specs": [
-    [
-     "Brand",
-     "D'Maiolica"
-    ],
-    [
-     "Material Type",
-     "Stoneware"
-    ],
-    [
-     "Brand Name",
-     "D'Maiolica"
-    ]
-   ]
-  },
-  {
-   "id": "c65af49f-f8d4-402c-981e-6af2ae270066",
-   "name": "Green Knife Set of 3",
-   "file": "final/c65af49f.glb",
-   "listing": "Green Knife Set",
-   "link": "https://amzn.to/4aRBcET",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    -0.92,
-    0.9,
-    -1.4
-   ],
-   "length": 0.318,
-   "desc": "A sharp, versatile knife set in a striking green finish, perfect for everyday prep and serving with style.",
-   "specs": []
   },
   {
    "id": "6970f7d6-2c64-4e7f-a0c3-41e8de7d56b0",
@@ -680,7 +552,7 @@
    "pos": [
     0.0,
     0.0,
-    -0.78
+    -0.8
    ],
    "length": 1.2,
    "rotY": 1.5708,
@@ -704,9 +576,9 @@
    "link": "https://www.amazon.in/dp/B0GGHRLMWC?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
-    0.52,
+    0.55,
     0.0,
-    0.35
+    0.4
    ],
    "length": 1.2,
    "desc": "Waterproof & Easy to Clean Protects your floors from water, oil, stains, and spills.",
@@ -718,5 +590,29 @@
    ]
   }
  ],
- "staging": []
+ "staging": [
+  {
+   "name": "Bajaj Mixer Grinder",
+   "file": "final/stage_mixer.glb",
+   "length": 0.36,
+   "pos": [
+    1.27,
+    0.9,
+    0.77
+   ],
+   "rotY": -1.5708
+  },
+  {
+   "name": "Elica Curved Glass Chimney",
+   "file": "final/stage_chimney.glb",
+   "length": 0.6,
+   "pos": [
+    1.25,
+    1.57,
+    -0.455
+   ],
+   "rotY": -1.5708,
+   "alignRight": 1.43
+  }
+ ]
 }

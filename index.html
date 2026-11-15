@@ -2272,7 +2272,21 @@
     el.addEventListener('pointercancel', end);
   }
   document.getElementById('deckNext').onclick = function () { fling(deck.lastElementChild, 1); };
-  document.getElementById('deckBack').onclick = function () { top = (top - 1 + CARDS.length) % CARDS.length; renderDeck(); };
+  /* Back is Next in reverse: the previous card is put on top and flies in from the left, the way the
+     current one flies out to the right. Same speed and the same tilt, so the two read as one motion. */
+  function flingBack() {
+    top = (top - 1 + CARDS.length) % CARDS.length;
+    renderDeck();
+    var el = deck.lastElementChild;                      // the top card is drawn last
+    el.style.transition = 'none';
+    el.style.transform = 'translateX(-130%) rotate(-18deg)';
+    el.style.opacity = '0';
+    void el.offsetWidth;                                 // let the browser register the start position
+    el.style.transition = '';                            // back to the stylesheet's .4s transition
+    el.style.transform = 'translate(0px,0px)';
+    el.style.opacity = '1';
+  }
+  document.getElementById('deckBack').onclick = flingBack;
   renderDeck();
 
   /* ── The Nest Edit, from the live articles ── */

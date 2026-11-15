@@ -588,6 +588,45 @@
                 font-family: 'Bodoni Moda', serif; font-style: italic; font-size: clamp(15px,1.9vw,24px); color: #F5F7F6; }
 </style>
 
+<!-- The same footer as every other page (About, The Nest Edit, Essentials ...) -->
+<style>
+  footer { padding: 32px 48px; background: var(--panel); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; border-top: 0.5px solid rgba(234,242,241,0.06); }
+  .footer-left { display: flex; align-items: center; gap: 12px; }
+  .footer-icon { width: 26px; height: 26px; border-radius: 50%; overflow: hidden; }
+  .footer-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 14px; letter-spacing: 0.18em; color: rgba(234,242,241,0.3); }
+  .footer-disclosure {
+    flex-basis: 100%; order: -1; max-width: 86ch;
+    padding-bottom: 20px; margin-bottom: 4px;
+    border-bottom: .5px solid rgba(234,242,241,.08);
+    font-size: 11.5px; line-height: 1.85; color: rgba(234,242,241,.34);
+    text-align: left;
+  }
+  .footer-disclosure a { color: var(--gold); text-decoration: none; white-space: nowrap; }
+  .footer-disclosure a:hover { text-decoration: underline; }
+  .footer-note { font-size: 11px; color: rgba(234,242,241,0.18); letter-spacing: 0.06em; }
+  @media (max-width: 768px) {
+    footer { padding: 24px 20px; flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+<footer>
+  <div class="footer-disclosure">
+    Every piece here is shown as a 3D model, built with AI assistance from the
+    maker&rsquo;s own photographs. It is a close likeness, not a photograph of the
+    object itself, so colour, finish and scale can differ from what arrives.
+    Treat the specification, and the seller&rsquo;s own page where there is one, as
+    the final word. Where a piece links out to a retailer we may earn a
+    commission on the sale; where it is sold here, the seller is named on the piece.
+    Pieces marked &ldquo;Sold &amp; shipped via Amazon&rdquo; are bought on Amazon; as an Amazon Associate, we earn from qualifying purchases.
+    <a href="about.html#renders">How we model things &rarr;</a>
+  </div>
+  <div class="footer-left">
+    <div class="footer-icon"><img src="logo-icon.png" alt="Urban Nest"/></div>
+    <span class="footer-logo">URBAN NEST</span>
+  </div>
+  <a href="policies.html" class="footer-note" style="text-decoration:none;margin-right:16px">Policies</a><a href="/studio/" class="footer-note" style="text-decoration:none;margin-right:16px">Creator sign in</a><div class="footer-note">© 2026 Urban Nest · All rights reserved</div>
+</footer>
+
 
 <script>
 function handleCityChange(val) {

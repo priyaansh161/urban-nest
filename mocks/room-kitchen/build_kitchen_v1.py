@@ -114,7 +114,9 @@ def world_uv(o, tile, vertical_grain=False):
     """Texture UVs from world position, projected along each face's main axis (real scale). vertical_grain: the image's
     v axis runs up (z) on every side face, so a laminate's grain stands upright like the photo's tall units."""
     me = o.data; uv = me.uv_layers[0] if me.uv_layers else me.uv_layers.new(name='UVMap'); mw = o.matrix_world
+    keep = {i for i, sl in enumerate(o.material_slots) if sl.material and sl.material.name.startswith(('Samsung', 'Elica', 'Electrolux'))}
     for poly in me.polygons:
+        if poly.material_index in keep: continue                 # appliance faces keep their own photo mapping
         ax = max(range(3), key=lambda i: abs(poly.normal[i]))
         for li, vi in zip(poly.loop_indices, poly.vertices):
             p = mw @ me.vertices[vi].co
@@ -220,7 +222,18 @@ def outside_image():
     rgb = np.where(trees[..., None], leaf, rgb)
     return SL.img('outside_col', np.clip(rgb, 0, 1), TMP)
 
-LAM = (0.60, 0.41, 0.23)                       # the photo's warm oak laminate
+LAM = (0.60, 0.41, 0.23)
+APP = os.path.join(OUT, 'appliances')
+def face_mat(name, file, rough):
+    im = bpy.data.images.load(os.path.join(APP, file)); im.pack()
+    return pbr(name, im, None, None, rough=rough)
+def face_uv(o, axis_u, axis_v, u0, u1, v0, v1):
+    """Fit the image over the object: u along axis_u from u0..u1, v along axis_v from v0..v1 (world)."""
+    me = o.data; uv = me.uv_layers[0] if me.uv_layers else me.uv_layers.new(name='UV')
+    for poly in me.polygons:
+        for li, vi in zip(poly.loop_indices, poly.vertices):
+            c = me.vertices[vi].co
+            uv.data[li].uv = ((c[axis_u] - u0) / (u1 - u0), (c[axis_v] - v0) / (v1 - v0))                       # the photo's warm oak laminate
 M = {
     'wall': pbr('Warm White Paint', scan_img('beige_wall_001/beige_wall_001_diff_2k.jpg', 1024, recolour=(0.90, 0.86, 0.78), contrast=0.25),
                 scan_img('beige_wall_001/beige_wall_001_nor_gl_2k.jpg', 1024, False), None, rough=0.85, nstr=0.4),
@@ -239,6 +252,10 @@ M = {
     'blackglass': mat('Black Glass', (0.012, 0.012, 0.014, 1), 0.06),
     'steel': mat('Brushed Steel (painted)', (0.30, 0.31, 0.33, 1), 0.32),       # metal bakes black in a diffuse map: painted grey
     'steeldark': mat('Steel Shadow', (0.14, 0.145, 0.155, 1), 0.35),
+    'fridge': face_mat('Samsung Side-by-Side Doors', 'fridge_front.png', 0.3),
+    'oven': face_mat('Elica Built-in Oven Front', 'oven_front.png', 0.08),
+    'micro': face_mat('Electrolux Built-in Microwave Front', 'microwave_front.png', 0.1),
+    'brushed': mat('Fridge Side Steel', (0.40, 0.41, 0.43, 1), 0.35),
     'upvc': mat('White uPVC', (0.94, 0.94, 0.93, 1), 0.35),
     'glass': mat('Window Glass', (0.85, 0.90, 0.92, 1), 0.02, alpha=0.08),
     'matblack': mat('Matte Black', (0.02, 0.02, 0.022, 1), 0.45),
@@ -329,25 +346,31 @@ def shutter_gaps(parts, x, ys, za, zb):
 tall = [bx('Tall Carcass', X0, FX, -1.70, -0.05, 0.08, Z_TALL, M['oak']), bx('Tall Plinth', X0, FX - 0.05, -1.70, -0.05, 0, 0.08, M['navy'])]
 # appliances column y -0.70..-0.10: drawer under, oven, microwave, shutter over
 AY0, AY1 = -0.68, -0.10
-tall += [bx('Oven', FX, FX + 0.012, AY0 + 0.01, AY1 - 0.01, 0.50, 1.10, M['blackglass'], 0.003),
-         bx('Oven Window', FX + 0.012, FX + 0.014, AY0 + 0.07, AY1 - 0.07, 0.56, 0.92, M['matblack']),
-         bx('Oven Handle', FX + 0.03, FX + 0.045, AY0 + 0.05, AY1 - 0.05, 0.98, 1.0, M['steel'], 0.004),
-         bx('Oven Panel', FX + 0.012, FX + 0.014, AY0 + 0.05, AY1 - 0.05, 1.01, 1.08, M['steeldark']),
-         bx('Microwave', FX, FX + 0.012, AY0 + 0.01, AY1 - 0.01, 1.16, 1.56, M['blackglass'], 0.003),
-         bx('Microwave Window', FX + 0.012, FX + 0.014, AY0 + 0.04, AY1 - 0.16, 1.21, 1.51, M['matblack']),
-         bx('Microwave Panel', FX + 0.012, FX + 0.014, AY1 - 0.13, AY1 - 0.04, 1.21, 1.51, M['steeldark'])]
-for k in range(3): tall.append(cyl('Knob', (FX + 0.02, AY0 + 0.12 + k * 0.08, 1.045), 0.012, 0.02, M['steel'], rot=(0, math.pi / 2, 0), seg=16))
-shutter_gaps(tall, FX, [AY0, AY1, -1.19], 0.08, Z_TALL)
-for z in (0.50, 1.10, 1.16, 1.56, 1.62): tall.append(bx('Gap', FX, FX + 0.003, AY0, AY1, z - 0.002, z + 0.002, M['gap']))
-tall.append(bx('Gap', FX, FX + 0.003, -1.70, AY0, 1.20, 1.204, M['gap']))
+ACX = (AY0 + AY1) / 2
+OV = bx('Oven', FX - 0.01, FX + 0.008, ACX - 0.2975, ACX + 0.2975, 0.505, 1.100, M['oven'], 0.002)
+face_uv(OV, 1, 2, ACX - 0.2975, ACX + 0.2975, 0.505, 1.100)      # faces +x: looking at it from the aisle, +y is to the right
+MW = bx('Microwave', FX - 0.01, FX + 0.008, ACX - 0.2975, ACX + 0.2975, 1.160, 1.549, M['micro'], 0.002)
+face_uv(MW, 1, 2, ACX - 0.2975, ACX + 0.2975, 1.160, 1.549)
+tall += [OV, MW, bx('Oven Handle', FX + 0.008, FX + 0.030, ACX - 0.255, ACX + 0.255, 0.930, 0.942, M['steel'], 0.005)]
+for dy in (-0.13, 0.0, 0.135):                                  # the three steel dials standing out of the glass
+    tall.append(cyl('Dial', (FX + 0.018, ACX + dy, 1.048), 0.019, 0.02, M['steel'], rot=(0, math.pi / 2, 0), seg=32))
+# the panel lines stand clear of the appliances (his review, 15 Nov: lines hugging the 59.5 cm oven made it look as if it
+# slid out of its panel): the column is 64 cm, 2.25 cm of oak each side, one line under the oven, one between, one over
+CG0, CG1 = ACX - 0.32, ACX + 0.32
+shutter_gaps(tall, FX, [CG0, CG1, -1.19], 0.08, Z_TALL)
+for z in (0.475, 1.13, 1.58): tall.append(bx('Gap', FX, FX + 0.003, CG0, CG1, z - 0.002, z + 0.002, M['gap']))
+tall.append(bx('Gap', FX, FX + 0.003, -1.70, CG0, 1.20, 1.204, M['gap']))
 tall_u = join(tall, 'LM_TallUnit'); world_uv(tall_u, 2.0); lm(tall_u, 2048)
 # fridge y -0.02..0.78: double-door, steel, recessed handles; oak cabinet over it; a 30 cm oak pull-out pantry to the back run
 FY0, FY1 = -0.02, 0.78
-fr = [bx('Fridge Body', X0 + 0.02, X0 + 0.72, FY0, FY1, 0.03, 1.80, M['steel'], 0.012), bx('Fridge Feet', X0 + 0.05, X0 + 0.68, FY0 + 0.03, FY1 - 0.03, 0, 0.03, M['matblack']),
-      bx('Fridge Seam', X0 + 0.72, X0 + 0.723, FY0 + 0.01, FY1 - 0.01, 1.22, 1.226, M['steeldark']),
-      bx('Fridge Seam', X0 + 0.72, X0 + 0.723, (FY0 + FY1) / 2 - 0.002, (FY0 + FY1) / 2 + 0.002, 0.04, 1.79, M['steeldark'])]
-for y_ in ((FY0 + FY1) / 2 - 0.045, (FY0 + FY1) / 2 + 0.045):
-    fr.append(bx('Fridge Handle', X0 + 0.723, X0 + 0.745, y_ - 0.008, y_ + 0.008, 0.70, 1.60, M['steel'], 0.004))
+FB = bx('Fridge Body', X0 + 0.02, X0 + 0.68, FY0 + 0.005, FY1 - 0.005, 0.04, 1.80, M['brushed'], 0.006)
+FD = bx('Fridge Doors', X0 + 0.68, X0 + 0.73, FY0 + 0.005, FY1 - 0.005, 0.04, 1.80, M['fridge'], 0.008)
+face_uv(FD, 1, 2, FY0 + 0.005, FY1 - 0.005, 0.04, 1.80)          # faces +x: the photo's left (freezer) is the room's -y side
+fr = [FB, FD, bx('Fridge Feet', X0 + 0.05, X0 + 0.66, FY0 + 0.04, FY1 - 0.04, 0, 0.04, M['matblack'])]
+GY = (FY0 + 0.005) + (FY1 - FY0 - 0.01) * (325 / 697)            # the photo's door gap: 309..341 of its 697 px
+for y_ in (GY - 0.035, GY + 0.035):                              # vertical bar handles either side of the gap
+    fr.append(bx('Fridge Handle', X0 + 0.735, X0 + 0.752, y_ - 0.009, y_ + 0.009, 0.62, 1.42, M['steel'], 0.005))
+    for z_ in (0.64, 1.40): fr.append(bx('Handle Post', X0 + 0.728, X0 + 0.737, y_ - 0.007, y_ + 0.007, z_ - 0.012, z_ + 0.012, M['steel'], 0.002))
 fr += [bx('Over Fridge', X0, FX, FY0, FY1, 1.88, Z_TALL, M['oak']), bx('Pantry', X0, FX, FY1 + 0.005, 1.10, 0.08, Z_TALL, M['oak']),
        bx('Pantry Plinth', X0, FX - 0.05, FY1, 1.10, 0, 0.08, M['navy']), bx('Fridge Side', X0, FX, FY1, FY1 + 0.005, 0.08, Z_TALL, M['oak'])]
 shutter_gaps(fr, FX, [(FY0 + FY1) / 2], 1.88, Z_TALL)
@@ -381,10 +404,35 @@ def base_run_x(ya, yb, doors, drawers=None):
             base.append(bx('Gap', RX - 0.001, RX + 0.002, ya_, yb_, z - 0.002, z + 0.002, M['gap']))
             base.append(bx('Drawer Profile', RX - 0.012, RX, ya_ + 0.01, yb_ - 0.01, z - 0.03, z - 0.012, M['profile']))
 base_run_y(KNEE, X1 - 0.60, [0.05, 0.40])
-base_run_x(-1.40, Y1, [-0.98, -0.52, 0.08, 0.83], drawers=(0.08, 0.83, [0.33, 0.56]))
+base_run_x(-1.40, Y1, [-0.98, -0.52, 0.08, 0.83], drawers=(0.08, 0.83, [0.33]))
+DR = dict(y0=0.085, y1=0.825, z0=0.565, z1=0.795, out=0.40)      # the open drawer
+
 base.append(bx('Knee Back', X0 + D_TALL, KNEE, Y1 - 0.02, Y1, 0.0, 0.86, M['wall']))
 base.append(bx('Knee Side', KNEE, KNEE + 0.02, BY + 0.02, Y1, 0.0, 0.86, M['navy']))
 base.append(bx('End Panel', RX, X1, -1.42, -1.40, 0.0, 0.86, M['navy']))
+def ctr(o):                                                         # a part's real centre (the boxes keep it in the mesh, not the object)
+    return sum((o.matrix_world @ Vector(c) for c in o.bound_box), Vector()) / 8
+for f_ in base:                                                    # the back-run carcass under the sink: hollow where the bowl hangs
+    if f_.name.startswith('Carcass') and f_.dimensions.x > 0.9 and ctr(f_).y > 1.0:
+        cut(f_, box('cut', (SINK[0], SINK[1], 0.76), (SINK[2] + 0.06, SINK[3] + 0.06, 0.30), M['gap']))
+for i_, f_ in enumerate(base):
+    if f_.name.startswith(('Front', 'Carcass')) and f_.dimensions.y > 3.0 and ctr(f_).x > RX - 0.05:   # the right run: open the drawer's mouth and the space behind it
+        cut(f_, box('cut', (RX + 0.27, (DR['y0'] + DR['y1']) / 2, (DR['z0'] + DR['z1']) / 2), (0.56, DR['y1'] - DR['y0'], DR['z1'] - DR['z0']), M['gap']))
+M['cavity'] = mat('Cabinet Cavity', (0.025, 0.025, 0.03, 1), 0.8)
+base += [bx('Cavity Top', RX + 0.02, RX + 0.55, DR['y0'], DR['y1'], DR['z1'], DR['z1'] + 0.006, M['cavity']),
+         bx('Cavity Back', RX + 0.54, RX + 0.55, DR['y0'], DR['y1'], DR['z0'], DR['z1'], M['cavity']),
+         bx('Cavity Side', RX + 0.02, RX + 0.55, DR['y0'] - 0.006, DR['y0'], DR['z0'], DR['z1'], M['cavity']),
+         bx('Cavity Side', RX + 0.02, RX + 0.55, DR['y1'], DR['y1'] + 0.006, DR['z0'], DR['z1'], M['cavity']),
+         bx('Cavity Floor', RX + 0.02, RX + 0.55, DR['y0'], DR['y1'], DR['z0'] - 0.006, DR['z0'], M['cavity'])]
+xf_ = RX - DR['out']                                               # the drawer itself: navy front, steel profile, white box inside
+M['drawerin'] = mat('Drawer Inside', (0.86, 0.85, 0.83, 1), 0.5)
+base += [bx('Drawer Front', xf_ - 0.02, xf_, DR['y0'], DR['y1'], DR['z0'] - 0.003, DR['z1'] + 0.003, M['navy']),
+         bx('Drawer Profile', xf_ - 0.032, xf_ - 0.02, DR['y0'] + 0.01, DR['y1'] - 0.01, DR['z1'] - 0.03, DR['z1'] - 0.012, M['profile']),
+         bx('Drawer Bottom', xf_, RX + 0.50, DR['y0'] + 0.01, DR['y1'] - 0.01, DR['z0'] + 0.005, DR['z0'] + 0.017, M['drawerin']),
+         bx('Drawer Side', xf_, RX + 0.50, DR['y0'] + 0.01, DR['y0'] + 0.022, DR['z0'] + 0.005, DR['z1'] - 0.06, M['drawerin']),
+         bx('Drawer Side', xf_, RX + 0.50, DR['y1'] - 0.022, DR['y1'] - 0.01, DR['z0'] + 0.005, DR['z1'] - 0.06, M['drawerin']),
+         bx('Drawer Back', RX + 0.488, RX + 0.50, DR['y0'] + 0.01, DR['y1'] - 0.01, DR['z0'] + 0.005, DR['z1'] - 0.06, M['drawerin']),
+         bx('Drawer Divider', xf_, RX + 0.50, 0.44, 0.452, DR['z0'] + 0.017, DR['z0'] + 0.08, M['drawerin'])]
 bases = join(base, 'LM_Bases'); world_uv(bases, 1.0); lm(bases, 2048)
 # quartz counter in one piece, sink cut in it; marble splash up to the wall cabinets
 top_parts = [bx('Counter Back', X0 + D_TALL, X1, BY - 0.02, Y1, 0.86, CT, M['quartz'], 0.003),
@@ -394,14 +442,25 @@ cutter = box('cut', (SINK[0], SINK[1], 0.88), (SINK[2], SINK[3], 0.2), M['quartz
 world_uv(counter, 1.2); lm(counter, 2048)
 sk = []
 SX0, SX1, SY0, SY1, SZ = SINK[0] - SINK[2] / 2, SINK[0] + SINK[2] / 2, SINK[1] - SINK[3] / 2, SINK[1] + SINK[3] / 2, 0.68
-sk += [bx('Sink Floor', SX0, SX1, SY0, SY1, SZ - 0.01, SZ, M['steeldark']), bx('Sink Wall', SX0 - 0.01, SX0, SY0, SY1, SZ, 0.88, M['steel']),
-       bx('Sink Wall', SX1, SX1 + 0.01, SY0, SY1, SZ, 0.88, M['steel']), bx('Sink Wall', SX0, SX1, SY0 - 0.01, SY0, SZ, 0.88, M['steel']),
-       bx('Sink Wall', SX0, SX1, SY1, SY1 + 0.01, SZ, 0.88, M['steel'])]
-sk.append(cyl('Drain', (SINK[0] + 0.12, SINK[1], SZ + 0.001), 0.04, 0.003, M['steeldark'], seg=32))
-tp = [(SINK[0] - 0.10, SY1 + 0.05, CT), (SINK[0] - 0.10, SY1 + 0.05, CT + 0.25), (SINK[0] - 0.10, SY1 + 0.03, CT + 0.33), (SINK[0] - 0.10, SY1 - 0.04, CT + 0.355), (SINK[0] - 0.10, SY1 - 0.11, CT + 0.33), (SINK[0] - 0.10, SY1 - 0.13, CT + 0.27)]
-sk.append(SL.tube('Tap', tp, [0.014, 0.013, 0.012, 0.012, 0.012, 0.013], M['matblack'], seg=16))
-sk.append(cyl('Tap Base', (SINK[0] - 0.10, SY1 + 0.05, CT + 0.015), 0.025, 0.03, M['matblack'], seg=24))
-sk.append(box('Tap Lever', (SINK[0] - 0.10 + 0.04, SY1 + 0.05, CT + 0.12), (0.07, 0.012, 0.012), M['matblack'], 0.004))
+M['sinksteel'] = mat('Sink Satin Steel', (0.30, 0.31, 0.33, 1), 0.38)
+SZ = 0.66                                                        # bowl floor: 20 cm below the counter top
+M['sinkfloor'] = mat('Sink Floor Steel', (0.20, 0.205, 0.22, 1), 0.4)
+T_ = 0.008
+sk += [bx('Sink Floor', SX0, SX1, SY0, SY1, SZ - T_, SZ, M['sinkfloor'], 0.002),
+       bx('Sink Wall L', SX0 - T_, SX0, SY0 - T_, SY1 + T_, SZ - T_, 0.875, M['sinksteel']), bx('Sink Wall R', SX1, SX1 + T_, SY0 - T_, SY1 + T_, SZ - T_, 0.875, M['sinksteel']),
+       bx('Sink Wall F', SX0, SX1, SY0 - T_, SY0, SZ - T_, 0.875, M['sinksteel']), bx('Sink Wall B', SX0, SX1, SY1, SY1 + T_, SZ - T_, 0.875, M['sinksteel'])]
+for (xa, ya) in ((SX0, SY0), (SX1, SY0), (SX0, SY1), (SX1, SY1)):          # soft inside corners
+    sk.append(cyl('Sink Corner', (xa, ya, (SZ + 0.875) / 2), 0.012, 0.875 - SZ, M['sinksteel'], seg=16))
+sk.append(cyl('Drain', (SINK[0] + 0.14, SINK[1] - 0.04, SZ + 0.001), 0.045, 0.004, M['steeldark'], seg=48))
+sk.append(cyl('Drain Cap', (SINK[0] + 0.14, SINK[1] - 0.04, SZ + 0.004), 0.030, 0.004, M['sinksteel'], seg=48))
+TX, TY = SINK[0] - 0.12, SY1 + 0.055                             # the tap: a round body, an arched spout over the bowl, a side lever
+tb = SL.lathe('Tap Body', [(0.0, CT), (0.028, CT), (0.028, CT + 0.008), (0.020, CT + 0.014), (0.017, CT + 0.20), (0.0, CT + 0.20)], M['matblack'], seg=40)
+tb.location = (TX, TY, 0); sk.append(tb)
+arc = [(TX, TY - 0.065 + 0.065 * math.cos(a), CT + 0.19 + 0.17 * math.sin(a)) for a in np.linspace(0.0, math.pi, 28)]
+arc += [(TX, arc[-1][1], arc[-1][2] - 0.04)]
+sk.append(SL.tube('Tap Spout', arc, [0.0135] * len(arc), M['matblack'], seg=24))
+ae = SL.lathe('Tap Aerator', [(0.0, 0.0), (0.0145, 0.0), (0.0145, 0.022), (0.0, 0.022)], M['matblack'], seg=32); ae.location = (TX, arc[-1][1], arc[-1][2] - 0.022); sk.append(ae)
+sk.append(SL.tube('Tap Lever', [(TX + 0.015, TY, CT + 0.15), (TX + 0.05, TY, CT + 0.165), (TX + 0.085, TY, CT + 0.172)], [0.008, 0.007, 0.006], M['matblack'], seg=16))
 sink = join(sk, 'LM_Sink'); world_uv(sink, 0.5); lm(sink, 512)
 SPL = 1.52                          # splash top: the underside of the wall cabinets
 spl = [bx('Splash Back L', X0 + D_TALL, WX0 - 0.03, Y1 - 0.012, Y1, CT, SPL, M['marble']),
@@ -419,7 +478,12 @@ def upper_x(ya, yb, splits):         # on the right wall, fronts face -x
     up.append(bx('Upper', X1 - 0.35, X1, ya, yb, UZ0, UZ1, M['oak'], 0.002))
     for y in splits: up.append(bx('Gap', X1 - 0.353, X1 - 0.349, y - 0.002, y + 0.002, UZ0, UZ1, M['gap']))
     up.append(bx('Profile', X1 - 0.35, X1 - 0.30, ya + 0.005, yb - 0.005, UZ0 - 0.012, UZ0, M['profile']))
-upper_x(-1.40, 0.08, [-0.88, -0.40]); upper_x(0.83, Y1, [1.25])
+upper_x(-1.40, -0.92, []); upper_x(-0.40, 0.08, []); upper_x(0.83, Y1, [1.25])
+ON = (-0.92, -0.40)                                               # the open niche between them
+M['shelfwhite'] = mat('Shelf White Laminate', (0.90, 0.89, 0.86, 1), 0.5)
+up += [bx('Niche Back', X1 - 0.02, X1, ON[0], ON[1], UZ0, UZ1, M['shelfwhite']), bx('Niche Side', X1 - 0.35, X1, ON[0], ON[0] + 0.018, UZ0, UZ1, M['oak']),
+       bx('Niche Side', X1 - 0.35, X1, ON[1] - 0.018, ON[1], UZ0, UZ1, M['oak']), bx('Niche Base', X1 - 0.35, X1, ON[0], ON[1], UZ0, UZ0 + 0.018, M['oak']),
+       bx('Niche Top', X1 - 0.35, X1, ON[0], ON[1], UZ1 - 0.018, UZ1, M['oak']), bx('Niche Shelf', X1 - 0.33, X1 - 0.02, ON[0] + 0.018, ON[1] - 0.018, UZ0 + 0.40, UZ0 + 0.418, M['oak'])]
 up.append(bx('Niche Top', X1 - 0.35, X1, 0.08, 0.83, 2.05, UZ1, M['oak'], 0.002))             # a short cabinet over the chimney
 up.append(bx('Niche Back', X1 - 0.02, X1, 0.08, 0.83, UZ0, 2.05, M['marble']))
 up.append(bx('Upper Back', WX1 + 0.18, X1 - 0.35, Y1 - 0.35, Y1, UZ0, UZ1, M['oak'], 0.002))  # back wall, right of the window
@@ -431,15 +495,26 @@ LEDS = [bx('LED R1', X1 - 0.33, X1 - 0.31, -1.38, 0.06, UZ0 - 0.006, UZ0 - 0.002
         bx('LED B', WX1 + 0.20, X1 - 0.36, Y1 - 0.33, Y1 - 0.31, UZ0 - 0.006, UZ0 - 0.002, M['led'])]
 # chimney: black body in the niche, angled glass visor (like the photo's)
 M['hoodblack'] = mat('Hood Black', (0.015, 0.015, 0.017, 1), 0.85)
-ch = [bx('Chimney Body', X1 - 0.30, X1 - 0.02, 0.18, 0.73, 1.80, 2.05, M['hoodblack'], 0.004)]
-vis = box('Visor', (X1 - 0.30, 0.455, 1.74), (0.40, 0.62, 0.008), M['hoodglass'], rot=(0, math.radians(-28), 0)); ch.append(vis)
-ch.append(bx('Visor Trim', X1 - 0.30, X1 - 0.02, 0.17, 0.74, 1.77, 1.80, M['steel']))
-chimney = join(ch, 'LM_Chimney'); world_uv(chimney, 1.0); lm(chimney, 512)
+# (the chimney is the Elica hood in placements.json staging)
 
 # ---------------------------------------------------------------- recessed downlights
-DL = [(-0.30, -0.95), (-0.30, 0.45), (0.45, -0.95), (0.45, 0.45), (0.10, 1.25)]
+FC = dict(x0=-0.50, x1=0.62, y0=-1.15, y1=0.82, drop=0.15)       # the raised centre (over the aisle)
+M['gypsum'] = mat('Gypsum White', (0.94, 0.93, 0.90, 1), 0.85)
+fz = H - FC['drop']
+fc = [bx('FC Band', X0, FC['x0'], Y0, Y1, fz, H, M['gypsum']), bx('FC Band', FC['x1'], X1, Y0, Y1, fz, H, M['gypsum']),
+      bx('FC Band', FC['x0'], FC['x1'], Y0, FC['y0'], fz, H, M['gypsum']), bx('FC Band', FC['x0'], FC['x1'], FC['y1'], Y1, fz, H, M['gypsum'])]
+fc += [bx('FC Lip', FC['x0'], FC['x0'] + 0.06, FC['y0'], FC['y1'], fz - 0.04, fz, M['gypsum']), bx('FC Lip', FC['x1'] - 0.06, FC['x1'], FC['y0'], FC['y1'], fz - 0.04, fz, M['gypsum']),
+       bx('FC Lip', FC['x0'] + 0.06, FC['x1'] - 0.06, FC['y0'], FC['y0'] + 0.06, fz - 0.04, fz, M['gypsum']), bx('FC Lip', FC['x0'] + 0.06, FC['x1'] - 0.06, FC['y1'] - 0.06, FC['y1'], fz - 0.04, fz, M['gypsum'])]
+falsec = join(fc, 'LM_FalseCeiling'); world_uv(falsec, 3.0); lm(falsec, 2048)
+M['cove'] = mat('Cove Glow', (1, .88, .7, 1), 0.5, 0.0, emit=((1, .80, .55, 1), 3.0))
+CG = [bx('Cove Glow', FC['x0'] + 0.08, FC['x0'] + 0.10, FC['y0'] + 0.1, FC['y1'] - 0.1, H - 0.012, H - 0.004, M['cove']),
+      bx('Cove Glow', FC['x1'] - 0.10, FC['x1'] - 0.08, FC['y0'] + 0.1, FC['y1'] - 0.1, H - 0.012, H - 0.004, M['cove']),
+      bx('Cove Glow', FC['x0'] + 0.1, FC['x1'] - 0.1, FC['y0'] + 0.08, FC['y0'] + 0.10, H - 0.012, H - 0.004, M['cove']),
+      bx('Cove Glow', FC['x0'] + 0.1, FC['x1'] - 0.1, FC['y1'] - 0.10, FC['y1'] - 0.08, H - 0.012, H - 0.004, M['cove'])]
+DLZ = fz                                                            # downlights sit in the band's underside
+DL = [(0.80, -0.95), (0.80, -0.20), (0.80, 0.55), (-0.25, 1.02), (0.40, 1.02), (-0.68, -1.30), (-0.68, 0.40)]
 for i_, (x_, y_) in enumerate(DL):
-    cyl('DLTrim%d' % i_, (x_, y_, H - 0.004), 0.06, 0.008, M['dltrim']); cyl('DLLens%d' % i_, (x_, y_, H - 0.009), 0.042, 0.006, M['dl'])
+    cyl('DLTrim%d' % i_, (x_, y_, DLZ - 0.004), 0.05, 0.008, M['dltrim']); cyl('DLLens%d' % i_, (x_, y_, DLZ - 0.009), 0.035, 0.006, M['dl'])
 
 # ---------------------------------------------------------------- staging: not for sale, lit live in the viewer (shadows bake under them)
 STAGE = []
@@ -456,19 +531,14 @@ M['jarglass'] = mat('Jar Glass', (0.9, 0.92, 0.9, 1), 0.05, alpha=0.25); M['cork
 M['ro'] = mat('RO Black', (0.03, 0.03, 0.035, 1), 0.15)
 # mixer grinder (the photo's lilac-and-white one): base, steel jar, lid
 mx_, my_ = 1.28, -0.38
-STAGE.append(box('Mixer Base', (mx_, my_, CT + 0.085), (0.20, 0.26, 0.17), M['white'], 0.04))
-STAGE.append(box('Mixer Panel', (mx_ - 0.101, my_, CT + 0.07), (0.004, 0.14, 0.10), M['lilac'], 0.01))
-cyl('Mixer Knob', (mx_ - 0.11, my_, CT + 0.07), 0.022, 0.02, M['white'], rot=(0, math.pi / 2, 0)); STAGE.append(bpy.context.active_object)
-lathe('Mixer Jar', [(0, 0), (0.05, 0), (0.06, 0.02), (0.075, 0.17), (0.08, 0.175), (0, 0.175)], M['ss'], (mx_, my_, CT + 0.17))
-lathe('Mixer Lid', [(0, 0), (0.082, 0), (0.08, 0.02), (0.03, 0.035), (0.02, 0.06), (0, 0.06)], M['lilac'], (mx_, my_, CT + 0.345))
+# (the mixer is the Bajaj in placements.json staging)
 # RO purifier on the wall right of the window
-STAGE.append(box('RO', (WX1 + 0.32, Y1 - 0.08, 1.80), (0.28, 0.14, 0.40), M['ro'], 0.02))
-STAGE.append(box('RO Tap', (WX1 + 0.32, Y1 - 0.16, 1.66), (0.03, 0.04, 0.06), M['white'], 0.008))
+# (the RO box went, 15 Nov: it sat inside the upper cabinet, its side flush with the cabinet's end, and flickered through it)
 # pressure cooker on the hob, dish soap, spice jars, plants on the sill, a hand towel on a drawer
 lathe('Cooker', [(0, 0), (0.11, 0), (0.115, 0.01), (0.115, 0.15), (0.12, 0.16), (0.10, 0.17), (0, 0.175)], M['ss'], (1.20, 0.62, CT + 0.11))
 STAGE.append(box('Cooker Handle', (1.20 - 0.17, 0.62, CT + 0.27), (0.14, 0.03, 0.025), M['matblack'], 0.008))
 lathe('Whistle', [(0, 0), (0.012, 0), (0.01, 0.04), (0.015, 0.05), (0, 0.06)], M['matblack'], (1.20, 0.62, CT + 0.285))
-lathe('Soap', [(0, 0), (0.03, 0), (0.032, 0.12), (0.02, 0.15), (0.008, 0.16), (0.008, 0.19), (0, 0.19)], M['soap'], (-0.30, 1.62, CT))
+lathe('Soap', [(0, 0), (0.03, 0), (0.032, 0.12), (0.02, 0.15), (0.008, 0.16), (0.008, 0.19), (0, 0.19)], M['soap'], (0.50, 1.47, CT + 0.012))
 for k, sp in enumerate(()):                                  # (the spice jars made way for the painted pickle set, 14 Nov)
     x_ = 0.62 + k * 0.10
     lathe('Spice Jar', [(0, 0), (0.035, 0), (0.037, 0.10), (0.03, 0.11), (0, 0.11)], M['jarglass'], (x_, 1.62, CT))
@@ -482,13 +552,78 @@ def pot_plant(x, y, z, h=0.22, seed=0):
         up = Vector((r.uniform(0.2, 0.7) * math.cos(a), r.uniform(0.2, 0.7) * math.sin(a), 1)).normalized()
         SL.leaf_strip(V, F, UV, Vector((x, y, z + 0.10)), up, side, r.uniform(0.45, 1.0) * h, r.uniform(0.03, 0.05), droop=r.uniform(0.3, 0.9))
     STAGE.append(SL.mesh_obj('Plant', V, F, M['leaf'], UV))
-pot_plant(WX0 + 0.15, Y1 + 0.05, WZ0, 0.20, 1); pot_plant(WX1 - 0.18, Y1 + 0.05, WZ0, 0.26, 2)
+M['soil'] = mat('Potting Soil', (0.10, 0.07, 0.05, 1), 0.95)
+_lv = np.mgrid[0:128, 0:64][0] / 128.0
+M['tulsi'] = SL.mat('Tulsi Leaf', (0.16, 0.36, 0.10), 0.45, image=SL.img('tulsi_col', np.clip(np.array([0.13, 0.33, 0.08]) * (0.8 + 0.35 * _lv)[..., None] * (1 - 0.25 * (np.abs(np.mgrid[0:128, 0:64][1] / 64.0 - 0.5) < 0.03))[..., None], 0, 1), TMP))
+_band = 0.5 + 0.5 * np.sin(np.mgrid[0:256, 0:64][0] / 256.0 * 60 + 2 * np.sin(np.mgrid[0:256, 0:64][1] / 64.0 * 6))
+_edge = (np.abs(np.mgrid[0:256, 0:64][1] / 64.0 - 0.5) > 0.44)
+M['snake'] = SL.mat('Snake Plant Leaf', (0.12, 0.30, 0.10), 0.4, image=SL.img('snake_col', np.clip(np.where(_edge[..., None], np.array([0.62, 0.62, 0.22]), np.array([0.07, 0.22, 0.08]) + np.array([0.10, 0.16, 0.08]) * _band[..., None]), 0, 1), TMP))
+def pot(x, y, z, r=0.055, h=0.10):
+    lathe('Pot', [(0, 0), (r * 0.72, 0), (r * 0.95, h * 0.85), (r * 1.08, h * 0.86), (r * 1.10, h), (r * 0.92, h), (r * 0.92, h * 0.9), (0, h * 0.9)], M['terracotta'], (x, y, z), seg=48)
+    lathe('Soil', [(0, h * 0.86), (r * 0.9, h * 0.86), (0, h * 0.88)], M['soil'], (x, y, z), seg=32)
+def leaf_quad(V, F, UV, base, d, side, L, W, curl=0.0, n=8):
+    """An oval leaf from base along d, width across side, cupped by curl."""
+    k0 = len(V)
+    for i in range(n + 1):
+        t = i / n; w = W * math.sin(math.pi * min(t * 1.05, 1.0)) ** 0.8
+        c = base + d * (L * t) - Vector((0, 0, 1)) * (0.25 * L * t * t)
+        for sgn in (-1, 0, 1):
+            V.append(tuple(c + side * (sgn * w / 2) + Vector((0, 0, 1)) * (curl * w * (1 - abs(sgn))))); UV.append(((sgn + 1) / 2, t))
+    for i in range(n):
+        for j in range(2):
+            a = k0 + i * 3 + j; F.append((a, a + 1, a + 4, a + 3))
+def tulsi(x, y, z, seed=3):
+    pot(x, y, z); r = np.random.default_rng(seed); V, F, UV = [], [], []; stems = []
+    for k in range(7):
+        a = r.uniform(0, 2 * math.pi); lean = r.uniform(0.15, 0.45); h = r.uniform(0.12, 0.20)
+        top = Vector((x + lean * h * math.cos(a), y + lean * h * math.sin(a), z + 0.09 + h)); bot = Vector((x, y, z + 0.09))
+        stems.append(SL.tube('Tulsi Stem', [bot, (bot + top) / 2 + Vector((0, 0, 0.01)), top], [0.0025, 0.002, 0.0015], M['tulsi'], seg=6))
+        for j in range(9):
+            t = 0.25 + 0.75 * j / 8; c = bot.lerp(top, t)
+            for sgn in (-1, 1):
+                b_ = a + sgn * math.pi / 2 + j * 0.9; d = Vector((math.cos(b_), math.sin(b_), 0.45)).normalized()
+                leaf_quad(V, F, UV, c, d, Vector((-d.y, d.x, 0)).normalized(), 0.028 * (1.2 - 0.5 * t), 0.018 * (1.2 - 0.5 * t), curl=0.25)
+    STAGE.append(SL.mesh_obj('Tulsi', V, F, M['tulsi'], UV)); STAGE.extend(stems)
+def snake_plant(x, y, z, seed=5):
+    pot(x, y, z, r=0.06, h=0.11); r = np.random.default_rng(seed); V, F, UV = [], [], []
+    for k in range(9):
+        a = r.uniform(0, 2 * math.pi); off = r.uniform(0.0, 0.03); base = Vector((x + off * math.cos(a), y + off * math.sin(a), z + 0.10))
+        L = r.uniform(0.20, 0.34); lean = r.uniform(0.05, 0.25); d = Vector((lean * math.cos(a), lean * math.sin(a), 1)).normalized()
+        side = Vector((-math.sin(a + 0.6), math.cos(a + 0.6), 0)); n = 10; k0 = len(V)
+        for i in range(n + 1):
+            t = i / n; w = 0.034 * (1 - t ** 3) + 0.002; c = base + d * (L * t)
+            for sgn in (-1, 0, 1): V.append(tuple(c + side * (sgn * w / 2) + Vector((0, 0, 0)) - (Vector((-side.y, side.x, 0)) * 0.006 * (1 - abs(sgn))))); UV.append(((sgn + 1) / 2, t))
+        for i in range(n):
+            for j in range(2):
+                q = k0 + i * 3 + j; F.append((q, q + 1, q + 4, q + 3))
+    STAGE.append(SL.mesh_obj('Snake Plant', V, F, M['snake'], UV))
+tulsi(WX0 + 0.16, Y1 + 0.05, WZ0); snake_plant(WX1 - 0.17, Y1 + 0.05, WZ0)
 tw = []
 for k in range(14):                                          # towel folded over the top drawer's profile, hanging down
     t = k / 13; tw.append((RX - 0.012 - 0.02 * math.sin(t * math.pi) * 0.3, -0.20, 0.79 - t * 0.38))
 STAGE.append(SL.tube('Towel', tw, [0.0] * len(tw), M['towel'], seg=4)) if False else None
-_tw = box('Towel', (RX - 0.018, 0.20, 0.62), (0.012, 0.24, 0.36), M['towel'], 0.005); _tw.rotation_euler.x = 0.04; STAGE.append(_tw); world_uv(_tw, 0.3)
-STAGE.append(box('Towel Fold', (RX - 0.006, 0.20, 0.785), (0.03, 0.24, 0.025), M['towel'], 0.01))
+def towel(xf, yc, ztop, w=0.26, front=0.36, back=0.12):
+    """A cotton towel hung over a bar at (xf, ztop): a short back flap, a longer front flap, soft folds, a slight sway."""
+    NU, NV = 28, 46; L = back + 0.04 + front; V, F, UV = [], [], []
+    for j in range(NV + 1):
+        sv = j / NV * L
+        for i in range(NU + 1):
+            u = i / NU - 0.5; y = yc + u * w
+            fold = 0.004 * math.sin(u * 22 + sv * 9) + 0.003 * math.sin(u * 47 - sv * 5)
+            if sv < back: x, z = xf + 0.012 + fold * 0.5, ztop - (back - sv)
+            elif sv < back + 0.04:
+                a = (sv - back) / 0.04 * math.pi; x, z = xf + 0.006 * math.cos(a) + 0.006, ztop + 0.006 * math.sin(a)
+            else:
+                d = sv - back - 0.04; x, z = xf - 0.004 - fold - 0.012 * (d / front) ** 2, ztop - d
+                y += 0.01 * (d / front) ** 2 * math.sin(u * 3)
+            V.append((x, y, z)); UV.append((i / NU, sv / L * 1.4))
+    for j in range(NV):
+        for i in range(NU): F.append((j * (NU + 1) + i, j * (NU + 1) + i + 1, (j + 1) * (NU + 1) + i + 1, (j + 1) * (NU + 1) + i))
+    o = SL.mesh_obj('Towel', V, F, M['towel'], UV)
+    md = o.modifiers.new('s', 'SOLIDIFY'); md.thickness = 0.003
+    bpy.ops.object.select_all(action='DESELECT'); o.select_set(True); bpy.context.view_layer.objects.active = o; bpy.ops.object.modifier_apply(modifier='s')
+    STAGE.append(o)
+towel(RX - 0.004, -1.05, 0.845, back=0.03, front=0.34)
 # the hob stands in until the Glen stove has its model (then it moves to placements.json as a product)
 GLEN = os.path.join(OUT, 'products', 'final', 'd0ccbf0a.glb')
 if not os.path.exists(GLEN):
@@ -496,13 +631,42 @@ if not os.path.exists(GLEN):
     STAGE.append(box('Hob Body', (1.21, 0.455, CT + 0.028), (0.40, 0.69, 0.056), M['ss'], 0.006))
     for y_ in (0.22, 0.455, 0.69):
         lathe('Burner', [(0, 0), (0.05, 0), (0.05, 0.015), (0.035, 0.02), (0, 0.022)], mat('Brass Burner', (0.7, 0.5, 0.2, 1), 0.3, 1.0), (1.23, y_, CT + 0.064))
+M['brasshook'] = mat('Brass Hook (lightmapped look)', (0.72, 0.52, 0.22, 1), 0.35, 0.0)
+hk = [bx('Hook Plate', FX, FX + 0.006, -1.27, -1.23, 1.52, 1.58, M['brasshook'], 0.002),
+      SL.tube('Hook', [(FX + 0.006, -1.25, 1.555), (FX + 0.045, -1.25, 1.555), (FX + 0.055, -1.25, 1.575), (FX + 0.05, -1.25, 1.59)], [0.005] * 4, M['brasshook'], seg=12)]
+# (the apron left the room, 15 Nov: its hook goes too)
+for o in hk: bpy.data.objects.remove(o)
+M['neem'] = SL.mat('Neem Wood', (0.42, 0.26, 0.13), 0.5)
+def spatula(x, y, z, rz, tilt=0.06):
+    """A flat neem-wood spatula (like the Vanam set's turner): 30 cm, a squared blade, a round handle."""
+    from mathutils import Matrix
+    P_ = [box('Spatula Blade', (0.0, 0.0, 0.0), (0.085, 0.06, 0.005), M['neem'], 0.002),
+          SL.tube('Spatula Neck', [(0.04, 0, 0), (0.09, 0, 0.004)], [0.009, 0.007], M['neem'], seg=12),
+          SL.tube('Spatula Handle', [(0.09, 0, 0.004), (0.21, 0, 0.012), (0.255, 0, 0.014)], [0.0075, 0.009, 0.0085], M['neem'], seg=14)]
+    o = SL.join(P_, 'Neem Spatula')
+    o.matrix_world = Matrix.Translation((x, y, z)) @ Matrix.Rotation(rz, 4, 'Z') @ Matrix.Rotation(-tilt, 4, 'Y')
+    STAGE.append(o)
+spatula(1.075, -0.07, CT + 0.016, math.pi, tilt=0.17)
 for o in STAGE: o.select_set(False)
 
 # ---------------------------------------------------------------- products: shadow casters for the bake
 PL = json.load(open(os.path.join(OUT, 'placements.json'), encoding='utf8'))
 CASTERS = []
+PLACED = {}
 for d in PL['products'] + [x for x in PL.get('staging', []) if not x.get('lm')]:
-    if 'file' in d and os.path.exists(os.path.join(OUT, 'products', d['file'])): CASTERS += place(d)
+    if 'file' in d and os.path.exists(os.path.join(OUT, 'products', d['file'])):
+        made = place(d); CASTERS += made; PLACED[d['name']] = made
+if 'probe' in ARGS:
+    from mathutils import Vector as _V
+    dg = bpy.context.evaluated_depsgraph_get()
+    for px, py in ((0.05, 1.40), (-0.10, 1.30), (0.20, 1.50), (1.10, 0.45)):
+        hit = scene.ray_cast(dg, _V((px, py, 1.6)) if px < 1 else _V((0.70, py, 0.70)), _V((0, 0, -1)) if px < 1 else _V((1, 0, 0)))
+        print('PROBE', px, py, 'hit', hit[0], round(hit[1].z, 3) if hit[0] else None, hit[4].name if hit[0] else None)
+    sys.exit(0)
+if 'bounds' in ARGS:                 # where every piece really is (Blender x, y, z), to check against walls, shelves, the drawer
+    for n, objs in PLACED.items():
+        mn, mx = bounds(objs); print('BOUNDS %-40s x %6.3f %6.3f  y %6.3f %6.3f  z %6.3f %6.3f' % (n[:40], mn.x, mx.x, mn.y, mx.y, mn.z, mx.z))
+    sys.exit(0)
 
 if 'wb' in ARGS:
     scene.render.engine = 'BLENDER_WORKBENCH'; sh = scene.display.shading; sh.light = 'STUDIO'; sh.color_type = 'TEXTURE'
@@ -536,7 +700,12 @@ def spot(name, loc, target, w, deg, blend=0.75, color=WARM):
 area('Sky Window', (wm, Y1 + 0.06, (WZ0 + WZ1) / 2), WX1 - WX0 - 0.1, WZ1 - WZ0 - 0.1, 260, (0.92, 0.96, 1.0), target=(wm, 0.0, 0.6))
 sun = bpy.data.lights.new('Sun', 'SUN'); sun.energy = 3.2; sun.color = (1.0, 0.90, 0.74); sun.angle = math.radians(1.5)
 so = bpy.data.objects.new('Sun', sun); scene.collection.objects.link(so); so.rotation_euler = (Vector((0.35, -1.0, -0.55)) * -1).to_track_quat('Z', 'Y').to_euler()
-for i_, (x_, y_) in enumerate(DL): spot('DL%d' % i_, (x_, y_, H - 0.02), (x_, y_, 0.0), 28, 85, 0.8)
+for i_, (x_, y_) in enumerate(DL): spot('DL%d' % i_, (x_, y_, DLZ - 0.02), (x_, y_, 0.0), 24, 80, 0.8)
+for nm_, loc_, rot_, sx_, sy_ in (('Cove L', (FC['x0'] + 0.09, (FC['y0'] + FC['y1']) / 2, H - 0.02), (0, math.radians(-40), 0), 0.08, FC['y1'] - FC['y0'] - 0.2),
+                                  ('Cove R', (FC['x1'] - 0.09, (FC['y0'] + FC['y1']) / 2, H - 0.02), (0, math.radians(40), 0), 0.08, FC['y1'] - FC['y0'] - 0.2),
+                                  ('Cove F', ((FC['x0'] + FC['x1']) / 2, FC['y0'] + 0.09, H - 0.02), (math.radians(40), 0, 0), FC['x1'] - FC['x0'] - 0.2, 0.08),
+                                  ('Cove B', ((FC['x0'] + FC['x1']) / 2, FC['y1'] - 0.09, H - 0.02), (math.radians(-40), 0, 0), FC['x1'] - FC['x0'] - 0.2, 0.08)):
+    area(nm_, loc_, sx_, sy_, 18, (1.0, 0.82, 0.58), rot=rot_)
 for nm, (xa, xb, ya, yb) in (('LED R1', (X1 - 0.33, X1 - 0.31, -1.38, 0.06)), ('LED R2', (X1 - 0.33, X1 - 0.31, 0.85, Y1 - 0.36)), ('LED B', (WX1 + 0.20, X1 - 0.36, Y1 - 0.33, Y1 - 0.31))):
     area(nm, ((xa + xb) / 2, (ya + yb) / 2, UZ0 - 0.01), max(xb - xa, 0.03), max(yb - ya, 0.03), 14 * max(xb - xa, yb - ya) / 0.5, (1.0, 0.85, 0.62))
 area('Fill', (0.0, 0.0, H - 0.05), 2.4, 3.0, 22, (1.0, 0.95, 0.88))
@@ -579,7 +748,7 @@ shot('front', (0.0, Y0 - 0.55, 1.50), (0.0, Y1, 1.05), 15, R)              # the
 shot('hob', (-0.55, -0.55, 1.55), (1.40, 0.30, 0.90), 20, R)
 shot('sink', (0.05, 0.35, 1.55), (0.0, Y1, 1.0), 20, R)
 shot('left', (0.70, 0.55, 1.45), (-1.45, -0.55, 1.05), 20, R)
-hide = [o for o, _, _ in SHELL if 'Ceiling' in o.name] + [o for o in bpy.data.objects if o.name.startswith(('LM_Uppers', 'LM_Bulk', 'LM_Chimney', 'DL'))]
+hide = [o for o, _, _ in SHELL if 'Ceiling' in o.name] + [o for o in bpy.data.objects if o.name.startswith(('LM_FalseCeiling', 'Cove Glow'))] + [o for o in bpy.data.objects if o.name.startswith(('LM_Uppers', 'LM_Bulk', 'LM_Chimney', 'DL'))]
 for o in hide: o.hide_render = True
 pd = bpy.data.cameras.new('Plan'); pd.type = 'ORTHO'; pd.ortho_scale = 3.8
 pc = bpy.data.objects.new('Plan', pd); scene.collection.objects.link(pc); pc.location = (0, 0, 8)
