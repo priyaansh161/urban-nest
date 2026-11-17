@@ -78,6 +78,14 @@
   .range { display: inline-flex; border: 0.5px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--white); }
   .range button { border: 0; background: transparent; padding: 8px 16px; font: 500 12px 'DM Sans', sans-serif; color: var(--grey); cursor: pointer; }
   .range button.on { background: var(--teal); color: #fff; }
+  .head-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .refresh-btn { display: inline-flex; align-items: center; gap: 7px; border: 0.5px solid var(--border); border-radius: 8px; background: var(--white); padding: 8px 14px; font: 500 12px 'DM Sans', sans-serif; color: var(--black); cursor: pointer; }
+  .refresh-btn:hover { border-color: var(--teal); }
+  .refresh-btn:disabled { opacity: .6; cursor: default; }
+  .refresh-btn svg { width: 14px; height: 14px; }
+  .refresh-btn.spin svg { animation: refspin .8s linear infinite; }
+  @keyframes refspin { to { transform: rotate(360deg); } }
+  .updated { font-size: 11px; color: var(--grey); }
 
   .section-label { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--grey); margin: 32px 0 12px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .section-label a { color: var(--gold); text-decoration: none; letter-spacing: 0.08em; text-transform: none; font-size: 12px; }
@@ -230,9 +238,13 @@
       <h1>Dashboard</h1>
       <p id="welcomeMsg">Welcome back</p>
     </div>
-    <div class="range" role="group" aria-label="Period">
-      <button data-days="7" class="on">7 days</button>
-      <button data-days="30">30 days</button>
+    <div class="head-actions">
+      <span class="updated" id="updatedAt"></span>
+      <button class="refresh-btn" id="refreshBtn" type="button" title="Load the latest numbers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>Refresh</button>
+      <div class="range" role="group" aria-label="Period">
+        <button data-days="7" class="on">7 days</button>
+        <button data-days="30">30 days</button>
+      </div>
     </div>
   </div>
 
@@ -540,9 +552,26 @@ async function loadCatalogue() {
   session = await requireAuth();
   if (!session) return;
   $('welcomeMsg').textContent = 'Welcome back, ' + (session.user.email.split('@')[0] || 'admin');
-  loadTraffic();
-  loadCatalogue();
+  await refreshAll();
 })();
+
+/* Numbers are read once per load, not live: Refresh re-reads everything.
+   Cloudflare's own traffic figures lag a few minutes behind real visits. */
+async function refreshAll() {
+  const btn = $('refreshBtn');
+  btn.disabled = true; btn.classList.add('spin');
+  try {
+    const fresh = (await db.auth.getSession()).data.session;   // token may have been renewed since the page opened
+    if (fresh) session = fresh;
+    await Promise.all([loadTraffic(), loadCatalogue()]);
+    $('updatedAt').textContent = 'Updated ' + new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    $('updatedAt').textContent = 'Refresh failed, try again';
+  } finally {
+    btn.disabled = false; btn.classList.remove('spin');
+  }
+}
+$('refreshBtn').onclick = refreshAll;
 </script>
 </body>
 </html>
