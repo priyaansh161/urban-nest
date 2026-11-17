@@ -59,7 +59,7 @@
   "published": true,
   "sort_order": 0,
   "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/homecloud-rubber-kitchen-mats-for-floor-set-of-2-pcs-non-ski-mwgihdjx.glb",
   "buy_link": "https://link.amazon/B02GmvXcV",
   "specs": [
    [
@@ -108,7 +108,7 @@
   "published": true,
   "sort_order": 0,
   "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/organizemee-garbage-bag-holder-dispenser-wall-mounted-trash--mwgkn53a.glb",
   "buy_link": "https://link.amazon/B06HOhkXk",
   "specs": [
    [
@@ -275,126 +275,6 @@
   "un_cons": null
  },
  {
-  "id": "ace72caf-f295-447d-9d8e-afe036d494dc",
-  "name": "Pickle Jar With Spoons | Achar Jar Set for Dining Table",
-  "description": "Handcrafted and hand-painted by Indian artisans, this charming pickle holder brings the serene, colourful character of a Puducherry village to your kitchen. Featuring two ceramic jars with spoons, set on a rustic mango wood, iron and cane tray, it blends traditional craftsmanship with everyday functionality.",
-  "image_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/pickle-jar-with-spoons-achar-jar-set-for-dining-table-mtobm38u.webp",
-  "category": "kitchen-essentials",
-  "price": "₹1,399 to ₹1,599",
-  "coming_soon": false,
-  "published": true,
-  "sort_order": 0,
-  "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
-  "buy_link": "https://link.amazon/B09FGvo78",
-  "specs": [
-   [
-    "Colour",
-    "JARS: Multicolored, TRAY: Dark Brown"
-   ],
-   [
-    "Material",
-    "Ceramic, Wood"
-   ],
-   [
-    "Brand",
-    "ExclusiveLane"
-   ]
-  ],
-  "seller_id": null,
-  "affiliate_seller_id": "7d0dd3e4-02ec-4c2d-a86e-8c78b90aecfe",
-  "price_paise": null,
-  "primary_cta": "affiliate",
-  "fulfilled_by": null,
-  "in_stock": true,
-  "section": "essentials",
-  "source_product_id": "a494da38-467b-4eca-bba2-e4d64cd11637",
-  "spline_url": "https://prod.spline.design/IkEu9KCcVm1Jzxz9/scene.splinecode",
-  "popup_bg": null,
-  "gallery": [],
-  "amazon_status": "unchecked",
-  "amazon_checked_at": null,
-  "un_rating": null,
-  "un_take": null,
-  "un_pros": null,
-  "un_cons": null
- },
- {
-  "id": "48410c20-4c17-471e-8141-2620d3f04818",
-  "name": "amazon basics Stainless Steel Knife Set with High-carbon Blades and Pine Wood Block, 14 Pieces",
-  "description": "14-piece knife set includes: 1 Pine wood block, 1 pair of scissors, 11 knife( 8-inch chef's knife, 8-inch slicing knife, 8-inch bread knife, 5.5-inch utility knife, and 3.5-inch peeling knife) Also includes (6) 4.5-inch steak knives, kitchen shears, sharpener, and wood block",
-  "image_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/amazon-basics-stainless-steel-knife-set-with-high-carbon-bla-mvl6amvp0.webp",
-  "category": "kitchen-essentials",
-  "price": "₹1,578",
-  "coming_soon": false,
-  "published": true,
-  "sort_order": 0,
-  "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
-  "buy_link": "https://www.amazon.in/dp/B00R3Z49G6?tag=urbannest03b-21",
-  "specs": [
-   [
-    "Number of Items",
-    "1"
-   ],
-   [
-    "Unit Count",
-    "14 Count"
-   ],
-   [
-    "Item Length",
-    "7.87 Inches"
-   ],
-   [
-    "Global Trade Identification Number",
-    "00841710105391"
-   ],
-   [
-    "Blade Material",
-    "Stainless Steel"
-   ],
-   [
-    "Is the item dishwasher safe?",
-    "No"
-   ],
-   [
-    "Handle Material",
-    "Plastic"
-   ],
-   [
-    "Colour",
-    "Multicolor"
-   ],
-   [
-    "Style",
-    "Modern"
-   ],
-   [
-    "Blade Edge",
-    "Serrated, Plain, Straight"
-   ]
-  ],
-  "seller_id": null,
-  "affiliate_seller_id": "7d0dd3e4-02ec-4c2d-a86e-8c78b90aecfe",
-  "price_paise": null,
-  "primary_cta": "affiliate",
-  "fulfilled_by": null,
-  "in_stock": true,
-  "section": "essentials",
-  "source_product_id": "d316ecc5-e310-422f-8ecc-5084dba27adf",
-  "spline_url": "https://prod.spline.design/MPqKBU1QLkL5Qzy7/scene.splinecode",
-  "popup_bg": null,
-  "gallery": [
-   "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/amazon-basics-stainless-steel-knife-set-with-high-carbon-bla-mvl6anb11.webp"
-  ],
-  "amazon_status": "unchecked",
-  "amazon_checked_at": null,
-  "un_rating": null,
-  "un_take": null,
-  "un_pros": null,
-  "un_cons": null
- },
- {
   "id": "b16d9948-b32b-4ad7-b55d-7adbb8273290",
   "name": "Premium 2 In 1 Glass Oil Dispenser For Kitchen",
   "description": "Elegant oil dispenser for storing and pouring cooking oil with precision.",
@@ -450,7 +330,7 @@
   "published": true,
   "sort_order": 0,
   "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/canway-kitchen-mats-for-floor-anti-slip-set-of-2-40x60-cm-12-mwgk8z7a.glb",
   "buy_link": "https://www.amazon.in/dp/B0GGHRLMWC?tag=urbannest03b-21",
   "specs": [
    [
@@ -558,6 +438,38 @@
   "un_cons": null
  },
  {
+  "id": "c65af49f-f8d4-402c-981e-6af2ae270066",
+  "name": "Green Knife Set",
+  "description": "A sharp, versatile knife set in a striking green finish, perfect for everyday prep and serving with style.",
+  "image_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/green-knife-set-mtu8ezk0.webp",
+  "category": "kitchen-essentials",
+  "price": "₹1,700 to ₹1,900",
+  "coming_soon": false,
+  "published": true,
+  "sort_order": 0,
+  "created_at": "2026-09-05T06:07:46.419115+00:00",
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/green-knife-set-mwkj3jy6.glb",
+  "buy_link": "https://amzn.to/4aRBcET",
+  "specs": [],
+  "seller_id": null,
+  "affiliate_seller_id": "7d0dd3e4-02ec-4c2d-a86e-8c78b90aecfe",
+  "price_paise": null,
+  "primary_cta": "affiliate",
+  "fulfilled_by": null,
+  "in_stock": true,
+  "section": "essentials",
+  "source_product_id": "4b0f3d43-8318-46f4-82a2-fa61898c71d8",
+  "spline_url": "https://prod.spline.design/iX1N4nnwWHcDUk22/scene.splinecode",
+  "popup_bg": null,
+  "gallery": [],
+  "amazon_status": "unchecked",
+  "amazon_checked_at": null,
+  "un_rating": null,
+  "un_take": null,
+  "un_pros": null,
+  "un_cons": null
+ },
+ {
   "id": "04283da4-9167-45c5-9612-437410f87051",
   "name": "Coffee Mugs",
   "description": "Sturdy, comfortable mugs made for your everyday coffee or tea ritual, with a clean, timeless look.",
@@ -593,38 +505,6 @@
   "section": "essentials",
   "source_product_id": "b2f918cd-e392-4d15-b8b3-1de0b87ba521",
   "spline_url": "https://prod.spline.design/PSQqu-tmEdCLhTpJ/scene.splinecode",
-  "popup_bg": null,
-  "gallery": [],
-  "amazon_status": "unchecked",
-  "amazon_checked_at": null,
-  "un_rating": null,
-  "un_take": null,
-  "un_pros": null,
-  "un_cons": null
- },
- {
-  "id": "c65af49f-f8d4-402c-981e-6af2ae270066",
-  "name": "Green Knife Set",
-  "description": "A sharp, versatile knife set in a striking green finish, perfect for everyday prep and serving with style.",
-  "image_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/green-knife-set-mtu8ezk0.webp",
-  "category": "kitchen-essentials",
-  "price": "₹1,700 to ₹1,900",
-  "coming_soon": false,
-  "published": true,
-  "sort_order": 0,
-  "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
-  "buy_link": "https://amzn.to/4aRBcET",
-  "specs": [],
-  "seller_id": null,
-  "affiliate_seller_id": "7d0dd3e4-02ec-4c2d-a86e-8c78b90aecfe",
-  "price_paise": null,
-  "primary_cta": "affiliate",
-  "fulfilled_by": null,
-  "in_stock": true,
-  "section": "essentials",
-  "source_product_id": "4b0f3d43-8318-46f4-82a2-fa61898c71d8",
-  "spline_url": "https://prod.spline.design/iX1N4nnwWHcDUk22/scene.splinecode",
   "popup_bg": null,
   "gallery": [],
   "amazon_status": "unchecked",
@@ -743,7 +623,7 @@
   "published": true,
   "sort_order": 0,
   "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/d-maiolica-ceramic-handmade-pickle-jars-in-1000ml-set-of-2-f-mwgjlcdx.glb",
   "buy_link": "https://www.amazon.in/dp/B0H6GLJWNJ?tag=urbannest03b-21",
   "specs": [
    [
@@ -818,7 +698,7 @@
   "published": true,
   "sort_order": 0,
   "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/rangchhelo-wood-tissue-box-cover-rectangular-wooden-tissue-h-mwgl0jz5.glb",
   "buy_link": "https://www.amazon.in/dp/B0FHWF4PYR?tag=urbannest03b-21",
   "specs": [
    [
@@ -932,58 +812,58 @@
   "un_cons": null
  },
  {
-  "id": "d0ccbf0a-de62-4f01-9823-743d4b1bf189",
-  "name": "Glen Toughened Glass Top PNG Gas Stove 3 Burner 70 cm | Brass Burners",
-  "description": "Toughened Glass: The thick toughened glass top is not only sleek and modern but also scratch and stain-resistant, making it easy to clean. Powder coated rust resistant body for durable use. Its black finish adds a sophisticated touch to your countertop. Premium Brass Burners: High-quality brass burners ensure…",
-  "image_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/glen-toughened-glass-top-png-gas-stove-3-burner-70-cm-brass--mvl6arxj0.webp",
+  "id": "48410c20-4c17-471e-8141-2620d3f04818",
+  "name": "amazon basics Stainless Steel Knife Set with High-carbon Blades and Pine Wood Block, 14 Pieces",
+  "description": "14-piece knife set includes: 1 Pine wood block, 1 pair of scissors, 11 knife( 8-inch chef's knife, 8-inch slicing knife, 8-inch bread knife, 5.5-inch utility knife, and 3.5-inch peeling knife) Also includes (6) 4.5-inch steak knives, kitchen shears, sharpener, and wood block",
+  "image_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/amazon-basics-stainless-steel-knife-set-with-high-carbon-bla-mvl6amvp0.webp",
   "category": "kitchen-essentials",
-  "price": "₹4,228",
+  "price": "₹1,578",
   "coming_soon": false,
   "published": true,
   "sort_order": 0,
   "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": null,
-  "buy_link": "https://www.amazon.in/dp/B0DWSRNR89?tag=urbannest03b-21",
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/amazon-basics-stainless-steel-knife-set-with-high-carbon-bla-mwgidp03.glb",
+  "buy_link": "https://www.amazon.in/dp/B00R3Z49G6?tag=urbannest03b-21",
   "specs": [
    [
-    "Number of Heating Elements",
-    "3"
+    "Number of Items",
+    "1"
    ],
    [
-    "Controls Type",
-    "Knob"
+    "Unit Count",
+    "14 Count"
    ],
    [
-    "Heating Element",
-    "Open"
+    "Item Length",
+    "7.87 Inches"
    ],
    [
-    "Power Source Type",
-    "Gas-Powered"
+    "Global Trade Identification Number",
+    "00841710105391"
+   ],
+   [
+    "Blade Material",
+    "Stainless Steel"
+   ],
+   [
+    "Is the item dishwasher safe?",
+    "No"
+   ],
+   [
+    "Handle Material",
+    "Plastic"
    ],
    [
     "Colour",
-    "Black"
+    "Multicolor"
    ],
    [
-    "Material Type",
-    "Glass"
+    "Style",
+    "Modern"
    ],
    [
-    "Item Dimensions D x W x H",
-    "40.5D x 70W x 11H Centimeters"
-   ],
-   [
-    "Item Weight",
-    "7 Kilograms"
-   ],
-   [
-    "Recommended Uses For Product",
-    "Cooking"
-   ],
-   [
-    "Brand Name",
-    "Glen"
+    "Blade Edge",
+    "Serrated, Plain, Straight"
    ]
   ],
   "seller_id": null,
@@ -993,11 +873,11 @@
   "fulfilled_by": null,
   "in_stock": true,
   "section": "essentials",
-  "source_product_id": "5178b49c-f16a-4bcd-97db-6e04de076e38",
-  "spline_url": "https://prod.spline.design/5A4eyOKKpVp7J3Jm/scene.splinecode",
+  "source_product_id": "d316ecc5-e310-422f-8ecc-5084dba27adf",
+  "spline_url": "https://prod.spline.design/MPqKBU1QLkL5Qzy7/scene.splinecode",
   "popup_bg": null,
   "gallery": [
-   "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/glen-toughened-glass-top-png-gas-stove-3-burner-70-cm-brass--mvl6as7j1.webp"
+   "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/amazon-basics-stainless-steel-knife-set-with-high-carbon-bla-mvl6anb11.webp"
   ],
   "amazon_status": "unchecked",
   "amazon_checked_at": null,
@@ -1096,7 +976,7 @@
   "published": true,
   "sort_order": 0,
   "created_at": "2026-09-05T06:07:46.419115+00:00",
-  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/tex-ro-utensils-drying-rack-dish-drying-rack-with-drainer-tr-mwger97x.glb",
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/tex-ro-utensils-drying-rack-dish-drying-rack-with-drainer-tr-mwkj3fxe.glb",
   "buy_link": "https://link.amazon/B0dtgBi8c",
   "specs": [
    [
@@ -1281,6 +1161,51 @@
    "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/p-plus-international-silicone-basting-brush-set-stainless-st-mwg1hrlz4.webp",
    "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/p-plus-international-silicone-basting-brush-set-stainless-st-mwg1hrw75.webp"
   ],
+  "amazon_status": "unchecked",
+  "amazon_checked_at": null,
+  "un_rating": null,
+  "un_take": null,
+  "un_pros": null,
+  "un_cons": null
+ },
+ {
+  "id": "ace72caf-f295-447d-9d8e-afe036d494dc",
+  "name": "Pickle Jar With Spoons | Achar Jar Set for Dining Table",
+  "description": "Handcrafted and hand-painted by Indian artisans, this charming pickle holder brings the serene, colourful character of a Puducherry village to your kitchen. Featuring two ceramic jars with spoons, set on a rustic mango wood, iron and cane tray, it blends traditional craftsmanship with everyday functionality.",
+  "image_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/pickle-jar-with-spoons-achar-jar-set-for-dining-table-mtobm38u.webp",
+  "category": "kitchen-essentials",
+  "price": "₹1,399 to ₹1,599",
+  "coming_soon": false,
+  "published": true,
+  "sort_order": 0,
+  "created_at": "2026-09-05T06:07:46.419115+00:00",
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/pickle-jar-with-spoons-achar-jar-set-for-dining-table-mwgjwq3z.glb",
+  "buy_link": "https://link.amazon/B09FGvo78",
+  "specs": [
+   [
+    "Colour",
+    "JARS: Multicolored, TRAY: Dark Brown"
+   ],
+   [
+    "Material",
+    "Ceramic, Wood"
+   ],
+   [
+    "Brand",
+    "ExclusiveLane"
+   ]
+  ],
+  "seller_id": null,
+  "affiliate_seller_id": "7d0dd3e4-02ec-4c2d-a86e-8c78b90aecfe",
+  "price_paise": null,
+  "primary_cta": "affiliate",
+  "fulfilled_by": null,
+  "in_stock": true,
+  "section": "essentials",
+  "source_product_id": "a494da38-467b-4eca-bba2-e4d64cd11637",
+  "spline_url": "https://prod.spline.design/IkEu9KCcVm1Jzxz9/scene.splinecode",
+  "popup_bg": null,
+  "gallery": [],
   "amazon_status": "unchecked",
   "amazon_checked_at": null,
   "un_rating": null,
@@ -1801,6 +1726,81 @@
   "gallery": [
    "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/the-better-home-glass-salt-pepper-shakers-set-black-white-mo-mvl6c95d1.webp",
    "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/the-better-home-glass-salt-pepper-shakers-set-black-white-mo-mvl6caew2.webp"
+  ],
+  "amazon_status": "unchecked",
+  "amazon_checked_at": null,
+  "un_rating": null,
+  "un_take": null,
+  "un_pros": null,
+  "un_cons": null
+ },
+ {
+  "id": "d0ccbf0a-de62-4f01-9823-743d4b1bf189",
+  "name": "Glen Toughened Glass Top PNG Gas Stove 3 Burner 70 cm | Brass Burners",
+  "description": "Toughened Glass: The thick toughened glass top is not only sleek and modern but also scratch and stain-resistant, making it easy to clean. Powder coated rust resistant body for durable use. Its black finish adds a sophisticated touch to your countertop. Premium Brass Burners: High-quality brass burners ensure…",
+  "image_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/glen-toughened-glass-top-png-gas-stove-3-burner-70-cm-brass--mvl6arxj0.webp",
+  "category": "kitchen-essentials",
+  "price": "₹4,228",
+  "coming_soon": false,
+  "published": true,
+  "sort_order": 0,
+  "created_at": "2026-09-05T06:07:46.419115+00:00",
+  "model_url": "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Models/glen-toughened-glass-top-png-gas-stove-3-burner-70-cm-brass--mwhd5zxj.glb",
+  "buy_link": "https://www.amazon.in/dp/B0DWSRNR89?tag=urbannest03b-21",
+  "specs": [
+   [
+    "Number of Heating Elements",
+    "3"
+   ],
+   [
+    "Controls Type",
+    "Knob"
+   ],
+   [
+    "Heating Element",
+    "Open"
+   ],
+   [
+    "Power Source Type",
+    "Gas-Powered"
+   ],
+   [
+    "Colour",
+    "Black"
+   ],
+   [
+    "Material Type",
+    "Glass"
+   ],
+   [
+    "Item Dimensions D x W x H",
+    "40.5D x 70W x 11H Centimeters"
+   ],
+   [
+    "Item Weight",
+    "7 Kilograms"
+   ],
+   [
+    "Recommended Uses For Product",
+    "Cooking"
+   ],
+   [
+    "Brand Name",
+    "Glen"
+   ]
+  ],
+  "seller_id": null,
+  "affiliate_seller_id": "7d0dd3e4-02ec-4c2d-a86e-8c78b90aecfe",
+  "price_paise": null,
+  "primary_cta": "affiliate",
+  "fulfilled_by": null,
+  "in_stock": true,
+  "section": "essentials",
+  "source_product_id": "5178b49c-f16a-4bcd-97db-6e04de076e38",
+  "spline_url": "https://prod.spline.design/5A4eyOKKpVp7J3Jm/scene.splinecode",
+  "popup_bg": null,
+  "gallery": [
+   "https://ifwxgwvsyispkaxzbstg.supabase.co/storage/v1/object/public/Blog%20Images/glen-toughened-glass-top-png-gas-stove-3-burner-70-cm-brass--mvl6as7j1.webp"
   ],
   "amazon_status": "unchecked",
   "amazon_checked_at": null,
