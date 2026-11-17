@@ -38,6 +38,8 @@ out = [
     P('53d21ba3', 'Mango Wood Chopping Board', CT, 1.00, -0.39, L(0.38), Q),
     P('7419de18', 'Wooden Tissue Roll Holder', CT, 1.36, -0.30, H(0.30)),
     # the front end: the dish mat with the strainer bowl drying on it
+    # the green knife set is a ribbed block (Meshy build of its photo, 17 Nov), so it stands on the counter, not in the drawer
+    P('c65af49f', 'Green Knife Set with Block', CT, 1.35, -0.47, H(0.33), -Q),
     P('3e046e4a', 'HomeCloud Dish Drying Mat', CT, 1.12, -1.16, L(0.50), Q),
     P('f146104d', 'Clazkit Strainer Bowl', CT + 0.005, 1.08, -1.14, L(0.22)),
     # the open niche: mugs and the butter dish up top, the two pickle sets below
@@ -45,8 +47,7 @@ out = [
     P('3bc04eb5', 'Butter Dish with Lid', SH1, NX, -0.53, L(0.18), -Q),
     P('c02bca89', "D'Maiolica Pickle Jars, Set of 2", SH0, NX, -0.765, L(0.25), -Q),
     P('ace72caf', 'Painted Pickle Jars with Tray', SH0, NX, -0.53, L(0.27)),       # the tray runs front-to-back so both sets fit
-    # the open drawer under the hob: the knives, the garlic press, the coconut opener, the basting brush
-    P('c65af49f', 'Green Knife Set of 3', DZ, 0.625, 0.27, L(0.318), Q),        # inside the drawer front (x 0.45)
+    # the open drawer under the hob: the garlic press, the coconut opener, the basting brush
     P('b46a7d38', 'HomeWiz Garlic Press', DZ, 0.72, 0.56, L(0.16), Q),
     P('b4867f61', 'Nestasia Coconut Opener', DZ, 0.62, 0.62, L(0.17), Q),
     P('71a93adf', 'Silicone Basting Brush', DZ, 0.81, 0.25, L(0.21), Q),

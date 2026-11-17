@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Collection — Urban Nest Admin</title>
+<title>Products — Urban Nest Admin</title>
 <link rel="icon" type="image/png" href="../favicon.png"/>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -207,7 +207,7 @@
     <div class="nav-group-label">Content</div>
     <a href="nest.html" class="nav-item"><span class="icon">✦</span> The Nest</a>
     <a href="contributors.html" class="nav-item"><span class="icon">✧</span> Contributors</a>
-    <a href="collection.html" class="nav-item active"><span class="icon">◻</span> Collection</a>
+    <a href="collection.html" class="nav-item active"><span class="icon">◻</span> Products</a>
     <a href="rooms.html" class="nav-item"><span class="icon">◉</span> Rooms</a>
     <a href="amazon-links.html" class="nav-item"><span class="icon">⛓</span> Amazon Links</a>
     <div class="nav-group-label">Commerce</div>
@@ -229,7 +229,7 @@
 
 <main class="main">
   <div class="page-header">
-    <h1 id="sectionHeading">Collection</h1>
+    <h1 id="sectionHeading">Products</h1>
     <p id="sectionBlurb">Handpicked decorative pieces &mdash; the things that prove the eye is worth trusting</p>
     <!-- Both sections live in the same two tables, told apart by a
          section column. This decides what is listed below and what a
@@ -498,7 +498,7 @@ async function setSection(next) {
   if (next === currentSection) return;
   currentSection = next;
   const [heading, blurb] = SECTION_COPY[next];
-  document.getElementById('sectionHeading').textContent = heading;
+  document.getElementById('sectionHeading').textContent = 'Products';   // one page for both halves (his call, 17 Nov): the toggle says which
   document.getElementById('sectionBlurb').innerHTML = blurb;
   document.getElementById('secCollection').classList.toggle('on', next === 'collection');
   paintSlugAddr();

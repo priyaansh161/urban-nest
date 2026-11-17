@@ -261,6 +261,23 @@
    ]
   },
   {
+   "id": "c65af49f-f8d4-402c-981e-6af2ae270066",
+   "name": "Green Knife Set with Block",
+   "file": "final/c65af49f.glb",
+   "listing": "Green Knife Set",
+   "link": "https://amzn.to/4aRBcET",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    1.35,
+    0.9,
+    0.47
+   ],
+   "height": 0.33,
+   "rotY": -1.5708,
+   "desc": "A sharp, versatile knife set in a striking green finish, perfect for everyday prep and serving with style.",
+   "specs": []
+  },
+  {
    "id": "3e046e4a-7300-495a-b6b3-3235b78f4b0c",
    "name": "HomeCloud Dish Drying Mat",
    "file": "final/3e046e4a.glb",
@@ -425,23 +442,6 @@
      "ExclusiveLane"
     ]
    ]
-  },
-  {
-   "id": "c65af49f-f8d4-402c-981e-6af2ae270066",
-   "name": "Green Knife Set of 3",
-   "file": "final/c65af49f.glb",
-   "listing": "Green Knife Set",
-   "link": "https://amzn.to/4aRBcET",
-   "tag": "ESSENTIALS · KITCHEN",
-   "pos": [
-    0.625,
-    0.582,
-    -0.27
-   ],
-   "length": 0.318,
-   "rotY": 1.5708,
-   "desc": "A sharp, versatile knife set in a striking green finish, perfect for everyday prep and serving with style.",
-   "specs": []
   },
   {
    "id": "b46a7d38-021d-4c5c-bea0-d64c4a980cd4",
