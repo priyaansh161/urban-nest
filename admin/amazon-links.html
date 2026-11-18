@@ -135,7 +135,7 @@
     <strong>How a check works.</strong> Press <strong>Open ↗</strong>. If the Amazon page loads with the product and a Buy option, press <strong>Still there</strong>.
     If it says "page not found", "currently unavailable" with no way to buy it, or shows a different product, press <strong>Gone</strong>.
     Links are done in order of oldest check first; anything older than 30 days comes back for a re-check.
-    <br><strong>Once a month: Run full check.</strong> It opens every link for you, one at a time (about 20 minutes, keep the page open), marks the clear ones Still there or Gone, lists pieces whose Amazon price has changed with an <strong>Update price</strong> button, and leaves anything unclear for you to look at.
+    <br><strong>Once a month: Run full check.</strong> It opens every link for you, one at a time (about 10 minutes, keep the page open), marks the clear ones Still there or Gone, lists pieces whose Amazon price has changed with an <strong>Update price</strong> button, and leaves anything unclear for you to look at.
     Links that are only <code>amazon.in</code> with no product (like the Bathroom MK1 dots) are listed separately — there is nothing to check until a real product link is pasted in.
   </div>
 
@@ -304,8 +304,8 @@ async function tidy(key) {
 }
 
 /* ── Run full check (18 Nov 2026) ────────────────────────────────────────
-   Every checkable link goes to /api/check-amazon, one at a time, 4 to 7 seconds apart, so a full run of ~190 links
-   takes about 20 minutes: meant for once a month (reading Amazon pages automatically is against the Associates
+   Every checkable link goes to /api/check-amazon, one at a time, 2 to 4 seconds apart, so a full run of ~190 links
+   takes about 10 minutes: meant for once a month (reading Amazon pages automatically is against the Associates
    terms; he accepted that risk for an occasional run). What happens with each answer:
      ok           saved as Still there; if Amazon's price differs from ours it is listed, with "Update price"
      gone         saved as Gone (the Amazon button disappears on the site)
@@ -326,7 +326,7 @@ async function runCheck() {
   if (!ready) { toast('Run the one-time setup first', true); return; }
   const todo = rows.filter(r => CHECKABLE(r.cls.kind));
   if (!todo.length) { toast('No Amazon links to check'); return; }
-  if (!confirm('Check all ' + todo.length + ' Amazon links now? It opens them one at a time and takes about ' + Math.ceil(todo.length * 5.5 / 60) + ' minutes. Keep this page open.')) return;
+  if (!confirm('Check all ' + todo.length + ' Amazon links now? It opens them one at a time and takes about ' + Math.ceil(todo.length * 3.5 / 60) + ' minutes. Keep this page open.')) return;
   const { data: { session } } = await db.auth.getSession();
   if (!session) { toast('Sign in again first', true); return; }
   run = { stop: false, done: 0, total: todo.length, ok: 0, gone: 0, price: [], review: [], blockedRow: 0 };
@@ -354,7 +354,7 @@ async function runCheck() {
       if (run.blockedRow >= 3) { run.stop = true; run.halted = 'Amazon showed robot checks three times in a row, so the check stopped to stay polite. Try again in a few hours.'; }
     }
     run.done++; showRun(); render();
-    if (!run.stop) await sleep(4000 + Math.random() * 3000);
+    if (!run.stop) await sleep(2000 + Math.random() * 2000);
   }
   run.finished = true; document.getElementById('runBtn').textContent = 'Run full check';
   showRun(); render();
@@ -364,7 +364,7 @@ function showRun(state) {
   const s = state || run || window._lastRun; if (!s) return;
   const el = document.getElementById('runPanel'); el.style.display = 'block';
   const pct = Math.round(100 * s.done / s.total);
-  const left = Math.ceil((s.total - s.done) * 5.5 / 60);
+  const left = Math.ceil((s.total - s.done) * 3.5 / 60);
   const line = (r, extra) => '<div class="row" style="grid-template-columns:1fr auto auto"><div><div class="name">' + esc(r.name) + '</div><div class="sub">' + extra + '</div></div>' +
     '<div class="status"></div><div class="actions"><a class="rb" href="' + esc(r.link) + '" target="_blank" rel="noopener noreferrer">Open ↗</a>' +
     (r.found && r.found.status === 'unavailable' ? '<button class="rb bad" onclick="mark(\'' + r.key + '\',\'gone\');reviewDone(\'' + r.key + '\')">Gone</button><button class="rb ok" onclick="mark(\'' + r.key + '\',\'ok\');reviewDone(\'' + r.key + '\')">Keep</button>' : '') +
