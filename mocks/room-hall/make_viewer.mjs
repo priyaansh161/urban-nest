@@ -47,4 +47,11 @@ R('function markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.ca
   'const ANISO = renderer.capabilities.getMaxAnisotropy();\nfunction markShadows(o, cast = true) { o.traverse(m => { if (m.isMesh) { m.castShadow = cast; m.receiveShadow = true; for (const mt of [].concat(m.material)) for (const k of [\'map\', \'normalMap\', \'roughnessMap\', \'metalnessMap\', \'emissiveMap\']) if (mt && mt[k]) { mt[k].anisotropy = ANISO; mt[k].needsUpdate = true; }');
 R('// glTF is Y-up. The room is 5.2 (x) x 4.2 (z) x 3.0 (y) metres, closed on all four sides (back wall z = -2.1, the\n// front wall z = +2.1): the camera stays inside. Arched windows on the right and front walls, the one door on the left wall.',
   '// glTF is Y-up. The hall is 3.5 (x) x 7.8 (z) x 3.0 (y) metres: the main door at z = +3.9 (living end), the balcony\n// door at z = -3.9 (dining end), the kitchen and the bedroom passage open off the left wall. The camera stays inside.');
+// the long hall: the opening view stands at the main door, ~6 m from what it looks at
+R('controls.minDistance = 0.3; controls.maxDistance = 4.2;', 'controls.minDistance = 0.3; controls.maxDistance = 8.0;');
+// the kitchen and corridor glimpses were built facing away from the hall; draw them from both sides
+R(`      m.material = bakedMaterial(m.material);
+    }`, `      m.material = bakedMaterial(m.material);
+    }
+    if (/Kitchen|Corridor/i.test(nm)) m.material.side = THREE.DoubleSide;`);
 writeFileSync('mocks/room-hall/viewer.html', s); console.log('viewer ok');

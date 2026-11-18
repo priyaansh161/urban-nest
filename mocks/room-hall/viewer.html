@@ -269,7 +269,7 @@ function tweenFov(dur) {
 fitFov();
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true; controls.dampingFactor = 0.08;
-controls.minDistance = 0.3; controls.maxDistance = 4.2;
+controls.minDistance = 0.3; controls.maxDistance = 8.0;
 controls.maxPolarAngle = Math.PI * 0.62;
 controls.rotateSpeed = 0.7; controls.zoomSpeed = 0.7; controls.panSpeed = 0.6;
 controls.screenSpacePanning = true;
@@ -408,6 +408,7 @@ async function loadRoom(file = ROOM_FILE) {
       // the lightmap UV.
       m.material = bakedMaterial(m.material);
     }
+    if (/Kitchen|Corridor/i.test(nm)) m.material.side = THREE.DoubleSide;
   });
   // Contact shadows (2 Nov 2026). A small prop's shadow in the lightmap is too soft to read (the breakfast tray
   // looked as if it floated over the duvet), so placements.json can lay a soft dark patch under one:
