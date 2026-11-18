@@ -10,7 +10,7 @@ STEP 1 — OPEN A TERMINAL IN THE PROJECT FOLDER
 
 Easiest way: open the folder
 
-    C:\Users\priya\OneDrive\Projects\urban-nest
+    C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest
 
 in File Explorer, click the address bar at the top, type
 
@@ -153,7 +153,7 @@ A page or image is missing after deploying
 COMPRESSING A 3D MODEL (separate job, no deploy involved)
 ----------------------------------------------------------
 
-    node "C:\Users\priya\OneDrive\Projects\urban-nest\tools\compress-model.mjs" "C:\Users\priya\OneDrive\Projects\urban-nest\models\source\your-file-raw.glb"
+    node "C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest\tools\compress-model.mjs" "C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest\models\source\your-file-raw.glb"
 
 Then open tools\verify.html, pick the file, check it renders.
 Then upload it in Admin > Collection with the Upload .glb button.

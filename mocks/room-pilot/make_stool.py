@@ -6,7 +6,7 @@
 #   blender -b -P make_stool.py -- <room-pilot dir>        (or run inside an open Blender: OUT defaults to here)
 import bpy, bmesh, math, os, sys
 import numpy as np
-OUT = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else r'C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-pilot'
+OUT = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else r'C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest\mocks\room-pilot'
 NAME = 'bath-cartaden-stool'
 for o in list(bpy.data.objects): bpy.data.objects.remove(o)
 for m in list(bpy.data.materials):

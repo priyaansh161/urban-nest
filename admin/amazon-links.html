@@ -110,6 +110,7 @@
     <div class="nav-group-label">Community</div>
     <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
     <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+    <a href="enma.html" class="nav-item"><span class="icon">◍</span> Enma Chats</a>
     <div class="nav-group-label">Motif Labs</div>
     <a href="motiflabs.html" class="nav-item"><span class="icon">◬</span> Chat Leads</a>
   </nav>
@@ -134,6 +135,7 @@
     <strong>How a check works.</strong> Press <strong>Open ↗</strong>. If the Amazon page loads with the product and a Buy option, press <strong>Still there</strong>.
     If it says "page not found", "currently unavailable" with no way to buy it, or shows a different product, press <strong>Gone</strong>.
     Links are done in order of oldest check first; anything older than 30 days comes back for a re-check.
+    <br><strong>Once a month: Run full check.</strong> It opens every link for you, one at a time (about 20 minutes, keep the page open), marks the clear ones Still there or Gone, lists pieces whose Amazon price has changed with an <strong>Update price</strong> button, and leaves anything unclear for you to look at.
     Links that are only <code>amazon.in</code> with no product (like the Bathroom MK1 dots) are listed separately — there is nothing to check until a real product link is pasted in.
   </div>
 
@@ -148,7 +150,11 @@
       <option value="room">3D rooms</option>
     </select>
     <button class="btn" onclick="openNext()">Open next to check ↗</button>
+    <button class="btn" id="runBtn" onclick="runCheck()" title="Opens every Amazon link for you, one at a time">Run full check</button>
   </div>
+
+  <!-- 18 Nov 2026: the monthly full check. Opens every link through /api/check-amazon, one at a time with a pause. -->
+  <div class="panel" id="runPanel" style="display:none;margin-bottom:16px;padding:16px 18px"></div>
 
   <div class="panel" id="list"><div class="empty">Loading…</div></div>
 </main>
@@ -210,12 +216,14 @@ async function load() {
     key: 'c' + x.id, table: 'collection_items', id: x.id, name: x.name,
     src: x.section === 'essentials' ? 'essentials' : 'collection',
     where: x.section === 'essentials' ? 'Essentials' : 'Collection',
-    link: x.buy_link, published: x.published, status: x.amazon_status || 'unchecked', checkedAt: x.amazon_checked_at, cls: classify(x.buy_link)
+    link: x.buy_link, published: x.published, status: x.amazon_status || 'unchecked', checkedAt: x.amazon_checked_at, cls: classify(x.buy_link),
+    price: x.price || ''
   }));
   (p.data || []).forEach(x => rows.push({
     key: 'r' + x.id, table: 'room_products', id: x.id, name: x.name, src: 'room',
     where: '3D room · ' + (ROOMS[x.room] || x.room),
-    link: x.buy_link, published: x.published, status: x.amazon_status || 'unchecked', checkedAt: x.amazon_checked_at, cls: classify(x.buy_link)
+    link: x.buy_link, published: x.published, status: x.amazon_status || 'unchecked', checkedAt: x.amazon_checked_at, cls: classify(x.buy_link),
+    price: x.price || '', hasPrice: 'price' in x
   }));
   // Oldest check first, never-checked at the very top.
   rows.sort((a, b) => (a.checkedAt ? new Date(a.checkedAt).getTime() : 0) - (b.checkedAt ? new Date(b.checkedAt).getTime() : 0) || a.name.localeCompare(b.name));
@@ -294,6 +302,94 @@ async function tidy(key) {
   r.link = clean; r.cls = classify(clean);
   toast('Link tidied'); render();
 }
+
+/* ── Run full check (18 Nov 2026) ────────────────────────────────────────
+   Every checkable link goes to /api/check-amazon, one at a time, 4 to 7 seconds apart, so a full run of ~190 links
+   takes about 20 minutes: meant for once a month (reading Amazon pages automatically is against the Associates
+   terms; he accepted that risk for an occasional run). What happens with each answer:
+     ok           saved as Still there; if Amazon's price differs from ours it is listed, with "Update price"
+     gone         saved as Gone (the Amazon button disappears on the site)
+     unavailable  listed for you to decide (it may come back); nothing saved
+     blocked      Amazon showed a robot check; listed, nothing saved. Three in a row stops the run: try again later.
+     unknown      listed, nothing saved
+   Leaving the page stops the run; what was saved stays saved. */
+let run = null;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const rupees = s => { const m = String(s || '').replace(/,/g, '').match(/\d+(\.\d+)?/g); return m ? m.map(Number) : []; };
+function priceDiffers(listed, amazon) {
+  const a = rupees(amazon)[0], l = rupees(listed);
+  if (!a || !l.length) return false;
+  return l.length > 1 ? (a < Math.min(...l) || a > Math.max(...l)) : Math.round(a) !== Math.round(l[0]);
+}
+async function runCheck() {
+  if (run) { run.stop = true; document.getElementById('runBtn').textContent = 'Stopping…'; return; }
+  if (!ready) { toast('Run the one-time setup first', true); return; }
+  const todo = rows.filter(r => CHECKABLE(r.cls.kind));
+  if (!todo.length) { toast('No Amazon links to check'); return; }
+  if (!confirm('Check all ' + todo.length + ' Amazon links now? It opens them one at a time and takes about ' + Math.ceil(todo.length * 5.5 / 60) + ' minutes. Keep this page open.')) return;
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) { toast('Sign in again first', true); return; }
+  run = { stop: false, done: 0, total: todo.length, ok: 0, gone: 0, price: [], review: [], blockedRow: 0 };
+  document.getElementById('runBtn').textContent = 'Stop the check';
+  showRun();
+  for (const r of todo) {
+    if (run.stop) break;
+    let res;
+    try {
+      const resp = await fetch('/api/check-amazon', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token }, body: JSON.stringify({ url: r.link }) });
+      res = resp.ok ? await resp.json() : { status: 'unknown', note: resp.status === 401 ? 'not signed in as admin' : 'check failed (' + resp.status + ')' };
+      if (resp.status === 401) { run.stop = true; toast('Your admin session ended: sign in again and re-run', true); }
+    } catch (e) { res = { status: 'unknown', note: 'could not reach the checker' }; }
+    r.found = res;
+    if (res.status === 'ok' || res.status === 'gone') {
+      const patch = { amazon_status: res.status, amazon_checked_at: new Date().toISOString() };
+      const { error } = await db.from(r.table).update(patch).eq('id', r.id);
+      if (!error) { r.status = res.status; r.checkedAt = patch.amazon_checked_at; }
+      if (res.status === 'ok') { run.ok++; if (res.price && priceDiffers(r.price, res.price)) run.price.push(r); }
+      else run.gone++;
+      run.blockedRow = 0;
+    } else {
+      run.review.push(r);
+      run.blockedRow = res.status === 'blocked' ? run.blockedRow + 1 : 0;
+      if (run.blockedRow >= 3) { run.stop = true; run.halted = 'Amazon showed robot checks three times in a row, so the check stopped to stay polite. Try again in a few hours.'; }
+    }
+    run.done++; showRun(); render();
+    if (!run.stop) await sleep(4000 + Math.random() * 3000);
+  }
+  run.finished = true; document.getElementById('runBtn').textContent = 'Run full check';
+  showRun(); render();
+  const last = run; run = null; window._lastRun = last; showRun(last);
+}
+function showRun(state) {
+  const s = state || run || window._lastRun; if (!s) return;
+  const el = document.getElementById('runPanel'); el.style.display = 'block';
+  const pct = Math.round(100 * s.done / s.total);
+  const left = Math.ceil((s.total - s.done) * 5.5 / 60);
+  const line = (r, extra) => '<div class="row" style="grid-template-columns:1fr auto auto"><div><div class="name">' + esc(r.name) + '</div><div class="sub">' + extra + '</div></div>' +
+    '<div class="status"></div><div class="actions"><a class="rb" href="' + esc(r.link) + '" target="_blank" rel="noopener noreferrer">Open ↗</a>' +
+    (r.found && r.found.status === 'unavailable' ? '<button class="rb bad" onclick="mark(\'' + r.key + '\',\'gone\');reviewDone(\'' + r.key + '\')">Gone</button><button class="rb ok" onclick="mark(\'' + r.key + '\',\'ok\');reviewDone(\'' + r.key + '\')">Keep</button>' : '') +
+    (r.found && r.found.price && (r.table === 'collection_items' || r.hasPrice) && priceDiffers(r.price, r.found.price) ? '<button class="rb ok" onclick="updatePrice(\'' + r.key + '\')">Update price</button>' : '') + '</div></div>';
+  const WHAT = { unavailable: 'Unavailable on Amazon (it may come back)', blocked: 'Amazon showed a robot check: open it yourself', unknown: 'Could not be read' };
+  el.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap"><strong>' +
+      (s.finished ? (s.halted ? 'Check stopped' : s.stop ? 'Check stopped by you' : 'Full check finished') : 'Checking Amazon links… ' + s.done + ' of ' + s.total) + '</strong>' +
+      '<span style="color:var(--grey);font-size:12px">' + (s.finished ? s.done + ' of ' + s.total + ' checked' : 'about ' + left + ' min left · keep this page open') + '</span></div>' +
+    '<div style="height:4px;background:var(--border);border-radius:4px;margin:10px 0 12px"><div style="height:4px;width:' + pct + '%;background:var(--gold);border-radius:4px;transition:width .4s"></div></div>' +
+    (s.halted ? '<p style="color:#c0392b;margin-bottom:10px">' + esc(s.halted) + '</p>' : '') +
+    '<p style="font-size:13px;margin-bottom:8px">Still there: <b>' + s.ok + '</b> · Gone (Amazon button hidden): <b>' + s.gone + '</b> · Price changed: <b>' + s.price.length + '</b> · For you to look at: <b>' + s.review.length + '</b></p>' +
+    (s.price.length ? '<div style="margin-top:12px"><strong style="font-size:12px;letter-spacing:.12em">PRICE CHANGED ON AMAZON</strong>' + s.price.map(r => line(r, 'Listed ' + esc(r.price || '—') + ' · Amazon now <b>' + esc(r.found.price) + '</b>')).join('') + '</div>' : '') +
+    (s.review.length ? '<div style="margin-top:12px"><strong style="font-size:12px;letter-spacing:.12em">FOR YOU TO LOOK AT</strong>' + s.review.map(r => line(r, esc(WHAT[r.found.status] || r.found.status) + (r.found.note ? ' · ' + esc(r.found.note) : ''))).join('') + '</div>' : '');
+}
+function reviewDone(key) { const s = window._lastRun || run; if (s) { s.review = s.review.filter(r => r.key !== key); showRun(s); } }
+async function updatePrice(key) {
+  const r = rows.find(x => x.key === key); if (!r || !r.found || !r.found.price) return;
+  const { error } = await db.from(r.table).update({ price: r.found.price }).eq('id', r.id);
+  if (error) { toast('Could not save: ' + error.message, true); return; }
+  toast(r.name + ': price now ' + r.found.price);
+  r.price = r.found.price;
+  const s = window._lastRun || run; if (s) { s.price = s.price.filter(x => x.key !== key); showRun(s); }
+}
+addEventListener('beforeunload', e => { if (run) { e.preventDefault(); e.returnValue = ''; } });
 
 function openNext() {
   const next = rows.find(r => stateOf(r) === 'check');

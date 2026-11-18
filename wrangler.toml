@@ -9,3 +9,7 @@ pages_build_output_dir = "dist"
 compatibility_date = "2026-09-01"
 # node:crypto (Razorpay signatures) and Buffer, used by lib/shared.mjs
 compatibility_flags = ["nodejs_compat"]
+
+# Workers AI for Enma, the chat assistant (functions/api/chat.js). Free plan: 10,000 neurons a day.
+[ai]
+binding = "AI"

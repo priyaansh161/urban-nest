@@ -3,7 +3,7 @@
 import { chromium } from 'playwright-core';
 import { readFileSync } from 'node:fs';
 const logo = 'data:image/png;base64,' + readFileSync(new URL('../../logo-icon.png', import.meta.url)).toString('base64');
-const OUT = 'C:/Users/priya/OneDrive/Projects/urban-nest-reels/brand-look/end-card-logo-tagline.png';
+const OUT = 'C:/Users/priya/OneDrive/Projects/Urban Nest/urban-nest-reels/brand-look/end-card-logo-tagline.png';
 const b = await chromium.launch({ channel: 'msedge', headless: true });
 const t = await b.newPage({ viewport: { width: 1080, height: 1920 } });
 await t.setContent(`<!doctype html><html><head>

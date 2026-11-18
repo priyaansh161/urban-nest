@@ -537,7 +537,7 @@
 </div>
 
 <main>
-  <p class="updated">Last updated 5 November 2026 (Privacy now has an India and a US version)</p>
+  <p class="updated">Last updated 18 November 2026 (Privacy now covers chats with Enma, our assistant)</p>
 
   <div class="layout">
     <aside class="toc">
@@ -803,6 +803,10 @@
         <ul>
           <li><strong>When you order:</strong> your name, phone number, email and delivery address.</li>
           <li><strong>When you subscribe or send feedback:</strong> whatever you choose to give us.</li>
+          <li><strong>When you chat with Enma, our assistant:</strong> what you write to her and her replies, the
+              page you started on, and a one-way scrambled form of your connection address, used only to stop
+              misuse. Anything you tell her, such as your name or number, is saved with the chat so we can get
+              back to you.</li>
           <li><strong>Automatically:</strong> ordinary technical information such as your browser
               type and the pages you visited.</li>
         </ul>
@@ -829,12 +833,15 @@
           Only those who have to: the seller and courier handling your delivery, our payment
           processor, and our hosting and database providers. Where a piece is sold by a partner
           showroom, they receive the details needed to pack and send it, and nothing more.
+          Enma's replies are written by an AI model that runs on Cloudflare, our host; your messages
+          go to it to be answered and are not used by us to train anything.
         </p>
 
         <h3>How long we keep it</h3>
         <p>
           Order records are kept as long as tax and accounting rules require. Mailing list details
-          are kept until you unsubscribe. Feedback is kept until it stops being useful.
+          are kept until you unsubscribe. Feedback and chats with Enma are kept until they stop
+          being useful, and a chat is deleted whenever you ask.
         </p>
 
         <h3>Your say</h3>
@@ -848,7 +855,8 @@
         <p>
           We use browser storage for practical things only: remembering your light or dark theme
           preference and what is in your basket. Your basket stays on your own device and is not
-          sent to us until you check out.
+          sent to us until you check out. A chat with Enma is also kept on your device, so it carries on
+          after a reload; NEW CHAT clears it.
         </p>
         </div><!-- /pvIN -->
 
@@ -866,6 +874,10 @@
               (your country), which we use to show you the right store.</li>
           <li><strong>When you join, subscribe or write to us:</strong> your name and email, and whatever else
               you choose to tell us.</li>
+          <li><strong>When you chat with Enma, our assistant:</strong> what you write to her and her replies, the
+              page you started on, and a one-way scrambled form of your connection address, used only to stop
+              misuse. Anything you tell her, such as your name or number, is saved with the chat so we can get
+              back to you.</li>
         </ul>
 
         <h3>Affiliate links</h3>
@@ -890,7 +902,8 @@
         <h3>Who else sees it</h3>
         <p>
           Only the providers that run the site for us: our hosting and database providers, which may keep
-          data on servers outside the United States, including in India. We do not pass your details to anyone else.
+          data on servers outside the United States, including in India. Enma's replies are written by an AI
+          model that runs on Cloudflare, our host. We do not pass your details to anyone else.
         </p>
 
         <h3>Your rights</h3>
@@ -909,7 +922,8 @@
         <h3>Cookies and browser storage</h3>
         <p>
           We use browser storage for practical things only: remembering your light or dark theme and your
-          choice of India or US store. Retailers we link to may set their own cookies once you leave our site.
+          choice of India or US store, and your chat with Enma, so it carries on after a reload (NEW CHAT clears it).
+          Retailers we link to may set their own cookies once you leave our site.
         </p>
         </div><!-- /pvUS -->
       </section>
@@ -980,5 +994,6 @@
 </script>
 
 <script src="join-nest.js" defer></script>
+<script src="enma.js" defer></script>
 </body>
 </html>

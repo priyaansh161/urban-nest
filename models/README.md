@@ -7,7 +7,7 @@ Raw Meshy exports are 15–100 MB and go in `models/source/`, which is
 gitignored. Compress before uploading — this is the same line the admin's
 *3D Model URL* field offers to copy, and it runs from any folder:
 
-    node "C:\Users\priya\OneDrive\Projects\urban-nest\tools\compress-model.mjs" "C:\Users\priya\OneDrive\Projects\urban-nest\models\source\whatever-raw.glb"
+    node "C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest\tools\compress-model.mjs" "C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest\models\source\whatever-raw.glb"
 
 Or, with a terminal already sitting in the project, the short form:
 

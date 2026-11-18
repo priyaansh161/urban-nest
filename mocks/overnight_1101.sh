@@ -2,7 +2,7 @@
 # 1 Nov 2026 overnight: bake the Sunday Bedroom and the Quiet Bath with their new staging, slim/compress both,
 # then shut the computer down (he asked). Nothing is published or deployed.
 B="/c/Program Files/Blender Foundation/Blender 5.2/blender.exe"
-R="C:/Users/priya/OneDrive/Projects/urban-nest"
+R="C:/Users/priya/OneDrive/Projects/Urban Nest/urban-nest"
 LOG="$R/mocks/overnight_1101.log"
 cd "$R"
 echo "START $(date)" > "$LOG"

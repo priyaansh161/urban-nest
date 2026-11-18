@@ -5,7 +5,7 @@
 #   blender -b -P make_diffuser.py -- <room-pilot dir>        (or run inside an open Blender: OUT defaults to here)
 import bpy, math, os, sys
 from mathutils import Vector
-OUT = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else r'C:\Users\priya\OneDrive\Projects\urban-nest\mocks\room-pilot'
+OUT = sys.argv[sys.argv.index('--') + 1] if '--' in sys.argv else r'C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest\mocks\room-pilot'
 NAME = 'bath-reed-diffuser'
 for o in list(bpy.data.objects): bpy.data.objects.remove(o)
 

@@ -220,6 +220,7 @@
     <div class="nav-group-label">Community</div>
     <a href="feedback.html" class="nav-item"><span class="icon">◌</span> Feedback</a>
     <a href="subscribers.html" class="nav-item"><span class="icon">◎</span> Subscribers</a>
+    <a href="enma.html" class="nav-item"><span class="icon">◍</span> Enma Chats</a>
     <div class="nav-group-label">Motif Labs</div>
     <a href="motiflabs.html" class="nav-item"><span class="icon">◬</span> Chat Leads</a>
   </nav>
@@ -372,7 +373,7 @@
         <input type="file" id="modelFile" accept=".glb" style="display:none" onchange="uploadModel(this)"/>
         <span class="hint" id="modelHint">A <strong>.glb</strong> exported from Meshy. Upload it here and it goes straight to Supabase Storage — no site deploy. Shown as a rotatable object instead of a photo.</span>
         <div class="cmd">
-          <code id="compressCmd">node "C:\Users\priya\OneDrive\Projects\urban-nest\tools\compress-model.mjs" "C:\Users\priya\OneDrive\Projects\urban-nest\models\source\<em>your-file-raw.glb</em>"</code>
+          <code id="compressCmd">node "C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest\tools\compress-model.mjs" "C:\Users\priya\OneDrive\Projects\Urban Nest\urban-nest\models\source\<em>your-file-raw.glb</em>"</code>
           <button type="button" class="cmd-copy" onclick="copyCmd(this)">Copy</button>
         </div>
         <span class="hint">Compress first — PowerShell, any folder. Swap in your filename. Writes the finished .glb to <strong>models\</strong>, typically 26 MB down to 1.6 MB, then check it renders with <strong>tools\verify.html</strong> before uploading here.</span>

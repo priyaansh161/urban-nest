@@ -8,7 +8,7 @@ import { chromium } from 'playwright-core';
 import { readFileSync } from 'node:fs';
 const [,, bgPath, outPath, mode, line = ''] = process.argv;
 const bg = 'data:image/jpeg;base64,' + readFileSync(bgPath).toString('base64');
-const card = 'data:image/png;base64,' + readFileSync('C:/Users/priya/OneDrive/Projects/urban-nest-reels/brand-look/end-card-logo-tagline.png').toString('base64');
+const card = 'data:image/png;base64,' + readFileSync('C:/Users/priya/OneDrive/Projects/Urban Nest/urban-nest-reels/brand-look/end-card-logo-tagline.png').toString('base64');
 const b = await chromium.launch({ channel: 'msedge', headless: true });
 const t = await b.newPage({ viewport: { width: 1080, height: 1920 } });
 await t.setContent('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@1,400&display=block"><body style="margin:0"><canvas id="c" width="1080" height="1920" style="display:block"></canvas></body>', { waitUntil: 'networkidle' });
