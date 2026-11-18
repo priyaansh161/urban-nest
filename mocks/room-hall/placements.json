@@ -1,0 +1,313 @@
+{
+ "_note": "hall products, see make_placements.py",
+ "room": "hall_v1-web.glb",
+ "products": [
+  {
+   "id": "8ff6fee2-7556-467e-9212-0a75e285ee89",
+   "name": "Torque Berlin L-Shaped Sofa",
+   "file": "final/8ff6fee2.glb",
+   "listing": "Torque Berlin 5 Seater L-Shaped Sofa -RHS-Beige | Modern Tight Curved Sectional Sofa",
+   "link": "https://www.amazon.in/dp/B0H2MKCK97?tag=urbannest03b-21",
+   "tag": "COLLECTION · SOFAS",
+   "pos": [
+    -0.905,
+    0.0,
+    2.19
+   ],
+   "length": 2.8,
+   "rotY": 1.5708,
+   "desc": "Primary Material: Premium Fabric | High Density Soft Foam Product Dimensions ( L x D x H ) Inches: 110 x 71 x 30 Inches | ( L x D x H ) CM: 280 x 180 x 75 Cm.",
+   "specs": [
+    [
+     "Brand",
+     "Torque"
+    ]
+   ],
+   "footprint": [
+    2.8,
+    1.65
+   ]
+  },
+  {
+   "id": "e716af29-6b6a-49bb-a10e-949435ead6fe",
+   "name": "Enfurnish Sheesham Coffee Table",
+   "file": "final/e716af29.glb",
+   "listing": "Enfurnish Sheesham Wood Coffee Table with Shelf, Walnut Finish",
+   "link": "https://www.amazon.in/dp/B0CGNPGT6K?tag=urbannest03b-21",
+   "tag": "COLLECTION · FURNITURE",
+   "pos": [
+    0.36,
+    0.0,
+    2.15
+   ],
+   "length": 1.0,
+   "rotY": 1.5708,
+   "desc": "This Sirius Solid wooden coffee table is made of natural Sheesham wood.",
+   "specs": []
+  },
+  {
+   "id": "aef51ee7-ecea-499c-9091-123306389c18",
+   "name": "BEHOMA Brass Peacock Urli",
+   "file": "final/aef51ee7.glb",
+   "listing": "BEHOMA Brass Peacock Urli 9.5 inch | Floating Flower Bowl for Centre Table & Pooja",
+   "link": "https://www.amazon.in/dp/B0DJJPWK3D?tag=urbannest03b-21",
+   "tag": "COLLECTION · FURNITURE",
+   "pos": [
+    0.36,
+    0.382,
+    2.15
+   ],
+   "length": 0.24,
+   "desc": "A golden brass urli with carved peacocks rising from either side as handles.",
+   "specs": [
+    [
+     "Brand",
+     "BEHOMA"
+    ],
+    [
+     "Material",
+     "Brass"
+    ],
+    [
+     "Size",
+     "9.5 inch"
+    ]
+   ]
+  },
+  {
+   "id": "e570aa03-a749-4f8d-a187-87d1e5cbd7d1",
+   "name": "Homesake ARC Floor Lamp",
+   "file": "final/e570aa03.glb",
+   "listing": "Homesake® ARC Floor Lamp for Living Room | Modern Standing Lamp with Linen Fabric Shade and Black Metal Frame",
+   "link": "https://link.amazon/B0aluxvGv",
+   "tag": "COLLECTION · LUMINAIRES",
+   "pos": [
+    -0.4,
+    0.0,
+    0.45
+   ],
+   "height": 1.85,
+   "rotY": 1.5708,
+   "desc": "A modern minimalist floor lamp featuring a sleek black metal frame and premium off-white khadi fabric drum shade.",
+   "specs": [
+    [
+     "Product Dimensions",
+     "15D x 25W x 30H Centimeters"
+    ]
+   ]
+  },
+  {
+   "id": "9677aca6-246e-4f79-abb7-fd503824369a",
+   "name": "Paper Plane Abstract Canvas 122 x 81",
+   "file": "final/9677aca6.glb",
+   "listing": "PAPER PLANE DESIGN Modern Abstract Canvas Painting 122 x 81 cm (32 x 48 Inch) | Large Statement Wall Art with Black Floater Frame",
+   "link": "https://link.amazon/B0hEoeBlf",
+   "tag": "COLLECTION · WALL ART",
+   "pos": [
+    -1.72,
+    1.05,
+    2.15
+   ],
+   "height": 1.22,
+   "rotY": 1.5708,
+   "desc": "Rooted in earthy warmth and folk-modern expressionism, this figurative artwork captures a solitary rider atop a sleek black stallion traversing a rolling desert landscape.",
+   "specs": [
+    [
+     "Material",
+     "380 gsm canvas, black floater frame"
+    ]
+   ],
+   "alignLeft": -1.745,
+   "noShadow": true
+  },
+  {
+   "id": "872070ef-ec77-4dfc-bc40-21c474d6d105",
+   "name": "UAG 7 Running Horses",
+   "file": "final/872070ef.glb",
+   "listing": "UAG Exports 19 Inch 7 Running Horses Statue Resin Vastu & Feng Shui Lucky Horse Decor | Stock Market Growth Item (Dark Brown, Wave Base)",
+   "link": "https://link.amazon/B06pJ0tSP",
+   "tag": "COLLECTION · SCULPTURES",
+   "pos": [
+    1.51,
+    0.6,
+    2.25
+   ],
+   "length": 0.48,
+   "rotY": -1.5708,
+   "desc": "Bring elegance and positive energy to your space with this premium 19-inch 7 Running Horses statue, expertly handcrafted from high-quality resin.",
+   "specs": [
+    [
+     "Colour",
+     "Dark Brown"
+    ],
+    [
+     "Material",
+     "Resin"
+    ]
+   ]
+  },
+  {
+   "id": "271ce125-61fd-4435-b868-804d37fcae61",
+   "name": "Ribbed Ceramic Vase",
+   "file": "final/271ce125.glb",
+   "listing": "Ribbed Ceramic Vase for Home Decor | Modern Minimalist Flower Vase",
+   "link": "https://link.amazon/B093PCuRU",
+   "tag": "COLLECTION · AMPHORAE",
+   "pos": [
+    1.51,
+    0.6,
+    0.8
+   ],
+   "height": 0.28,
+   "desc": "Add a touch of elegance to your space with this stylish ribbed decorative vase.",
+   "specs": [
+    [
+     "Material",
+     "Ceramic"
+    ],
+    [
+     "Colour",
+     "White - Big"
+    ],
+    [
+     "Brand",
+     "DecoKura"
+    ]
+   ]
+  },
+  {
+   "id": "91771cce-63f6-4450-9d7d-e3559125630a",
+   "name": "10-Light Linear Glass Chandelier",
+   "file": "final/91771cce.glb",
+   "listing": "10-Light Linear Glass Chandelier | Modern Hanging Pendant Light for Dining Room & Hall",
+   "link": "https://link.amazon/B0ilRi1r7",
+   "tag": "COLLECTION · LIGHTING",
+   "pos": [
+    -0.15,
+    3.0,
+    -2.05
+   ],
+   "length": 1.0,
+   "rotY": 1.5708,
+   "desc": "Ten glass globes hung at staggered heights from a single linear bar, made for the long stretch above a dining table or an island.",
+   "specs": [
+    [
+     "Brand",
+     "light home"
+    ],
+    [
+     "Material",
+     "Metal and Glass"
+    ]
+   ],
+   "hang": true
+  },
+  {
+   "id": "ade2831e-dd13-4d2f-b744-63654d9ff34b",
+   "name": "Woodshoppe Shisham Cutlery Caddy",
+   "file": "final/ade2831e.glb",
+   "listing": "World Mart Woodshoppe Cutlery Case Natural Finish Shisham Wood Caddy | Utensils Holder",
+   "link": "https://www.amazon.in/dp/B0CSYZ5VQM?tag=urbannest03b-21",
+   "tag": "ESSENTIALS · KITCHEN ESSENTIALS",
+   "pos": [
+    -0.15,
+    0.764,
+    -2.3
+   ],
+   "length": 0.2,
+   "rotY": 1.5708,
+   "desc": "Sleek Shisham Wood Design: Crafted from elegant Shisham Wood, this cutlery case adds a touch of natural beauty to your kitchen or dining table.",
+   "specs": []
+  },
+  {
+   "id": "bd5ca151-0cbb-4870-9490-d0316398eb4b",
+   "name": "Auromin Metal & Wood Wall Clock",
+   "file": "final/bd5ca151.glb",
+   "listing": "Auromin Metal & Wood Wall Clock 50 cm | Modern Analog Wall Clock for Living Room, Bedroom & Office",
+   "link": "https://link.amazon/B0bP2CEEQ",
+   "tag": "COLLECTION · TIMEPIECES",
+   "pos": [
+    -0.7,
+    1.7,
+    3.87
+   ],
+   "length": 0.5,
+   "rotY": 3.1416,
+   "desc": "Half-metre analog wall clock combining a brushed metal frame with warm wood detailing in black and brown.",
+   "specs": [
+    [
+     "Material",
+     "Metal and wood"
+    ],
+    [
+     "Colour",
+     "Black and brown"
+    ],
+    [
+     "Brand",
+     "AUROMIN; THE ART OF INGENUITY"
+    ]
+   ]
+  },
+  {
+   "id": "395cbcd3-97d2-416f-91b6-c99294607e3b",
+   "name": "Brass Ganesh Idol",
+   "file": "final/395cbcd3.glb",
+   "listing": "Brass Ganesh Idol Statue Ganesha Vinayak Ganpati Bhagwan",
+   "link": "https://link.amazon/B04inh7NI",
+   "tag": "COLLECTION · SCULPTURES",
+   "pos": [
+    -1.6,
+    1.04,
+    -1.6
+   ],
+   "height": 0.22,
+   "rotY": 1.5708,
+   "desc": "A timeless expression of grace, prosperity, and positive energy, this Ganesha sculpture brings a sense of serenity and warmth to any space.",
+   "specs": [
+    [
+     "Brand",
+     "ARTVARKO"
+    ],
+    [
+     "Colour",
+     "Gold"
+    ],
+    [
+     "Material",
+     "Brass"
+    ]
+   ]
+  },
+  {
+   "id": "553c88f9-3698-456e-a618-186c5756b9e1",
+   "name": "Soapstone Marble Flower Vase",
+   "file": "final/553c88f9.glb",
+   "listing": "Soapstone Marble Flower Decorative Vase",
+   "link": "https://link.amazon/B04kyJEoD",
+   "tag": "COLLECTION · AMPHORAE",
+   "pos": [
+    1.58,
+    0.975,
+    3.1
+   ],
+   "height": 0.26,
+   "desc": "Hand-carved soapstone vase with a timeless marble finish, perfect for displaying fresh or dried flowers.",
+   "specs": [
+    [
+     "Material",
+     "Soapstone"
+    ],
+    [
+     "Colour",
+     "Off White"
+    ],
+    [
+     "Brand",
+     "HANDI STONE"
+    ]
+   ]
+  }
+ ],
+ "staging": []
+}
