@@ -131,3 +131,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-11-18 | 10:36 | 9127a13 (+ uncommitted changes) | Enma, the Urban Nest chat assistant (bubble stacked above Join the Nest, live catalogue + Nest Edit, Workers AI), admin Enma Chats page, Amazon Links 'Run full check' with price changes, privacy policy covers chats | https://a90eb510.storeurbannest.pages.dev |
 | 2026-11-18 | 10:41 | 4730c04 (+ uncommitted changes) | Amazon full check: 2-4 s apart (~10 min), clean links checked without the affiliate tag | https://461f179c.storeurbannest.pages.dev |
 | 2026-11-18 | 10:51 | c595f2d | Enma: when several pieces could fit she shows 2-4 and asks; picture cards (photo, name, price) under her replies; weak matches dropped; short names | https://bfb810b8.storeurbannest.pages.dev |
+| 2026-11-18 | 10:54 | 33a0f87 | Enma: one-line disclaimer | https://9d7a703a.storeurbannest.pages.dev |
