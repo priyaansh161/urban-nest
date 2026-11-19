@@ -17,6 +17,7 @@ for d in PL['products'] + [x for x in PL.get('staging', []) if not x.get('lm')]:
     if 'file' in d and os.path.exists(os.path.join(OUT, 'products', d['file'])):
         made = place_fp(d); CASTERS += made; PLACED[d['name']] = made
 if 'bounds' in ARGS:
+    bpy.context.view_layer.update()
     for n, objs in PLACED.items():
         mn, mx = bounds(objs); print('BOUNDS %-40s x %6.3f %6.3f  y %6.3f %6.3f  z %6.3f %6.3f' % (n[:40], mn.x, mx.x, mn.y, mx.y, mn.z, mx.z))
     sys.exit(0)

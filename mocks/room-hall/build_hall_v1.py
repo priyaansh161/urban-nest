@@ -227,27 +227,32 @@ def rug_image():
     return SL.img('rug_col', np.clip(rgb, 0, 1), TMP)
 
 LAM = (0.60, 0.41, 0.23)
+# v2 (19 Nov): every wood is the crisp oak_veneer_03 scan (grain turned to run along v like the old walnut), recoloured per
+# finish; floor = Marble021 scan as an 80 cm marble-look vitrified tile; ceilings get a faint plaster; fabrics = linen scan.
+OAKD = 'oak_veneer_03/oak_veneer_03_diff_2k.jpg'; OAKN = 'oak_veneer_03/oak_veneer_03_nor_gl_2k.jpg'; OAKR = 'oak_veneer_03/oak_veneer_03_rough_2k.jpg'
+LIN = 'rough_linen/rough_linen_diff_2k.jpg'; LINN = 'rough_linen/rough_linen_nor_gl_2k.jpg'
+PLD = 'beige_wall_001/beige_wall_001_diff_2k.jpg'; PLN = 'beige_wall_001/beige_wall_001_nor_gl_2k.jpg'
+def wood(name, col, contrast, rough=0.45):
+    return pbr(name, scan_img(OAKD, 2048, recolour=col, contrast=contrast, rot90=True), scan_img(OAKN, 1024, False, rot90=True), None, rough=rough, nstr=0.35)
 M = {
     'wall': pbr('Warm White Paint', scan_img('beige_wall_001/beige_wall_001_diff_2k.jpg', 1024, recolour=(0.91, 0.88, 0.82), contrast=0.25),
                 scan_img('beige_wall_001/beige_wall_001_nor_gl_2k.jpg', 1024, False), None, rough=0.85, nstr=0.4),
     'accent': pbr('Sage Accent Paint', scan_img('beige_wall_001/beige_wall_001_diff_2k.jpg', 1024, recolour=(0.62, 0.66, 0.58), contrast=0.25),
                   scan_img('beige_wall_001/beige_wall_001_nor_gl_2k.jpg', 1024, False), None, rough=0.85, nstr=0.4),
-    'ceiling': mat('Ceiling', (0.93, 0.91, 0.87, 1), 0.9),
-    'tile': SL.mat('Ivory Vitrified Tile', (0.86, 0.82, 0.74), 0.12, image=tile_image()),
+    'ceiling': pbr('Ceiling Plaster', scan_img(PLD, 1024, recolour=(0.93, 0.92, 0.89), contrast=0.12), scan_img(PLN, 1024, False), None, rough=0.9, nstr=0.15),
+    'tile': pbr('Ivory Marble Vitrified Tile', scan_img('Marble021/Marble021_2K-JPG_Color.jpg', 2048, recolour=(0.90, 0.87, 0.81), contrast=1.1),
+                scan_img('Marble021/Marble021_2K-JPG_NormalGL.jpg', 1024, False), None, rough=0.1, nstr=0.12),
     'grout': mat('Grout', (0.68, 0.63, 0.55, 1), 0.7),
     'marble': pbr('Grey Marble', scan_img('Marble019/Marble019_2K-JPG_Color.jpg', 2048, recolour=(0.80, 0.78, 0.76), contrast=1.6),
                   scan_img('Marble019/Marble019_2K-JPG_NormalGL.jpg', 1024, False), None, rough=0.15, nstr=0.3),
     'whitemarble': pbr('White Marble', scan_img('Marble019/Marble019_2K-JPG_Color.jpg', 1024, tint=(1.04, 1.03, 1.02)), None, None, rough=0.15),
     'quartz': pbr('White Quartz', scan_img('Marble019/Marble019_2K-JPG_Color.jpg', 1024, tint=(1.03, 1.02, 1.0), contrast=0.55), None, None, rough=0.18),
-    'oak': pbr('Oak Laminate', scan_img('walnut_veneer/walnut_veneer_Diffuse_2k.jpg', 2048, recolour=LAM, contrast=1.9),
-               scan_img('walnut_veneer/walnut_veneer_nor_gl_2k.jpg', 1024, False), None, rough=0.45, nstr=0.5),
-    'teak': pbr('Teak Veneer', scan_img('walnut_veneer/walnut_veneer_Diffuse_2k.jpg', 2048, recolour=(0.42, 0.24, 0.11), contrast=1.7),
-                scan_img('walnut_veneer/walnut_veneer_nor_gl_2k.jpg', 1024, False), None, rough=0.4, nstr=0.5),
-    'walnut': pbr('Walnut Table', scan_img('walnut_veneer/walnut_veneer_Diffuse_2k.jpg', 2048, recolour=(0.34, 0.20, 0.11), contrast=1.5),
-                  scan_img('walnut_veneer/walnut_veneer_nor_gl_2k.jpg', 1024, False), None, rough=0.35, nstr=0.4),
+    'oak': wood('Oak Laminate', (0.64, 0.45, 0.28), 1.35),
+    'teak': wood('Teak Veneer', (0.42, 0.25, 0.12), 1.3, 0.4),
+    'walnut': wood('Walnut Table', (0.32, 0.19, 0.10), 1.25, 0.35),
     'navy': mat('Charcoal Navy Matte', (0.020, 0.027, 0.048, 1), 0.55),
     'gap': mat('Shutter Gap', (0.02, 0.02, 0.025, 1), 0.8),
-    'gypsum': mat('Gypsum White', (0.94, 0.93, 0.90, 1), 0.85),
+    'gypsum': pbr('Gypsum White', scan_img(PLD, 1024, recolour=(0.94, 0.93, 0.90), contrast=0.1), scan_img(PLN, 1024, False), None, rough=0.85, nstr=0.12),
     'alu': mat('Dark Grey Aluminium', (0.10, 0.10, 0.11, 1), 0.4),
     'glass': mat('Glass', (0.85, 0.90, 0.92, 1), 0.02, alpha=0.08),
     'bronzeglass': mat('Bronze Glass', (0.20, 0.15, 0.10, 1), 0.05, alpha=0.45),
@@ -257,9 +262,14 @@ M = {
     'brass': mat('Brass (lightmapped look)', (0.70, 0.50, 0.22, 1), 0.35),
     'steel': mat('Steel (painted)', (0.40, 0.41, 0.43, 1), 0.32),
     'white': mat('Matte White', (0.92, 0.92, 0.90, 1), 0.5),
-    'fabric': SL.mat('Linen Upholstery', (0.74, 0.68, 0.58), 0.9, sheen=0.4),
+    'fabric': pbr('Linen Upholstery', scan_img(LIN, 1024, recolour=(0.86, 0.82, 0.74), contrast=1.2), scan_img(LINN, 1024, False), None, rough=0.9, nstr=0.8),
     'cushion': SL.mat('Rust Cushion', (0.62, 0.30, 0.16), 0.9, sheen=0.4),
-    'drape': SL.mat('Taupe Drape', (0.55, 0.48, 0.40), 0.9, sheen=0.5),
+    'drape': pbr('Taupe Linen Drape', scan_img(LIN, 1024, recolour=(0.60, 0.53, 0.44), contrast=1.3), scan_img(LINN, 1024, False), None, rough=0.92, nstr=0.9),
+    'runner': pbr('Linen Runner', scan_img(LIN, 1024, recolour=(0.80, 0.74, 0.64), contrast=1.2), scan_img(LINN, 1024, False), None, rough=0.9, nstr=0.8),
+    'marigold': mat('Marigold', (0.95, 0.42, 0.04, 1), 0.7),
+    'mango': mat('Mango Leaf', (0.10, 0.30, 0.06, 1), 0.5),
+    'book1': mat('Book Cloth Sage', (0.42, 0.47, 0.38, 1), 0.8), 'book2': mat('Book Cloth Ochre', (0.70, 0.52, 0.24, 1), 0.8),
+    'pages': mat('Book Pages', (0.92, 0.89, 0.82, 1), 0.9),
     'sheer': SL.mat('Sheer', (0.95, 0.94, 0.90), 0.9, alpha_blend=True),
     'rug': SL.mat('Living Rug', (0.80, 0.76, 0.70), 0.95, image=rug_image()),
     'coir': mat('Coir Mat', (0.45, 0.32, 0.18, 1), 0.95),
@@ -339,22 +349,22 @@ opening = join(op, 'LM_Openings'); world_uv(opening, 3.0); lm(opening, 512)
 # kitchen beyond (the Oak Kitchen's look: navy bases, quartz, oak uppers), 2 m deep
 KX = X0 - 2.0
 kf = grid('Kitchen Floor', (KX, KY0 - 0.6, 0), (X0 - KX, 0, 0), (0, KY1 - KY0 + 1.2, 0), M['tile'], tile=0.8); tile_uv(kf, seed=7)
-grid('Kitchen Back', (KX, KY1 + 0.6, 0), (0, -(KY1 - KY0 + 1.2), 0), (0, 0, H), M['wall'], tile=3.0)
-grid('Kitchen Side A', (KX, KY0 - 0.6, 0), (X0 - T_ - KX, 0, 0), (0, 0, H), M['wall'], tile=3.0)
-grid('Kitchen Side B', (X0 - T_, KY1 + 0.6, 0), (-(X0 - T_ - KX), 0, 0), (0, 0, H), M['wall'], tile=3.0)
+grid('Kitchen Back', (KX, KY1 + 0.6, 0), (0, -(KY1 - KY0 + 1.2), 0), (0, 0, H), M['wall'], tile=3.0).data.flip_normals()
+grid('Kitchen Side A', (KX, KY0 - 0.6, 0), (X0 - T_ - KX, 0, 0), (0, 0, H), M['wall'], tile=3.0).data.flip_normals()
+grid('Kitchen Side B', (X0 - T_, KY1 + 0.6, 0), (-(X0 - T_ - KX), 0, 0), (0, 0, H), M['wall'], tile=3.0).data.flip_normals()
 grid('Kitchen Ceiling', (KX, KY1 + 0.6, H), (X0 - KX, 0, 0), (0, -(KY1 - KY0 + 1.2), 0), M['ceiling'], tile=3.0)
 kp = [bx('K Base', KX, KX + 0.60, KY0 - 0.6, KY1 + 0.6, 0.10, 0.86, M['navy']), bx('K Plinth', KX, KX + 0.55, KY0 - 0.6, KY1 + 0.6, 0, 0.10, M['matblack']),
       bx('K Top', KX, KX + 0.62, KY0 - 0.6, KY1 + 0.6, 0.86, 0.90, M['quartz']), bx('K Splash', KX, KX + 0.012, KY0 - 0.6, KY1 + 0.6, 0.90, 1.50, M['whitemarble']),
       bx('K Upper', KX, KX + 0.35, KY0 - 0.6, KY1 + 0.6, 1.52, 2.25, M['oak'])]
 for yy in (KY0 - 0.15, KY0 + 0.45, KY1 + 0.15):
     kp.append(bx('K Gap', KX + 0.60, KX + 0.603, yy - 0.002, yy + 0.002, 0.12, 0.84, M['gap'])); kp.append(bx('K Gap', KX + 0.35, KX + 0.353, yy - 0.002, yy + 0.002, 1.53, 2.24, M['gap']))
-kit = join(kp, 'LM_KitchenGlimpse'); world_uv(kit, 2.0); lm(kit, 1024)
+kit = join(kp, 'LM_KitchenGlimpse'); world_uv(kit, 1.2); lm(kit, 1024)
 # passage beyond: a 1 m corridor, 1.6 m deep, a white bedroom door at its end
 CX = X0 - 1.6
 cf = grid('Corridor Floor', (CX, PY0, 0), (X0 - CX, 0, 0), (0, PY1 - PY0, 0), M['tile'], tile=0.8); tile_uv(cf, seed=8)
-grid('Corridor End', (CX, PY1, 0), (0, -(PY1 - PY0), 0), (0, 0, H), M['wall'], tile=3.0)
-grid('Corridor Side A', (CX, PY0, 0), (X0 - T_ - CX, 0, 0), (0, 0, H), M['wall'], tile=3.0)
-grid('Corridor Side B', (X0 - T_, PY1, 0), (-(X0 - T_ - CX), 0, 0), (0, 0, H), M['wall'], tile=3.0)
+grid('Corridor End', (CX, PY1, 0), (0, -(PY1 - PY0), 0), (0, 0, H), M['wall'], tile=3.0).data.flip_normals()
+grid('Corridor Side A', (CX, PY0, 0), (X0 - T_ - CX, 0, 0), (0, 0, H), M['wall'], tile=3.0).data.flip_normals()
+grid('Corridor Side B', (X0 - T_, PY1, 0), (-(X0 - T_ - CX), 0, 0), (0, 0, H), M['wall'], tile=3.0).data.flip_normals()
 grid('Corridor Ceiling', (CX, PY1, H), (X0 - CX, 0, 0), (0, -(PY1 - PY0), 0), M['ceiling'], tile=3.0)
 pc_ = (PY0 + PY1) / 2
 cd = [bx('Bed Door Frame', CX, CX + 0.04, pc_ - 0.50, pc_ + 0.50, 0, 2.18, M['white']), bx('Bed Door', CX + 0.01, CX + 0.045, pc_ - 0.44, pc_ + 0.44, 0.01, 2.12, M['white']),
@@ -372,7 +382,7 @@ dp += [bx('Door Handle Plate', DX0 + 0.06, DX0 + 0.10, Y0 + 0.04, Y0 + 0.05, 0.9
 dp += [bx('Switch', DX0 - 0.30, DX0 - 0.14, Y0, Y0 + 0.012, 1.15, 1.27, M['switch'])]
 dp += [bx('Switch', X0, X0 + 0.012, 0.35, 0.47, 1.15, 1.27, M['switch']), bx('Switch', X1 - 0.012, X1, 0.70, 0.86, 1.15, 1.27, M['switch'])]
 dp += [bx('Video Phone', DX0 - 0.30, DX0 - 0.12, Y0, Y0 + 0.02, 1.40, 1.60, M['white']), bx('Video Phone Screen', DX0 - 0.28, DX0 - 0.14, Y0 + 0.02, Y0 + 0.022, 1.46, 1.57, M['tvblack'])]
-door = join(dp, 'LM_MainDoor'); world_uv(door, 1.5, vertical_grain=True); lm(door, 1024)
+door = join(dp, 'LM_MainDoor'); world_uv(door, 1.2, vertical_grain=True); lm(door, 1024)
 
 # ---------------------------------------------------------------- balcony: sliding door, floor, railing, view
 FD = 0.10
@@ -413,12 +423,12 @@ for a, b in ((TV0, TVC - MW), (TVC + MW, TV1)):
     while y + 0.03 <= b:
         twf.append(bx('Flute', X1 - 0.035, X1 - 0.012, y, y + 0.03, 0, 2.75, M['oak'])); y += 0.04
 tvwall = join(tw, 'LM_TVMarble'); world_uv(tvwall, 1.6); lm(tvwall, 1024)
-flutes = join(twf, 'LM_TVFlutes'); world_uv(flutes, 2.0, vertical_grain=True); lm(flutes, 2048)
+flutes = join(twf, 'LM_TVFlutes'); world_uv(flutes, 1.2, vertical_grain=True); lm(flutes, 2048)
 CN0, CN1 = TVC - 0.95, TVC + 0.95
 cs = [bx('Console', X1 - 0.44, X1 - 0.02, CN0, CN1, 0.24, 0.60, M['oak'])]
 for yy in (CN0 + 0.70, CN0 + 1.40): cs.append(bx('Console Gap', X1 - 0.443, X1 - 0.44, yy - 0.002, yy + 0.002, 0.25, 0.59, M['gap']))
 cs.append(bx('Console Groove', X1 - 0.443, X1 - 0.44, CN0 + 0.02, CN1 - 0.02, 0.53, 0.536, M['gap']))
-console = join(cs, 'LM_Console'); world_uv(console, 2.0); lm(console, 1024)
+console = join(cs, 'LM_Console'); world_uv(console, 1.2); lm(console, 1024)
 glow = [bx('Console Glow', X1 - 0.40, X1 - 0.06, CN0 + 0.05, CN1 - 0.05, 0.236, 0.24, M['led'])]
 tv = [bx('TV Body', X1 - 0.055, X1 - 0.025, TVC - 0.617, TVC + 0.617, 0.955, 1.665, M['matblack'], 0.004),
       bx('TV Screen', X1 - 0.0565, X1 - 0.055, TVC - 0.605, TVC + 0.605, 0.967, 1.653, M['tvblack']),
@@ -427,11 +437,22 @@ tvo = join(tv, 'LM_TV'); world_uv(tvo, 1.0); lm(tvo, 512)
 # split AC high on the left wall, near the balcony
 ac = [bx('AC Body', X0, X0 + 0.21, -3.40, -2.50, 2.25, 2.55, M['white'], 0.02), bx('AC Vent', X0 + 0.15, X0 + 0.212, -3.35, -2.55, 2.27, 2.30, M['matblack'])]
 aco = join(ac, 'LM_AC'); world_uv(aco, 1.0); lm(aco, 256)
+# sofa wall: painted picture-frame mouldings (a wide centre panel for the Gond set, two narrow ones), under the AC's line
+mo = []; MOW, MOD = 0.03, 0.016
+def frame_x(y0, y1, z0, z1):
+    mo.extend([bx('Moulding', X0, X0 + MOD, y0, y1, z0, z0 + MOW, M['wall'], 0.004), bx('Moulding', X0, X0 + MOD, y0, y1, z1 - MOW, z1, M['wall'], 0.004),
+               bx('Moulding', X0, X0 + MOD, y0, y0 + MOW, z0 + MOW, z1 - MOW, M['wall'], 0.004), bx('Moulding', X0, X0 + MOD, y1 - MOW, y1, z0 + MOW, z1 - MOW, M['wall'], 0.004)])
+for y0, y1 in ((-3.80, -3.18), (-3.10, -1.55), (-1.47, -0.85)):
+    frame_x(y0, y1, 0.95, 2.15); frame_x(y0, y1, 0.14, 0.86)
+mould = join(mo, 'LM_Mouldings'); world_uv(mould, 3.0); lm(mould, 1024)
+mo = [bx('Dado Rail', X0, X0 + 0.022, -3.88, -0.77, 0.885, 0.92, M['wall'], 0.006)]
+dado = join(mo, 'LM_Dado'); world_uv(dado, 3.0); lm(dado, 256)
 
 # ---------------------------------------------------------------- dining wall (right): shoe cabinet + round mirror by the door, crockery unit
 sc = [bx('Shoe Cab', X1 - 0.35, X1, -3.80, -2.90, 0.15, 0.95, M['oak']), bx('Shoe Top', X1 - 0.36, X1, -3.81, -2.89, 0.95, 0.975, M['quartz']),
-      bx('Shoe Gap', X1 - 0.353, X1 - 0.35, -3.352, -3.348, 0.16, 0.94, M['gap']), bx('Shoe Glow', X1 - 0.30, X1 - 0.05, -3.75, -2.95, 0.145, 0.15, M['led'])]
-shoe = join(sc, 'LM_ShoeCab'); world_uv(shoe, 2.0); lm(shoe, 512)
+      bx('Shoe Gap', X1 - 0.353, X1 - 0.35, -3.352, -3.348, 0.16, 0.94, M['gap']), bx('Shoe Glow', X1 - 0.30, X1 - 0.05, -3.75, -2.95, 0.145, 0.15, M['led']),
+      bx('Shoe Handle', X1 - 0.362, X1 - 0.35, -3.79, -2.91, 0.905, 0.935, M['alu']), bx('Shoe Edge', X1 - 0.351, X1 - 0.35, -3.80, -2.90, 0.15, 0.152, M['gap'])]
+shoe = join(sc, 'LM_ShoeCab'); world_uv(shoe, 1.2); lm(shoe, 512)
 CU0, CU1 = 0.95, 2.55; CD = 0.42
 cu = [bx('CU Plinth', X1 - CD + 0.05, X1, CU0, CU1, 0, 0.10, M['matblack']), bx('CU Base', X1 - CD, X1, CU0, CU1, 0.10, 0.85, M['oak']),
       bx('CU Top', X1 - CD - 0.01, X1, CU0 - 0.01, CU1 + 0.01, 0.85, 0.875, M['quartz']), bx('CU Niche Back', X1 - 0.015, X1, CU0, CU1, 0.875, 1.25, M['whitemarble']),
@@ -440,10 +461,12 @@ cu = [bx('CU Plinth', X1 - CD + 0.05, X1, CU0, CU1, 0, 0.10, M['matblack']), bx(
       bx('CU Side', X1 - 0.38, X1, CU1 - 0.02, CU1, 1.25, 2.20, M['oak']), bx('CU Mid', X1 - 0.38, X1, (CU0 + CU1) / 2 - 0.01, (CU0 + CU1) / 2 + 0.01, 1.25, 2.20, M['oak']),
       bx('CU Shelf', X1 - 0.36, X1 - 0.012, CU0 + 0.02, CU1 - 0.02, 1.70, 1.715, M['oak'])]
 for yy in (CU0 + 0.4, (CU0 + CU1) / 2, CU1 - 0.4): cu.append(bx('CU Gap', X1 - CD - 0.003, X1 - CD, yy - 0.002, yy + 0.002, 0.11, 0.84, M['gap']))
+cu.append(bx('CU Handle', X1 - CD - 0.012, X1 - CD, CU0 + 0.01, CU1 - 0.01, 0.79, 0.82, M['alu']))
+cu += [bx('CU Glass Shelf Edge', X1 - 0.37, X1 - 0.012, CU0 + 0.02, CU1 - 0.02, 1.715, 1.718, M['gap'])]
 for a, b in ((CU0 + 0.02, (CU0 + CU1) / 2 - 0.01), ((CU0 + CU1) / 2 + 0.01, CU1 - 0.02)):          # glass doors' oak frames
     for xa, xb, za, zb in ((a, b, 1.27, 1.32), (a, b, 2.13, 2.18), (a, a + 0.05, 1.27, 2.18), (b - 0.05, b, 1.27, 2.18)):
         cu.append(bx('CU Door Frame', X1 - 0.40, X1 - 0.38, xa, xb, za, zb, M['oak']))
-crock = join(cu, 'LM_Crockery'); world_uv(crock, 2.0); lm(crock, 2048)
+crock = join(cu, 'LM_Crockery'); world_uv(crock, 1.2); lm(crock, 2048)
 for a, b in ((CU0 + 0.07, (CU0 + CU1) / 2 - 0.06), ((CU0 + CU1) / 2 + 0.06, CU1 - 0.07)):
     g_ = bx('CU Glass', X1 - 0.395, X1 - 0.39, a, b, 1.32, 2.13, M['bronzeglass']); g_.visible_shadow = False; GLASS.append(g_)
 glow += [bx('CU Glow', X1 - 0.30, X1 - 0.05, CU0 + 0.05, CU1 - 0.05, 1.245, 1.25, M['led'])]
@@ -455,8 +478,24 @@ md = [bx('Mandir Drawers', X0, X0 + 0.40, MY0, MY1, 0.30, 0.70, M['teak']), bx('
       bx('Mandir Side', X0, X0 + 0.32, MY0 + 0.08, MY0 + 0.12, 1.04, 1.80, M['teak']), bx('Mandir Side', X0, X0 + 0.32, MY1 - 0.12, MY1 - 0.08, 1.04, 1.80, M['teak']),
       bx('Mandir Back', X0, X0 + 0.012, MY0 + 0.12, MY1 - 0.12, 1.04, 1.80, M['white']),
       bx('Mandir Pillar', X0 + 0.30, X0 + 0.34, MY0 + 0.08, MY0 + 0.12, 1.04, 1.80, M['brass']), bx('Mandir Pillar', X0 + 0.30, X0 + 0.34, MY1 - 0.12, MY1 - 0.08, 1.04, 1.80, M['brass'])]
-mandir = join(md, 'LM_Mandir'); world_uv(mandir, 1.5, vertical_grain=True); lm(mandir, 1024)
+mandir = join(md, 'LM_Mandir'); world_uv(mandir, 1.0, vertical_grain=True); lm(mandir, 1024)
 glow += [bx('Mandir Glow', X0 + 0.02, X0 + 0.30, MY0 + 0.13, MY1 - 0.13, 1.795, 1.80, M['led'])]
+# v2 mandir detail: a backlit CNC jaali (overlapping-circle lotus lattice in teak over warm light) behind the idol
+def jaali_image():
+    S = 1024; y, x = np.mgrid[0:S, 0:S] / S * 4.0                       # 4 x 4 repeats of the lattice
+    fx, fy = x % 1 - 0.5, y % 1 - 0.5; r = np.sqrt(fx * fx + fy * fy)
+    lattice = np.zeros((S, S), bool)
+    for cx_, cy_ in ((0, 0), (0.5, 0), (-0.5, 0), (0, 0.5), (0, -0.5)):    # petals: circles of r 0.5 centred on the cell's edges
+        d = np.sqrt((fx - cx_) ** 2 + (fy - cy_) ** 2); lattice |= np.abs(d - 0.5) < 0.035
+    lattice |= np.abs(r - 0.12) < 0.03                                    # a small ring at every flower's heart
+    edge = np.minimum(np.minimum(x, 4 - x), np.minimum(y, 4 - y)) < 0.12  # solid border
+    wood_ = np.array([0.30, 0.17, 0.08]); light = np.array([1.0, 0.86, 0.62])
+    rgb = np.where((lattice | edge)[..., None], wood_ * 0.25, light)
+    return SL.img('jaali_col', np.clip(rgb, 0, 1), TMP)
+JAALI = mat('Jaali Backlit', (0, 0, 0, 1), 0.6)
+_jb = JAALI.node_tree.nodes['Principled BSDF']; _jt = JAALI.node_tree.nodes.new('ShaderNodeTexImage'); _jt.image = jaali_image()
+JAALI.node_tree.links.new(_jt.outputs['Color'], _jb.inputs['Emission Color']); _jb.inputs['Emission Strength'].default_value = 2.2
+_jo = bx('Mandir Jaali', X0 + 0.012, X0 + 0.016, MY0 + 0.12, MY1 - 0.12, 1.08, 1.795, JAALI); world_uv(_jo, 0.56); glow.append(_jo)   # 14 cm flowers
 for g_ in glow: g_.visible_shadow = False
 
 # ---------------------------------------------------------------- false ceiling: band at 2.75, recessed trays with coves (living, dining), downlights
@@ -466,13 +505,22 @@ fc = []
 for y0, y1 in ((Y0, LIV[2]), (LIV[3], DIN[2]), (DIN[3], Y1)): fc.append(bx('FC Band', X0, X1, y0, y1, FZ, H, M['gypsum']))
 for t in (LIV, DIN):
     fc += [bx('FC Band', X0, t[0], t[2], t[3], FZ, H, M['gypsum']), bx('FC Band', t[1], X1, t[2], t[3], FZ, H, M['gypsum'])]
-    fc += [bx('FC Lip', t[0], t[0] + 0.05, t[2], t[3], FZ - 0.03, FZ, M['gypsum']), bx('FC Lip', t[1] - 0.05, t[1], t[2], t[3], FZ - 0.03, FZ, M['gypsum']),
+    # v2: the lips no longer overlap at the corners (the overlap baked black squares into every tray corner)
+    fc += [bx('FC Lip', t[0], t[0] + 0.05, t[2] + 0.05, t[3] - 0.05, FZ - 0.03, FZ, M['gypsum']), bx('FC Lip', t[1] - 0.05, t[1], t[2] + 0.05, t[3] - 0.05, FZ - 0.03, FZ, M['gypsum']),
            bx('FC Lip', t[0], t[1], t[2], t[2] + 0.05, FZ - 0.03, FZ, M['gypsum']), bx('FC Lip', t[0], t[1], t[3] - 0.05, t[3], FZ - 0.03, FZ, M['gypsum'])]
 falsec = join(fc, 'LM_FalseCeiling'); world_uv(falsec, 3.0); lm(falsec, 2048)
+# a 15 mm shadow gap where the false ceiling meets every wall (the finished-gypsum look), dark, not lit
+sg = [bx('FC Shadow Gap', X0, X0 + 0.012, Y0, Y1, FZ - 0.018, FZ, M['gap']), bx('FC Shadow Gap', X1 - 0.012, X1, Y0, Y1, FZ - 0.018, FZ, M['gap']),
+      bx('FC Shadow Gap', X0 + 0.012, X1 - 0.012, Y0, Y0 + 0.012, FZ - 0.018, FZ, M['gap']), bx('FC Shadow Gap', X0 + 0.012, BX0, Y1 - 0.012, Y1, FZ - 0.018, FZ, M['gap']),
+      bx('FC Shadow Gap', BX1, X1 - 0.012, Y1 - 0.012, Y1, FZ - 0.018, FZ, M['gap'])]
+sgap = join(sg, 'LM_ShadowGap'); world_uv(sgap, 1.0); lm(sgap, 256)
 CG = []
 for t in (LIV, DIN):
     CG += [bx('Cove Glow', t[0] + 0.07, t[0] + 0.09, t[2] + 0.1, t[3] - 0.1, H - 0.012, H - 0.004, M['cove']), bx('Cove Glow', t[1] - 0.09, t[1] - 0.07, t[2] + 0.1, t[3] - 0.1, H - 0.012, H - 0.004, M['cove']),
            bx('Cove Glow', t[0] + 0.1, t[1] - 0.1, t[2] + 0.07, t[2] + 0.09, H - 0.012, H - 0.004, M['cove']), bx('Cove Glow', t[0] + 0.1, t[1] - 0.1, t[3] - 0.09, t[3] - 0.07, H - 0.012, H - 0.004, M['cove'])]
+# a slim linear LED profile set into the band between the two trays, across the hall
+CG.append(bx('Linear Profile', -1.05, 1.05, 0.18, 0.215, FZ - 0.003, FZ, M['led']))
+CG += [bx('Linear Profile Trim', -1.06, 1.06, 0.172, 0.178, FZ - 0.004, FZ, M['alu']), bx('Linear Profile Trim', -1.06, 1.06, 0.217, 0.223, FZ - 0.004, FZ, M['alu'])]
 for g_ in CG: g_.visible_shadow = False
 DL = [(-1.45, -3.20), (-1.45, -2.15), (-1.45, -1.10), (1.45, -2.45), (1.45, -0.75), (-0.5, -0.25), (0.5, -0.25),
       (-1.35, 1.40), (-1.35, 2.70), (1.40, 1.20), (1.40, 2.30), (0.0, -3.62), (1.05, -3.62), (-0.6, 3.62), (0.6, 3.62)]
@@ -489,26 +537,31 @@ S(box('Table Top', (TX, TY, 0.74), (0.90, 1.80, 0.04), M['walnut'], 0.004))
 for sx in (-1, 1):
     for sy in (-1, 1): S(box('Table Leg', (TX + sx * 0.37, TY + sy * 0.80, 0.36), (0.06, 0.06, 0.72), M['walnut'], 0.004))
 S(box('Table Apron', (TX, TY, 0.68), (0.80, 1.66, 0.08), M['walnut'], 0.003))
+for o in STAGE: world_uv(o, 1.2)
 def chair(x, y, rz):
     from mathutils import Matrix
     parts = [box('Seat', (0, 0, 0.44), (0.46, 0.46, 0.08), M['fabric'], 0.02), box('Back', (0, 0.21, 0.72), (0.44, 0.06, 0.50), M['fabric'], 0.02)]
     for lx in (-0.19, 0.19):
         for ly in (-0.19, 0.19): parts.append(box('Chair Leg', (lx, ly, 0.20), (0.035, 0.035, 0.40), M['walnut'], 0.003))
     o = SL.join(parts, 'Dining Chair'); o.matrix_world = Matrix.Translation((x, y, 0)) @ Matrix.Rotation(rz, 4, 'Z'); STAGE.append(o)
+    bpy.context.view_layer.update(); world_uv(o, 0.45)
 for yy in (TY - 0.45, TY + 0.45):
-    chair(TX - 0.62, yy, -math.pi / 2); chair(TX + 0.62, yy, math.pi / 2)
+    chair(TX - 0.62, yy, math.pi / 2); chair(TX + 0.62, yy, -math.pi / 2)        # v2: backs away from the table
 chair(TX, TY - 1.17, math.pi); chair(TX, TY + 1.17, 0)
-S(box('Table Runner', (TX, TY, 0.762), (0.34, 1.50, 0.004), M['drape'], 0.0))
+rn = S(box('Table Runner', (TX, TY, 0.762), (0.34, 1.50, 0.004), M['runner'], 0.0)); world_uv(rn, 0.4)
+S(box('Runner Hem', (TX, TY - 0.75, 0.7585), (0.34, 0.006, 0.012), M['runner'], 0.0)); S(box('Runner Hem', (TX, TY + 0.75, 0.7585), (0.34, 0.006, 0.012), M['runner'], 0.0))
 # living rug
 rug = S(box('Rug', (0.0, -2.10, 0.006), (1.70, 2.40, 0.012), M['rug'], 0.004))
 me = rug.data; uv = me.uv_layers[0] if me.uv_layers else me.uv_layers.new(name='UV')
 for p in me.polygons:
     for li, vi in zip(p.loop_indices, p.vertices):
         co = me.vertices[vi].co; uv.data[li].uv = ((co.x + 0.85) / 1.70, (co.y + 3.30) / 2.40)
-# cushions on the sofa happen with the product; door mat; mirror by the door
+# coffee table (top at 0.382): two cloth-bound books beside the candle
+for (bw, bd, bh, bz, rz, m_) in ((0.26, 0.19, 0.032, 0.382, 0.10, 'book1'), (0.22, 0.16, 0.026, 0.414, -0.12, 'book2')):
+    S(box('Book', (0.44, -1.88, bz + bh / 2), (bw, bd, bh), M[m_], 0.002, rot=(0, 0, rz)))
+    S(box('Book Pages', (0.44 + 0.004, -1.88, bz + bh / 2), (bw - 0.012, bd - 0.008, bh - 0.006), M['pages'], 0.0, rot=(0, 0, rz)))
+# cushions on the sofa happen with the product; door mat
 S(box('Door Mat', ((DX0 + DX1) / 2, Y0 + 0.40, 0.006), (0.80, 0.50, 0.012), M['coir'], 0.004))
-mr = lathe('Mirror Frame', [(0, 0), (0.33, 0), (0.33, 0.02), (0.30, 0.025), (0, 0.025)], M['brass'], (X1 - 0.02, -3.35, 1.62), seg=64); mr.rotation_euler = (0, -math.pi / 2, 0)
-mg = lathe('Mirror Glass', [(0, 0), (0.30, 0), (0.30, 0.004), (0, 0.004)], M['mirror'], (X1 - 0.046, -3.35, 1.62), seg=64); mg.rotation_euler = (0, -math.pi / 2, 0)
 # crockery behind the glass: plates standing, bowls, cups
 for k in range(5): S(SL.lathe('Plate', [(0, 0), (0.12, 0), (0.13, 0.015), (0, 0.012)], M['crockery'], seg=32)).location = (X1 - 0.20, CU0 + 0.20 + k * 0.03, 1.40)
 for o in STAGE[-5:]: o.rotation_euler = (math.pi / 2 - 0.15, 0, 0)
@@ -520,22 +573,50 @@ lathe('Diya', [(0, 0), (0.03, 0), (0.04, 0.02), (0, 0.02)], M['brass'], (X0 + 0.
 S(SL.lathe('Flame', [(0, 0), (0.006, 0.004), (0.004, 0.02), (0, 0.03)], M['diya'], seg=12)).location = (X0 + 0.22, MC + 0.18, 1.06)
 lathe('Bell', [(0, 0), (0.025, 0), (0.02, 0.03), (0.008, 0.045), (0, 0.05)], M['brass'], (X0 + 0.20, MC - 0.20, 1.04))
 S(box('Mandir Cloth', (X0 + 0.17, MC, 1.0405), (0.28, 0.66, 0.002), mat('Red Cloth', (0.62, 0.08, 0.06, 1), 0.8), 0.0))
+# v2: a white-marble step for the idol, a kalash, two hanging brass bells, a marigold-and-mango-leaf toran across the front
+S(box('Mandir Step', (X0 + 0.135, MC, 1.06), (0.17, 0.30, 0.04), M['whitemarble'], 0.004))
+lathe('Kalash', [(0, 0), (0.02, 0), (0.035, 0.03), (0.03, 0.06), (0.018, 0.075), (0.024, 0.085), (0, 0.085)], M['brass'], (X0 + 0.24, MC - 0.08, 1.04))
+for yy in (MY0 + 0.20, MY1 - 0.20):
+    S(SL.tube('Bell Chain', [(X0 + 0.25, yy, 1.795), (X0 + 0.25, yy, 1.66)], [0.0025, 0.0025], M['brass'], seg=6))
+    lathe('Hanging Bell', [(0, 0), (0.032, 0), (0.03, 0.012), (0.022, 0.045), (0.010, 0.06), (0, 0.065)], M['brass'], (X0 + 0.25, yy, 1.60))
+def toran(x, ya, yb, ztop, sag, drops):
+    """Marigold strings: one swag between ya and yb, and short hanging strands, built as one mesh of small spheres."""
+    import bmesh
+    bm = bmesh.new(); pts = []
+    n = 28
+    for k in range(n + 1):
+        t = k / n; pts.append((x, ya + (yb - ya) * t, ztop - sag * 4 * t * (1 - t)))
+    for k in range(drops + 1):
+        t = k / drops; y0 = ya + (yb - ya) * t; z0 = ztop - sag * 4 * t * (1 - t)
+        for j in range(1, 6): pts.append((x, y0, z0 - j * 0.022))
+    for p in pts:
+        m_ = Matrix.Translation(p); bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.012, matrix=m_)
+    me = bpy.data.meshes.new('Toran'); bm.to_mesh(me); bm.free()
+    o = bpy.data.objects.new('Marigold Toran', me); scene.collection.objects.link(o); me.materials.append(M['marigold']); STAGE.append(o)
+    V, F, UV = [], [], []                                                # mango leaves between the strands
+    for k in range(drops + 1):
+        t = k / drops; y0 = ya + (yb - ya) * t; z0 = ztop - sag * 4 * t * (1 - t)
+        SL.leaf_strip(V, F, UV, Vector((x + 0.004, y0 + 0.02, z0)), Vector((0.1, 0.15, -1)).normalized(), Vector((0, 1, 0)), 0.09, 0.022, droop=0.1)
+    STAGE.append(SL.mesh_obj('Toran Leaves', V, F, M['mango'], UV))
+from mathutils import Matrix
+toran(X0 + 0.355, MY0 + 0.07, MY1 - 0.07, 1.785, 0.05, 6)
 # curtains: taupe drapes gathered at both sides of the balcony door, sheers behind, on a black rod
 def drape(x0, x1, y, ztop, zbot, folds, amp, m, name):
-    NU, NV = 64, 30; V, F, UV = [], [], []
+    NU, NV = 160, 40; V, F, UV = [], [], []
     for j in range(NV + 1):
         z = ztop - (ztop - zbot) * j / NV
         for i in range(NU + 1):
             t = i / NU; x = x0 + (x1 - x0) * t
-            V.append((x, y + amp * math.sin(t * folds * 2 * math.pi) * (1 + 0.15 * j / NV), z)); UV.append((t * folds, j / NV * 3))
+            a_ = amp * (0.8 + 0.35 * math.sin(t * 7.3 + 1.1) * math.sin(t * 3.1)) * (1 + 0.25 * j / NV)
+            V.append((x, y + a_ * math.sin(t * folds * 2 * math.pi), z)); UV.append(((x - x0) * 1.6 / 0.45, (ztop - z) / 0.45))
     for j in range(NV):
         for i in range(NU): F.append((j * (NU + 1) + i, j * (NU + 1) + i + 1, (j + 1) * (NU + 1) + i + 1, (j + 1) * (NU + 1) + i))
     o = SL.mesh_obj(name, V, F, m, UV); STAGE.append(o); return o
 CY = Y1 - 0.10
-drape(X0 + 0.04, X0 + 0.60, CY, FZ - 0.03, 0.01, 6, 0.035, M['drape'], 'Drape L'); drape(X1 - 0.60, X1 - 0.04, CY, FZ - 0.03, 0.01, 6, 0.035, M['drape'], 'Drape R')
-sh1 = drape(X0 + 0.55, -0.55, CY + 0.05, FZ - 0.03, 0.01, 9, 0.025, M['sheer'], 'Sheer L'); sh2 = drape(0.55, X1 - 0.55, CY + 0.05, FZ - 0.03, 0.01, 9, 0.025, M['sheer'], 'Sheer R')
+drape(X0 + 0.04, X0 + 0.62, CY, FZ - 0.02, 0.0, 8, 0.045, M['drape'], 'Drape L'); drape(X1 - 0.62, X1 - 0.04, CY, FZ - 0.02, 0.0, 8, 0.045, M['drape'], 'Drape R')
+sh1 = drape(X0 + 0.55, -0.50, CY + 0.06, FZ - 0.02, 0.0, 11, 0.03, M['sheer'], 'Sheer L'); sh2 = drape(0.50, X1 - 0.55, CY + 0.06, FZ - 0.02, 0.0, 11, 0.03, M['sheer'], 'Sheer R')
 sh1.visible_shadow = False; sh2.visible_shadow = False
-S(SL.tube('Curtain Rod', [(X0 + 0.02, CY + 0.02, FZ - 0.025), (X1 - 0.02, CY + 0.02, FZ - 0.025)], [0.012, 0.012], M['matblack'], seg=12))
+S(box('Curtain Track', (0, CY + 0.03, FZ - 0.008), (X1 - X0 - 0.04, 0.10, 0.016), M['alu'], 0.002))
 # plants: a tall areca in a charcoal planter by the balcony door (right), two pots outside on the balcony
 def areca(x, y, z, h=1.5, seed=4):
     lathe('Planter', [(0, 0), (0.15, 0), (0.19, 0.42), (0.20, 0.44), (0, 0.44)], M['planter'], (x, y, z), seg=48)
@@ -550,7 +631,6 @@ def areca(x, y, z, h=1.5, seed=4):
             for sgn in (-1, 1):
                 SL.leaf_strip(V, F, UV, c, (d * 0.3 + side * sgn + Vector((0, 0, -0.25))).normalized(), d, 0.22 * (1.1 - t), 0.022, droop=0.6)
     STAGE.append(SL.mesh_obj('Areca', V, F, M['leaf'], UV))
-areca(1.40, 0.25, 0)                                                  # between the TV wall and the crockery unit
 for xx in (-1.3, 1.3): lathe('Balcony Pot', [(0, 0), (0.12, 0), (0.16, 0.30), (0, 0.30)], M['terracotta'], (xx, BY1 - 0.30, 0))
 for xx in (-1.3, 1.3):
     r = np.random.default_rng(int(xx * 10) + 50); V, F, UV = [], [], []
@@ -579,6 +659,7 @@ for d in PL['products'] + [x for x in PL.get('staging', []) if not x.get('lm')]:
     if 'file' in d and os.path.exists(os.path.join(OUT, 'products', d['file'])):
         made = place_fp(d); CASTERS += made; PLACED[d['name']] = made
 if 'bounds' in ARGS:
+    bpy.context.view_layer.update()
     for n, objs in PLACED.items():
         mn, mx = bounds(objs); print('BOUNDS %-40s x %6.3f %6.3f  y %6.3f %6.3f  z %6.3f %6.3f' % (n[:40], mn.x, mx.x, mn.y, mx.y, mn.z, mx.z))
     sys.exit(0)
