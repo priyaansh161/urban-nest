@@ -23,6 +23,9 @@
 (function () {
   'use strict';
   var KEY = 'un-market', GEO = 'un-geo';
+  // 20 Nov 2026: the US store is closed for now (Walmart turned the application down). Everyone gets the India
+  // store and the IN | US switch is not drawn; set US_OPEN to true to bring both back, nothing else changes.
+  var US_OPEN = false;
   var NAMES = { IN: 'India', US: 'US' };
   var HOSTS = {
     // amzn.to and link.amazon are the short links our Amazon India Associates links use today.
@@ -166,11 +169,11 @@
     style();
     var q = norm(new URLSearchParams(location.search).get('market'));
     if (q) write(KEY, q);
-    var chosen = norm(read(KEY));
-    var geo = norm(read(GEO, sessionStorage));
+    var chosen = US_OPEN ? norm(read(KEY)) : 'IN';
+    var geo = US_OPEN ? norm(read(GEO, sessionStorage)) : 'IN';
     visitor = chosen || geo || 'IN';
     document.documentElement.setAttribute('data-store', visitor.toLowerCase());
-    addSwitch();
+    if (US_OPEN) addSwitch();
     sweep();
     new MutationObserver(later).observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['href'] });
 

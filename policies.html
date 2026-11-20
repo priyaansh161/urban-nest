@@ -793,7 +793,8 @@
           .pv-tabs button[aria-pressed="true"] { background: var(--black); color: var(--white); opacity: 1; }
           .pv-pane[hidden] { display: none; }
         </style>
-        <div class="pv-tabs" id="privacy-us" role="group" aria-label="Privacy notice for">
+        <!-- 20 Nov 2026: the US store is closed for now, so the India / US choice is hidden (the US notice stays in the page, unused). -->
+        <div class="pv-tabs" id="privacy-us" role="group" aria-label="Privacy notice for" hidden style="display:none">
           <button type="button" data-pv="IN" aria-pressed="true">India</button>
           <button type="button" data-pv="US" aria-pressed="false">United States</button>
         </div>
@@ -968,7 +969,7 @@
       for (var i = 0; i < tabs.length; i++) tabs[i].setAttribute('aria-pressed', String(tabs[i].getAttribute('data-pv') === m));
     }
     for (var i = 0; i < tabs.length; i++) tabs[i].addEventListener('click', function () { show(this.getAttribute('data-pv')); });
-    function start() { show(location.hash === '#privacy-us' ? 'US' : (window.UNMarket ? UNMarket.current() : 'IN')); }
+    function start() { show('IN'); }   // the US store is closed for now (20 Nov 2026)
     window.addEventListener('load', start);
     document.addEventListener('un-market', function (e) { show(e.detail); });
   })();

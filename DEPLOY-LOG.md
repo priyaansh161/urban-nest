@@ -133,3 +133,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-11-18 | 10:51 | c595f2d | Enma: when several pieces could fit she shows 2-4 and asks; picture cards (photo, name, price) under her replies; weak matches dropped; short names | https://bfb810b8.storeurbannest.pages.dev |
 | 2026-11-18 | 10:54 | 33a0f87 | Enma: one-line disclaimer | https://9d7a703a.storeurbannest.pages.dev |
 | 2026-11-18 | 14:06 | b00f1e8 | Enma: plurals match (vases), category everyday words, real Collection pieces when nothing matches (no invented pieces) | https://71e3053c.storeurbannest.pages.dev |
+| 2026-11-20 | 12:56 | b1923f6 (+ uncommitted changes) | US store closed for now: IN/US switch hidden, everyone gets the India store; privacy shows the India notice only | https://98dfe5be.storeurbannest.pages.dev |
