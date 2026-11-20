@@ -2,31 +2,23 @@
  "_note": "kitchen products, see make_placements.py",
  "products": [
   {
-   "id": "6410bafe-88fe-46b1-b92b-1942b384949d",
-   "name": "TEX-RO Dish Drying Rack",
-   "file": "final/6410bafe.glb",
-   "listing": "TEX-RO Utensils Drying Rack|Dish Drying Rack with Drainer Tray",
-   "link": "https://link.amazon/B0dtgBi8c",
+   "id": "1c96d2fe-01e6-45e2-8286-5387b3ae67e5",
+   "name": "ZROY 2-Tier Dish Drying Rack",
+   "file": "final/1c96d2fe.glb",
+   "listing": "ZROY ENTERPRISE ZROY Dish Drying Rack 2-Tier with Drainboard for Kitchen Countertop – Stainless Steel Dish Drainer with Utensil Holder, Cup",
+   "link": "https://www.amazon.in/dp/B0G1YLN7H9?tag=urbannest03b-21",
    "tag": "ESSENTIALS · KITCHEN",
    "pos": [
     -0.56,
     0.9,
     -1.42
    ],
-   "length": 0.43,
-   "desc": "A practical drying stand designed to hold utensils upright for quick air-drying near the sink.",
+   "length": 0.42,
+   "desc": "Multi-Tier Design: Two spacious tiers provide ample storage for plates, bowls, mugs, and more, ideal for small and large families alike.",
    "specs": [
     [
-     "Material",
-     "Stainless Steel"
-    ],
-    [
-     "Product Dimensions",
-     "43D x 32W x 13H Centimeters"
-    ],
-    [
-     "Brand",
-     "TEX-RO"
+     "Item Dimensions D x W x H",
+     "10D x 10W x 10H Centimeters"
     ]
    ]
   },
@@ -49,6 +41,32 @@
     [
      "Item Dimensions D x W x H",
      "30D x 10W x 2H Centimeters"
+    ]
+   ]
+  },
+  {
+   "id": "32bb34cd-f0eb-41e2-8a53-13234dbf77df",
+   "name": "Epicstack 3-in-1 Soap Dispenser",
+   "file": "final/32bb34cd.glb",
+   "listing": "EPICSTACK 3-in-1 Soap Pump Dispenser for Kitchen and Bathroom, Dish Soap Liquid Dispenser Sponge Holder with Sponge Holder (Multi-Colour)",
+   "link": "https://www.amazon.in/dp/B0DQ1YGYLJ?tag=urbannest03b-21",
+   "tag": "ESSENTIALS · KITCHEN",
+   "pos": [
+    0.48,
+    0.912,
+    -1.44
+   ],
+   "length": 0.195,
+   "rotY": -1.5708,
+   "desc": "Compact Design: With dimensions of 19.5 cm in length, 10.25 cm in height, and 9 cm in width, this 3-in-1 dispenser offers a space-saving solution for your kitchen or bathroom countertop.",
+   "specs": [
+    [
+     "Item Dimensions L x W x H",
+     "19.5L x 9W x 10.3H Centimeters"
+    ],
+    [
+     "Colour",
+     "Multi Colour"
     ]
    ]
   },

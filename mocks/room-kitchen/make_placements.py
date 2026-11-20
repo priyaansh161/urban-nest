@@ -24,8 +24,11 @@ NX = 1.27                        # niche shelf centre (x); the niche runs y -0.9
 DZ = 0.582                       # the open drawer's floor
 out = [
     # back run: rack left of the sink; right of it the sponge tray draining into the sink (soap on it, staging), the curd maker
-    P('6410bafe', 'TEX-RO Dish Drying Rack', CT, -0.56, 1.42, L(0.43)),
+    # 20 Nov: the ZROY two-tier rack in place of the TEX-RO (its Meshy build reads better); the Epicstack soap pump + sponge
+    # holder stands on the sink mat (the green soap bottle, staging, went)
+    P('1c96d2fe', 'ZROY 2-Tier Dish Drying Rack', CT, -0.56, 1.42, L(0.42)),
     P('1b0130dd', 'HOMEZE Silicone Sink Mat', CT, 0.48, 1.44, L(0.30), -Q),
+    P('32bb34cd', 'Epicstack 3-in-1 Soap Dispenser', CT + 0.012, 0.48, 1.44, L(0.195), -Q),
     P('b4bd8136', 'HomeWiz Hung Curd Maker', CT, 0.74, 1.52, H(0.185)),
     # the corner: knife block and the spatula set in reach of the hob
     P('48410c20', 'Amazon Basics Knife Block Set', CT, 1.24, 1.56, H(0.36), -0.6),

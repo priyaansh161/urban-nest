@@ -202,24 +202,30 @@ def tile_image():
     return SL.img('tile_col', np.clip(rgb, 0, 1), TMP)
 
 def outside_image():
-    """Day view from a Noida high-rise: hazy pale sky, a row of tall residential towers, tree tops below the sill."""
-    Hh, Ww = 768, 840; v, u = np.mgrid[0:Hh, 0:Ww]; v = 1 - v / Hh; u = u / Ww          # v = 0 at the bottom
-    sky = np.array([0.86, 0.90, 0.94]) * (1 - 0.25 * v[..., None]) + np.array([0.62, 0.74, 0.88]) * 0.25 * v[..., None]
-    rgb = sky.copy()
+    """Night from a Noida high-rise (v6, 20 Nov): deep blue sky with the city's orange glow low down, a row of dark
+    towers with warm lit windows (a few cool ones, most dark), street-light glow and dark tree tops below the sill."""
+    Hh, Ww = 1024, 1120; v, u = np.mgrid[0:Hh, 0:Ww]; v = 1 - v / Hh; u = u / Ww          # v = 0 at the bottom
+    glow = np.exp(-v * 3.2)[..., None]
+    sky = np.array([0.012, 0.020, 0.055]) * (1 - glow) + np.array([0.16, 0.085, 0.045]) * glow
+    rgb = sky + 0.004 * noise(Hh, Ww, 7, 1)[..., None]
     r_ = np.random.default_rng(3)
-    for k in range(9):                                                                   # towers: pale render, a grid of windows, balconies
-        cx = 0.05 + k * 0.115 + r_.uniform(-0.03, 0.03); w_ = r_.uniform(0.06, 0.10); top = r_.uniform(0.55, 0.95)
+    for k in range(11):                                                                  # towers: dark, with windows
+        cx = 0.03 + k * 0.095 + r_.uniform(-0.03, 0.03); w_ = r_.uniform(0.06, 0.11); top = r_.uniform(0.50, 0.93)
         m_ = (abs(u - cx) < w_ / 2) & (v < top)
-        shade = 0.78 + 0.12 * r_.random()
-        col = np.array([0.86, 0.84, 0.80]) * shade
-        win = ((np.floor(v * 90) % 3) == 0) & ((np.floor((u - cx) * 400) % 4) < 2)
-        bal = (np.floor(v * 90) % 3) == 1
-        t_ = np.where(win[..., None], col * 0.55, np.where(bal[..., None], col * 0.92, col))
-        far = 0.65 + 0.35 * (k % 3) / 2; t_ = t_ * far + sky * (1 - far)                   # haze on the far ones
+        near = (k % 3) / 2
+        body = np.array([0.020, 0.022, 0.032]) * (0.8 + 0.6 * near) + np.array([0.05, 0.03, 0.02]) * glow * (1 - near)
+        row = np.floor(v * 110).astype(int); col = np.floor((u - cx + 1) * 520).astype(int)
+        win = ((row % 3) == 0) & ((col % 4) < 2)
+        cell = (row * 7919 + col // 4 * 104729 + k * 31337) % 1000 / 1000.0
+        lit = win & (cell < 0.30); cool = win & (cell > 0.955)
+        warm = np.array([1.0, 0.70, 0.36]) * (0.55 + 0.45 * ((cell * 13) % 1))[..., None]
+        t_ = np.where(lit[..., None], warm * (0.75 + 0.25 * near), np.where(cool[..., None], np.array([0.75, 0.82, 1.0]) * 0.7, body))
+        t_ = np.where(((v > top - 0.004) & (abs(u - cx) < w_ * 0.08))[..., None], np.array([1.0, 0.1, 0.05]), t_)   # aviation light on top
         rgb = np.where(m_[..., None], t_, rgb)
-    trees = (v < 0.22 + 0.05 * np.sin(u * 40) * np.cos(u * 17))
-    leaf = np.array([0.20, 0.36, 0.14]) * (0.7 + 0.5 * (0.5 + 0.5 * noise(Hh, Ww, 9, 2)))[..., None]
-    rgb = np.where(trees[..., None], leaf, rgb)
+    trees = (v < 0.20 + 0.05 * np.sin(u * 40) * np.cos(u * 17))
+    leaf = np.array([0.012, 0.022, 0.012]) * (0.7 + 0.6 * (0.5 + 0.5 * noise(Hh, Ww, 9, 2)))[..., None]
+    lamps = np.exp(-((v - 0.16) ** 2) / 0.0025)[..., None] * ((0.5 + 0.5 * np.cos(u * 2 * math.pi * 7)) ** 8)[..., None]
+    rgb = np.where(trees[..., None], leaf + lamps * np.array([0.9, 0.55, 0.2]) * 0.6, rgb)
     return SL.img('outside_col', np.clip(rgb, 0, 1), TMP)
 
 LAM = (0.60, 0.41, 0.23)
@@ -266,7 +272,7 @@ M = {
     'dltrim': mat('Downlight Trim', (0.92, 0.92, 0.90, 1), 0.4),
     'switch': mat('Switch Plate', (0.95, 0.95, 0.94, 1), 0.3),
 }
-OUTSIDE = SL.mat('Outside Day', (0.8, 0.85, 0.9), 1.0, image=outside_image())
+OUTSIDE = SL.mat('Outside Night', (0.8, 0.85, 0.9), 1.0, image=outside_image())
 _ob = OUTSIDE.node_tree.nodes['Principled BSDF']
 for nd in list(OUTSIDE.node_tree.nodes):
     if nd.type == 'TEX_IMAGE': OUTSIDE.node_tree.links.new(nd.outputs['Color'], _ob.inputs['Emission Color'])
@@ -538,7 +544,7 @@ mx_, my_ = 1.28, -0.38
 lathe('Cooker', [(0, 0), (0.11, 0), (0.115, 0.01), (0.115, 0.15), (0.12, 0.16), (0.10, 0.17), (0, 0.175)], M['ss'], (1.20, 0.62, CT + 0.11))
 STAGE.append(box('Cooker Handle', (1.20 - 0.17, 0.62, CT + 0.27), (0.14, 0.03, 0.025), M['matblack'], 0.008))
 lathe('Whistle', [(0, 0), (0.012, 0), (0.01, 0.04), (0.015, 0.05), (0, 0.06)], M['matblack'], (1.20, 0.62, CT + 0.285))
-lathe('Soap', [(0, 0), (0.03, 0), (0.032, 0.12), (0.02, 0.15), (0.008, 0.16), (0.008, 0.19), (0, 0.19)], M['soap'], (0.50, 1.47, CT + 0.012))
+# (the dish-soap bottle went, 20 Nov: the Epicstack soap dispenser, a product, stands on the sink mat)
 for k, sp in enumerate(()):                                  # (the spice jars made way for the painted pickle set, 14 Nov)
     x_ = 0.62 + k * 0.10
     lathe('Spice Jar', [(0, 0), (0.035, 0), (0.037, 0.10), (0.03, 0.11), (0, 0.11)], M['jarglass'], (x_, 1.62, CT))
@@ -552,15 +558,26 @@ def pot_plant(x, y, z, h=0.22, seed=0):
         up = Vector((r.uniform(0.2, 0.7) * math.cos(a), r.uniform(0.2, 0.7) * math.sin(a), 1)).normalized()
         SL.leaf_strip(V, F, UV, Vector((x, y, z + 0.10)), up, side, r.uniform(0.45, 1.0) * h, r.uniform(0.03, 0.05), droop=r.uniform(0.3, 0.9))
     STAGE.append(SL.mesh_obj('Plant', V, F, M['leaf'], UV))
+M['manjari'] = mat('Tulsi Flower', (0.30, 0.12, 0.22, 1), 0.6)
 M['soil'] = mat('Potting Soil', (0.10, 0.07, 0.05, 1), 0.95)
 _lv = np.mgrid[0:128, 0:64][0] / 128.0
 M['tulsi'] = SL.mat('Tulsi Leaf', (0.16, 0.36, 0.10), 0.45, image=SL.img('tulsi_col', np.clip(np.array([0.13, 0.33, 0.08]) * (0.8 + 0.35 * _lv)[..., None] * (1 - 0.25 * (np.abs(np.mgrid[0:128, 0:64][1] / 64.0 - 0.5) < 0.03))[..., None], 0, 1), TMP))
 _band = 0.5 + 0.5 * np.sin(np.mgrid[0:256, 0:64][0] / 256.0 * 60 + 2 * np.sin(np.mgrid[0:256, 0:64][1] / 64.0 * 6))
 _edge = (np.abs(np.mgrid[0:256, 0:64][1] / 64.0 - 0.5) > 0.44)
 M['snake'] = SL.mat('Snake Plant Leaf', (0.12, 0.30, 0.10), 0.4, image=SL.img('snake_col', np.clip(np.where(_edge[..., None], np.array([0.62, 0.62, 0.22]), np.array([0.07, 0.22, 0.08]) + np.array([0.10, 0.16, 0.08]) * _band[..., None]), 0, 1), TMP))
-def pot(x, y, z, r=0.055, h=0.10):
-    lathe('Pot', [(0, 0), (r * 0.72, 0), (r * 0.95, h * 0.85), (r * 1.08, h * 0.86), (r * 1.10, h), (r * 0.92, h), (r * 0.92, h * 0.9), (0, h * 0.9)], M['terracotta'], (x, y, z), seg=48)
+M['glaze1'] = mat('Glazed Ceramic Cream', (0.86, 0.82, 0.72, 1), 0.18); M['glaze2'] = mat('Glazed Ceramic Teal', (0.10, 0.34, 0.36, 1), 0.15)
+M['pebble'] = mat('Pebbles', (0.55, 0.52, 0.48, 1), 0.7)
+def pot(x, y, z, r=0.055, h=0.10, glaze='glaze1'):
+    """A glazed ceramic pot with a rolled rim on a saucer, soil with a few pebbles on top (v6)."""
+    lathe('Saucer', [(0, 0), (r * 1.05, 0), (r * 1.18, 0.008), (r * 1.20, 0.014), (r * 1.12, 0.014), (r * 1.0, 0.006), (0, 0.006)], M[glaze], (x, y, z), seg=48)
+    z += 0.006
+    lathe('Pot', [(0, 0), (r * 0.70, 0), (r * 0.74, 0.006), (r * 0.98, h * 0.80), (r * 1.06, h * 0.84), (r * 1.10, h * 0.92), (r * 1.06, h), (r * 0.93, h), (r * 0.92, h * 0.90), (0, h * 0.90)], M[glaze], (x, y, z), seg=56)
     lathe('Soil', [(0, h * 0.86), (r * 0.9, h * 0.86), (0, h * 0.88)], M['soil'], (x, y, z), seg=32)
+    rr = np.random.default_rng(int(abs(x) * 1000) % 97)
+    for i in range(9):
+        a = rr.uniform(0, 2 * math.pi); d = rr.uniform(0.3, 0.8) * r * 0.8; s_ = rr.uniform(0.005, 0.009)
+        o = lathe('Pebble', [(0, 0), (s_, 0), (s_ * 1.05, s_ * 0.5), (s_ * 0.8, s_ * 0.9), (0, s_)], M['pebble'], (x + d * math.cos(a), y + d * math.sin(a), z + h * 0.86), seg=10)
+        o.scale = (1.0, rr.uniform(0.6, 1.0), 0.7)
 def leaf_quad(V, F, UV, base, d, side, L, W, curl=0.0, n=8):
     """An oval leaf from base along d, width across side, cupped by curl."""
     k0 = len(V)
@@ -573,20 +590,22 @@ def leaf_quad(V, F, UV, base, d, side, L, W, curl=0.0, n=8):
         for j in range(2):
             a = k0 + i * 3 + j; F.append((a, a + 1, a + 4, a + 3))
 def tulsi(x, y, z, seed=3):
-    pot(x, y, z); r = np.random.default_rng(seed); V, F, UV = [], [], []; stems = []
-    for k in range(7):
-        a = r.uniform(0, 2 * math.pi); lean = r.uniform(0.15, 0.45); h = r.uniform(0.12, 0.20)
+    pot(x, y, z, r=0.058, h=0.105, glaze='glaze1'); z += 0.006; r = np.random.default_rng(seed); V, F, UV = [], [], []; stems = []
+    for k in range(11):
+        a = r.uniform(0, 2 * math.pi); lean = r.uniform(0.10, 0.50); h = r.uniform(0.11, 0.22)
         top = Vector((x + lean * h * math.cos(a), y + lean * h * math.sin(a), z + 0.09 + h)); bot = Vector((x, y, z + 0.09))
         stems.append(SL.tube('Tulsi Stem', [bot, (bot + top) / 2 + Vector((0, 0, 0.01)), top], [0.0025, 0.002, 0.0015], M['tulsi'], seg=6))
-        for j in range(9):
-            t = 0.25 + 0.75 * j / 8; c = bot.lerp(top, t)
+        if k % 3 == 0:                                           # manjari: the purple flower spike at the tip
+            stems.append(SL.tube('Tulsi Spike', [top, top + Vector((0, 0, 0.035))], [0.0035, 0.0012], M['manjari'], seg=6))
+        for j in range(12):
+            t = 0.18 + 0.82 * j / 11; c = bot.lerp(top, t)
             for sgn in (-1, 1):
                 b_ = a + sgn * math.pi / 2 + j * 0.9; d = Vector((math.cos(b_), math.sin(b_), 0.45)).normalized()
-                leaf_quad(V, F, UV, c, d, Vector((-d.y, d.x, 0)).normalized(), 0.028 * (1.2 - 0.5 * t), 0.018 * (1.2 - 0.5 * t), curl=0.25)
+                leaf_quad(V, F, UV, c, d, Vector((-d.y, d.x, 0)).normalized(), 0.032 * (1.25 - 0.55 * t), 0.021 * (1.25 - 0.55 * t), curl=0.3)
     STAGE.append(SL.mesh_obj('Tulsi', V, F, M['tulsi'], UV)); STAGE.extend(stems)
 def snake_plant(x, y, z, seed=5):
-    pot(x, y, z, r=0.06, h=0.11); r = np.random.default_rng(seed); V, F, UV = [], [], []
-    for k in range(9):
+    pot(x, y, z, r=0.062, h=0.115, glaze='glaze2'); z += 0.006; r = np.random.default_rng(seed); V, F, UV = [], [], []
+    for k in range(15):
         a = r.uniform(0, 2 * math.pi); off = r.uniform(0.0, 0.03); base = Vector((x + off * math.cos(a), y + off * math.sin(a), z + 0.10))
         L = r.uniform(0.20, 0.34); lean = r.uniform(0.05, 0.25); d = Vector((lean * math.cos(a), lean * math.sin(a), 1)).normalized()
         side = Vector((-math.sin(a + 0.6), math.cos(a + 0.6), 0)); n = 10; k0 = len(V)
@@ -596,7 +615,10 @@ def snake_plant(x, y, z, seed=5):
         for i in range(n):
             for j in range(2):
                 q = k0 + i * 3 + j; F.append((q, q + 1, q + 4, q + 3))
-    STAGE.append(SL.mesh_obj('Snake Plant', V, F, M['snake'], UV))
+    o = SL.mesh_obj('Snake Plant', V, F, M['snake'], UV)
+    md = o.modifiers.new('s', 'SOLIDIFY'); md.thickness = 0.004; md.offset = 0
+    bpy.ops.object.select_all(action='DESELECT'); o.select_set(True); bpy.context.view_layer.objects.active = o; bpy.ops.object.modifier_apply(modifier='s')
+    STAGE.append(o)
 tulsi(WX0 + 0.16, Y1 + 0.05, WZ0); snake_plant(WX1 - 0.17, Y1 + 0.05, WZ0)
 tw = []
 for k in range(14):                                          # towel folded over the top drawer's profile, hanging down
@@ -687,7 +709,7 @@ for ob, ul, vl in SHELL:
     lightmap_prep(ob, (max(16, min(1024, round(ul / d))), max(16, min(1024, round(vl / d)))), new_uv=False)
 for o, res in ((sill, 512),): lightmap_prep(o, res); LMX.append(o)
 
-# ---------------------------------------------------------------- lights: a bright late-morning day through the window, the downlights on, LED strips
+# ---------------------------------------------------------------- lights (v6, 20 Nov): night. Warm downlights, cove and under-cabinet strips; the city dark outside
 def area(name, loc, sx, sy, energy, color, target=None, rot=(0, 0, 0)):
     ld = bpy.data.lights.new(name, 'AREA'); ld.energy = energy; ld.color = color; ld.shape = 'RECTANGLE'; ld.size = sx; ld.size_y = sy
     lo = bpy.data.objects.new(name, ld); lo.location = loc; lo.rotation_euler = rot; scene.collection.objects.link(lo)
@@ -697,21 +719,20 @@ def spot(name, loc, target, w, deg, blend=0.75, color=WARM):
     ld = bpy.data.lights.new(name, 'SPOT'); ld.energy = w; ld.color = color; ld.spot_size = math.radians(deg); ld.spot_blend = blend; ld.shadow_soft_size = 0.03
     lo = bpy.data.objects.new(name, ld); lo.location = Vector(loc); scene.collection.objects.link(lo)
     lo.rotation_euler = (Vector(target) - lo.location).to_track_quat('-Z', 'Y').to_euler()
-area('Sky Window', (wm, Y1 + 0.06, (WZ0 + WZ1) / 2), WX1 - WX0 - 0.1, WZ1 - WZ0 - 0.1, 260, (0.92, 0.96, 1.0), target=(wm, 0.0, 0.6))
-sun = bpy.data.lights.new('Sun', 'SUN'); sun.energy = 3.2; sun.color = (1.0, 0.90, 0.74); sun.angle = math.radians(1.5)
-so = bpy.data.objects.new('Sun', sun); scene.collection.objects.link(so); so.rotation_euler = (Vector((0.35, -1.0, -0.55)) * -1).to_track_quat('Z', 'Y').to_euler()
-for i_, (x_, y_) in enumerate(DL): spot('DL%d' % i_, (x_, y_, DLZ - 0.02), (x_, y_, 0.0), 24, 80, 0.8)
+# night (v6): no sky through the window, no sun; only a faint blue from the city outside
+area('Night Window', (wm, Y1 + 0.06, (WZ0 + WZ1) / 2), WX1 - WX0 - 0.1, WZ1 - WZ0 - 0.1, 6, (0.55, 0.65, 1.0), target=(wm, 0.0, 0.6))
+for i_, (x_, y_) in enumerate(DL): spot('DL%d' % i_, (x_, y_, DLZ - 0.02), (x_, y_, 0.0), 34, 80, 0.8, color=(1.0, 0.78, 0.50))
 for nm_, loc_, rot_, sx_, sy_ in (('Cove L', (FC['x0'] + 0.09, (FC['y0'] + FC['y1']) / 2, H - 0.02), (0, math.radians(-40), 0), 0.08, FC['y1'] - FC['y0'] - 0.2),
                                   ('Cove R', (FC['x1'] - 0.09, (FC['y0'] + FC['y1']) / 2, H - 0.02), (0, math.radians(40), 0), 0.08, FC['y1'] - FC['y0'] - 0.2),
                                   ('Cove F', ((FC['x0'] + FC['x1']) / 2, FC['y0'] + 0.09, H - 0.02), (math.radians(40), 0, 0), FC['x1'] - FC['x0'] - 0.2, 0.08),
                                   ('Cove B', ((FC['x0'] + FC['x1']) / 2, FC['y1'] - 0.09, H - 0.02), (math.radians(-40), 0, 0), FC['x1'] - FC['x0'] - 0.2, 0.08)):
-    area(nm_, loc_, sx_, sy_, 18, (1.0, 0.82, 0.58), rot=rot_)
+    area(nm_, loc_, sx_, sy_, 22, (1.0, 0.76, 0.48), rot=rot_)
 for nm, (xa, xb, ya, yb) in (('LED R1', (X1 - 0.33, X1 - 0.31, -1.38, 0.06)), ('LED R2', (X1 - 0.33, X1 - 0.31, 0.85, Y1 - 0.36)), ('LED B', (WX1 + 0.20, X1 - 0.36, Y1 - 0.33, Y1 - 0.31))):
-    area(nm, ((xa + xb) / 2, (ya + yb) / 2, UZ0 - 0.01), max(xb - xa, 0.03), max(yb - ya, 0.03), 14 * max(xb - xa, yb - ya) / 0.5, (1.0, 0.85, 0.62))
-area('Fill', (0.0, 0.0, H - 0.05), 2.4, 3.0, 22, (1.0, 0.95, 0.88))
-area('Hall', (0.0, Y0 - 1.2, 1.4), 1.6, 2.0, 60, (1.0, 0.92, 0.82), target=(0.0, 0.5, 1.0))
+    area(nm, ((xa + xb) / 2, (ya + yb) / 2, UZ0 - 0.01), max(xb - xa, 0.03), max(yb - ya, 0.03), 22 * max(xb - xa, yb - ya) / 0.5, (1.0, 0.78, 0.50))
+area('Fill', (0.0, 0.0, H - 0.05), 2.4, 3.0, 7, (1.0, 0.82, 0.60))
+area('Hall', (0.0, Y0 - 1.2, 1.4), 1.6, 2.0, 30, (1.0, 0.80, 0.56), target=(0.0, 0.5, 1.0))
 world = bpy.data.worlds.new('W'); scene.world = world; world.use_nodes = True
-world.node_tree.nodes['Background'].inputs['Color'].default_value = (0.75, 0.82, 0.92, 1); world.node_tree.nodes['Background'].inputs['Strength'].default_value = 0.6
+world.node_tree.nodes['Background'].inputs['Color'].default_value = (0.02, 0.03, 0.06, 1); world.node_tree.nodes['Background'].inputs['Strength'].default_value = 0.3
 
 # ---------------------------------------------------------------- bake light into every lightmap
 scene.render.engine = 'CYCLES'; scene.cycles.device = 'CPU'

@@ -6,8 +6,8 @@ import sys, os; sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from klib import *
 
 reset()
-GLASS = see_through('Borosilicate Glass', (0.90, 0.95, 0.94), 0.16, 0.02, coat=1.0)
-OIL = see_through('Oil', (0.95, 0.62, 0.0), 0.86, 0.03, glow=(0.55, 0.30, 0.0))
+GLASS = see_through('Borosilicate Glass', (0.90, 0.95, 0.94), 0.10, 0.02, coat=1.0)
+OIL = see_through('Oil', (0.98, 0.78, 0.20), 0.42, 0.03, glow=(0.20, 0.12, 0.0))   # 20 Nov: lighter, half full, so the brush shows
 WHITE = pmat('White Cap', (0.95, 0.95, 0.94), 0.28, coat=0.3)
 TEAL = pmat('Teal Silicone', (0.10, 0.33, 0.37), 0.5)
 # glass jar: thick base, rounded heel, 2.4 mm wall, a thread band under the cap
@@ -17,7 +17,7 @@ lathe('Jar', [(0, 0.0045), (0.012, 0.0042), (0.020, 0.0018), (0.0265, 0.0), (0.0
 for z in (0.1011, 0.1027):
     lathe('Thread', [(0.0300, z), (0.0310, z + 0.0004), (0.0310, z + 0.0008), (0.0300, z + 0.0012)], [GLASS], seg=192, closed=True)
 # oil with a meniscus
-lathe('Oil', [(0, 0.0063), (0.0283, 0.0063), (0.0289, 0.0069), (0.0289, 0.0855), (0.0287, 0.0862), (0.025, 0.0858), (0, 0.0856)], [OIL], seg=192)
+lathe('Oil', [(0, 0.0063), (0.0283, 0.0063), (0.0289, 0.0069), (0.0289, 0.0505), (0.0287, 0.0512), (0.025, 0.0508), (0, 0.0506)], [OIL], seg=192)
 # cap: straight skirt, generous rounded shoulder, flat top ring
 lathe('Cap', [(0.0293, 0.0990), (0.0330, 0.0990), (0.0334, 0.0994), (0.0334, 0.1110), (0.0331, 0.1145), (0.0322, 0.1175), (0.0305, 0.1205),
               (0.0280, 0.1232), (0.0245, 0.1253), (0.0200, 0.1266), (0.0160, 0.1270), (0.0080, 0.1270), (0, 0.1270), (0, 0.1060),
