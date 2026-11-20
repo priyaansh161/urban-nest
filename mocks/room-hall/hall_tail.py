@@ -61,13 +61,22 @@ area('Sky Balcony Open', (0, BY1 + 0.3, 1.5), X1 - X0, 2.5, 500, (0.90, 0.95, 1.
 sun = bpy.data.lights.new('Sun', 'SUN'); sun.energy = 2.6; sun.color = (1.0, 0.86, 0.66); sun.angle = math.radians(1.5)
 so = bpy.data.objects.new('Sun', sun); scene.collection.objects.link(so); so.rotation_euler = (Vector((0.35, -1.0, -0.42)) * -1).to_track_quat('Z', 'Y').to_euler()
 for i_, (x_, y_) in enumerate(DL): spot('DL%d' % i_, (x_, y_, FZ - 0.02), (x_, y_, 0.0), 22, 80, 0.8)
+# v3 cove lights: a strip of light on each ledge, aimed up and a little outward at the recess wall, so the recess and the
+# tray ceiling glow (bright at the edge, fading to the middle), plus a soft wash down the curtains from the track
+def cove(name, loc, along, out, length, w):
+    d = (Vector((0, 0, 1)) * math.cos(math.radians(28)) + Vector(out) * math.sin(math.radians(28))).normalized()
+    X = Vector(along).normalized(); Z = -d; Y = Z.cross(X); X = Y.cross(Z)
+    ld = bpy.data.lights.new(name, 'AREA'); ld.shape = 'RECTANGLE'; ld.size = length; ld.size_y = 0.02; ld.energy = w; ld.color = (1.0, 0.80, 0.55)
+    ld.spread = math.radians(130)
+    lo = bpy.data.objects.new(name, ld); lo.location = loc; scene.collection.objects.link(lo)
+    lo.rotation_euler = Matrix((X, Y, Z)).transposed().to_euler()
+from mathutils import Matrix
+CW = 45                                                                  # W per metre of strip
 for t in (LIV, DIN):
-    cx_, cy_ = (t[0] + t[1]) / 2, (t[2] + t[3]) / 2
-    for nm_, loc_, rot_, sx_, sy_ in (('Cove L', (t[0] + 0.08, cy_, H - 0.02), (0, math.radians(-40), 0), 0.08, t[3] - t[2] - 0.2),
-                                      ('Cove R', (t[1] - 0.08, cy_, H - 0.02), (0, math.radians(40), 0), 0.08, t[3] - t[2] - 0.2),
-                                      ('Cove F', (cx_, t[2] + 0.08, H - 0.02), (math.radians(40), 0, 0), t[1] - t[0] - 0.2, 0.08),
-                                      ('Cove B', (cx_, t[3] - 0.08, H - 0.02), (math.radians(-40), 0, 0), t[1] - t[0] - 0.2, 0.08)):
-        area(nm_, loc_, sx_, sy_, 22, (1.0, 0.82, 0.58), rot=rot_)
+    z = FZ + LT + 0.02; o_ = 0.05; cx_, cy_ = (t[0] + t[1]) / 2, (t[2] + t[3]) / 2; lx, ly = t[1] - t[0] + 0.1, t[3] - t[2] + 0.1
+    cove('Cove L', (t[0] - o_, cy_, z), (0, 1, 0), (-1, 0, 0), ly, CW * ly); cove('Cove R', (t[1] + o_, cy_, z), (0, 1, 0), (1, 0, 0), ly, CW * ly)
+    cove('Cove F', (cx_, t[2] - o_, z), (1, 0, 0), (0, -1, 0), lx, CW * lx); cove('Cove B', (cx_, t[3] + o_, z), (1, 0, 0), (0, 1, 0), lx, CW * lx)
+area('Curtain Wash', (0, CY + 0.03, FZ - 0.03), X1 - X0 - 0.2, 0.04, 70, (1.0, 0.82, 0.58))
 point('Pendant', (TX, TY, 2.15), 60, (1.0, 0.80, 0.55), 0.3)
 point('Mandir Lamp', (X0 + 0.16, MC, 1.70), 6, (1.0, 0.72, 0.42), 0.05)
 area('Console Glow', (X1 - 0.23, TVC, 0.22), 0.30, CN1 - CN0, 18, (1.0, 0.82, 0.58), rot=(math.pi, 0, 0))
@@ -90,7 +99,7 @@ if not QUICK:
     BAKED = {}
     for o, img, uvn in LM:
         w, h = img.size; BAKED[o.name] = gblur(np.array(img.pixels[:], dtype=np.float32).reshape(h, w, 4)[..., :3])
-    room_names = {ob.name for ob, _, _ in SHELL if 'Outside' not in ob.name and 'Kitchen' not in ob.name and 'Corridor' not in ob.name}
+    room_names = {ob.name for ob, _, _ in SHELL if 'Outside' not in ob.name and 'Kitchen' not in ob.name and 'Corridor' not in ob.name and 'Ceiling' not in ob.name}
     lum = np.concatenate([BAKED[n].reshape(-1, 3) for n in room_names]) @ np.array([0.2126, 0.7152, 0.0722])
     gain = 0.95 / max(1e-4, np.percentile(lum, 98.5)); print('BAKE gain', round(float(gain), 3), 'p50', round(float(np.percentile(lum, 50)), 3))
     LM_IMG = {}

@@ -373,7 +373,7 @@ cdoor = join(cd, 'LM_BedDoor'); world_uv(cdoor, 2.0); lm(cdoor, 512)
 
 # ---------------------------------------------------------------- main door (teak, brass), door mat, switches, video phone
 DX0, DX1 = 0.50, 1.55
-dp = [bx('Door Frame L', DX0 - 0.07, DX0, Y0, Y0 + 0.05, 0, 2.25, M['teak']), bx('Door Frame R', DX1, DX1 + 0.07, Y0, Y0 + 0.05, 0, 2.25, M['teak']),
+dp = [bx('Door Frame L', DX0 - 0.07, DX0, Y0, Y0 + 0.05, 0, 2.18, M['teak']), bx('Door Frame R', DX1, DX1 + 0.07, Y0, Y0 + 0.05, 0, 2.18, M['teak']),
       bx('Door Frame T', DX0 - 0.07, DX1 + 0.07, Y0, Y0 + 0.05, 2.18, 2.25, M['teak']), bx('Door Leaf', DX0, DX1, Y0, Y0 + 0.04, 0.005, 2.18, M['teak'])]
 for z in (0.55, 0.95, 1.35, 1.75): dp.append(bx('Door Groove', DX0 + 0.08, DX1 - 0.08, Y0 + 0.04, Y0 + 0.043, z - 0.004, z + 0.004, M['gap']))
 dp += [bx('Door Handle Plate', DX0 + 0.06, DX0 + 0.10, Y0 + 0.04, Y0 + 0.05, 0.95, 1.20, M['brass']),
@@ -388,11 +388,11 @@ door = join(dp, 'LM_MainDoor'); world_uv(door, 1.2, vertical_grain=True); lm(doo
 FD = 0.10
 bp = []
 bp += [bx('Bal Frame', BX0, BX1, Y1 + FD, Y1 + FD + 0.08, 0, 0.05, M['alu']), bx('Bal Frame', BX0, BX1, Y1 + FD, Y1 + FD + 0.08, BZ1 - 0.06, BZ1, M['alu']),
-       bx('Bal Frame', BX0, BX0 + 0.06, Y1 + FD, Y1 + FD + 0.08, 0, BZ1, M['alu']), bx('Bal Frame', BX1 - 0.06, BX1, Y1 + FD, Y1 + FD + 0.08, 0, BZ1, M['alu'])]
+       bx('Bal Frame', BX0, BX0 + 0.06, Y1 + FD, Y1 + FD + 0.08, 0.05, BZ1 - 0.06, M['alu']), bx('Bal Frame', BX1 - 0.06, BX1, Y1 + FD, Y1 + FD + 0.08, 0.05, BZ1 - 0.06, M['alu'])]
 PW = (BX1 - BX0 - 0.12) / 3
 for k in range(3):
     a = BX0 + 0.06 + k * PW; b = a + PW; yy = Y1 + FD + (0.005 if k != 1 else 0.042)
-    for xa, xb, za, zb in ((a, b, 0.05, 0.11), (a, b, BZ1 - 0.12, BZ1 - 0.06), (a, a + 0.05, 0.05, BZ1 - 0.06), (b - 0.05, b, 0.05, BZ1 - 0.06)):
+    for xa, xb, za, zb in ((a, b, 0.05, 0.11), (a, b, BZ1 - 0.12, BZ1 - 0.06), (a, a + 0.05, 0.11, BZ1 - 0.12), (b - 0.05, b, 0.11, BZ1 - 0.12)):
         bp.append(bx('Bal Sash', xa, xb, yy, yy + 0.035, za, zb, M['alu']))
     bp.append(bx('Bal Handle', b - 0.09 if k == 0 else a + 0.07, b - 0.07 if k == 0 else a + 0.09, yy - 0.02, yy, 0.95, 1.20, M['alu']))
 baldoor = join(bp, 'LM_BalconyDoor'); world_uv(baldoor, 1.0); lm(baldoor, 1024)
@@ -456,15 +456,15 @@ shoe = join(sc, 'LM_ShoeCab'); world_uv(shoe, 1.2); lm(shoe, 512)
 CU0, CU1 = 0.95, 2.55; CD = 0.42
 cu = [bx('CU Plinth', X1 - CD + 0.05, X1, CU0, CU1, 0, 0.10, M['matblack']), bx('CU Base', X1 - CD, X1, CU0, CU1, 0.10, 0.85, M['oak']),
       bx('CU Top', X1 - CD - 0.01, X1, CU0 - 0.01, CU1 + 0.01, 0.85, 0.875, M['quartz']), bx('CU Niche Back', X1 - 0.015, X1, CU0, CU1, 0.875, 1.25, M['whitemarble']),
-      bx('CU Upper Box', X1 - 0.38, X1, CU0, CU1, 1.25, 1.27, M['oak']), bx('CU Upper Top', X1 - 0.38, X1, CU0, CU1, 2.18, 2.20, M['oak']),
-      bx('CU Upper Back', X1 - 0.012, X1, CU0, CU1, 1.27, 2.18, M['oak']), bx('CU Side', X1 - 0.38, X1, CU0, CU0 + 0.02, 1.25, 2.20, M['oak']),
-      bx('CU Side', X1 - 0.38, X1, CU1 - 0.02, CU1, 1.25, 2.20, M['oak']), bx('CU Mid', X1 - 0.38, X1, (CU0 + CU1) / 2 - 0.01, (CU0 + CU1) / 2 + 0.01, 1.25, 2.20, M['oak']),
+      bx('CU Upper Box', X1 - 0.38, X1, CU0 + 0.02, CU1 - 0.02, 1.25, 1.27, M['oak']), bx('CU Upper Top', X1 - 0.38, X1, CU0 + 0.02, CU1 - 0.02, 2.18, 2.20, M['oak']),
+      bx('CU Upper Back', X1 - 0.012, X1, CU0 + 0.02, CU1 - 0.02, 1.27, 2.18, M['oak']), bx('CU Side', X1 - 0.38, X1, CU0, CU0 + 0.02, 1.25, 2.20, M['oak']),
+      bx('CU Side', X1 - 0.38, X1, CU1 - 0.02, CU1, 1.25, 2.20, M['oak']), bx('CU Mid', X1 - 0.38, X1 - 0.012, (CU0 + CU1) / 2 - 0.01, (CU0 + CU1) / 2 + 0.01, 1.27, 2.18, M['oak']),
       bx('CU Shelf', X1 - 0.36, X1 - 0.012, CU0 + 0.02, CU1 - 0.02, 1.70, 1.715, M['oak'])]
 for yy in (CU0 + 0.4, (CU0 + CU1) / 2, CU1 - 0.4): cu.append(bx('CU Gap', X1 - CD - 0.003, X1 - CD, yy - 0.002, yy + 0.002, 0.11, 0.84, M['gap']))
 cu.append(bx('CU Handle', X1 - CD - 0.012, X1 - CD, CU0 + 0.01, CU1 - 0.01, 0.79, 0.82, M['alu']))
 cu += [bx('CU Glass Shelf Edge', X1 - 0.37, X1 - 0.012, CU0 + 0.02, CU1 - 0.02, 1.715, 1.718, M['gap'])]
 for a, b in ((CU0 + 0.02, (CU0 + CU1) / 2 - 0.01), ((CU0 + CU1) / 2 + 0.01, CU1 - 0.02)):          # glass doors' oak frames
-    for xa, xb, za, zb in ((a, b, 1.27, 1.32), (a, b, 2.13, 2.18), (a, a + 0.05, 1.27, 2.18), (b - 0.05, b, 1.27, 2.18)):
+    for xa, xb, za, zb in ((a, b, 1.27, 1.32), (a, b, 2.13, 2.18), (a, a + 0.05, 1.32, 2.13), (b - 0.05, b, 1.32, 2.13)):
         cu.append(bx('CU Door Frame', X1 - 0.40, X1 - 0.38, xa, xb, za, zb, M['oak']))
 crock = join(cu, 'LM_Crockery'); world_uv(crock, 1.2); lm(crock, 2048)
 for a, b in ((CU0 + 0.07, (CU0 + CU1) / 2 - 0.06), ((CU0 + CU1) / 2 + 0.06, CU1 - 0.07)):
@@ -475,7 +475,7 @@ glow += [bx('CU Glow', X1 - 0.30, X1 - 0.05, CU0 + 0.05, CU1 - 0.05, 1.245, 1.25
 MY0, MY1 = 1.15, 2.05; MC = (MY0 + MY1) / 2
 md = [bx('Mandir Drawers', X0, X0 + 0.40, MY0, MY1, 0.30, 0.70, M['teak']), bx('Mandir Drawer Gap', X0 + 0.40, X0 + 0.403, MY0 + 0.02, MY1 - 0.02, 0.499, 0.503, M['gap']),
       bx('Mandir Base', X0, X0 + 0.32, MY0 + 0.08, MY1 - 0.08, 1.00, 1.04, M['teak']), bx('Mandir Top', X0, X0 + 0.34, MY0 + 0.06, MY1 - 0.06, 1.80, 1.86, M['teak']),
-      bx('Mandir Side', X0, X0 + 0.32, MY0 + 0.08, MY0 + 0.12, 1.04, 1.80, M['teak']), bx('Mandir Side', X0, X0 + 0.32, MY1 - 0.12, MY1 - 0.08, 1.04, 1.80, M['teak']),
+      bx('Mandir Side', X0, X0 + 0.30, MY0 + 0.08, MY0 + 0.12, 1.04, 1.80, M['teak']), bx('Mandir Side', X0, X0 + 0.30, MY1 - 0.12, MY1 - 0.08, 1.04, 1.80, M['teak']),
       bx('Mandir Back', X0, X0 + 0.012, MY0 + 0.12, MY1 - 0.12, 1.04, 1.80, M['white']),
       bx('Mandir Pillar', X0 + 0.30, X0 + 0.34, MY0 + 0.08, MY0 + 0.12, 1.04, 1.80, M['brass']), bx('Mandir Pillar', X0 + 0.30, X0 + 0.34, MY1 - 0.12, MY1 - 0.08, 1.04, 1.80, M['brass'])]
 mandir = join(md, 'LM_Mandir'); world_uv(mandir, 1.0, vertical_grain=True); lm(mandir, 1024)
@@ -501,13 +501,24 @@ for g_ in glow: g_.visible_shadow = False
 # ---------------------------------------------------------------- false ceiling: band at 2.75, recessed trays with coves (living, dining), downlights
 FZ = H - 0.25
 LIV = (-1.15, 1.15, -3.35, -0.55); DIN = (-0.95, 0.75, 0.95, 3.10)
+# v3 (20 Nov, his reference photo): COVE trays. Above the band the recess is CV wider than the opening, leaving a thin
+# ledge; a hidden LED strip on the ledge, behind a small upstand, throws light UP onto the recess sides and the tray
+# ceiling, so the ceiling itself glows ("the neon effect"). E = the recess outline, t = the opening seen from below.
+CV, LT, UP = 0.14, 0.05, 0.045
 fc = []
-for y0, y1 in ((Y0, LIV[2]), (LIV[3], DIN[2]), (DIN[3], Y1)): fc.append(bx('FC Band', X0, X1, y0, y1, FZ, H, M['gypsum']))
+E_ = lambda t: (t[0] - CV, t[1] + CV, t[2] - CV, t[3] + CV)
+LE, DE = E_(LIV), E_(DIN)
+for y0, y1 in ((Y0, LE[2]), (LE[3], DE[2]), (DE[3], Y1)): fc.append(bx('FC Band', X0, X1, y0, y1, FZ, H, M['gypsum']))
 for t in (LIV, DIN):
-    fc += [bx('FC Band', X0, t[0], t[2], t[3], FZ, H, M['gypsum']), bx('FC Band', t[1], X1, t[2], t[3], FZ, H, M['gypsum'])]
-    # v2: the lips no longer overlap at the corners (the overlap baked black squares into every tray corner)
-    fc += [bx('FC Lip', t[0], t[0] + 0.05, t[2] + 0.05, t[3] - 0.05, FZ - 0.03, FZ, M['gypsum']), bx('FC Lip', t[1] - 0.05, t[1], t[2] + 0.05, t[3] - 0.05, FZ - 0.03, FZ, M['gypsum']),
-           bx('FC Lip', t[0], t[1], t[2], t[2] + 0.05, FZ - 0.03, FZ, M['gypsum']), bx('FC Lip', t[0], t[1], t[3] - 0.05, t[3], FZ - 0.03, FZ, M['gypsum'])]
+    e = E_(t)
+    fc += [bx('FC Band', X0, e[0], e[2], e[3], FZ, H, M['gypsum']), bx('FC Band', e[1], X1, e[2], e[3], FZ, H, M['gypsum'])]
+    # the ledge (a 5 cm slab between the opening and the recess wall), four pieces that never overlap
+    fc += [bx('FC Ledge', e[0], e[1], e[2], t[2], FZ, FZ + LT, M['gypsum']), bx('FC Ledge', e[0], e[1], t[3], e[3], FZ, FZ + LT, M['gypsum']),
+           bx('FC Ledge', e[0], t[0], t[2], t[3], FZ, FZ + LT, M['gypsum']), bx('FC Ledge', t[1], e[1], t[2], t[3], FZ, FZ + LT, M['gypsum'])]
+    # the upstand on the ledge's inner edge that hides the strip from below
+    fc += [bx('FC Upstand', t[0] - 0.012, t[1] + 0.012, t[2] - 0.012, t[2], FZ + LT, FZ + LT + UP, M['gypsum']),
+           bx('FC Upstand', t[0] - 0.012, t[1] + 0.012, t[3], t[3] + 0.012, FZ + LT, FZ + LT + UP, M['gypsum']),
+           bx('FC Upstand', t[0] - 0.012, t[0], t[2], t[3], FZ + LT, FZ + LT + UP, M['gypsum']), bx('FC Upstand', t[1], t[1] + 0.012, t[2], t[3], FZ + LT, FZ + LT + UP, M['gypsum'])]
 falsec = join(fc, 'LM_FalseCeiling'); world_uv(falsec, 3.0); lm(falsec, 2048)
 # a 15 mm shadow gap where the false ceiling meets every wall (the finished-gypsum look), dark, not lit
 sg = [bx('FC Shadow Gap', X0, X0 + 0.012, Y0, Y1, FZ - 0.018, FZ, M['gap']), bx('FC Shadow Gap', X1 - 0.012, X1, Y0, Y1, FZ - 0.018, FZ, M['gap']),
@@ -515,9 +526,10 @@ sg = [bx('FC Shadow Gap', X0, X0 + 0.012, Y0, Y1, FZ - 0.018, FZ, M['gap']), bx(
       bx('FC Shadow Gap', BX1, X1 - 0.012, Y1 - 0.012, Y1, FZ - 0.018, FZ, M['gap'])]
 sgap = join(sg, 'LM_ShadowGap'); world_uv(sgap, 1.0); lm(sgap, 256)
 CG = []
-for t in (LIV, DIN):
-    CG += [bx('Cove Glow', t[0] + 0.07, t[0] + 0.09, t[2] + 0.1, t[3] - 0.1, H - 0.012, H - 0.004, M['cove']), bx('Cove Glow', t[1] - 0.09, t[1] - 0.07, t[2] + 0.1, t[3] - 0.1, H - 0.012, H - 0.004, M['cove']),
-           bx('Cove Glow', t[0] + 0.1, t[1] - 0.1, t[2] + 0.07, t[2] + 0.09, H - 0.012, H - 0.004, M['cove']), bx('Cove Glow', t[0] + 0.1, t[1] - 0.1, t[3] - 0.09, t[3] - 0.07, H - 0.012, H - 0.004, M['cove'])]
+for t in (LIV, DIN):                                                     # the LED strips themselves, lying on the ledge behind the upstand
+    z0, z1 = FZ + LT, FZ + LT + 0.008; o_ = 0.045
+    CG += [bx('Cove LED', t[0] - o_ - 0.012, t[0] - o_, t[2] - o_, t[3] + o_, z0, z1, M['cove']), bx('Cove LED', t[1] + o_, t[1] + o_ + 0.012, t[2] - o_, t[3] + o_, z0, z1, M['cove']),
+           bx('Cove LED', t[0] - o_, t[1] + o_, t[2] - o_ - 0.012, t[2] - o_, z0, z1, M['cove']), bx('Cove LED', t[0] - o_, t[1] + o_, t[3] + o_, t[3] + o_ + 0.012, z0, z1, M['cove'])]
 # a slim linear LED profile set into the band between the two trays, across the hall
 CG.append(bx('Linear Profile', -1.05, 1.05, 0.18, 0.215, FZ - 0.003, FZ, M['led']))
 CG += [bx('Linear Profile Trim', -1.06, 1.06, 0.172, 0.178, FZ - 0.004, FZ, M['alu']), bx('Linear Profile Trim', -1.06, 1.06, 0.217, 0.223, FZ - 0.004, FZ, M['alu'])]
@@ -536,7 +548,7 @@ TX, TY = -0.15, 2.05
 S(box('Table Top', (TX, TY, 0.74), (0.90, 1.80, 0.04), M['walnut'], 0.004))
 for sx in (-1, 1):
     for sy in (-1, 1): S(box('Table Leg', (TX + sx * 0.37, TY + sy * 0.80, 0.36), (0.06, 0.06, 0.72), M['walnut'], 0.004))
-S(box('Table Apron', (TX, TY, 0.68), (0.80, 1.66, 0.08), M['walnut'], 0.003))
+S(box('Table Apron', (TX, TY, 0.68), (0.68, 1.54, 0.08), M['walnut'], 0.003))     # set between the legs (a shared face baked black)
 for o in STAGE: world_uv(o, 1.2)
 def chair(x, y, rz):
     from mathutils import Matrix
@@ -703,13 +715,22 @@ area('Sky Balcony Open', (0, BY1 + 0.3, 1.5), X1 - X0, 2.5, 500, (0.90, 0.95, 1.
 sun = bpy.data.lights.new('Sun', 'SUN'); sun.energy = 2.6; sun.color = (1.0, 0.86, 0.66); sun.angle = math.radians(1.5)
 so = bpy.data.objects.new('Sun', sun); scene.collection.objects.link(so); so.rotation_euler = (Vector((0.35, -1.0, -0.42)) * -1).to_track_quat('Z', 'Y').to_euler()
 for i_, (x_, y_) in enumerate(DL): spot('DL%d' % i_, (x_, y_, FZ - 0.02), (x_, y_, 0.0), 22, 80, 0.8)
+# v3 cove lights: a strip of light on each ledge, aimed up and a little outward at the recess wall, so the recess and the
+# tray ceiling glow (bright at the edge, fading to the middle), plus a soft wash down the curtains from the track
+def cove(name, loc, along, out, length, w):
+    d = (Vector((0, 0, 1)) * math.cos(math.radians(28)) + Vector(out) * math.sin(math.radians(28))).normalized()
+    X = Vector(along).normalized(); Z = -d; Y = Z.cross(X); X = Y.cross(Z)
+    ld = bpy.data.lights.new(name, 'AREA'); ld.shape = 'RECTANGLE'; ld.size = length; ld.size_y = 0.02; ld.energy = w; ld.color = (1.0, 0.80, 0.55)
+    ld.spread = math.radians(130)
+    lo = bpy.data.objects.new(name, ld); lo.location = loc; scene.collection.objects.link(lo)
+    lo.rotation_euler = Matrix((X, Y, Z)).transposed().to_euler()
+from mathutils import Matrix
+CW = 45                                                                  # W per metre of strip
 for t in (LIV, DIN):
-    cx_, cy_ = (t[0] + t[1]) / 2, (t[2] + t[3]) / 2
-    for nm_, loc_, rot_, sx_, sy_ in (('Cove L', (t[0] + 0.08, cy_, H - 0.02), (0, math.radians(-40), 0), 0.08, t[3] - t[2] - 0.2),
-                                      ('Cove R', (t[1] - 0.08, cy_, H - 0.02), (0, math.radians(40), 0), 0.08, t[3] - t[2] - 0.2),
-                                      ('Cove F', (cx_, t[2] + 0.08, H - 0.02), (math.radians(40), 0, 0), t[1] - t[0] - 0.2, 0.08),
-                                      ('Cove B', (cx_, t[3] - 0.08, H - 0.02), (math.radians(-40), 0, 0), t[1] - t[0] - 0.2, 0.08)):
-        area(nm_, loc_, sx_, sy_, 22, (1.0, 0.82, 0.58), rot=rot_)
+    z = FZ + LT + 0.02; o_ = 0.05; cx_, cy_ = (t[0] + t[1]) / 2, (t[2] + t[3]) / 2; lx, ly = t[1] - t[0] + 0.1, t[3] - t[2] + 0.1
+    cove('Cove L', (t[0] - o_, cy_, z), (0, 1, 0), (-1, 0, 0), ly, CW * ly); cove('Cove R', (t[1] + o_, cy_, z), (0, 1, 0), (1, 0, 0), ly, CW * ly)
+    cove('Cove F', (cx_, t[2] - o_, z), (1, 0, 0), (0, -1, 0), lx, CW * lx); cove('Cove B', (cx_, t[3] + o_, z), (1, 0, 0), (0, 1, 0), lx, CW * lx)
+area('Curtain Wash', (0, CY + 0.03, FZ - 0.03), X1 - X0 - 0.2, 0.04, 70, (1.0, 0.82, 0.58))
 point('Pendant', (TX, TY, 2.15), 60, (1.0, 0.80, 0.55), 0.3)
 point('Mandir Lamp', (X0 + 0.16, MC, 1.70), 6, (1.0, 0.72, 0.42), 0.05)
 area('Console Glow', (X1 - 0.23, TVC, 0.22), 0.30, CN1 - CN0, 18, (1.0, 0.82, 0.58), rot=(math.pi, 0, 0))
@@ -732,7 +753,7 @@ if not QUICK:
     BAKED = {}
     for o, img, uvn in LM:
         w, h = img.size; BAKED[o.name] = gblur(np.array(img.pixels[:], dtype=np.float32).reshape(h, w, 4)[..., :3])
-    room_names = {ob.name for ob, _, _ in SHELL if 'Outside' not in ob.name and 'Kitchen' not in ob.name and 'Corridor' not in ob.name}
+    room_names = {ob.name for ob, _, _ in SHELL if 'Outside' not in ob.name and 'Kitchen' not in ob.name and 'Corridor' not in ob.name and 'Ceiling' not in ob.name}
     lum = np.concatenate([BAKED[n].reshape(-1, 3) for n in room_names]) @ np.array([0.2126, 0.7152, 0.0722])
     gain = 0.95 / max(1e-4, np.percentile(lum, 98.5)); print('BAKE gain', round(float(gain), 3), 'p50', round(float(np.percentile(lum, 50)), 3))
     LM_IMG = {}
