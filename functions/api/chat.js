@@ -172,9 +172,12 @@ export async function liveContext(env, messages, page) {   // exported for tools
 
 // ── model calls (Cloudflare Workers AI, Qwen 3) ─────────────────────────
 const NO_THINK = '\n\n/no_think';
+// qwen3.8 ignores /no_think and reasons silently before writing (first words after ~10 s, sometimes over a minute);
+// this switch turns the reasoning off: first words in under a second (measured 21 Nov 2026)
+const NO_REASONING = { chat_template_kwargs: { enable_thinking: false } };
 async function* replyStream(env, system, messages) {
   if (env.MOCK_LLM === '1') { yield* mockReply(messages); return; }
-  const stream = await env.AI.run(env.CF_MODEL || CF_MODEL, { messages: [{ role: 'system', content: system + NO_THINK }, ...messages], stream: true, max_tokens: 700, temperature: 0.4 });
+  const stream = await env.AI.run(env.CF_MODEL || CF_MODEL, { ...NO_REASONING, messages: [{ role: 'system', content: system + NO_THINK }, ...messages], stream: true, max_tokens: 700, temperature: 0.4 });
   const reader = stream.getReader(), dec = new TextDecoder();
   let buf = '', inThink = false, pending = '', started = false;
   for (;;) {
@@ -208,7 +211,7 @@ async function* replyStream(env, system, messages) {
   }
   if (!inThink && pending.trim()) { started = true; yield pending; }
   if (started) return;
-  const again = await env.AI.run(env.CF_MODEL || CF_MODEL, { messages: [{ role: 'system', content: system + NO_THINK }, ...messages], max_tokens: 1200, temperature: 0.4 });
+  const again = await env.AI.run(env.CF_MODEL || CF_MODEL, { ...NO_REASONING, messages: [{ role: 'system', content: system + NO_THINK }, ...messages], max_tokens: 1200, temperature: 0.4 });
   const text = String(again.response ?? again.choices?.[0]?.message?.content ?? '').replace(/<think>[\s\S]*?(<\/think>|$)/g, '').trim();
   yield text || 'Sorry, I could not answer that just now. Could you ask again, or message the team on ' + WA + '?';
 }
@@ -217,7 +220,7 @@ function partialTag(s) { for (let k = Math.min(6, s.length); k > 0; k--) if ('<t
 async function summarise(env, messages) {
   if (env.MOCK_LLM === '1') return null;
   const transcript = messages.map(m => `${m.role === 'user' ? 'VISITOR' : 'ENMA'}: ${m.content}`).join('\n\n');
-  const res = await env.AI.run(env.CF_MODEL || CF_MODEL, {
+  const res = await env.AI.run(env.CF_MODEL || CF_MODEL, { ...NO_REASONING,
     messages: [
       { role: 'system', content: SUMMARY_PROMPT + '\n\nReply with only one JSON object with exactly these keys: ' + SUMMARY_SCHEMA.required.join(', ') + '. "questions" is an array of strings; every other value is a string.' + NO_THINK },
       { role: 'user', content: `<chat>\n${transcript}\n</chat>` },
