@@ -136,3 +136,4 @@ The rows before `tools/deploy.mjs` existed were filled in afterwards from
 | 2026-11-20 | 12:56 | b1923f6 (+ uncommitted changes) | US store closed for now: IN/US switch hidden, everyone gets the India store; privacy shows the India notice only | https://98dfe5be.storeurbannest.pages.dev |
 | 2026-11-21 | 09:08 | 2d1248c (+ uncommitted changes) | Enma: switch to qwen3.8-27b (Cloudflare retired qwen3-30b on 20 Nov; replies were failing) | https://a36183fb.storeurbannest.pages.dev |
 | 2026-11-21 | 09:24 | 7872278 (+ uncommitted changes) | Enma: reasoning switched off on qwen3.8 (first words ~10 s -> under 1 s) | https://214bfc13.storeurbannest.pages.dev |
+| 2026-11-21 | 18:20 | 2be5fd6 (+ uncommitted changes) | Essentials: gold New badge for pieces featured as new (sort_order below 0); BURRDOFF tea infuser listed and featured in Kitchen | https://f8d284d7.storeurbannest.pages.dev |

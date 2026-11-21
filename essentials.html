@@ -204,6 +204,8 @@
     .stage-ph img { width: 40px; height: 40px; border-radius: 50%; opacity: .35; }
     .badge3d { position: absolute; top: 12px; left: 12px; z-index: 2; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: #061E23; background: rgba(234,242,241,.9); padding: 4px 9px; border-radius: 20px; }
     .badge-soon { position: absolute; top: 12px; right: 12px; z-index: 2; font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: #F5F7F6; background: rgba(163,123,63,.85); padding: 4px 9px; border-radius: 20px; }
+  /* "New" (21 Nov 2026): a piece featured as new has sort_order below 0 in admin, which also puts it first in its category */
+  .badge-new { background: var(--gold, #A37B3F) !important; color: #fff !important; border-color: transparent !important; }
     .spin-hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; z-index: 2; font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: rgba(234,242,241,.4); pointer-events: none; }
 
     .body { padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
@@ -1040,11 +1042,13 @@
       return '<div class="stage">' +
         (has3d ? '<span class="badge3d">3D</span>' : '') +
         (item.coming_soon ? '<span class="badge-soon">Coming soon</span>' : '') +
+        (item.sort_order < 0 && !item.coming_soon ? '<span class="badge-soon badge-new">New</span>' : '') +
         '<img src="' + esc(unImg(item.image_url, 500)) + '" alt="' + esc(item.name) + '" loading="lazy" decoding="async"/></div>';
     }
     return '<div class="stage">' +
       (has3d ? '<span class="badge3d">3D</span>' : '') +
       (item.coming_soon ? '<span class="badge-soon">Coming soon</span>' : '') +
+        (item.sort_order < 0 && !item.coming_soon ? '<span class="badge-soon badge-new">New</span>' : '') +
       '<span class="stage-ph"><img src="favicon.png" alt="" aria-hidden="true"/></span></div>';
   }
 
