@@ -409,6 +409,8 @@ async function loadRoom(file = ROOM_FILE) {
       m.material = bakedMaterial(m.material);
     }
     if (/Kitchen|Corridor/i.test(nm)) m.material.side = THREE.DoubleSide;
+    // v4: glass (crockery doors, balcony) reflects the room itself, like a real pane, not the studio env
+    if (/Glass/i.test(m.material.name || '')) { m.material.envMapIntensity = 1.8; m.material.roughness = Math.min(m.material.roughness, 0.03); glassMats.push(m.material); }
   });
   // Contact shadows (2 Nov 2026). A small prop's shadow in the lightmap is too soft to read (the breakfast tray
   // looked as if it floated over the duvet), so placements.json can lay a soft dark patch under one:
@@ -481,6 +483,7 @@ const BAKED_LIGHTS = THREE.ShaderChunk.lights_fragment_begin
   .replace('getAmbientLightIrradiance( ambientLightColor )', 'vec3( 0.0 )')
   .replace(/defined\( USE_LIGHT_PROBES \)/g, 'defined( BAKED_NO_PROBES )');
 const bakedMats = [];
+const glassMats = [];
 const BAKED_EXPOSURE = 1.3;   // as the Quiet Bath: the bake's gain is set by its brightest walls (the cove band may clip)
 function bakedMaterial(src, lift = 1) {
   lift *= BAKED_EXPOSURE;
@@ -506,6 +509,7 @@ function captureRoomEnv() {
   const env = pmrem.fromCubemap(rt.texture).texture; rt.dispose();
   const old = bakedMats[0] && bakedMats[0].envMap;            // captured again once the products are in
   for (const m of bakedMats) { m.envMap = env; m.needsUpdate = true; }
+  for (const m of glassMats) { m.envMap = env; m.needsUpdate = true; }
   if (old) old.dispose();
 }
 

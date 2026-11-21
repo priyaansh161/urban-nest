@@ -40,8 +40,16 @@ LAM = (0.60, 0.41, 0.23)
 OAKD = 'oak_veneer_03/oak_veneer_03_diff_2k.jpg'; OAKN = 'oak_veneer_03/oak_veneer_03_nor_gl_2k.jpg'; OAKR = 'oak_veneer_03/oak_veneer_03_rough_2k.jpg'
 LIN = 'rough_linen/rough_linen_diff_2k.jpg'; LINN = 'rough_linen/rough_linen_nor_gl_2k.jpg'
 PLD = 'beige_wall_001/beige_wall_001_diff_2k.jpg'; PLN = 'beige_wall_001/beige_wall_001_nor_gl_2k.jpg'
+WVD = 'walnut_veneer/walnut_veneer_Diffuse_2k.jpg'; WVN = 'walnut_veneer/walnut_veneer_nor_gl_2k.jpg'
 def wood(name, col, contrast, rough=0.45):
-    return pbr(name, scan_img(OAKD, 2048, recolour=col, contrast=contrast, rot90=True), scan_img(OAKN, 1024, False, rot90=True), None, rough=rough, nstr=0.35)
+    # v4 (his 11-21 review: the hall's wood "doesn't look like wood"): the kitchen's walnut-veneer scan, grain pushed as hard
+    # as the kitchen's cabinets (contrast ~1.9) and a pore normal that catches the room's reflection
+    return pbr(name, scan_img(WVD, 2048, recolour=col, contrast=contrast * 1.45), scan_img(WVN, 1024, False), None, rough=rough, nstr=0.6)
+def bev(o, w=0.004):
+    # v4: rounded edges on joined cabinetry so every edge catches a highlight (sharp boxes read as flat cut-outs)
+    bpy.ops.object.select_all(action='DESELECT'); o.select_set(True); bpy.context.view_layer.objects.active = o
+    md = o.modifiers.new('bev', 'BEVEL'); md.width = w; md.segments = 2; md.limit_method = 'ANGLE'; md.harden_normals = False
+    bpy.ops.object.modifier_apply(modifier=md.name); return o
 M = {
     'wall': pbr('Warm White Paint', scan_img('beige_wall_001/beige_wall_001_diff_2k.jpg', 1024, recolour=(0.91, 0.88, 0.82), contrast=0.25),
                 scan_img('beige_wall_001/beige_wall_001_nor_gl_2k.jpg', 1024, False), None, rough=0.85, nstr=0.4),
@@ -63,7 +71,7 @@ M = {
     'gypsum': pbr('Gypsum White', scan_img(PLD, 1024, recolour=(0.94, 0.93, 0.90), contrast=0.1), scan_img(PLN, 1024, False), None, rough=0.85, nstr=0.12),
     'alu': mat('Dark Grey Aluminium', (0.10, 0.10, 0.11, 1), 0.4),
     'glass': mat('Glass', (0.85, 0.90, 0.92, 1), 0.02, alpha=0.08),
-    'bronzeglass': mat('Bronze Glass', (0.20, 0.15, 0.10, 1), 0.05, alpha=0.45),
+    'bronzeglass': mat('Smoked Glass', (0.42, 0.38, 0.33, 1), 0.02, alpha=0.22),
     'mirror': mat('Mirror', (0.70, 0.72, 0.74, 1), 0.03, 1.0),
     'matblack': mat('Matte Black', (0.02, 0.02, 0.022, 1), 0.45),
     'tvblack': mat('TV Screen', (0.008, 0.009, 0.011, 1), 0.08),
@@ -260,7 +268,7 @@ dado = join(mo, 'LM_Dado'); world_uv(dado, 3.0); lm(dado, 256)
 sc = [bx('Shoe Cab', X1 - 0.35, X1, -3.80, -2.90, 0.15, 0.95, M['oak']), bx('Shoe Top', X1 - 0.36, X1, -3.81, -2.89, 0.95, 0.975, M['quartz']),
       bx('Shoe Gap', X1 - 0.353, X1 - 0.35, -3.352, -3.348, 0.16, 0.94, M['gap']), bx('Shoe Glow', X1 - 0.30, X1 - 0.05, -3.75, -2.95, 0.145, 0.15, M['led']),
       bx('Shoe Handle', X1 - 0.362, X1 - 0.35, -3.79, -2.91, 0.905, 0.935, M['alu']), bx('Shoe Edge', X1 - 0.351, X1 - 0.35, -3.80, -2.90, 0.15, 0.152, M['gap'])]
-shoe = join(sc, 'LM_ShoeCab'); world_uv(shoe, 1.2); lm(shoe, 512)
+shoe = bev(join(sc, 'LM_ShoeCab')); world_uv(shoe, 1.2); lm(shoe, 512)
 CU0, CU1 = 0.95, 2.55; CD = 0.42
 cu = [bx('CU Plinth', X1 - CD + 0.05, X1, CU0, CU1, 0, 0.10, M['matblack']), bx('CU Base', X1 - CD, X1, CU0, CU1, 0.10, 0.85, M['oak']),
       bx('CU Top', X1 - CD - 0.01, X1, CU0 - 0.01, CU1 + 0.01, 0.85, 0.875, M['quartz']), bx('CU Niche Back', X1 - 0.015, X1, CU0, CU1, 0.875, 1.25, M['whitemarble']),
@@ -274,10 +282,11 @@ cu += [bx('CU Glass Shelf Edge', X1 - 0.37, X1 - 0.012, CU0 + 0.02, CU1 - 0.02, 
 for a, b in ((CU0 + 0.02, (CU0 + CU1) / 2 - 0.01), ((CU0 + CU1) / 2 + 0.01, CU1 - 0.02)):          # glass doors' oak frames
     for xa, xb, za, zb in ((a, b, 1.27, 1.32), (a, b, 2.13, 2.18), (a, a + 0.05, 1.32, 2.13), (b - 0.05, b, 1.32, 2.13)):
         cu.append(bx('CU Door Frame', X1 - 0.40, X1 - 0.38, xa, xb, za, zb, M['oak']))
-crock = join(cu, 'LM_Crockery'); world_uv(crock, 1.2); lm(crock, 2048)
+crock = bev(join(cu, 'LM_Crockery')); world_uv(crock, 1.2); lm(crock, 2048)
 for a, b in ((CU0 + 0.07, (CU0 + CU1) / 2 - 0.06), ((CU0 + CU1) / 2 + 0.06, CU1 - 0.07)):
     g_ = bx('CU Glass', X1 - 0.395, X1 - 0.39, a, b, 1.32, 2.13, M['bronzeglass']); g_.visible_shadow = False; GLASS.append(g_)
-glow += [bx('CU Glow', X1 - 0.30, X1 - 0.05, CU0 + 0.05, CU1 - 0.05, 1.245, 1.25, M['led'])]
+CUGLOW = mat('Cabinet LED (soft)', (1, 0.9, 0.75, 1), 0.5, emit=((1.0, 0.85, 0.62, 1), 2.2))   # v4: was the 6.0 LED strip
+glow += [bx('CU Glow', X1 - 0.30, X1 - 0.05, CU0 + 0.05, CU1 - 0.05, 1.245, 1.25, CUGLOW)]
 
 # ---------------------------------------------------------------- mandir on the left wall (between kitchen and passage): drawer unit, temple box, arch glow
 MY0, MY1 = 1.15, 2.05; MC = (MY0 + MY1) / 2
@@ -286,7 +295,7 @@ md = [bx('Mandir Drawers', X0, X0 + 0.40, MY0, MY1, 0.30, 0.70, M['teak']), bx('
       bx('Mandir Side', X0, X0 + 0.30, MY0 + 0.08, MY0 + 0.12, 1.04, 1.80, M['teak']), bx('Mandir Side', X0, X0 + 0.30, MY1 - 0.12, MY1 - 0.08, 1.04, 1.80, M['teak']),
       bx('Mandir Back', X0, X0 + 0.012, MY0 + 0.12, MY1 - 0.12, 1.04, 1.80, M['white']),
       bx('Mandir Pillar', X0 + 0.30, X0 + 0.34, MY0 + 0.08, MY0 + 0.12, 1.04, 1.80, M['brass']), bx('Mandir Pillar', X0 + 0.30, X0 + 0.34, MY1 - 0.12, MY1 - 0.08, 1.04, 1.80, M['brass'])]
-mandir = join(md, 'LM_Mandir'); world_uv(mandir, 1.0, vertical_grain=True); lm(mandir, 1024)
+mandir = bev(join(md, 'LM_Mandir')); world_uv(mandir, 1.0, vertical_grain=True); lm(mandir, 1024)
 glow += [bx('Mandir Glow', X0 + 0.02, X0 + 0.30, MY0 + 0.13, MY1 - 0.13, 1.795, 1.80, M['led'])]
 # v2 mandir detail: a backlit CNC jaali (overlapping-circle lotus lattice in teak over warm light) behind the idol
 def jaali_image():
@@ -302,7 +311,7 @@ def jaali_image():
     return SL.img('jaali_col', np.clip(rgb, 0, 1), TMP)
 JAALI = mat('Jaali Backlit', (0, 0, 0, 1), 0.6)
 _jb = JAALI.node_tree.nodes['Principled BSDF']; _jt = JAALI.node_tree.nodes.new('ShaderNodeTexImage'); _jt.image = jaali_image()
-JAALI.node_tree.links.new(_jt.outputs['Color'], _jb.inputs['Emission Color']); _jb.inputs['Emission Strength'].default_value = 2.2
+JAALI.node_tree.links.new(_jt.outputs['Color'], _jb.inputs['Emission Color']); _jb.inputs['Emission Strength'].default_value = 1.2   # v4: was 2.2
 _jo = bx('Mandir Jaali', X0 + 0.012, X0 + 0.016, MY0 + 0.12, MY1 - 0.12, 1.08, 1.795, JAALI); world_uv(_jo, 0.56); glow.append(_jo)   # 14 cm flowers
 for g_ in glow: g_.visible_shadow = False
 
@@ -353,16 +362,44 @@ def lathe(name, prof, m, loc, seg=40):
     o = SL.lathe(name, prof, m, seg=seg); o.location = loc; STAGE.append(o); return o
 def S(o): STAGE.append(o); return o
 TX, TY = -0.15, 2.05
-S(box('Table Top', (TX, TY, 0.74), (0.90, 1.80, 0.04), M['walnut'], 0.004))
+S(box('Table Top', (TX, TY, 0.737), (0.90, 1.80, 0.046), M['walnut'], 0.008))
 for sx in (-1, 1):
     for sy in (-1, 1): S(box('Table Leg', (TX + sx * 0.37, TY + sy * 0.80, 0.36), (0.06, 0.06, 0.72), M['walnut'], 0.004))
 S(box('Table Apron', (TX, TY, 0.68), (0.68, 1.54, 0.08), M['walnut'], 0.003))     # set between the legs (a shared face baked black)
 for o in STAGE: world_uv(o, 1.2)
 def chair(x, y, rz):
+    """v4: an upholstered dining chair: a thick cushioned seat with a sewn welt, a back that rakes 8 degrees and curves
+    round the sitter (a bent panel), a walnut frame showing under the seat, tapered splayed legs with brass caps and
+    side stretchers. Front of the chair is -y in its own frame."""
     from mathutils import Matrix
-    parts = [box('Seat', (0, 0, 0.44), (0.46, 0.46, 0.08), M['fabric'], 0.02), box('Back', (0, 0.21, 0.72), (0.44, 0.06, 0.50), M['fabric'], 0.02)]
-    for lx in (-0.19, 0.19):
-        for ly in (-0.19, 0.19): parts.append(box('Chair Leg', (lx, ly, 0.20), (0.035, 0.035, 0.40), M['walnut'], 0.003))
+    import bmesh as _bm
+    parts = []
+    # seat cushion: a rounded slab (bevel 2.5 cm) on a walnut seat frame
+    parts.append(box('Seat Frame', (0, 0, 0.415), (0.47, 0.47, 0.035), M['walnut'], 0.006))
+    parts.append(box('Seat', (0, -0.005, 0.465), (0.48, 0.47, 0.07), M['fabric'], 0.028, segs=4))
+    parts.append(box('Seat Welt', (0, -0.245, 0.462), (0.44, 0.012, 0.012), M['fabric'], 0.005))
+    # back: a curved, raked panel (bent in an arc of 0.06 m sag), padded
+    bpy.ops.mesh.primitive_cube_add(size=1); bk = bpy.context.active_object; bk.name = 'Back'
+    bk.scale = (0.46, 0.07, 0.52); bpy.ops.object.transform_apply(scale=True)
+    bm = _bm.new(); bm.from_mesh(bk.data)
+    _bm.ops.subdivide_edges(bm, edges=[e for e in bm.edges if abs(e.verts[0].co.x - e.verts[1].co.x) > 0.1], cuts=10, use_grid_fill=True)
+    for v in bm.verts: v.co.y += 0.05 * (2 * v.co.x / 0.46) ** 2          # a squared panel that wraps round the sitter
+    bm.to_mesh(bk.data); bm.free()
+    md = bk.modifiers.new('bev', 'BEVEL'); md.width = 0.022; md.segments = 4; md.limit_method = 'ANGLE'
+    bpy.ops.object.modifier_apply(modifier=md.name)          # padded, rounded edges (a smooth box, not an egg)
+    bk.data.materials.append(M['fabric'])
+    bk.rotation_euler = (math.radians(-8), 0, 0); bk.location = (0, 0.215, 0.76)
+    bpy.ops.object.transform_apply(location=True, rotation=True)
+    for p in bk.data.polygons: p.use_smooth = True
+    parts.append(bk)
+    # legs: tapered (4 cm at the seat to 2.6 cm at the floor), splayed 3 degrees, brass caps
+    for lx in (-0.20, 0.20):
+        for ly in (-0.20, 0.20):
+            bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.019, radius2=0.028, depth=0.40, location=(lx, ly, 0.20))
+            lg = bpy.context.active_object; lg.name = 'Chair Leg'; lg.rotation_euler = (math.radians(-3 * (ly > 0) + 3 * (ly < 0)), math.radians(3 * (lx > 0) - 3 * (lx < 0)), math.pi / 4)
+            bpy.ops.object.transform_apply(location=True, rotation=True); lg.data.materials.append(M['walnut']); parts.append(lg)
+            parts.append(box('Leg Cap', (lx * 1.08, ly * 1.08, 0.008), (0.03, 0.03, 0.016), M['brass'], 0.004))
+        parts.append(box('Stretcher', (lx * 1.04, 0, 0.14), (0.018, 0.38, 0.022), M['walnut'], 0.004))
     o = SL.join(parts, 'Dining Chair'); o.matrix_world = Matrix.Translation((x, y, 0)) @ Matrix.Rotation(rz, 4, 'Z'); STAGE.append(o)
     bpy.context.view_layer.update(); world_uv(o, 0.45)
 for yy in (TY - 0.45, TY + 0.45):
