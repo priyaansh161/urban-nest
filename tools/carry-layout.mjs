@@ -21,5 +21,5 @@ if (missing.length) { console.error('saved layout names files the room no longer
 console.log(`${room}: saved layout ${saved.version} -> ${base.version} (${saved.products.length} products, ${saved.staging.length} staging)`);
 if (process.argv.includes('--dry')) process.exit(0);
 saved.version = base.version;
-const up = await fetch(url, { method: 'PUT', headers: { ...H, 'Content-Type': 'application/octet-stream', 'x-upsert': 'true', 'cache-control': 'max-age=30' }   // as admin/rooms.html saves it, body: JSON.stringify(saved) });
+const up = await fetch(url, { method: 'PUT', headers: { ...H, 'Content-Type': 'application/octet-stream', 'x-upsert': 'true', 'cache-control': 'max-age=30' }, body: JSON.stringify(saved) });   // as admin/rooms.html saves it
 console.log(up.ok ? 'carried over' : 'upload failed ' + up.status + ' ' + (await up.text()));
