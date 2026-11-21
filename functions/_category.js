@@ -10,7 +10,7 @@ export async function categoryPage(ctx, section) {
   const slug = String(ctx.params.slug || '').toLowerCase();
   const [cat] = await sb(`collection_categories?select=*&slug=eq.${encodeURIComponent(slug)}&section=eq.${section}&published=eq.true&limit=1`);
   if (!cat) return notFound(ctx);
-  const items = await sb(`collection_items?select=id,name,image_url,price,model_url&published=eq.true&category=eq.${encodeURIComponent(slug)}&order=sort_order.asc,name.asc`);
+  const items = await sb(`collection_items?select=id,name,image_url,price,model_url,sort_order&published=eq.true&category=eq.${encodeURIComponent(slug)}&order=sort_order.asc,name.asc`);
   if (!items.length) return notFound(ctx);
 
   const home = section === 'essentials' ? 'Essentials' : 'The Collection';

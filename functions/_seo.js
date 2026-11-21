@@ -82,7 +82,7 @@ export const liveBuyLink = (it) => it.buy_link && !/^TODO-/i.test(it.buy_link) &
 export function pieceCard(it, catName) {
   return `<a class="sv-card" href="${esc(UNUrls.piece(it))}">` +
     `<img src="${esc(img(it.image_url, 600))}" alt="${esc(it.name)}" loading="lazy" decoding="async"/>` +
-    `<div class="sv-card-b"><div class="sv-card-k">${esc(catName || '')}${it.model_url ? (catName ? ' · ' : '') + '3D' : ''}</div>` +
+    `<div class="sv-card-b"><div class="sv-card-k">${esc(catName || '')}${it.model_url ? (catName ? ' · ' : '') + '3D' : ''}${it.sort_order < 0 ? ' · <b style="color:var(--gold,#A37B3F)">New</b>' : ''}</div>` +
     `<div class="sv-card-t">${nameBoth(it.name)}</div>${it.price ? `<div class="sv-card-p">${esc(it.price)}</div>` : ''}</div></a>`;
 }
 
