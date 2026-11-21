@@ -16,7 +16,8 @@ import { sb, img, shortName } from '../_seo.js';            // the public read-o
 
 const UNUrls = globalThis.UNUrls;            // set by urls.js, which _seo.js loads
 const ORIGIN = 'https://storeurbannest.in';
-const CF_MODEL = '@cf/qwen/qwen3-30b-a3b-fp8';
+// 21 Nov 2026: Cloudflare retired qwen3-30b-a3b-fp8 on 20 Nov (every reply failed); same replacement as the Motif Labs bot
+const CF_MODEL = '@cf/qwen/qwen3.8-27b';
 const MAX_TURNS = 30;            // visitor messages per conversation
 const MAX_CHARS = 1500;          // per visitor message
 const NEW_CHATS_PER_IP_HOUR = 8; // fresh conversations per visitor per hour
