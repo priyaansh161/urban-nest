@@ -1,0 +1,39 @@
+# placements.json for the hall: Collection pieces (and the Woodshoppe caddy) where a Noida family would keep them.
+# pos = three.js [x, y(up), z] = Blender (x, -z, y). See LAYOUT.md.
+import json, os
+D = os.path.dirname(os.path.abspath(__file__))
+items = {r['id'][:8]: r for r in json.load(open(os.path.join(D, 'hall_items.json'), encoding='utf8'))}
+def P(id8, name, bx_, by_, bz, size, rot=0.0, **kw):
+    """bx_, by_, bz: Blender x, y and the height the piece stands on."""
+    r = items[id8]; tag = ('ESSENTIALS · ' if r.get('section') == 'essentials' else 'COLLECTION · ') + (r.get('category') or '').upper().replace('-', ' ')
+    d = dict(id=r['id'], name=name, file='final/%s.glb' % id8, listing=r['name'], link=r.get('buy_link'), tag=tag, pos=[bx_, bz, -by_]); d.update(size)
+    if rot: d['rotY'] = rot
+    desc = ' '.join((r.get('description') or '').split()); desc = desc.split('. ')[0].rstrip('.') + '.' if desc else ''
+    d['desc'] = desc[:220]
+    d['specs'] = [s for s in (r.get('specs') or []) if s[0] in ('Material', 'Material Type', 'Colour', 'Color', 'Item Dimensions L x W x H', 'Product Dimensions', 'Brand', 'Brand Name', 'Size')][:3]
+    d.update(kw); return d
+H = lambda h: {'height': h}; L = lambda l: {'length': l}
+Q = 1.5708
+X0, X1, Y0, Y1 = -1.75, 1.75, -3.9, 3.9
+TX, TY = -0.15, 2.05                    # dining table centre (staging), top at 0.76
+out = [
+    # living: the L-sofa along the left wall, chaise toward the balcony; coffee table + urli on the rug; arc lamp by the sofa's end
+    P('8ff6fee2', 'Torque Berlin L-Shaped Sofa', -0.905, -2.19, 0.0, L(2.80), Q, footprint=[2.80, 1.65]),
+    P('e716af29', 'Enfurnish Sheesham Coffee Table', 0.36, -2.15, 0.0, L(1.00), Q),
+    P('aef51ee7', 'BEHOMA Brass Peacock Urli', 0.36, -2.15, 0.382, L(0.24)),
+    P('e570aa03', 'Homesake ARC Floor Lamp', -0.40, -0.45, 0.0, H(1.85), Q),
+    P('9677aca6', 'Paper Plane Abstract Canvas 122 x 81', X0 + 0.03, -2.15, 1.05, H(1.22), Q, alignLeft=X0 + 0.005, noShadow=True),
+    # the TV console: running horses toward the balcony end, a ribbed vase at the other
+    P('872070ef', 'UAG 7 Running Horses', X1 - 0.24, -2.25, 0.60, L(0.48), -Q),
+    P('271ce125', 'Ribbed Ceramic Vase', X1 - 0.24, -0.80, 0.60, H(0.28)),
+    # dining: the linear chandelier over the table, the caddy on it, the clock on the end wall
+    P('91771cce', '10-Light Linear Glass Chandelier', TX, TY, 3.0, L(1.00), Q, hang=True),
+    P('ade2831e', 'Woodshoppe Shisham Cutlery Caddy', TX, TY + 0.25, 0.764, L(0.20), Q),
+    P('bd5ca151', 'Auromin Metal & Wood Wall Clock', -0.70, Y0 + 0.03, 1.70, L(0.50), 3.1416),
+    # the mandir (Ganesh on its shelf), the entry (soapstone vase on the shoe cabinet)
+    P('395cbcd3', 'Brass Ganesh Idol', X0 + 0.15, 1.60, 1.04, H(0.22), Q),
+    P('553c88f9', 'Soapstone Marble Flower Vase', X1 - 0.17, -3.10, 0.975, H(0.26)),
+]
+json.dump({'_note': 'hall products, see make_placements.py', 'room': 'hall_v1-web.glb', 'products': out, 'staging': []},
+          open(os.path.join(D, 'placements.json'), 'w', encoding='utf8'), indent=1, ensure_ascii=False)
+print(len(out), 'products')
